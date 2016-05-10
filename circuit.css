@@ -37,7 +37,8 @@ body {
 .info {
     width: 100%;
     height: auto;
-    border-style: none;
+    border-style: solid none none none;
+    border-width: thin;
     background-color: #d0d0ff;
 }
 p {

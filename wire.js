@@ -115,7 +115,7 @@ function Wire(io1, io2) {
 	x2 = this.i.cell.x + this.i.x;
 	y2 = this.i.cell.y + this.i.y;
 	this.arcwire(x1, y1, x2-x1, y2-y1);
-    }
+    };
 
     this.redraw = function() {
 	this.compute();
@@ -134,7 +134,7 @@ function Wire(io1, io2) {
     var attr = {
 	"stroke-width": 1,
 	stroke: "#000"
-    }
+    };
     this.draw_fg = this.paper.path(this.path).attr(attr);
 
     this.draw_bg.setAttr("pointer-events", "none");
@@ -157,5 +157,5 @@ function Wire(io1, io2) {
 	this.i.disconnect(this);
 	this.draw_fg.remove();
 	this.draw_bg.remove();
-    }
-};
+    };
+}

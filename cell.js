@@ -10,6 +10,34 @@ function Cell(type, x, y) {
     this.connection_width = 10;
     this.inv_size = 10;
 
+    this.cell_fg_attr = {
+	"stroke-width": 3,
+	stroke: "#000",
+	fill: "#fff"
+    };
+    this.cell_bg_attr = {
+	"stroke-width": 9,
+	stroke: "#eee",
+	"stroke-linejoin": "round"
+    };
+
+    this.stub_fg_attr = {
+	"stroke-width": 1,
+	stroke: "#000"
+    };
+    this.stub_bg_attr = {
+	"stroke-width": 7,
+	stroke: "#eee",
+	"stroke-linejoin": "round"
+    };
+
+
+    // Public members
+
+    this.drive_output = function(value) {
+	this.io["o"].update_value(value);
+    };
+
 
     // Private functions & members
 
@@ -79,7 +107,7 @@ function Cell(type, x, y) {
 	}
     };
 
-    this.inv = function() { return this.buf(true); }
+    this.inv = function() { return this.buf(true); };
     this.buf = function(inv) {
 	var height = 1.5 * this.connection_spacing;
 	var width = Math.sqrt(height*height-height*height/4); /* equilateral */
@@ -88,60 +116,76 @@ function Cell(type, x, y) {
 
 	stub_path = this.init_io(inv, 1, left, right);
 
-	var gate_path = ["M", left, -height/2,
+	var cell_path = ["M", left, -height/2,
 			 "v", height,
 			 "l", width, -height/2,
 			 "z"];
-	this.draw.push(paper.path(stub_path).attr({"stroke-width": 7, stroke: "#eee", "stroke-linejoin": "round"}));
-	this.draw.push(paper.path(gate_path).attr({"stroke-width": 9, stroke: "#eee", "stroke-linejoin": "round"}));
+	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
+	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 
-	this.draw.push(paper.path(stub_path).attr({"stroke-width": 1, stroke: "#000"}));
-	this.draw.push(paper.path(gate_path).attr({"stroke-width": 3, stroke: "#000", fill: "#fff"}));
+	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
     this.and = function(inv) { return this.generic2("and", inv) };
     this.or = function(inv) { return this.generic2("or", inv) };
-    this.nand = function() { return this.and(true); }
-    this.nor = function() { return this.or(true); }
+    this.nand = function() { return this.and(true); };
+    this.nor = function() { return this.or(true); };
     this.generic2 = function(gate, inv) {
 	var ni = 2;
 	var height = ni*this.connection_spacing;
 	var r = height/2;
 	var box_width = height-r;
-	var gate_width = height;
-	var left = -gate_width/2;
-	var right = gate_width/2;
+	var cell_width = height;
+	var left = -cell_width/2;
+	var right = cell_width/2;
 	var top = -height/2;
 
 	stub_path = this.init_io(inv, ni, left, right);
 
 	if (gate == "and") {
-	    var gate_path = ["M", left, top,
+	    var cell_path = ["M", left, top,
 			     "v", height,
 			     "h", box_width,
 			     "a", r, r, 0, 0, 0, 0, -height,
 			     "h", -box_width,
 			     "z"];
 	} else if (gate == "or") {
-	    var arx = gate_width;
+	    var arx = cell_width;
 	    var ary = height;
 	    var lr = r*2.5;
-	    var gate_path = ["M", left, top,
+	    var cell_path = ["M", left, top,
 			     "a", lr, lr, 0, 0, 1, 0, height,
-			     "a", arx, ary, 0, 0, 0, gate_width, -height/2,
-			     "a", arx, ary, 0, 0, 0, -gate_width, -height/2,
+			     "a", arx, ary, 0, 0, 0, cell_width, -height/2,
+			     "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 			     "z"];
 	}
 
-	this.draw.push(paper.path(stub_path).attr({"stroke-width": 7, stroke: "#eee", "stroke-linejoin": "round"}));
-	this.draw.push(paper.path(gate_path).attr({"stroke-width": 9, stroke: "#eee", "stroke-linejoin": "round"}));
+	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
+	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 
-	this.draw.push(paper.path(stub_path).attr({"stroke-width": 1, stroke: "#000"}));
-	this.draw.push(paper.path(gate_path).attr({"stroke-width": 3, stroke: "#000", fill: "#fff"}));
+	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
+    };
+
+    this.const = function() {
+	var height = 2 * this.connection_spacing;
+	var width = height;
+	var left = -width/2;
+	var right = width/2;
+	var top = -height/2;
+
+	stub_path = this.init_io(false, 0, left, right);
+
+	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
+	this.draw.push(paper.rect(left, top, width, height).attr(this.cell_bg_attr));
+
+	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw.push(paper.rect(left, top, width, height).attr(this.cell_fg_attr));
     };
 
     this.null = function() {
@@ -166,7 +210,7 @@ function Cell(type, x, y) {
 
     // Add the IO handles to the draw set so that they get moved with the cell.
     for (var port_name in this.io) {
-	this.draw.push(this.io[port_name].draw);
+	this.draw.push(this.io[port_name].draw_set);
     }
     this.draw.transform("t" + this.x + "," + this.y);
 }

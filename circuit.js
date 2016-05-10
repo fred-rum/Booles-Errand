@@ -18,6 +18,7 @@ function Circuits() {
     Wire.prototype.null_io = null_cell.io["null"];
     Drag.prototype.null_io = null_cell.io["null"];
 
+    var c0 = new Cell("const", 100, 250);
     var c1 = new Cell("buf", 200, 200);
     var c2 = new Cell("inv", 400, 300);
     var c3 = new Cell("and", 400, 200);
@@ -26,6 +27,10 @@ function Circuits() {
     new Wire(c1.io["o"], c2.io["i"]);
     new Wire(c2.io["o"], c1.io["i"]);
     new Wire(c2.io["o"], c3.io["i1"]);
+
+    var sim = new Sim();
+    c0.drive_output(0);
+    sim.start();
 }
 
 var circuits;

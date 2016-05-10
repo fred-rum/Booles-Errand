@@ -30,7 +30,7 @@ function Drag() {
 	for (var i = 0; i < this.old_wires.length; i++){
 	    this.old_wires[i].draw_fg.attr(attr);
 	}
-    }
+    };
 
     this.restore_old_wires = function() {
 	    var attr = {stroke: "#000",
@@ -39,21 +39,21 @@ function Drag() {
 	    this.old_wires[i].draw_fg.attr(attr);
 	}
 	this.old_wires = [];
-    }
+    };
 
     this.remove_new_wires = function() {
 	for (var i = 0; i < this.new_wires.length; i++){
 	    this.new_wires[i].remove();
 	}
 	this.new_wires = [];
-    }
+    };
 
     this.mark_new_wires = function() {
 	var attr = {stroke: "#eeb"}
 	for (var i = 0; i < this.new_wires.length; i++){
 	    this.new_wires[i].draw_bg.attr(attr);
 	}
-    }
+    };
 
     this.commit_new_wires = function() {
 	var attr = {stroke: "#eee"}
@@ -61,7 +61,7 @@ function Drag() {
 	    this.new_wires[i].draw_bg.attr(attr);
 	}
 	this.new_wires = [];
-    }
+    };
 
     this.update_free_drag = function(event) {
 	if (this.new_io == this.null_io){
@@ -107,7 +107,7 @@ function Drag() {
 
     this.double_click = function(io, event) {
 	while (io.w.length > 0) io.w[0].remove();
-    }
+    };
 
     this.hover_start = function(io, event) {
 	io.set_vis("hover", true);
@@ -137,7 +137,7 @@ function Drag() {
 	    this.gen_old_wires(i);
 	    this.new_wires.push(new Wire(o, i));
 	}
-    }
+    };
 
     this.update_new_io = function(io, event) {
 	// Like cannot drag to like unless there are one or more wires
