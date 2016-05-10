@@ -26,7 +26,7 @@ function Drag() {
 	    var attr = {stroke: "#e88", // red
 		       "stroke-dasharray": "-"};
 	}
-	this.old_wires = io.w.slice(0);
+	this.old_wires = this.old_wires.concat(io.w.slice(0));
 	for (var i = 0; i < this.old_wires.length; i++){
 	    this.old_wires[i].draw_fg.attr(attr);
 	}
@@ -167,6 +167,7 @@ function Drag() {
 	    this.connect_o_to_i(io, this.orig_io);
 	} else if ((this.orig_io.type == "input") && (io.type == "input")) {
 	    this.gen_old_wires(this.orig_io);
+	    this.gen_old_wires(io);
 	    this.new_wires.push(new Wire(this.orig_io.w[0].o, io));
 	} else {
 	    // This should never happen.
