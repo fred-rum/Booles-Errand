@@ -1,3 +1,5 @@
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
+
 function Io(cell, name, type, x, y, hx, hy) {
     this.cell = cell;
     this.name = name;

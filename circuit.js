@@ -1,4 +1,4 @@
-var paper = null;
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
 
 function Circuits() {
     ExtendRaphael();

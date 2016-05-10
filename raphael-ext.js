@@ -1,3 +1,5 @@
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
+
 function ExtendRaphael () {
     Raphael.el.setAttr = function(attrName, value) {
 	this.node.setAttribute(attrName, value);

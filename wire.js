@@ -1,3 +1,5 @@
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
+
 function Wire(io1, io2) {
     // When the user drags out new wires, he could be dragging in either
     // direction, so we reverse the ports as appropriate.  Note that the

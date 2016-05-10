@@ -1,3 +1,5 @@
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
+
 function Drag() {
     this.remove_null_wire = function() {
 	if (this.null_wire){

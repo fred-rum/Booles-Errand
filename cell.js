@@ -1,3 +1,5 @@
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
+
 function Cell(type, x, y) {
     var paper = this.paper;
     this.io = {};
@@ -77,6 +79,7 @@ function Cell(type, x, y) {
 	}
     };
 
+    this.inv = function() { return this.buf(true); }
     this.buf = function(inv) {
 	var height = 1.5 * this.connection_spacing;
 	var width = Math.sqrt(height*height-height*height/4); /* equilateral */
@@ -98,6 +101,10 @@ function Cell(type, x, y) {
 	this.draw_inv(inv, right, false);
     };
 
+    this.and = function(inv) { return this.generic2("and", inv) };
+    this.or = function(inv) { return this.generic2("or", inv) };
+    this.nand = function() { return this.and(true); }
+    this.nor = function() { return this.or(true); }
     this.generic2 = function(gate, inv) {
 	var ni = 2;
 	var height = ni*this.connection_spacing;
@@ -136,13 +143,6 @@ function Cell(type, x, y) {
 	this.draw.push(paper.path(gate_path).attr({"stroke-width": 3, stroke: "#000", fill: "#fff"}));
 	this.draw_inv(inv, right, false);
     };
-
-    this.and = function(inv) { return this.generic2("and", inv) };
-    this.or = function(inv) { return this.generic2("or", inv) };
-
-    this.inv = function() { return this.buf(true); }
-    this.nand = function() { return this.and(true); }
-    this.nor = function() { return this.or(true); }
 
     this.null = function() {
 	// A "null" port is used as the connection point for wires
