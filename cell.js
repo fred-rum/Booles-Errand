@@ -14,13 +14,29 @@ function Cell(type, x, y) {
 
     this.cell_fg_attr = {
 	"stroke-width": 3,
+	"stroke-linejoin": "miter",
 	stroke: "#000",
 	fill: "#fff"
     };
     this.cell_bg_attr = {
 	"stroke-width": 9,
-	stroke: "#eee",
-	"stroke-linejoin": "round"
+	"stroke-linejoin": "round",
+	stroke: "#eee"
+    };
+
+    // For the case that the foreground lines & fill are drawn separately.
+    this.cell_fg_line_attr = {
+	"stroke-width": 3,
+	"stroke-linejoin": "miter",
+	"stroke-linecap": "round",
+	stroke: "#000",
+	fill: "none"
+    };
+    this.cell_fg_fill_attr = {
+	"stroke-width": 3,
+	"stroke-linejoin": "miter",
+	stroke: "#fff",
+	fill: "#fff"
     };
 
     this.stub_fg_attr = {
@@ -30,7 +46,7 @@ function Cell(type, x, y) {
     this.stub_bg_attr = {
 	"stroke-width": 7,
 	stroke: "#eee",
-	"stroke-linejoin": "round"
+	"stroke-linecap": "round"
     };
 
 
@@ -107,6 +123,19 @@ function Cell(type, x, y) {
 	return value;
     };
     this.calc_nor = function() { return this.calc_or(true); };
+
+    this.calc_xor = function(inv) {
+	var i0 = this.io.i0.value;
+	var i1 = this.io.i1.value;
+	var value;
+	if ((i0 === undefined) || (i1 === undefined)){
+	    return undefined;
+	}
+	value = i0 ^ i1;
+	if (inv) value = 1-value;
+	return value;
+    };
+    this.calc_xnor = function() { return this.calc_xor(true); };
 
     function cell_drag_start(x, y, event) {
 	this.drag_dx = 0;
@@ -203,8 +232,10 @@ function Cell(type, x, y) {
 
     this.and = function(inv) { return this.generic2("and", inv) };
     this.or = function(inv) { return this.generic2("or", inv) };
+    this.xor = function(inv) { return this.generic2("xor", inv) };
     this.nand = function() { return this.and(true); };
     this.nor = function() { return this.or(true); };
+    this.xnor = function() { return this.xor(true); };
     this.generic2 = function(gate, inv) {
 	var ni = 2;
 	var height = ni*this.connection_spacing;
@@ -215,9 +246,9 @@ function Cell(type, x, y) {
 	var right = cell_width/2;
 	var top = -height/2;
 
-	stub_path = this.init_io(inv, ni, left, right);
-
 	if (gate == "and") {
+	    stub_path = this.init_io(inv, ni, left, right);
+
 	    var cell_path = ["M", left, top,
 			     "v", height,
 			     "h", box_width,
@@ -225,14 +256,52 @@ function Cell(type, x, y) {
 			     "h", -box_width,
 			     "z"];
 	} else if (gate == "or") {
-	    var arx = cell_width;
+	    stub_path = this.init_io(inv, ni, left, right);
+
+	    // The arcs that meet at the front (output) end of the gate have
+	    // ary=height and arx chosen such that the back of the arc is
+	    // exactly horizontal.  Trigonometry is fun!
 	    var ary = height;
+	    var arx = cell_width * 2/Math.sqrt(3);
 	    var lr = r*2.5;
 	    var cell_path = ["M", left, top,
 			     "a", lr, lr, 0, 0, 1, 0, height,
 			     "a", arx, ary, 0, 0, 0, cell_width, -height/2,
 			     "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 			     "z"];
+	} else if (gate == "xor") {
+	    var bar_space = cell_width/6;
+	    var far_left = left - bar_space;
+	    stub_path = this.init_io(inv, ni, far_left, right);
+
+	    var ary = height;
+	    var arx = cell_width * 2/Math.sqrt(3);
+	    var lr = r*2.5;
+	    var cell_path_fg = ["M", left, top,
+				"a", lr, lr, 0, 0, 1, 0, height,
+				"a", arx, ary, 0, 0, 0, cell_width, -height/2,
+				"a", arx, ary, 0, 0, 0, -cell_width, -height/2,
+				"z",
+				"m", -bar_space, 0,
+				"a", lr, lr, 0, 0, 1, 0, height];
+	    var cell_path_bg = ["M", far_left, top,
+				"a", lr, lr, 0, 0, 1, 0, height,
+				"h", bar_space,
+				"a", arx, ary, 0, 0, 0, cell_width, -height/2,
+				"a", arx, ary, 0, 0, 0, -cell_width, -height/2,
+				"h", -bar_space,
+				"z"];
+
+	    this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
+	    this.draw.push(paper.path(cell_path_bg).attr(this.cell_bg_attr));
+	    this.draw_inv(inv, right, true);
+
+	    this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	    this.draw.push(paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
+	    this.draw.push(paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
+	    this.draw_inv(inv, right, false);
+
+	    return;
 	}
 
 	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));

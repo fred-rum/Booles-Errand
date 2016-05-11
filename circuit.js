@@ -28,7 +28,7 @@ function Circuits() {
     var c1 = new Cell("buf", 200, 200);
     var c2 = new Cell("inv", 400, 300);
     var c3 = new Cell("and", 400, 200);
-    var c4 = new Cell("nor", 400, 100);
+    var c4 = new Cell("xnor", 400, 100);
 
     new Wire(c1.io["o"], c2.io["i"]);
     new Wire(c2.io["o"], c1.io["i"]);
