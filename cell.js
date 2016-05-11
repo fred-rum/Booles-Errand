@@ -156,9 +156,6 @@ function Cell(type, x, y) {
 	for (var port_name in this.io) {
 	    var io_obj = this.io[port_name];
 	    io_obj.redraw();
-	    for (var i = 0; i < io_obj.w.length; i++){
-		io_obj.w[i].redraw();
-	    }
 	}
     }
 
