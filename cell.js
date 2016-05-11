@@ -165,25 +165,39 @@ function Cell(type, x, y) {
     this.init_io = function(inv, ni, left, right) {
 	var cw = this.connection_width;
 	var cs = this.connection_spacing;
-	var stub_path = [];
 
 	if (inv) right += this.inv_size;
 
-	var io_obj = new Io(this, "o", "output", right+cw, 0, right+cw/2, 0);
+	var io_obj = new Io(this, "o", "output", right+cw, 0);
 	this.io[io_obj.name] = io_obj;
-	stub_path.push("M", io_obj.x, io_obj.y,
-		       "H", 0); // draw horizontally to the cell's center
 
 	for (var i = 0; i < ni; i++) {
 	    var y = ((i+0.5)*cs)-(ni*cs/2);
 	    var io_obj = new Io(this, (ni > 1) ? "i" + i : "i", "input",
-				left-cw, y, left-cw/2, y);
+				left-cw, y);
 	    this.io[io_obj.name] = io_obj;
-	    stub_path.push("M", io_obj.x, io_obj.y,
-			   "H", 0); // draw horizontally to the cell's center
 	}
+    };
 
-	return stub_path;
+    this.draw_stubs = function() {
+	// Since the stub backgrounds are drawn only once and all the
+	// same color, they are grouped into a single path (with disjoint
+	// segments).  That means that the path must be owned by the cell
+	// and not the IOs.
+	var stub_path = [];
+	for (var name in this.io) {
+	    stub_path = stub_path.concat(this.io[name].path);
+	}
+	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
+
+	// In contrast, the stub foregrounds can be drawn in different
+	// colors depending on the IO state.  Therefore, each is its own
+	// path, owned by the IO instance.  The cell does still get the
+	// drawing elements, though, so that they can be added to the
+	// set for translation.
+	for (var name in this.io) {
+	    this.draw.push(this.io[name].draw_stub_fg(this.stub_fg_attr));
+	}
     };
 
     this.draw_inv = function(inv, right, bg) {
@@ -221,11 +235,9 @@ function Cell(type, x, y) {
 			 "v", height,
 			 "l", width, -height/2,
 			 "z"];
-	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
 	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
-
-	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw_stubs();
 	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
@@ -250,11 +262,9 @@ function Cell(type, x, y) {
 			 "h", -box_width,
 			 "z"];
 
-	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
 	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
-
-	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw_stubs();
 	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
@@ -283,11 +293,9 @@ function Cell(type, x, y) {
 			 "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 			 "z"];
 
-	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
 	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
-
-	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw_stubs();
 	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
@@ -325,11 +333,9 @@ function Cell(type, x, y) {
 			    "h", -bar_space,
 			    "z"];
 
-	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
 	this.draw.push(paper.path(cell_path_bg).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
-
-	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw_stubs();
 	this.draw.push(paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
 	this.draw.push(paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
 	this.draw_inv(inv, right, false);
@@ -342,19 +348,17 @@ function Cell(type, x, y) {
 	var right = width/2;
 	var top = -height/2;
 
-	stub_path = this.init_io(false, 0, left, right);
+	this.init_io(false, 0, left, right);
 
-	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
 	this.draw.push(paper.rect(left, top, width, height).attr(this.cell_bg_attr));
-
-	this.draw.push(paper.path(stub_path).attr(this.stub_fg_attr));
+	this.draw_stubs();
 	this.draw.push(paper.rect(left, top, width, height).attr(this.cell_fg_attr));
     };
 
     this.null = function() {
 	// A "null" port is used as the connection point for wires
 	// currently being dragged.
-	var io_obj = new Io(this, "null", "null", 0, 0, null, null);
+	var io_obj = new Io(this, "null", "null", 0, 0);
 	this.io["null"] = io_obj;
 
 	// A blank graphic element is used as a reference point for Z ordering.

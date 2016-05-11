@@ -1,6 +1,6 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Io(cell, name, type, x, y, hx, hy) {
+function Io(cell, name, type, x, y) {
     this.cell = cell;
     this.name = name;
     this.type = type;
@@ -8,10 +8,6 @@ function Io(cell, name, type, x, y, hx, hy) {
     // x,y is the point to/from which wires are drawn.
     this.x = x;
     this.y = y;
-
-    // hx,hy is the center point of the IO handle.
-    this.hx = hx;
-    this.hy = hy;
 
     this.w = [];
 
@@ -21,7 +17,22 @@ function Io(cell, name, type, x, y, hx, hy) {
 
     // Public members
 
+    this.draw_stub_fg = function(attr) {
+	var stub_end_path = ["M", x, y-3,
+			     "v", 6];
+	this.stub_end = this.paper.path(stub_end_path).attr(attr)
+	this.stub_end.setAttr("visibility", "hidden");
+
+	this.stub = this.paper.path(this.path).attr(attr)
+
+	return this.paper.set(this.stub_end, this.stub);
+    };
+
     this.connect = function(wire) {
+	if (!this.w.length && this.stub_end){
+	    this.stub_end.setAttr("visibility", "visible");
+	}
+
 	if ((this.type == "output") && (this.w.length > 0)) {
 	    // We want the new wire to be ordered together with the existing
 	    // wires connected to the same output.  But we also want the new
@@ -40,6 +51,10 @@ function Io(cell, name, type, x, y, hx, hy) {
 		this.w.splice(i, 1);
 		return;
 	    }
+	}
+
+	if (!this.w.length && this.stub_end){
+	    this.stub_end.setAttr("visibility", "hidden");
 	}
     };
 
@@ -117,7 +132,7 @@ function Io(cell, name, type, x, y, hx, hy) {
 	fill: "#ff0",
 	opacity: "0.80"
     };
-    this.draw = this.paper.circle(hx, hy, tw/2, tw/2).attr(attr);
+    this.draw = this.paper.circle(x, y, tw/2, tw/2).attr(attr);
     this.draw.setAttr("visibility", "hidden");
     this.draw.setAttr("pointer-events", "all");
 
@@ -159,4 +174,10 @@ function Io(cell, name, type, x, y, hx, hy) {
 				       this.draw_value_bg,
 				       this.draw_value);
     }
+
+
+    // Initialization code
+
+    this.path = ["M", x, y,
+		 "H", 0]; // draw horizontally to the cell's center
 }
