@@ -115,31 +115,30 @@ function Wire(io1, io2) {
 
 	for (var i = 0; i < this.in_flight.length; i++){
 	    var fl_obj = this.in_flight[i];
-	    var age_len = fl_obj.age * 5;
-if (!this.pending_del){
-		var path = Raphael.getSubpath(this.path, age_len, older_age_len);
-		older_draw.attr({path: path});
+	    var age_len = fl_obj.age * this.path_length;
+	    var path = Raphael.getSubpath(this.path, age_len, older_age_len);
+	    older_draw.attr({path: path});
 
-		if (!fl_obj.draw){
-		    // Draw a path placeholder of the appropriate color.
-		    // The actual path will be inserted at the next loop
-		    // iteration or the end of the loop.
-		    var attr = {
-			"stroke-width": 1,
-			stroke: this.color(fl_obj.value)
-		    };
-		    fl_obj.draw = this.paper.path("M0,0").attr(attr);
-		    fl_obj.draw.insertAfter(older_draw);
-		}
-
-		older_value = fl_obj.value;
-		older_draw = fl_obj.draw;
-		older_age_len = age_len;
+	    if (!fl_obj.draw){
+		// Draw a path placeholder of the appropriate color.
+		// The actual path will be inserted at the next loop
+		// iteration or the end of the loop.
+		var attr = {
+		    "stroke-width": 1,
+		    stroke: this.color(fl_obj.value)
+		};
+		fl_obj.draw = this.paper.path("M0,0").attr(attr);
+		fl_obj.draw.insertAfter(older_draw);
 	    }
+
+	    older_value = fl_obj.value;
+	    older_draw = fl_obj.draw;
+	    older_age_len = age_len;
 	}
 
 	var path;
-	if (older_age_len == this.path_length){
+	if (older_age_len >= this.path_length){
+	    // This only happens if there are no values in flight.
 	    path = this.path;
 	} else {
 	    path = Raphael.getSubpath(this.path, 0, older_age_len);
@@ -175,9 +174,8 @@ if (!this.pending_del){
 
 	for (var i = 0; i < this.in_flight.length; i++){
 	    var fl_obj = this.in_flight[i];
-	    fl_obj.age += 1;
-	    var age_len = fl_obj.age * 5;
-	    if (age_len >= this.path_length){
+	    fl_obj.age += 5 / this.path_length;
+	    if (fl_obj.age >= 1.0){
 		if (fl_obj.draw) fl_obj.draw.remove();
 		this.update_wire_color(fl_obj.value);
 		this.i.update_value(fl_obj.value);
