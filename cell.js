@@ -111,6 +111,7 @@ function Cell(type, x, y) {
     function cell_drag_start(x, y, event) {
 	this.drag_dx = 0;
 	this.drag_dy = 0;
+	this.drag.disable_hover();
     }
 
     function cell_drag_move(dx, dy, x, y, event) {
@@ -129,6 +130,7 @@ function Cell(type, x, y) {
     }
 
     function cell_drag_end() {
+	this.drag.enable_hover();
     }
 
     this.init_io = function(inv, ni, left, right) {
