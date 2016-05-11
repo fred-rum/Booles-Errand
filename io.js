@@ -28,8 +28,7 @@ function Io(cell, name, type, x, y, hx, hy) {
 	    // wire to be on top.  So we reorder all existing wires to be
 	    // displayed at the same Z height as the new wire.
 	    for (var i = 0; i < this.w.length; i++) {
-		this.w[i].draw_bg.insertBefore(wire.draw_bg);
-		this.w[i].draw_fg.insertBefore(wire.draw_fg);
+		this.w[i].reorder_z(wire.draw_bg, wire.draw_fg);
 	    }
 	}
 	this.w.push(wire);

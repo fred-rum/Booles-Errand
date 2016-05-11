@@ -35,7 +35,6 @@ function Circuits() {
     new Wire(c2.io["o"], c3.io["i1"]);
 
     c0.drive_output(0);
-    sim.start();
 }
 
 var circuits;

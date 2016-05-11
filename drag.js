@@ -28,15 +28,14 @@ function Drag() {
 	}
 	this.old_wires = this.old_wires.concat(io.w.slice(0));
 	for (var i = 0; i < this.old_wires.length; i++){
-	    this.old_wires[i].draw_fg.attr(attr);
+	    this.old_wires[i].mark_old(attr);
 	}
     };
 
     this.restore_old_wires = function() {
-	    var attr = {stroke: "#000",
-		       "stroke-dasharray": ""};
+	    var attr = {"stroke-dasharray": ""};
 	for (var i = 0; i < this.old_wires.length; i++){
-	    this.old_wires[i].draw_fg.attr(attr);
+	    this.old_wires[i].restore_old(attr);
 	}
 	this.old_wires = [];
     };
@@ -52,7 +51,7 @@ function Drag() {
 	var attr = {stroke: "#eeb"}
 	for (var i = 0; i < this.new_wires.length; i++){
 	    this.new_wires[i].draw_bg.attr(attr);
-	    this.new_wires[i].pending = true;
+	    this.new_wires[i].pending_new = true;
 	}
     };
 
@@ -60,7 +59,7 @@ function Drag() {
 	var attr = {stroke: "#eee"}
 	for (var i = 0; i < this.new_wires.length; i++){
 	    this.new_wires[i].draw_bg.attr(attr);
-	    this.new_wires[i].pending = false;
+	    this.new_wires[i].pending_new = false;
 	    this.new_wires[i].update_value();
 	}
 	this.new_wires = [];
@@ -83,7 +82,7 @@ function Drag() {
 		this.null_wire = new Wire(from_io, this.null_io);
 		var attr = {stroke: "#eeb"}
 		this.null_wire.draw_bg.attr(attr);
-		this.null_wire.pending = true;
+		this.null_wire.pending_new = true;
 	    }
 	}
     };
@@ -190,8 +189,15 @@ function Drag() {
 	    this.connect_o_to_i(io, this.orig_io);
 	} else if ((this.orig_io.type == "input") && (io.type == "input")) {
 	    this.gen_old_wires(this.orig_io);
-	    this.gen_old_wires(io);
-	    this.new_wires.push(new Wire(this.orig_io.w[0].o, io));
+	    if (io.w.length && (io.w[0].o == this.orig_io.w[0].o)){
+		// The new wire would duplicate an existing connection at
+		// this location.  Rather than delete the existing wire and
+		// replace it with a new one (which would trigger signal
+		// events), do nothing instead.
+	    } else {
+		this.gen_old_wires(io);
+		this.new_wires.push(new Wire(this.orig_io.w[0].o, io));
+	    }
 	} else {
 	    // This should never happen.
 	    this.update_new_io(this.null_io, event);
