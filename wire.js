@@ -222,6 +222,9 @@ function Wire(io1, io2) {
 	    lb = 0;
 
 	    if ((dx > 0) && (dy == 4)) {
+		//   -.
+		//     \
+		//      `-
 		/* Slope with straight (angled) line, special case.
 		   The normal equation divides 0 by 0 at exactly dy=4,
 		   so here we take a short-cut to the correct value. */
@@ -229,6 +232,11 @@ function Wire(io1, io2) {
 		angle = 2*Math.atan(slope);
 		//console.log("y=4", dx, dy, slope, angle);
 	    } else if ((dx <= 0) && (dy == 4)) {
+		//      -.
+		//        )
+		//   .---'
+		//  (
+		//   `-
 		/* Arcs connected with straight (horizontal) line to the left.
 		   The normal equation gets the wrong sign from atan,
 		   so here we take a short-cut to the correct value. */
@@ -236,12 +244,19 @@ function Wire(io1, io2) {
 		//console.log("x<0 y=4", dx, dy, "-0", angle);
 	    } else if ((dx > 2) || (dy > 4) ||
 		       ((dx > 0) && (dy < 2 - Math.sqrt(4 - dx*dx)))) {
+		//   -.   -.   -._  ---
+		//     )    |
+		//    /     |
+		//   (      `-
+		//    `-
 		/* Normal case: straight line connects arcs with +/-slope. */
 		slope = (Math.sqrt(dx*dx+(dy-4)*dy)-dx)/(dy-4)
 		angle = 2*Math.atan(slope);
 		//console.log("std", dx, dy, slope, angle);
 	    } else {
 		/* 0 < dx <= 2, sqrt < dy < 4 */
+		//   -.
+		//    `-
 		/* Reduced radius, no straight line */
 		slope = dy/dx;
 		angle = 2*Math.atan(slope)
