@@ -22,6 +22,12 @@ function Wire(io1, io2) {
 	this.draw_fg.remove();
 	this.draw_bg.remove();
 
+	if (!this.pending){
+	    // Update the attached cell input with the fact that it's
+	    // disconnected.
+	    this.i.update_value(undefined);
+	}
+
 	// In case the wire is disconnected while a value change is pending,
 	// we disconnect the wire ends so that the change can't propagate.
 	this.o = undefined;

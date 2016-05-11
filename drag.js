@@ -83,6 +83,7 @@ function Drag() {
 		this.null_wire = new Wire(from_io, this.null_io);
 		var attr = {stroke: "#eeb"}
 		this.null_wire.draw_bg.attr(attr);
+		this.null_wire.pending = true;
 	    }
 	}
     };

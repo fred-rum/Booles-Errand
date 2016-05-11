@@ -64,6 +64,13 @@ function Io(cell, name, type, x, y, hx, hy) {
     this.update_value = function(value) {
 	this.value = value;
 
+	if (value === undefined){
+	    value = "";
+	    var bg_opacity = 0;
+	} else {
+	    var bg_opacity = "1.0";
+	}
+
 	this.draw_value.attr({text: "" + value});
 
 	// Create a background rectangle for the text and move both of them
@@ -83,7 +90,7 @@ function Io(cell, name, type, x, y, hx, hy) {
 	    y: top,
 	    width: bbox.width,
 	    height: bbox.height,
-	    opacity: "1.0"
+	    opacity: bg_opacity
 	};
 	if (value) {
 	    attr_bg.fill = "#8d8";
