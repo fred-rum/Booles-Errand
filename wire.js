@@ -276,6 +276,11 @@ function Wire(io1, io2) {
 	    var xy = dx/dy;
 	    if (dy >= 0){
 		/* 0 < dy < 4 */
+		//      ,-.
+		//     /   )
+		//    /  -'
+		//   (
+                //    `-
 		la = 1;
 		lb = 0;
 		slope = Math.sqrt(xy*xy+1)-xy; /* slope < 0 */
@@ -288,6 +293,11 @@ function Wire(io1, io2) {
 		//console.log("x<0,y>0", dx, dy, slope, angle);
 	    } else {
 		/* -4 < dy < 0 */
+		//    ,-.
+		//   (   \
+		//    `-  \
+		//         )
+		//       -'
 		la = 0;
 		lb = 1;
 		slope = Math.sqrt(xy*xy+1)+xy; /* slope > 0 */
