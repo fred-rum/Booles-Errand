@@ -43,6 +43,10 @@ function Cell(type, x, y) {
 	"stroke-width": 1,
 	stroke: "#000"
     };
+    this.stub_end_attr = {
+	"stroke-width": 1,
+	stroke: "#000"
+    };
     this.stub_bg_attr = {
 	"stroke-width": 7,
 	stroke: "#eee",
@@ -196,7 +200,7 @@ function Cell(type, x, y) {
 	// drawing elements, though, so that they can be added to the
 	// set for translation.
 	for (var name in this.io) {
-	    this.draw.push(this.io[name].draw_stub_fg(this.stub_fg_attr));
+	    this.draw.push(this.io[name].draw_stub_fg(this.stub_fg_attr, this.stub_end_attr));
 	}
     };
 

@@ -35,20 +35,10 @@ function Wire(io1, io2) {
 	this.i = undefined;
     };
 
-    this.color = function(value) {
-	if (value === undefined) {
-	    return "#000";
-	} else if (value === 0){
-	    return "#aaf";
-	} else if (value === 1) {
-	    return "#8d8";
-	}
-    };
-
     this.update_wire_color = function(value) {
 	if (!this.pending_del){
 	    var attr = {
-		stroke: this.color(value)
+		stroke: Wire.color(value)
 	    };
 	    this.draw_fg.attr(attr);
 	}
@@ -125,7 +115,7 @@ function Wire(io1, io2) {
 		// iteration or the end of the loop.
 		var attr = {
 		    "stroke-width": 1,
-		    stroke: this.color(fl_obj.value)
+		    stroke: Wire.color(fl_obj.value)
 		};
 		fl_obj.draw = this.paper.path("M0,0").attr(attr);
 		fl_obj.draw.insertAfter(older_draw);
@@ -348,3 +338,13 @@ function Wire(io1, io2) {
     this.newest_value = null;
     this.in_flight = [];
 }
+
+Wire.color = function(value) {
+    if (value === undefined) {
+	return "#000";
+    } else if (value === 0){
+	return "#aaf";
+    } else if (value === 1) {
+	return "#6c6";
+    }
+};
