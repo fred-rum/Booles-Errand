@@ -16,6 +16,107 @@ function Wire(io1, io2) {
 
     // Public members
 
+    this.get_subpath = function(z1, z2) {
+	// Raphael's (and thus presumably the browser's) getSubpath function
+	// is slow and estimates the subpath using cubic Bezier segments.
+	// This is understandable for a general case path, but our path is
+	// so simple that we can do much better.
+	var x1 = this.o.cell.x + this.o.x;
+	var y1 = this.o.cell.y + this.o.y;
+	var x2 = this.i.cell.x + this.i.x;
+	var y2 = this.i.cell.y + this.i.y;
+
+	var aw = this.aw;
+	var len_aa = aw.angle_a * aw.r;
+	var len_ab = aw.angle_b * aw.r;
+	var len_b = len_aa + aw.seg_len;
+	var path_length = this.path_length;
+
+	function get_point(z) {
+	    var point;
+	    if (z < len_aa){
+		var angle = z / aw.r;
+		var sign_ya = aw.cwa ? 1 : -1;
+		xd = aw.r*Math.sin(angle);
+		yd = aw.r*(1-Math.cos(angle)) * sign_ya;
+		return [x1+xd, y1+yd];
+	    } else if (z < len_b){
+		var d = z - len_aa;
+		xd = (aw.xb-aw.xa) * (d / aw.seg_len);
+		yd = (aw.yb-aw.ya) * (d / aw.seg_len);
+		return [aw.xa+xd, aw.ya+yd];
+	    } else {
+		var angle = (path_length - z) / aw.r;
+		var sign_yb = aw.cwb ? 1 : -1;
+		xd = -aw.r*Math.sin(angle);
+		yd = aw.r*(1-Math.cos(angle)) * sign_yb;
+		return [x2+xd, y2+yd];
+	    }
+	}
+
+	var seg1 =
+	    (z1 < len_aa) ? 0 :
+	    (z1 < len_b)  ? 1 :
+                            2;
+	var seg2 =
+	    (z2 < len_aa) ? 0 :
+	    (z2 < len_b)  ? 1 :
+                            2;
+	var la, lb;
+
+	var path = ["M"].concat(get_point(z1));
+	if (seg1 == 0){
+	    if (seg2 == 0){
+		// seg1 == 0, seg2 == 0
+		la = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
+		path = path.concat("A", aw.r, aw.r, 0, la, aw.cwa,
+				   get_point(z2));
+	    } else {
+		// seg1 == 0, seg2 > 0
+		la = ((len_aa-z1)/aw.r > Math.PI) ? 1 : 0;
+		path = path.concat("A", aw.r, aw.r, 0, la, aw.cwa,
+				   aw.xa, aw.ya);
+		if (seg2 == 1){
+		    path = path.concat("L", get_point(z2));
+		} else {
+		    lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
+		    path = path.concat("L", aw.xb, aw.yb,
+				       "A", aw.r, aw.r, 0, lb, aw.cwb,
+				       get_point(z2));
+		}
+	    }
+	} else if (seg1 == 1){
+	    if (seg2 == 1){
+		path = path.concat("L", get_point(z2));
+	    } else {
+		lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
+		path = path.concat("L", aw.xb, aw.yb,
+				   "A", aw.r, aw.r, 0, lb, aw.cwb,
+				   get_point(z2));
+	    }
+	} else {
+	    // seg1 == 2
+	    lb = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
+	    path = path.concat("A", aw.r, aw.r, 0, lb, aw.cwb,
+			       get_point(z2));
+	}
+
+	return path;
+    };
+
+    this.measure_perf = function(name) {
+	if (!this.measured) this.measured = {};
+	if (this.measured[name]) return;
+	this.measured[name] = true;
+
+	var n0 = performance.now();
+	for (var i = 0; i < 1000; i++){
+	    this.redraw_fg();
+	}
+	var n1 = performance.now();
+	console.log(name, n1-n0);
+    };
+
     this.remove = function() {
 	this.o.disconnect(this);
 	this.i.disconnect(this);
@@ -106,7 +207,7 @@ function Wire(io1, io2) {
 	for (var i = 0; i < this.in_flight.length; i++){
 	    var fl_obj = this.in_flight[i];
 	    var age_len = fl_obj.age * this.path_length;
-	    var path = Raphael.getSubpath(this.path, age_len, older_age_len);
+	    var path = this.get_subpath(age_len, older_age_len);
 	    older_draw.attr({path: path});
 
 	    if (!fl_obj.draw){
@@ -131,7 +232,7 @@ function Wire(io1, io2) {
 	    // This only happens if there are no values in flight.
 	    path = this.path;
 	} else {
-	    path = Raphael.getSubpath(this.path, 0, older_age_len);
+	    path = this.get_subpath(0, older_age_len);
 	}
 	older_draw.attr({path: path});
     };
@@ -164,7 +265,7 @@ function Wire(io1, io2) {
 
 	for (var i = 0; i < this.in_flight.length; i++){
 	    var fl_obj = this.in_flight[i];
-	    fl_obj.age += 5 / this.path_length;
+	    fl_obj.age += 10 / this.path_length;
 	    if (fl_obj.age >= 1.0){
 		if (fl_obj.draw) fl_obj.draw.remove();
 		this.update_wire_color(fl_obj.value);
@@ -176,6 +277,7 @@ function Wire(io1, io2) {
 
 	if (!this.pending_del){
 	    this.redraw_fg();
+//	    this.measure_perf("segmented");
 	}
 
 	if (this.in_flight.length){
@@ -196,14 +298,14 @@ function Wire(io1, io2) {
 
     // Private functions and members
 
-    this.arcwire = function (x1, y1, xd, yd) {
-	var x2 = x1+xd;
-	var y2 = y1+yd;
+    this.arcwire = function (x1, y1, xc, yc) {
+	var x2 = x1+xc;
+	var y2 = y1+yc;
 	var r = 20;
 	var dx = (x2-x1)/r;
 	var dy = (y2-y1)/r;
 	var slope, angle;
-	var xa, ya, xb, yb, cwa, cwb, la, lb;
+	var xd, yd, xa, ya, xb, yb, cwa, cwb, la, lb;
 
 	if ((dx > 0) || (dy >= 4) || (dy <= -4)) {
 	    var sign_y;
@@ -264,10 +366,12 @@ function Wire(io1, io2) {
 		//console.log("<r", dx, dy, slope, angle);
 	    }
 
-	    xa = r*Math.sin(angle);
-	    ya = r*(1-Math.cos(angle)) * sign_y;
-	    xb = x2-xa;
-	    yb = y2-ya;
+	    xd = r*Math.sin(angle);
+	    yd = r*(1-Math.cos(angle)) * sign_y;
+	    xb = x2-xd;
+	    yb = y2-yd;
+
+	    angle_a = angle_b = angle;
 	} else {
 	    /* backwards and close; requires reverse swivel */
 	    cwa = 0;
@@ -290,6 +394,8 @@ function Wire(io1, io2) {
 		} else {
 		    angle = 2*Math.atan(slope); /* 180 < angle < 270 */
 		}
+		angle_a = Math.PI*2 - angle;
+		angle_b = angle;
 		//console.log("x<0,y>0", dx, dy, slope, angle);
 	    } else {
 		/* -4 < dy < 0 */
@@ -302,20 +408,41 @@ function Wire(io1, io2) {
 		lb = 1;
 		slope = Math.sqrt(xy*xy+1)+xy; /* slope > 0 */
 		angle = -2*Math.atan(slope); /* 90 < angle < 180 */
+		angle_a = -angle;
+		angle_b = Math.PI*2 - angle_a;
 		//console.log("x<0,y<0", dx, dy, slope, angle);
 	    }
 
-	    xa = -r*Math.sin(angle);     /* xa <= 0 */
-	    ya = -r*(1-Math.cos(angle)); /* ya <= 0 */
-	    xb = x2+xa;                 /* xb < x2 */
-	    yb = y2+ya;                 /* yb < y2 */
+	    xd = -r*Math.sin(angle);     /* xd <= 0 */
+	    yd = -r*(1-Math.cos(angle));
+	    xb = x2+xd;                  /* xb < x2 */
+	    yb = y2+yd;
 	}
 
+	xa = x1+xd;
+	ya = y1+yd;
 	this.path = ["M", x1, y1,
-		     "a", r, r, 0, la, cwa, xa, ya,
+		     "A", r, r, 0, la, cwa, xa, ya,
 		     "L", xb, yb,
 		     "A", r, r, 0, lb, cwb, x2, y2];
-	this.path_length = Raphael.getTotalLength(this.path);
+
+	var seg_len = Math.sqrt((xb-xa)*(xb-xa)+(yb-ya)*(yb-ya))
+	this.path_length = angle_a * r + seg_len + angle_b * r;
+
+	this.aw = {
+	    r: r,
+	    angle_a: angle_a,
+	    cwa: cwa,
+	    la: la,
+	    xa: xa,
+	    ya: ya,
+	    seg_len: seg_len,
+	    xb: xb,
+	    yb: yb,
+	    angle_b: angle_b,
+	    cwb: cwb,
+	    lb: lb
+	};
     };
 
     this.compute = function() {
@@ -362,6 +489,8 @@ function Wire(io1, io2) {
     this.pending_del = false;
     this.newest_value = null;
     this.in_flight = [];
+
+//    this.measure_perf("not segmented");
 }
 
 Wire.color = function(value) {
