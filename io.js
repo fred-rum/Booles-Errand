@@ -49,12 +49,11 @@ function Io(cell, name, type, x, y) {
 	for (var i = 0; i < this.w.length; i++){
 	    if (wire == this.w[i]){
 		this.w.splice(i, 1);
+		if (!this.w.length && this.stub_end){
+		    this.stub_end.setAttr("visibility", "hidden");
+		}
 		return;
 	    }
-	}
-
-	if (!this.w.length && this.stub_end){
-	    this.stub_end.setAttr("visibility", "hidden");
 	}
     };
 
