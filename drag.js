@@ -113,7 +113,25 @@ function Drag() {
 	while (io.w.length > 0) io.w[0].remove();
     };
 
+    this.disable_hover = function() {
+	this.no_hover = true;
+    }
+
+    this.enable_hover = function() {
+	this.no_hover = false;
+	if (this.pending_hover_io) {
+	    this.pending_hover_io.set_vis("hover", true);
+	    this.pending_hover_io = undefined;
+	    // We know that an IO drag hasn't begun, so nothing more is needed.
+	}
+    }
+
     this.hover_start = function(io, event) {
+	if (this.no_hover){
+	    this.pending_hover_io = io;
+	    return;
+	}
+
 	io.set_vis("hover", true);
 
 	if (this.orig_io){
@@ -123,6 +141,7 @@ function Drag() {
 
     this.hover_end = function(io, event) {
 	io.set_vis("hover", false);
+	this.pending_hover_io = undefined;
 
 	if (this.orig_io){
 	    // hover_start could conceivably be called on a new target

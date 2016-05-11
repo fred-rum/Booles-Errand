@@ -10,7 +10,9 @@ function Circuits() {
     Io.prototype.paper = this.paper;
     Wire.prototype.paper = this.paper;
 
-    Io.prototype.drag = new Drag();
+    var drag = new Drag();
+    Cell.prototype.drag = drag;
+    Io.prototype.drag = drag;
 
     Cell.prototype.sim = sim;
     Wire.prototype.sim = sim;

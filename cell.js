@@ -128,6 +128,9 @@ function Cell(type, x, y) {
 	}
     }
 
+    function cell_drag_end() {
+    }
+
     this.init_io = function(inv, ni, left, right) {
 	var cw = this.connection_width;
 	var cs = this.connection_spacing;
@@ -273,7 +276,8 @@ function Cell(type, x, y) {
     // the IO handles to the draw set.
     this.draw.insertBefore(this.null_cell.draw);
     this.draw.drag($.proxy(cell_drag_move, this),
-		   $.proxy(cell_drag_start, this));
+		   $.proxy(cell_drag_start, this),
+		   $.proxy(cell_drag_end, this));
 
     // Add the IO handles to the draw set so that they get moved with the cell.
     for (var port_name in this.io) {
