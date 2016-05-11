@@ -52,6 +52,7 @@ function Drag() {
 	var attr = {stroke: "#eeb"}
 	for (var i = 0; i < this.new_wires.length; i++){
 	    this.new_wires[i].draw_bg.attr(attr);
+	    this.new_wires[i].pending = true;
 	}
     };
 
@@ -59,6 +60,8 @@ function Drag() {
 	var attr = {stroke: "#eee"}
 	for (var i = 0; i < this.new_wires.length; i++){
 	    this.new_wires[i].draw_bg.attr(attr);
+	    this.new_wires[i].pending = false;
+	    this.new_wires[i].update_value();
 	}
 	this.new_wires = [];
     };

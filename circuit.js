@@ -4,12 +4,16 @@ function Circuits() {
     ExtendRaphael();
 
     this.paper = Raphael("holder", "100%", "100%");
+    var sim = new Sim();
 
     Cell.prototype.paper = this.paper;
     Io.prototype.paper = this.paper;
     Wire.prototype.paper = this.paper;
 
     Io.prototype.drag = new Drag();
+
+    Cell.prototype.sim = sim;
+    Wire.prototype.sim = sim;
 
     var null_cell = new Cell("null", 0, 0);
     var null_io = null_cell.io["null"];
@@ -28,7 +32,6 @@ function Circuits() {
     new Wire(c2.io["o"], c1.io["i"]);
     new Wire(c2.io["o"], c3.io["i1"]);
 
-    var sim = new Sim();
     c0.drive_output(0);
     sim.start();
 }

@@ -13,6 +13,55 @@ function Wire(io1, io2) {
 	this.i = io1;
     }
 
+
+    // Public members
+
+    this.remove = function() {
+	this.o.disconnect(this);
+	this.i.disconnect(this);
+	this.draw_fg.remove();
+	this.draw_bg.remove();
+
+	// In case the wire is disconnected while a value change is pending,
+	// we disconnect the wire ends so that the change can't propagate.
+	this.o = undefined;
+	this.i = undefined;
+    };
+
+    this.update_value = function() {
+	// Don't propagate values across pending (uncommitted) new wires.
+	// This also prevents propagating to the null cell.
+	if (this.pending) return;
+
+	var value = this.o.value;
+
+	// Don't propagate the value if it is the same as the value at
+	// the wire's output end.  (Eventually this should look at
+	// the newest progating value on the wire, once that's supported.)
+	if (value === this.i.value) return;
+
+	// A cell should only produce one value per tick, but if the user
+	// moves the wire around, it could connect multiple values within
+	// the same tick.  If so, record the last value, but don't
+	// re-register the wire for ticking.
+	if (this.newest_value === null) {
+	    this.sim.register_obj(this);
+	}
+	this.newest_value = value;
+    };
+
+    this.tick = function() {
+	// The wire could have been disconnected while we waited for the tick.
+	// In that case, value propagation is interrupted.
+	if (this.i) {
+	    this.i.update_value(this.newest_value);
+	}
+	this.newest_value = null;
+    }
+
+
+    // Private functions and members
+
     this.arcwire = function (x1, y1, xd, yd) {
 	var x2 = x1+xd;
 	var y2 = y1+yd;
@@ -149,13 +198,6 @@ function Wire(io1, io2) {
     this.o.connect(this);
     this.i.connect(this);
 
-
-    // Public members
-
-    this.remove = function() {
-	this.o.disconnect(this);
-	this.i.disconnect(this);
-	this.draw_fg.remove();
-	this.draw_bg.remove();
-    };
+    this.pending = false;
+    this.newest_value = null;
 }

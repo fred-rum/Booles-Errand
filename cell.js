@@ -2,9 +2,11 @@
 
 function Cell(type, x, y) {
     var paper = this.paper;
-    this.io = {};
+    this.type = type;
     this.x = x;
     this.y = y;
+    this.io = {};
+    this.newest_value = null;
 
     this.connection_spacing = 20;
     this.connection_width = 10;
@@ -38,8 +40,73 @@ function Cell(type, x, y) {
 	this.io["o"].update_value(value);
     };
 
+    this.update_value = function() {
+	var calc_func_name = "calc_" + this.type;
+	if (!this[calc_func_name]) return;
+	var value = this[calc_func_name]();
+
+	// Don't propagate the value if it is the same as the value at
+	// the cell's output.  (Eventually this should look at
+	// the newest progating value in the cell, once that's supported.)
+	if (value === this.io.o.value) return;
+
+	// Due to changing inputs, a cell may calculate more than one new
+	// value per tick.  If that happens, record the last value, but don't
+	// re-register the cell for ticking.
+	if (this.newest_value === null) {
+	    this.sim.register_obj(this);
+	}
+	this.newest_value = value;
+    };
+
+    this.tick = function() {
+	this.io.o.update_value(this.newest_value);
+	this.newest_value = null;
+    }
+
 
     // Private functions & members
+
+    this.calc_buf = function(inv) {
+	var i = this.io.i.value;
+	if (i === undefined) return undefined;
+	var value = i;
+	if (inv) value = 1-value;
+	return value;
+    };
+    this.calc_inv = function() { return this.calc_buf(true); };
+
+    this.calc_and = function(inv) {
+	var i0 = this.io.i0.value;
+	var i1 = this.io.i1.value;
+	var value;
+	if ((i0 === 0) || (i1 === 0)){
+	    value = 0;
+	} else if ((i0 === undefined) || (i1 === undefined)){
+	    return undefined;
+	} else {
+	    value = 1;
+	}
+	if (inv) value = 1-value;
+	return value;
+    };
+    this.calc_nand = function() { return this.calc_and(true); };
+
+    this.calc_or = function(inv) {
+	var i0 = this.io.i0.value;
+	var i1 = this.io.i1.value;
+	var value;
+	if ((i0 === 1) || (i1 === 1)){
+	    value = 1;
+	} else if ((i0 === undefined) || (i1 === undefined)){
+	    return undefined;
+	} else {
+	    value = 0;
+	}
+	if (inv) value = 1-value;
+	return value;
+    };
+    this.calc_nor = function() { return this.calc_or(true); };
 
     function cell_drag_start(x, y, event) {
 	this.drag_dx = 0;

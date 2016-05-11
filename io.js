@@ -62,13 +62,13 @@ function Io(cell, name, type, x, y, hx, hy) {
     };
 
     this.update_value = function(value) {
+	this.value = value;
+
 	this.draw_value.attr({text: "" + value});
 
 	// Create a background rectangle for the text and move both of them
 	// up so that the bottom of each is just above the stub.
 	var bbox = this.draw_value.getBBox(true);
-	console.log(bbox.x, bbox.y, bbox.width, bbox.height);
-	console.log(this.x, this.y);
 	var left = bbox.x;
 	var top = this.y - 2 - bbox.height;
 
@@ -85,7 +85,20 @@ function Io(cell, name, type, x, y, hx, hy) {
 	    height: bbox.height,
 	    opacity: "1.0"
 	};
+	if (value) {
+	    attr_bg.fill = "#8d8";
+	} else {
+	    attr_bg.fill = "#aaf";
+	}
 	this.draw_value_bg.attr(attr_bg);
+
+	if (this.type == "output"){
+	    for (var i = 0; i < this.w.length; i++) {
+		this.w[i].update_value();
+	    }
+	} else { // input
+	    this.cell.update_value();
+	}
     };
 
 
@@ -129,7 +142,6 @@ function Io(cell, name, type, x, y, hx, hy) {
 
 	var attr_bg = {
 	    "stroke-width": 0,
-	    fill: "#e88",
 	    opacity: "0"
 	};
 	this.draw_value_bg = this.paper.rect(0, 0, 0, 0);
