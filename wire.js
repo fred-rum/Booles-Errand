@@ -138,15 +138,6 @@ function Wire(be, io1, io2) {
 	this.i = undefined;
     };
 
-    this.update_wire_color = function(value) {
-	if (!this.pending_del){
-	    var attr = {
-		stroke: Wire.color(value)
-	    };
-	    this.draw_fg.attr(attr);
-	}
-    }
-
     this.remove_subpaths = function() {
 	// Remove all propagating subpaths.
 	for (var i = 0; i < this.in_flight.length; i++){
@@ -174,7 +165,7 @@ function Wire(be, io1, io2) {
     this.restore_old = function(attr) {
 	this.pending_del = false;
 	this.draw_fg.attr(attr);
-	this.update_wire_color();
+	this.redraw_fg();
     }
 
     this.update_value = function() {
@@ -197,10 +188,7 @@ function Wire(be, io1, io2) {
     };
 
     this.redraw_fg = function() {
-	if (this.pending_del){
-	    this.draw_fg.attr({path: this.path});
-	    return;
-	}
+	if (this.pending_del) return;
 
 	var older_value = this.i.value;
 	var older_draw = this.draw_fg;
@@ -236,7 +224,11 @@ function Wire(be, io1, io2) {
 	} else {
 	    path = this.get_subpath(0, older_age_len);
 	}
-	older_draw.attr({path: path});
+	var attr = {
+	    path: path,
+	    stroke: Wire.color(older_value)
+	};
+	older_draw.attr(attr);
     };
 
     this.tick = function() {
@@ -270,17 +262,14 @@ function Wire(be, io1, io2) {
 	    fl_obj.age += this.be.wire_speed / this.path_length;
 	    if (fl_obj.age >= 1.0){
 		if (fl_obj.draw) fl_obj.draw.remove();
-		this.update_wire_color(fl_obj.value);
 		this.i.update_value(fl_obj.value);
 		this.in_flight = this.in_flight.slice(1);
 		i--;
 	    }
 	}
 
-	if (!this.pending_del){
-	    this.redraw_fg();
-//	    this.measure_perf("segmented");
-	}
+	this.redraw_fg();
+//	this.measure_perf("segmented");
 
 	if (this.in_flight.length){
 	    this.be.sim.register_obj(this);
@@ -334,7 +323,6 @@ function Wire(be, io1, io2) {
 		   so here we take a short-cut to the correct value. */
 		slope = 2/dx;
 		angle = 2*Math.atan(slope);
-		//console.log("y=4", dx, dy, slope, angle);
 	    } else if ((dx <= 0) && (dy == 4)) {
 		//      -.
 		//        )
@@ -345,7 +333,6 @@ function Wire(be, io1, io2) {
 		   The normal equation gets the wrong sign from atan,
 		   so here we take a short-cut to the correct value. */
 		angle = Math.PI;
-		//console.log("x<0 y=4", dx, dy, "-0", angle);
 	    } else if ((dx > 2) || (dy > 4) ||
 		       ((dx > 0) && (dy < 2 - Math.sqrt(4 - dx*dx)))) {
 		//   -.   -.   -._  ---
@@ -356,7 +343,6 @@ function Wire(be, io1, io2) {
 		/* Normal case: straight line connects arcs with +/-slope. */
 		slope = (Math.sqrt(dx*dx+(dy-4)*dy)-dx)/(dy-4)
 		angle = 2*Math.atan(slope);
-		//console.log("std", dx, dy, slope, angle);
 	    } else {
 		/* 0 < dx <= 2, sqrt < dy < 4 */
 		//   -.
@@ -365,7 +351,6 @@ function Wire(be, io1, io2) {
 		slope = dy/dx;
 		angle = 2*Math.atan(slope)
 		r = r * dx * (slope*slope + 1) / (4 * slope);
-		//console.log("<r", dx, dy, slope, angle);
 	    }
 
 	    xd = r*Math.sin(angle);
@@ -398,7 +383,6 @@ function Wire(be, io1, io2) {
 		}
 		angle_a = Math.PI*2 - angle;
 		angle_b = angle;
-		//console.log("x<0,y>0", dx, dy, slope, angle);
 	    } else {
 		/* -4 < dy < 0 */
 		//    ,-.
@@ -412,7 +396,6 @@ function Wire(be, io1, io2) {
 		angle = -2*Math.atan(slope); /* 90 < angle < 180 */
 		angle_a = -angle;
 		angle_b = Math.PI*2 - angle_a;
-		//console.log("x<0,y<0", dx, dy, slope, angle);
 	    }
 
 	    xd = -r*Math.sin(angle);     /* xd <= 0 */
@@ -457,7 +440,8 @@ function Wire(be, io1, io2) {
 
     this.redraw = function() {
 	this.compute();
-	this.draw_bg.attr("path", this.path);
+	this.draw_bg.attr({path: this.path});
+	this.draw_fg.attr({path: this.path});
 	this.redraw_fg();
     };
 

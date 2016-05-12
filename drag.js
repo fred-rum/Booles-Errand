@@ -35,7 +35,7 @@ function Drag(be) {
     };
 
     this.restore_old_wires = function() {
-	    var attr = {"stroke-dasharray": ""};
+	var attr = {"stroke-dasharray": ""};
 	for (var i = 0; i < this.old_wires.length; i++){
 	    this.old_wires[i].restore_old(attr);
 	}
@@ -177,8 +177,10 @@ function Drag(be) {
 
     this.update_new_io = function(io, event) {
 	// Like cannot drag to like unless there are one or more wires
-	// on the original IO that can be moved.
-	if (this.orig_empty && (this.orig_io.type == io.type)){
+	// on the original IO that can be moved.  The exception is
+	// when the new IO is the same as the original IO.
+	if (this.orig_empty && (this.orig_io.type == io.type) &&
+	    (!io == this.orig_io)){
 	    io = this.be.null_io;
 	}
 
@@ -188,6 +190,8 @@ function Drag(be) {
 	this.remove_new_wires();
 	this.remove_null_wire();
 	this.new_io = io;
+
+	if (io == this.orig_io) return; // no new wires
 
 	if (io.type == "null") {
 	    if (this.orig_io.type == "input") this.gen_old_wires(this.orig_io);
