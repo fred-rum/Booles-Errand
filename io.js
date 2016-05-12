@@ -15,170 +15,6 @@ function Io(be, cell, name, type, x, y) {
     // If any properties of vis_state are true, then the IO handle is visible.
     this.vis_state = {};
 
-
-    // Public members
-
-    this.draw_stub_fg = function() {
-	var stub_fg_attr = {
-	    "stroke-width": this.be.stroke_wire_fg,
-	    stroke: "#000"
-	};
-	var stub_end_attr = {
-	    "stroke-width": this.be.stroke_stub_end_undefined,
-	    stroke: "#000"
-	};
-	var stub_end_path = ["M", x, y - this.be.stub_end_len/2,
-			     "v", this.be.stub_end_len];
-	this.el_stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
-	this.el_stub_end.setAttr("visibility", "hidden");
-	this.set_io.push(this.el_stub_end);
-
-	this.stub = this.be.paper.path(this.path).attr(stub_fg_attr);
-	return this.stub;
-    };
-
-    this.connect = function(wire) {
-	if (!this.w.length && this.el_stub_end){
-	    this.el_stub_end.setAttr("visibility", "visible");
-	}
-
-	if ((this.type == "output") && (this.w.length > 0)) {
-	    // We want the new wire to be ordered together with the existing
-	    // wires connected to the same output.  But we also want the new
-	    // wire to be on top.  So we reorder all existing wires to be
-	    // displayed at the same Z height as the new wire.
-	    for (var i = 0; i < this.w.length; i++) {
-		this.w[i].reorder_z(wire.el_bg, wire.el_fg);
-	    }
-	}
-	this.w.push(wire);
-    };
-
-    this.disconnect = function(wire) {
-	for (var i = 0; i < this.w.length; i++){
-	    if (wire == this.w[i]){
-		this.w.splice(i, 1);
-		if (!this.w.length && this.el_stub_end){
-		    this.el_stub_end.setAttr("visibility", "hidden");
-		}
-		return;
-	    }
-	}
-    };
-
-    this.redraw = function() {
-	for (var i = 0; i < this.w.length; i++){
-	    this.w[i].redraw();
-	}
-    };
-
-    this.set_vis = function(type, vis) {
-	this.vis_state[type] = vis;
-	for (var name in this.vis_state){
-	    if (this.vis_state[name]){
-		this.el_handle.setAttr("visibility", "visible");
-		return;
-	    }
-	}
-	this.el_handle.setAttr("visibility", "hidden");
-    };
-
-    this.display_fail = function(fail) {
-	if (fail){
-	    var tw = this.be.io_handle_size;
-	    var attr = {
-		"stroke-width": tw/5,
-		stroke: "#f00",
-		fill: "#fff"
-	    };
-	    var cx = this.cell.x + this.x;
-	    var cy = this.cell.y + this.y;
-
-	    this.el_fail_circle = this.be.paper.circle(cx, cy, tw/2, tw/2);
-	    this.el_fail_circle.attr(attr);
-	    this.el_fail_circle.setAttr("pointer-events", "none");
-
-	    // Rather than doing trigonometry to draw the diagonal slash,
-	    // we just draw it straight and then rotate it.
-	    this.el_fail_slash = this.be.paper.path(["M", cx, cy-tw/2,
-						     "v", tw]);
-	    this.el_fail_slash.attr(attr);
-	    this.el_fail_slash.rotate(45, cx, cy);
-	    this.el_fail_slash.setAttr("pointer-events", "none");
-	} else if (this.el_fail_circle){
-	    this.el_fail_circle.remove();
-	    this.el_fail_slash.remove();
-	}
-    };
-
-    this.update_value = function(value) {
-	this.value = value;
-
-	var attr = {
-	    stroke: Wire.color(value),
-	};
-	this.stub.attr(attr);
-
-	attr["stroke-width"] =
-	    (value === undefined) ? this.be.stroke_stub_end_undefined :
-	                            this.be.stroke_stub_end_defined;
-	this.el_stub_end.attr(attr);
-
-	if (value === undefined){
-	    value = "";
-	    var bg_opacity = 0;
-	} else {
-	    var bg_opacity = "1.0";
-	}
-
-	this.el_value_text.attr({text: "" + value});
-
-	// Create a background rectangle for the text and move both of them
-	// up so that the bottom of each is just above the stub.
-	var bbox = this.el_value_text.getBBox(true);
-	var left = bbox.x;
-	var top = this.y - 2 - bbox.height;
-
-	var desiredbottom = this.y - 2;
-	var actualbottom = bbox.y + bbox.height - 1;
-	var drift_y = actualbottom - desiredbottom;
-	this.value_y -= drift_y;
-	this.el_value_text.attr({y: this.value_y});
-
-	var attr_bg = {
-	    x: left,
-	    y: top,
-	    width: bbox.width,
-	    height: bbox.height,
-	    opacity: bg_opacity
-	};
-	if (value) {
-	    attr_bg.fill = "#8d8";
-	} else {
-	    attr_bg.fill = "#aaf";
-	}
-	this.el_value_text_bg.attr(attr_bg);
-
-	if (this.type == "output"){
-	    for (var i = 0; i < this.w.length; i++) {
-		this.w[i].update_value();
-	    }
-	} else { // input
-	    this.cell.update_value();
-	}
-    };
-
-    this.bring_to_top = function() {
-	this.el_value_text_bg.insertBefore(this.be.z_io);
-	this.el_value_text.insertBefore(this.be.z_io);
-	this.el_stub_end.insertBefore(this.be.z_io);
-
-	this.el_handle.insertBefore(this.be.z_handle);
-    };
-
-
-    // Private functions & members
-
     var attr = {
 	"stroke-width": this.be.stroke_io_handle,
 	stroke: "#f80",
@@ -230,3 +66,162 @@ function Io(be, cell, name, type, x, y) {
     this.path = ["M", x, y,
 		 "H", 0]; // draw horizontally to the cell's center
 }
+
+
+Io.prototype.draw_stub_fg = function() {
+    var stub_fg_attr = {
+	"stroke-width": this.be.stroke_wire_fg,
+	stroke: "#000"
+    };
+    var stub_end_attr = {
+	"stroke-width": this.be.stroke_stub_end_undefined,
+	stroke: "#000"
+    };
+    var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
+			 "v", this.be.stub_end_len];
+    this.el_stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
+    this.el_stub_end.setAttr("visibility", "hidden");
+    this.set_io.push(this.el_stub_end);
+
+    this.stub = this.be.paper.path(this.path).attr(stub_fg_attr);
+    return this.stub;
+};
+
+Io.prototype.connect = function(wire) {
+    if (!this.w.length && this.el_stub_end){
+	this.el_stub_end.setAttr("visibility", "visible");
+    }
+
+    if ((this.type == "output") && (this.w.length > 0)) {
+	// We want the new wire to be ordered together with the existing
+	// wires connected to the same output.  But we also want the new
+	// wire to be on top.  So we reorder all existing wires to be
+	// displayed at the same Z height as the new wire.
+	for (var i = 0; i < this.w.length; i++) {
+	    this.w[i].reorder_z(wire.el_bg, wire.el_fg);
+	}
+    }
+    this.w.push(wire);
+};
+
+Io.prototype.disconnect = function(wire) {
+    for (var i = 0; i < this.w.length; i++){
+	if (wire == this.w[i]){
+	    this.w.splice(i, 1);
+	    if (!this.w.length && this.el_stub_end){
+		this.el_stub_end.setAttr("visibility", "hidden");
+	    }
+	    return;
+	}
+    }
+};
+
+Io.prototype.redraw = function() {
+    for (var i = 0; i < this.w.length; i++){
+	this.w[i].redraw();
+    }
+};
+
+Io.prototype.set_vis = function(type, vis) {
+    this.vis_state[type] = vis;
+    for (var name in this.vis_state){
+	if (this.vis_state[name]){
+	    this.el_handle.setAttr("visibility", "visible");
+	    return;
+	}
+    }
+    this.el_handle.setAttr("visibility", "hidden");
+};
+
+Io.prototype.display_fail = function(fail) {
+    if (fail){
+	var tw = this.be.io_handle_size;
+	var attr = {
+	    "stroke-width": tw/5,
+	    stroke: "#f00",
+	    fill: "#fff"
+	};
+	var cx = this.cell.x + this.x;
+	var cy = this.cell.y + this.y;
+
+	this.el_fail_circle = this.be.paper.circle(cx, cy, tw/2, tw/2);
+	this.el_fail_circle.attr(attr);
+	this.el_fail_circle.setAttr("pointer-events", "none");
+
+	// Rather than doing trigonometry to draw the diagonal slash,
+	// we just draw it straight and then rotate it.
+	this.el_fail_slash = this.be.paper.path(["M", cx, cy-tw/2,
+						 "v", tw]);
+	this.el_fail_slash.attr(attr);
+	this.el_fail_slash.rotate(45, cx, cy);
+	this.el_fail_slash.setAttr("pointer-events", "none");
+    } else if (this.el_fail_circle){
+	this.el_fail_circle.remove();
+	this.el_fail_slash.remove();
+    }
+};
+
+Io.prototype.update_value = function(value) {
+    this.value = value;
+
+    var attr = {
+	stroke: Wire.color(value),
+    };
+    this.stub.attr(attr);
+
+    attr["stroke-width"] =
+	(value === undefined) ? this.be.stroke_stub_end_undefined :
+	this.be.stroke_stub_end_defined;
+    this.el_stub_end.attr(attr);
+
+    if (value === undefined){
+	value = "";
+	var bg_opacity = 0;
+    } else {
+	var bg_opacity = "1.0";
+    }
+
+    this.el_value_text.attr({text: "" + value});
+
+    // Create a background rectangle for the text and move both of them
+    // up so that the bottom of each is just above the stub.
+    var bbox = this.el_value_text.getBBox(true);
+    var left = bbox.x;
+    var top = this.y - 2 - bbox.height;
+
+    var desiredbottom = this.y - 2;
+    var actualbottom = bbox.y + bbox.height - 1;
+    var drift_y = actualbottom - desiredbottom;
+    this.value_y -= drift_y;
+    this.el_value_text.attr({y: this.value_y});
+
+    var attr_bg = {
+	x: left,
+	y: top,
+	width: bbox.width,
+	height: bbox.height,
+	opacity: bg_opacity
+    };
+    if (value) {
+	attr_bg.fill = "#8d8";
+    } else {
+	attr_bg.fill = "#aaf";
+    }
+    this.el_value_text_bg.attr(attr_bg);
+
+    if (this.type == "output"){
+	for (var i = 0; i < this.w.length; i++) {
+	    this.w[i].update_value();
+	}
+    } else { // input
+	this.cell.update_value();
+    }
+};
+
+Io.prototype.bring_to_top = function() {
+    this.el_value_text_bg.insertBefore(this.be.z_io);
+    this.el_value_text.insertBefore(this.be.z_io);
+    this.el_stub_end.insertBefore(this.be.z_io);
+
+    this.el_handle.insertBefore(this.be.z_handle);
+};
