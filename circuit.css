@@ -15,8 +15,8 @@ body {
 .box {
     position: fixed;
     top: 0;
-    width: 100px;
-    height: 100px;
+    width: 8em;
+    height: 8em;
     overflow: auto;
     z-index: -1;
     background-color: #d0ffd0;

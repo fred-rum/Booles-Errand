@@ -19,8 +19,8 @@ function Io(be, cell, name, type, x, y) {
     // Public members
 
     this.draw_stub_fg = function(stub_fg_attr, stub_end_attr) {
-	var stub_end_path = ["M", x, y-3,
-			     "v", 6];
+	var stub_end_path = ["M", x, y - this.be.stub_end_len/2,
+			     "v", this.be.stub_end_len];
 	this.stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
 	this.stub_end.setAttr("visibility", "hidden");
 
@@ -83,7 +83,9 @@ function Io(be, cell, name, type, x, y) {
 	};
 	this.stub.attr(attr);
 
-	attr["stroke-width"] = (value === undefined) ? 1 : 3
+	attr["stroke-width"] =
+	    (value === undefined) ? this.be.stroke_stub_end_undefined :
+	                            this.be.stroke_stub_end_defined;
 	this.stub_end.attr(attr);
 
 	if (value === undefined){
@@ -133,13 +135,13 @@ function Io(be, cell, name, type, x, y) {
 
     // Private functions & members
 
-    var tw = 15;
     var attr = {
-	"stroke-width": 1,
+	"stroke-width": this.be.stroke_io_handle,
 	stroke: "#f80",
 	fill: "#ff0",
 	opacity: "0.80"
     };
+    var tw = this.be.io_handle_size;
     this.draw = this.be.paper.circle(x, y, tw/2, tw/2).attr(attr);
     this.draw.setAttr("visibility", "hidden");
     this.draw.setAttr("pointer-events", "all");

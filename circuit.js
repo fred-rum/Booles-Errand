@@ -5,6 +5,28 @@ function Circuits() {
 
     this.be = {}
     this.be.paper = Raphael("holder", "100%", "100%");
+
+    var em_size = $('.box').width() / 8; // *** 8
+    this.be.io_spacing = em_size * 10/8;
+    this.be.io_handle_size = this.be.io_spacing * 3/4;
+    this.be.stub_len = em_size * 5/8;
+    this.be.stub_end_len = 6;
+    this.be.inv_bubble_size = em_size * 4/8;
+    this.be.wire_arc_radius = em_size * 10/8;
+
+    this.be.wire_speed = em_size*5/8;
+
+    this.be.stroke_wire_fg = em_size * 1/16;
+    this.be.stroke_wire_bg = em_size * 5/16;
+
+    this.be.stroke_cell_fg = em_size * 3/16;
+    this.be.stroke_cell_bg = em_size * 7/16;
+
+    this.be.stroke_stub_end_undefined = em_size * 1/16;
+    this.be.stroke_stub_end_defined   = em_size * 3/16; // *** 3/16
+
+    this.be.stroke_io_handle = em_size * 1/16;
+
     this.be.sim = new Sim();
     this.be.drag = new Drag(this.be);
 

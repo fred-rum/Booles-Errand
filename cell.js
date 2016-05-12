@@ -8,47 +8,43 @@ function Cell(be, type, x, y) {
     this.io = {};
     this.newest_value = null;
 
-    this.connection_spacing = 20;
-    this.connection_width = 10;
-    this.inv_size = 10;
-
     this.cell_fg_attr = {
-	"stroke-width": 3,
+	"stroke-width": this.be.stroke_cell_fg,
 	"stroke-linejoin": "miter",
 	stroke: "#000",
 	fill: "#fff"
     };
     this.cell_bg_attr = {
-	"stroke-width": 9,
+	"stroke-width": this.be.stroke_cell_bg,
 	"stroke-linejoin": "round",
 	stroke: "#eee"
     };
 
     // For the case that the foreground lines & fill are drawn separately.
     this.cell_fg_line_attr = {
-	"stroke-width": 3,
+	"stroke-width": this.be.stroke_cell_fg,
 	"stroke-linejoin": "miter",
 	"stroke-linecap": "round",
 	stroke: "#000",
 	fill: "none"
     };
     this.cell_fg_fill_attr = {
-	"stroke-width": 3,
+	"stroke-width": this.be.stroke_cell_fg,
 	"stroke-linejoin": "miter",
 	stroke: "#fff",
 	fill: "#fff"
     };
 
     this.stub_fg_attr = {
-	"stroke-width": 1,
+	"stroke-width": this.be.stroke_wire_fg,
 	stroke: "#000"
     };
     this.stub_end_attr = {
-	"stroke-width": 1,
+	"stroke-width": this.be.stroke_stub_end_undefined,
 	stroke: "#000"
     };
     this.stub_bg_attr = {
-	"stroke-width": 7,
+	"stroke-width": this.be.stroke_wire_bg,
 	stroke: "#eee",
 	"stroke-linecap": "round"
     };
@@ -167,10 +163,10 @@ function Cell(be, type, x, y) {
     }
 
     this.init_io = function(inv, ni, left, right) {
-	var cw = this.connection_width;
-	var cs = this.connection_spacing;
+	var cw = this.be.stub_len;
+	var cs = this.be.io_spacing;
 
-	if (inv) right += this.inv_size;
+	if (inv) right += this.be.inv_bubble_size;
 
 	var io_obj = new Io(this.be, this, "o", "output", right+cw, 0);
 	this.io[io_obj.name] = io_obj;
@@ -208,29 +204,18 @@ function Cell(be, type, x, y) {
 
     this.draw_inv = function(inv, right, bg) {
 	if (inv){
-	    var inv_r = this.inv_size/2;
+	    var inv_r = this.be.inv_bubble_size/2;
 	    var inv_cx = right+inv_r;
 	    var sw = bg ? 9 : 3;
 	    var sc = bg ? "#eee" : "#000";
-	    if (bg) {
-		var attr = {
-		    "stroke-width": 9,
-		    stroke: "#eee"
-		};
-	    } else {
-		var attr = {
-		    "stroke-width": 3,
-		    stroke: "#000",
-		    fill: "#fff"
-		};
-	    }
+	    var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
 	    this.draw.push(this.be.paper.circle(inv_cx, 0, inv_r).attr(attr));
 	}
     };
 
     this.inv = function() { return this.buf(true); };
     this.buf = function(inv) {
-	var height = 1.5 * this.connection_spacing;
+	var height = 1.5 * this.be.io_spacing;
 	var width = Math.sqrt(height*height-height*height/4); /* equilateral */
 	var left = -width/2;
 	var right = width/2;
@@ -251,7 +236,7 @@ function Cell(be, type, x, y) {
     this.nand = function() { return this.and(true); };
     this.and = function(inv) {
 	var ni = 2;
-	var height = ni*this.connection_spacing;
+	var height = ni*this.be.io_spacing;
 	var r = height/2;
 	var box_width = height-r;
 	var cell_width = height;
@@ -278,7 +263,7 @@ function Cell(be, type, x, y) {
     this.nor = function() { return this.or(true); };
     this.or = function(inv) {
 	var ni = 2;
-	var height = ni*this.connection_spacing;
+	var height = ni*this.be.io_spacing;
 	var r = height/2;
 	var cell_width = height;
 	var left = -cell_width/2;
@@ -309,7 +294,7 @@ function Cell(be, type, x, y) {
     this.xnor = function() { return this.xor(true); };
     this.xor = function(inv) {
 	var ni = 2;
-	var height = ni*this.connection_spacing;
+	var height = ni*this.be.io_spacing;
 	var r = height/2;
 	var box_width = height-r;
 	var cell_width = height;
@@ -348,7 +333,7 @@ function Cell(be, type, x, y) {
     };
 
     this.const = function() {
-	var height = 2 * this.connection_spacing;
+	var height = 2 * this.be.io_spacing;
 	var width = height;
 	var left = -width/2;
 	var right = width/2;

@@ -217,7 +217,7 @@ function Wire(be, io1, io2) {
 		// The actual path will be inserted at the next loop
 		// iteration or the end of the loop.
 		var attr = {
-		    "stroke-width": 1,
+		    "stroke-width": this.be.stroke_wire_fg,
 		    stroke: Wire.color(fl_obj.value)
 		};
 		fl_obj.draw = this.be.paper.path("M0,0").attr(attr);
@@ -267,7 +267,7 @@ function Wire(be, io1, io2) {
 
 	for (var i = 0; i < this.in_flight.length; i++){
 	    var fl_obj = this.in_flight[i];
-	    fl_obj.age += 10 / this.path_length;
+	    fl_obj.age += this.be.wire_speed / this.path_length;
 	    if (fl_obj.age >= 1.0){
 		if (fl_obj.draw) fl_obj.draw.remove();
 		this.update_wire_color(fl_obj.value);
@@ -303,7 +303,7 @@ function Wire(be, io1, io2) {
     this.arcwire = function (x1, y1, xc, yc) {
 	var x2 = x1+xc;
 	var y2 = y1+yc;
-	var r = 20;
+	var r = this.be.wire_arc_radius;
 	var dx = (x2-x1)/r;
 	var dy = (y2-y1)/r;
 	var slope, angle;
@@ -464,13 +464,13 @@ function Wire(be, io1, io2) {
     this.compute();
 
     var attr = {
-	"stroke-width": 7,
+	"stroke-width": this.be.stroke_wire_bg,
 	stroke: "#eee"
     };
     this.draw_bg = this.be.paper.path(this.path).attr(attr);
 
     var attr = {
-	"stroke-width": 1,
+	"stroke-width": this.be.stroke_wire_fg,
 	stroke: "#000"
     };
     this.draw_fg = this.be.paper.path(this.path).attr(attr);
