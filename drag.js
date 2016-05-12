@@ -46,7 +46,7 @@ function Drag(be) {
     this.mark_new_wires = function() {
 	var attr = {stroke: "#eeb"}
 	for (var i = 0; i < this.new_wires.length; i++){
-	    this.new_wires[i].draw_bg.attr(attr);
+	    this.new_wires[i].el_bg.attr(attr);
 	    this.new_wires[i].pending_new = true;
 	}
     };
@@ -54,7 +54,7 @@ function Drag(be) {
     this.commit_new_wires = function() {
 	var attr = {stroke: "#eee"}
 	for (var i = 0; i < this.new_wires.length; i++){
-	    this.new_wires[i].draw_bg.attr(attr);
+	    this.new_wires[i].el_bg.attr(attr);
 	    this.new_wires[i].pending_new = false;
 	    this.new_wires[i].update_value();
 	}
@@ -77,7 +77,7 @@ function Drag(be) {
 		}
 		this.null_wire = new Wire(this.be, from_io, this.be.null_io);
 		var attr = {stroke: "#eeb"}
-		this.null_wire.draw_bg.attr(attr);
+		this.null_wire.el_bg.attr(attr);
 		this.null_wire.pending_new = true;
 	    }
 	}

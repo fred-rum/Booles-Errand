@@ -130,7 +130,7 @@ function Cell(be, type, x, y) {
     };
 
     this.bring_to_top = function() {
-	this.draw_cell.insertBefore(this.be.z_cell);
+	this.el_cell.insertBefore(this.be.z_cell);
 	for (var port_name in this.io) {
 	    this.io[port_name].bring_to_top();
 	}
@@ -150,7 +150,7 @@ function Cell(be, type, x, y) {
 	this.y += dy - this.drag_dy;
 	this.drag_dx = dx;
 	this.drag_dy = dy;
-	this.draw.transform("t" + this.x + "," + this.y);
+	this.set_xform.transform("t" + this.x + "," + this.y);
 	for (var port_name in this.io) {
 	    var io_obj = this.io[port_name];
 	    io_obj.redraw();
@@ -188,7 +188,7 @@ function Cell(be, type, x, y) {
 	for (var name in this.io) {
 	    stub_path = stub_path.concat(this.io[name].path);
 	}
-	this.draw.push(this.be.paper.path(stub_path).attr(this.stub_bg_attr));
+	this.el_cell.push(this.be.paper.path(stub_path).attr(this.stub_bg_attr));
 
 	// In contrast, the stub foregrounds can be drawn in different
 	// colors depending on the IO state.  Therefore, each is its own
@@ -197,7 +197,7 @@ function Cell(be, type, x, y) {
 	// set for translation.  (But the cell also keeps them separately
 	// to avoid changing their Z level.)
 	for (var name in this.io) {
-	    this.draw.push(this.io[name].draw_stub_fg());
+	    this.el_cell.push(this.io[name].draw_stub_fg());
 	}
     };
 
@@ -208,7 +208,7 @@ function Cell(be, type, x, y) {
 	    var sw = bg ? 9 : 3;
 	    var sc = bg ? "#eee" : "#000";
 	    var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
-	    this.draw.push(this.be.paper.circle(inv_cx, 0, inv_r).attr(attr));
+	    this.el_cell.push(this.be.paper.circle(inv_cx, 0, inv_r).attr(attr));
 	}
     };
 
@@ -225,10 +225,10 @@ function Cell(be, type, x, y) {
 			 "v", height,
 			 "l", width, -height/2,
 			 "z"];
-	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -252,10 +252,10 @@ function Cell(be, type, x, y) {
 			 "h", -box_width,
 			 "z"];
 
-	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -283,10 +283,10 @@ function Cell(be, type, x, y) {
 			 "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 			 "z"];
 
-	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -323,11 +323,11 @@ function Cell(be, type, x, y) {
 			    "h", -bar_space,
 			    "z"];
 
-	this.draw.push(this.be.paper.path(cell_path_bg).attr(this.cell_bg_attr));
+	this.el_cell.push(this.be.paper.path(cell_path_bg).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(this.be.paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
-	this.draw.push(this.be.paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
+	this.el_cell.push(this.be.paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
+	this.el_cell.push(this.be.paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -340,9 +340,9 @@ function Cell(be, type, x, y) {
 
 	this.init_io(false, 0, left, right);
 
-	this.draw.push(this.be.paper.rect(left, top, width, height).attr(this.cell_bg_attr));
+	this.el_cell.push(this.be.paper.rect(left, top, width, height).attr(this.cell_bg_attr));
 	this.draw_stubs();
-	this.draw.push(this.be.paper.rect(left, top, width, height).attr(this.cell_fg_attr));
+	this.el_cell.push(this.be.paper.rect(left, top, width, height).attr(this.cell_fg_attr));
     };
 
     this.null = function() {
@@ -353,24 +353,24 @@ function Cell(be, type, x, y) {
 	this.be.null_io = io_obj;
     };
 
-    this.draw = this.be.paper.set();
+    this.el_cell = this.be.paper.set();
     this[type](); // Call cell-type initiator function by name
     if (type == "null") return; // do nothing else for the null cell
 
-    // Keep a separate draw_cell set that does not include the IO elements.
-    // draw_cell is used to set the cell's Z-level and for cell dragging.
-    this.draw_cell = this.be.paper.set();
-    this.draw.forEach($.proxy(function(el) {this.draw_cell.push(el);}),
-		      this);
+    // Make a separate xform set that includes the IO elements so that they
+    // get moved with the cell.
+    this.set_xform = this.be.paper.set();
+    var set_callback = $.proxy(function(el) {this.set_xform.push(el);});
+    this.el_cell.forEach(set_callback, this);
 
     // Add the IO elements to the draw set so that they get moved with the cell.
     for (var port_name in this.io) {
-	this.draw.push(this.io[port_name].draw_set);
+	this.set_xform.push(this.io[port_name].set_io);
     }
-    this.draw.transform("t" + this.x + "," + this.y);
+    this.set_xform.transform("t" + this.x + "," + this.y);
 
     this.bring_to_top();
-    this.draw_cell.drag($.proxy(cell_drag_move, this),
-			$.proxy(cell_drag_start, this),
-			$.proxy(cell_drag_end, this));
+    this.el_cell.drag($.proxy(cell_drag_move, this),
+		      $.proxy(cell_drag_start, this),
+		      $.proxy(cell_drag_end, this));
 }

@@ -122,8 +122,8 @@ function Wire(be, io1, io2) {
     this.remove = function() {
 	this.o.disconnect(this);
 	this.i.disconnect(this);
-	this.draw_fg.remove();
-	this.draw_bg.remove();
+	this.el_fg.remove();
+	this.el_bg.remove();
 	this.remove_subpaths();
 
 	if (!this.pending_new){
@@ -142,9 +142,9 @@ function Wire(be, io1, io2) {
 	// Remove all propagating subpaths.
 	for (var i = 0; i < this.in_flight.length; i++){
 	    var fl_obj = this.in_flight[i];
-	    if (fl_obj.draw){
-		fl_obj.draw.remove();
-		fl_obj.draw = undefined;
+	    if (fl_obj.el_subpath){
+		fl_obj.el_subpath.remove();
+		fl_obj.el_subpath = undefined;
 	    }
 	}
     }
@@ -183,7 +183,7 @@ function Wire(be, io1, io2) {
 
     this.redraw_fg = function() {
 	var older_value = this.i.value;
-	var older_draw = this.draw_fg;
+	var older_el_subpath = this.el_fg;
 	var older_age_len = this.path_length;
 
 	if (this.pending_del != "del"){ // no sub-paths when "del"
@@ -191,9 +191,9 @@ function Wire(be, io1, io2) {
 		var fl_obj = this.in_flight[i];
 		var age_len = fl_obj.age * this.path_length;
 		var path = this.get_subpath(age_len, older_age_len);
-		older_draw.attr({path: path});
+		older_el_subpath.attr({path: path});
 
-		if (!fl_obj.draw){
+		if (!fl_obj.el_subpath){
 		    // Draw a path placeholder of the appropriate color.
 		    // The actual path will be inserted at the next loop
 		    // iteration or the end of the loop.
@@ -201,12 +201,12 @@ function Wire(be, io1, io2) {
 			"stroke-width": this.be.stroke_wire_fg,
 			stroke: Wire.color(fl_obj.value)
 		    };
-		    fl_obj.draw = this.be.paper.path("M0,0").attr(attr);
-		    fl_obj.draw.insertAfter(older_draw);
+		    fl_obj.el_subpath = this.be.paper.path("M0,0").attr(attr);
+		    fl_obj.el_subpath.insertAfter(older_el_subpath);
 		}
 
 		older_value = fl_obj.value;
-		older_draw = fl_obj.draw;
+		older_el_subpath = fl_obj.el_subpath;
 		older_age_len = age_len;
 	    }
 	}
@@ -234,7 +234,7 @@ function Wire(be, io1, io2) {
 		opacity: (this.pending_del == "null") ? "0.4" : "1.0"
 	    };
 	}
-	older_draw.attr(attr);
+	older_el_subpath.attr(attr);
     };
 
     this.tick = function() {
@@ -267,7 +267,7 @@ function Wire(be, io1, io2) {
 	    var fl_obj = this.in_flight[i];
 	    fl_obj.age += this.be.wire_speed / this.path_length;
 	    if (fl_obj.age >= 1.0){
-		if (fl_obj.draw) fl_obj.draw.remove();
+		if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
 		this.i.update_value(fl_obj.value);
 		this.in_flight = this.in_flight.slice(1);
 		i--;
@@ -283,11 +283,11 @@ function Wire(be, io1, io2) {
     };
 
     this.reorder_z = function(ref_bg, ref_fg) {
-	this.draw_bg.insertBefore(ref_bg);
-	this.draw_fg.insertBefore(ref_fg);
+	this.el_bg.insertBefore(ref_bg);
+	this.el_fg.insertBefore(ref_fg);
 	for (var i = this.in_flight.length-1; i >= 0 ; i--){
-	    if (this.in_flight[i].draw){
-		this.in_flight[i].draw.insertBefore(ref_fg);
+	    if (this.in_flight[i].el_subpath){
+		this.in_flight[i].el_subpath.insertBefore(ref_fg);
 	    }
 	}
     };
@@ -452,8 +452,8 @@ function Wire(be, io1, io2) {
 
     this.redraw = function() {
 	this.compute();
-	this.draw_bg.attr({path: this.path});
-	this.draw_fg.attr({path: this.path});
+	this.el_bg.attr({path: this.path});
+	this.el_fg.attr({path: this.path});
 	this.redraw_fg();
     };
 
@@ -463,22 +463,22 @@ function Wire(be, io1, io2) {
 	"stroke-width": this.be.stroke_wire_bg,
 	stroke: "#eee"
     };
-    this.draw_bg = this.be.paper.path(this.path).attr(attr);
+    this.el_bg = this.be.paper.path(this.path).attr(attr);
 
     var attr = {
 	"stroke-width": this.be.stroke_wire_fg,
 	stroke: "#000"
     };
-    this.draw_fg = this.be.paper.path(this.path).attr(attr);
+    this.el_fg = this.be.paper.path(this.path).attr(attr);
 
-    this.draw_bg.setAttr("pointer-events", "none");
-    this.draw_fg.setAttr("pointer-events", "none");
+    this.el_bg.setAttr("pointer-events", "none");
+    this.el_fg.setAttr("pointer-events", "none");
 
     // Insert the new wire just above the null gate so that it is below
     // IO handles.  This is its default position, but its Z order may be
     // changed by o.connect().
-    this.draw_bg.insertBefore(this.be.z_wire);
-    this.draw_fg.insertAfter(this.draw_bg);
+    this.el_bg.insertBefore(this.be.z_wire);
+    this.el_fg.insertBefore(this.be.z_wire);
 
     this.o.connect(this);
     this.i.connect(this);

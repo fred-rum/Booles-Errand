@@ -31,7 +31,7 @@ function Io(be, cell, name, type, x, y) {
 			     "v", this.be.stub_end_len];
 	this.el_stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
 	this.el_stub_end.setAttr("visibility", "hidden");
-	this.draw_set.push(this.el_stub_end);
+	this.set_io.push(this.el_stub_end);
 
 	this.stub = this.be.paper.path(this.path).attr(stub_fg_attr);
 	return this.stub;
@@ -48,7 +48,7 @@ function Io(be, cell, name, type, x, y) {
 	    // wire to be on top.  So we reorder all existing wires to be
 	    // displayed at the same Z height as the new wire.
 	    for (var i = 0; i < this.w.length; i++) {
-		this.w[i].reorder_z(wire.draw_bg, wire.draw_fg);
+		this.w[i].reorder_z(wire.el_bg, wire.el_fg);
 	    }
 	}
 	this.w.push(wire);
@@ -219,9 +219,9 @@ function Io(be, cell, name, type, x, y) {
 	this.el_value_text_bg.attr(attr_bg);
 	this.el_value_text_bg.setAttr("pointer-events", "none");
 
-	this.draw_set = this.be.paper.set(this.el_handle,
-					  this.el_value_text_bg,
-					  this.el_value_text);
+	this.set_io = this.be.paper.set(this.el_handle,
+					this.el_value_text_bg,
+					this.el_value_text);
     }
 
 
