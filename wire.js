@@ -481,7 +481,7 @@ function Wire(be, io1, io2) {
     // Insert the new wire just above the null gate so that it is below
     // IO handles.  This is its default position, but its Z order may be
     // changed by o.connect().
-    this.draw_bg.insertBefore(this.be.null_io.draw);
+    this.draw_bg.insertBefore(this.be.z_wire);
     this.draw_fg.insertAfter(this.draw_bg);
 
     this.o.connect(this);

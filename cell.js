@@ -35,14 +35,6 @@ function Cell(be, type, x, y) {
 	fill: "#fff"
     };
 
-    this.stub_fg_attr = {
-	"stroke-width": this.be.stroke_wire_fg,
-	stroke: "#000"
-    };
-    this.stub_end_attr = {
-	"stroke-width": this.be.stroke_stub_end_undefined,
-	stroke: "#000"
-    };
     this.stub_bg_attr = {
 	"stroke-width": this.be.stroke_wire_bg,
 	stroke: "#eee",
@@ -137,13 +129,20 @@ function Cell(be, type, x, y) {
 	return value;
     };
 
+    this.bring_to_top = function() {
+	this.draw_cell.insertBefore(this.be.z_cell);
+	for (var port_name in this.io) {
+	    this.io[port_name].bring_to_top();
+	}
+    };
+
     function cell_drag_start(x, y, event) {
 	this.drag_dx = 0;
 	this.drag_dy = 0;
 	this.be.drag.disable_hover();
 
 	// Pop cell to top for more natural dragging.
-	this.draw_cell.insertBefore(this.be.null_cell.draw);
+	this.bring_to_top();
     }
 
     function cell_drag_move(dx, dy, x, y, event) {
@@ -198,7 +197,7 @@ function Cell(be, type, x, y) {
 	// set for translation.  (But the cell also keeps them separately
 	// to avoid changing their Z level.)
 	for (var name in this.io) {
-	    this.draw.push(this.io[name].draw_stub_fg(this.stub_fg_attr, this.stub_end_attr));
+	    this.draw.push(this.io[name].draw_stub_fg());
 	}
     };
 
@@ -351,28 +350,27 @@ function Cell(be, type, x, y) {
 	// currently being dragged.
 	var io_obj = new Io(this.be, this, "null", "null", 0, 0);
 	this.io["null"] = io_obj;
-
-	// A blank graphic element is used as a reference point for Z ordering.
-	this.draw.push(this.be.paper.path("M0,0"));
+	this.be.null_io = io_obj;
     };
 
     this.draw = this.be.paper.set();
     this[type](); // Call cell-type initiator function by name
     if (type == "null") return; // do nothing else for the null cell
 
-    // Do these things to the cell graphic before before adding
-    // the IO handles to the draw set.
-    this.draw.insertBefore(this.be.null_cell.draw);
-    this.draw.drag($.proxy(cell_drag_move, this),
-		   $.proxy(cell_drag_start, this),
-		   $.proxy(cell_drag_end, this));
-
-    // Add the IO handles to the draw set so that they get moved with the cell.
+    // Keep a separate draw_cell set that does not include the IO elements.
+    // draw_cell is used to set the cell's Z-level and for cell dragging.
     this.draw_cell = this.be.paper.set();
     this.draw.forEach($.proxy(function(el) {this.draw_cell.push(el);}),
 		      this);
+
+    // Add the IO elements to the draw set so that they get moved with the cell.
     for (var port_name in this.io) {
 	this.draw.push(this.io[port_name].draw_set);
     }
     this.draw.transform("t" + this.x + "," + this.y);
+
+    this.bring_to_top();
+    this.draw_cell.drag($.proxy(cell_drag_move, this),
+			$.proxy(cell_drag_start, this),
+			$.proxy(cell_drag_end, this));
 }

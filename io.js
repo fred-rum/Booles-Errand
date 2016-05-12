@@ -18,20 +18,28 @@ function Io(be, cell, name, type, x, y) {
 
     // Public members
 
-    this.draw_stub_fg = function(stub_fg_attr, stub_end_attr) {
+    this.draw_stub_fg = function() {
+	var stub_fg_attr = {
+	    "stroke-width": this.be.stroke_wire_fg,
+	    stroke: "#000"
+	};
+	var stub_end_attr = {
+	    "stroke-width": this.be.stroke_stub_end_undefined,
+	    stroke: "#000"
+	};
 	var stub_end_path = ["M", x, y - this.be.stub_end_len/2,
 			     "v", this.be.stub_end_len];
-	this.stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
-	this.stub_end.setAttr("visibility", "hidden");
+	this.el_stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
+	this.el_stub_end.setAttr("visibility", "hidden");
+	this.draw_set.push(this.el_stub_end);
 
 	this.stub = this.be.paper.path(this.path).attr(stub_fg_attr);
-
-	return this.be.paper.set(this.stub_end, this.stub);
+	return this.stub;
     };
 
     this.connect = function(wire) {
-	if (!this.w.length && this.stub_end){
-	    this.stub_end.setAttr("visibility", "visible");
+	if (!this.w.length && this.el_stub_end){
+	    this.el_stub_end.setAttr("visibility", "visible");
 	}
 
 	if ((this.type == "output") && (this.w.length > 0)) {
@@ -50,8 +58,8 @@ function Io(be, cell, name, type, x, y) {
 	for (var i = 0; i < this.w.length; i++){
 	    if (wire == this.w[i]){
 		this.w.splice(i, 1);
-		if (!this.w.length && this.stub_end){
-		    this.stub_end.setAttr("visibility", "hidden");
+		if (!this.w.length && this.el_stub_end){
+		    this.el_stub_end.setAttr("visibility", "hidden");
 		}
 		return;
 	    }
@@ -68,11 +76,11 @@ function Io(be, cell, name, type, x, y) {
 	this.vis_state[type] = value;
 	for (var name in this.vis_state){
 	    if (this.vis_state[name]){
-		this.draw.setAttr("visibility", "visible");
+		this.el_handle.setAttr("visibility", "visible");
 		return;
 	    }
 	}
-	this.draw.setAttr("visibility", "hidden");
+	this.el_handle.setAttr("visibility", "hidden");
     };
 
     this.update_value = function(value) {
@@ -86,7 +94,7 @@ function Io(be, cell, name, type, x, y) {
 	attr["stroke-width"] =
 	    (value === undefined) ? this.be.stroke_stub_end_undefined :
 	                            this.be.stroke_stub_end_defined;
-	this.stub_end.attr(attr);
+	this.el_stub_end.attr(attr);
 
 	if (value === undefined){
 	    value = "";
@@ -95,11 +103,11 @@ function Io(be, cell, name, type, x, y) {
 	    var bg_opacity = "1.0";
 	}
 
-	this.draw_value.attr({text: "" + value});
+	this.el_value_text.attr({text: "" + value});
 
 	// Create a background rectangle for the text and move both of them
 	// up so that the bottom of each is just above the stub.
-	var bbox = this.draw_value.getBBox(true);
+	var bbox = this.el_value_text.getBBox(true);
 	var left = bbox.x;
 	var top = this.y - 2 - bbox.height;
 
@@ -107,7 +115,7 @@ function Io(be, cell, name, type, x, y) {
 	var actualbottom = bbox.y + bbox.height - 1;
 	var drift_y = actualbottom - desiredbottom;
 	this.value_y -= drift_y;
-	this.draw_value.attr({y: this.value_y});
+	this.el_value_text.attr({y: this.value_y});
 
 	var attr_bg = {
 	    x: left,
@@ -121,7 +129,7 @@ function Io(be, cell, name, type, x, y) {
 	} else {
 	    attr_bg.fill = "#aaf";
 	}
-	this.draw_value_bg.attr(attr_bg);
+	this.el_value_text_bg.attr(attr_bg);
 
 	if (this.type == "output"){
 	    for (var i = 0; i < this.w.length; i++) {
@@ -130,6 +138,14 @@ function Io(be, cell, name, type, x, y) {
 	} else { // input
 	    this.cell.update_value();
 	}
+    };
+
+    this.bring_to_top = function() {
+	this.el_value_text_bg.insertBefore(this.be.z_io);
+	this.el_value_text.insertBefore(this.be.z_io);
+	this.el_stub_end.insertBefore(this.be.z_io);
+
+	this.el_handle.insertBefore(this.be.z_handle);
     };
 
 
@@ -142,9 +158,10 @@ function Io(be, cell, name, type, x, y) {
 	opacity: "0.80"
     };
     var tw = this.be.io_handle_size;
-    this.draw = this.be.paper.circle(x, y, tw/2, tw/2).attr(attr);
-    this.draw.setAttr("visibility", "hidden");
-    this.draw.setAttr("pointer-events", "all");
+    this.el_handle = this.be.paper.circle(x, y, tw/2, tw/2).attr(attr);
+    this.el_handle.setAttr("visibility", "hidden");
+    this.el_handle.setAttr("pointer-events", "all");
+
 
     if (type != "null"){
 	this.be.drag.enable_drag(this);
@@ -163,21 +180,20 @@ function Io(be, cell, name, type, x, y) {
 	    "font-size": text_height
 	};
 	this.value_y = 0;
-	this.draw_value = this.be.paper.text(this.x, this.value_y, "").attr(attr);
-	this.draw_value.setAttr("pointer-events", "none");
+	this.el_value_text = this.be.paper.text(this.x, this.value_y, "").attr(attr);
+	this.el_value_text.setAttr("pointer-events", "none");
 
 	var attr_bg = {
 	    "stroke-width": 0,
 	    opacity: "0"
 	};
-	this.draw_value_bg = this.be.paper.rect(0, 0, 0, 0);
-	this.draw_value_bg.attr(attr_bg);
-	this.draw_value_bg.insertBefore(this.draw_value);
-	this.draw_value_bg.setAttr("pointer-events", "none");
+	this.el_value_text_bg = this.be.paper.rect(0, 0, 0, 0);
+	this.el_value_text_bg.attr(attr_bg);
+	this.el_value_text_bg.setAttr("pointer-events", "none");
 
-	this.draw_set = this.be.paper.set(this.draw,
-					  this.draw_value_bg,
-					  this.draw_value);
+	this.draw_set = this.be.paper.set(this.el_handle,
+					  this.el_value_text_bg,
+					  this.el_value_text);
     }
 
 

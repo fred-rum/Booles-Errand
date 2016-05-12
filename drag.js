@@ -115,12 +115,12 @@ function Drag(be) {
     };
 
     this.enable_drag = function(io) {
-	io.draw.dblclick($.proxy(this.double_click, this, io));
-	io.draw.drag($.proxy(this.drag_move, this, io),
-		     $.proxy(this.drag_start, this, io),
-		     $.proxy(this.drag_end, this, io));
-	io.draw.hover($.proxy(this.hover_start, this, io),
-		      $.proxy(this.hover_end, this, io));
+	io.el_handle.dblclick($.proxy(this.double_click, this, io));
+	io.el_handle.drag($.proxy(this.drag_move, this, io),
+			  $.proxy(this.drag_start, this, io),
+			  $.proxy(this.drag_end, this, io));
+	io.el_handle.hover($.proxy(this.hover_start, this, io),
+			   $.proxy(this.hover_end, this, io));
     }
 
     this.disable_hover = function() {

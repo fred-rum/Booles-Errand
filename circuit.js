@@ -6,7 +6,7 @@ function Circuits() {
     this.be = {}
     this.be.paper = Raphael("holder", "100%", "100%");
 
-    var em_size = $('.box').width() / 8; // *** 8
+    var em_size = $('.box').width() / 8;
     this.be.io_spacing = em_size * 10/8;
     this.be.io_handle_size = this.be.io_spacing * 3/4;
     this.be.stub_len = em_size * 5/8;
@@ -22,17 +22,22 @@ function Circuits() {
     this.be.stroke_cell_fg = em_size * 3/16;
     this.be.stroke_cell_bg = em_size * 7/16;
 
-    this.be.stroke_stub_end_undefined = em_size * 1/16;
-    this.be.stroke_stub_end_defined   = em_size * 3/16; // *** 3/16
+    this.be.stroke_stub_end_undefined = em_size * 0.5/16;
+    this.be.stroke_stub_end_defined   = em_size * 2/16;
 
     this.be.stroke_io_handle = em_size * 1/16;
 
     this.be.sim = new Sim();
     this.be.drag = new Drag(this.be);
 
-    this.be.null_cell = new Cell(this.be, "null", 0, 0);
-    this.be.null_io = this.be.null_cell.io["null"];
-    this.be.null_io.draw.insertAfter(this.be.null_cell.draw); // ?
+    // Create Z-level references
+    this.be.z_cell = this.be.paper.path("M0,0");
+    this.be.z_wire = this.be.paper.path("M0,0");
+    this.be.z_io = this.be.paper.path("M0,0");
+    this.be.z_handle = this.be.paper.path("M0,0");
+
+    // null cell
+    new Cell(this.be, "null", 0, 0);
 
     var c0 = new Cell(this.be, "const", 100, 250);
     var c1 = new Cell(this.be, "buf", 200, 200);
