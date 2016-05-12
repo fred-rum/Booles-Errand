@@ -147,7 +147,7 @@ function Cell(type, x, y) {
 	this.drag.disable_hover();
 
 	// Pop cell to top for more natural dragging.
-	this.draw.insertBefore(this.null_cell.draw);
+	this.draw_cell.insertBefore(this.null_cell.draw);
     }
 
     function cell_drag_move(dx, dy, x, y, event) {
@@ -198,7 +198,8 @@ function Cell(type, x, y) {
 	// colors depending on the IO state.  Therefore, each is its own
 	// path, owned by the IO instance.  The cell does still get the
 	// drawing elements, though, so that they can be added to the
-	// set for translation.
+	// set for translation.  (But the cell also keeps them separately
+	// to avoid changing their Z level.)
 	for (var name in this.io) {
 	    this.draw.push(this.io[name].draw_stub_fg(this.stub_fg_attr, this.stub_end_attr));
 	}
@@ -381,6 +382,9 @@ function Cell(type, x, y) {
 		   $.proxy(cell_drag_end, this));
 
     // Add the IO handles to the draw set so that they get moved with the cell.
+    this.draw_cell = paper.set();
+    this.draw.forEach($.proxy(function(el) {this.draw_cell.push(el);}),
+		      this);
     for (var port_name in this.io) {
 	this.draw.push(this.io[port_name].draw_set);
     }
