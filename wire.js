@@ -370,6 +370,12 @@ function Wire(be, io1, io2) {
 	    cwa = 0;
 	    cwb = 0;
 
+	    if (dx*dx+dy*dy < 4){
+		// For wires shorter than 2r, reduce the radius proportionally.
+		// This makes dragging out a new wire look smoother.
+		r *= Math.sqrt(dx*dx+dy*dy)/2;
+	    }
+
 	    var xy = dx/dy;
 	    if (dy >= 0){
 		/* 0 < dy < 4 */
