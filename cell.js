@@ -145,6 +145,9 @@ function Cell(type, x, y) {
 	this.drag_dx = 0;
 	this.drag_dy = 0;
 	this.drag.disable_hover();
+
+	// Pop cell to top for more natural dragging.
+	this.draw.insertBefore(this.null_cell.draw);
     }
 
     function cell_drag_move(dx, dy, x, y, event) {
