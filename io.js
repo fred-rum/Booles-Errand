@@ -1,6 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Io(cell, name, type, x, y) {
+function Io(be, cell, name, type, x, y) {
+    this.be = be;
     this.cell = cell;
     this.name = name;
     this.type = type;
@@ -20,12 +21,12 @@ function Io(cell, name, type, x, y) {
     this.draw_stub_fg = function(stub_fg_attr, stub_end_attr) {
 	var stub_end_path = ["M", x, y-3,
 			     "v", 6];
-	this.stub_end = this.paper.path(stub_end_path).attr(stub_end_attr);
+	this.stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
 	this.stub_end.setAttr("visibility", "hidden");
 
-	this.stub = this.paper.path(this.path).attr(stub_fg_attr);
+	this.stub = this.be.paper.path(this.path).attr(stub_fg_attr);
 
-	return this.paper.set(this.stub_end, this.stub);
+	return this.be.paper.set(this.stub_end, this.stub);
     };
 
     this.connect = function(wire) {
@@ -139,17 +140,12 @@ function Io(cell, name, type, x, y) {
 	fill: "#ff0",
 	opacity: "0.80"
     };
-    this.draw = this.paper.circle(x, y, tw/2, tw/2).attr(attr);
+    this.draw = this.be.paper.circle(x, y, tw/2, tw/2).attr(attr);
     this.draw.setAttr("visibility", "hidden");
     this.draw.setAttr("pointer-events", "all");
 
     if (type != "null"){
-	this.draw.dblclick($.proxy(this.drag.double_click, this.drag, this));
-	this.draw.drag($.proxy(this.drag.drag_move, this.drag, this),
-		       $.proxy(this.drag.drag_start, this.drag, this),
-		       $.proxy(this.drag.drag_end, this.drag, this));
-	this.draw.hover($.proxy(this.drag.hover_start, this.drag, this),
-			$.proxy(this.drag.hover_end, this.drag, this));
+	this.be.drag.enable_drag(this);
 
 	// Placeholders to display IO value in text and rectangle object.
 	// The position of the text and the size and position of the rectangle
@@ -165,21 +161,21 @@ function Io(cell, name, type, x, y) {
 	    "font-size": text_height
 	};
 	this.value_y = 0;
-	this.draw_value = this.paper.text(this.x, this.value_y, "").attr(attr);
+	this.draw_value = this.be.paper.text(this.x, this.value_y, "").attr(attr);
 	this.draw_value.setAttr("pointer-events", "none");
 
 	var attr_bg = {
 	    "stroke-width": 0,
 	    opacity: "0"
 	};
-	this.draw_value_bg = this.paper.rect(0, 0, 0, 0);
+	this.draw_value_bg = this.be.paper.rect(0, 0, 0, 0);
 	this.draw_value_bg.attr(attr_bg);
 	this.draw_value_bg.insertBefore(this.draw_value);
 	this.draw_value_bg.setAttr("pointer-events", "none");
 
-	this.draw_set = this.paper.set(this.draw,
-				       this.draw_value_bg,
-				       this.draw_value);
+	this.draw_set = this.be.paper.set(this.draw,
+					  this.draw_value_bg,
+					  this.draw_value);
     }
 
 

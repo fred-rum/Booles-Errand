@@ -1,6 +1,8 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Drag() {
+function Drag(be) {
+    this.be = be;
+
     this.remove_null_wire = function() {
 	if (this.null_wire){
 	    // remove_null_wire
@@ -20,7 +22,7 @@ function Drag() {
     };
 
     this.gen_old_wires = function(io) {
-	if (this.new_io == this.null_io){
+	if (this.new_io == this.be.null_io){
 	    var attr = {stroke: "#aaa"}; // gray
 	} else {
 	    var attr = {stroke: "#e88", // red
@@ -66,9 +68,9 @@ function Drag() {
     };
 
     this.update_free_drag = function(event) {
-	if (this.new_io == this.null_io){
-	    this.null_io.x = event.pageX - $("#holder").offset().left;
-	    this.null_io.y = event.pageY - $("#holder").offset().top;
+	if (this.new_io == this.be.null_io){
+	    this.be.null_io.x = event.pageX - $("#holder").offset().left;
+	    this.be.null_io.y = event.pageY - $("#holder").offset().top;
 
 	    if (this.null_wire){
 		this.null_wire.redraw();
@@ -79,7 +81,7 @@ function Drag() {
 		} else {
 		    var from_io = this.orig_io;
 		}
-		this.null_wire = new Wire(from_io, this.null_io);
+		this.null_wire = new Wire(this.be, from_io, this.be.null_io);
 		var attr = {stroke: "#eeb"}
 		this.null_wire.draw_bg.attr(attr);
 		this.null_wire.pending_new = true;
@@ -93,7 +95,7 @@ function Drag() {
 
     this.drag_end = function(io, event) {
 	this.orig_io.set_vis("drag", false);
-	if (this.new_io == this.null_io){
+	if (this.new_io == this.be.null_io){
 	    this.restore_old_wires();
 	} else {
 	    // Delete the old wires.
@@ -112,7 +114,19 @@ function Drag() {
 	while (io.w.length > 0) io.w[0].remove();
     };
 
+    this.enable_drag = function(io) {
+	io.draw.dblclick($.proxy(this.double_click, this, io));
+	io.draw.drag($.proxy(this.drag_move, this, io),
+		     $.proxy(this.drag_start, this, io),
+		     $.proxy(this.drag_end, this, io));
+	io.draw.hover($.proxy(this.hover_start, this, io),
+		      $.proxy(this.hover_end, this, io));
+    }
+
     this.disable_hover = function() {
+	// We could disable hover by removing the hover event triggers,
+	// but we'd have to do that for every IO.  So instead we just make
+	// a note to ignore hover events until they're re-enabled.
 	this.no_hover = true;
     }
 
@@ -146,7 +160,7 @@ function Drag() {
 	    // hover_start could conceivably be called on a new target
 	    // before hover_end is called on the old target.  In that case,
 	    // don't blow up the new info.
-	    if (io == this.new_io) this.update_new_io(this.null_io, event);
+	    if (io == this.new_io) this.update_new_io(this.be.null_io, event);
 	}
     };
 
@@ -157,7 +171,7 @@ function Drag() {
 	    this.gen_old_wires(i);
 	} else {
 	    this.gen_old_wires(i);
-	    this.new_wires.push(new Wire(o, i));
+	    this.new_wires.push(new Wire(this.be, o, i));
 	}
     };
 
@@ -165,7 +179,7 @@ function Drag() {
 	// Like cannot drag to like unless there are one or more wires
 	// on the original IO that can be moved.
 	if (this.orig_empty && (this.orig_io.type == io.type)){
-	    io = this.null_io;
+	    io = this.be.null_io;
 	}
 
 	if (io == this.new_io) return; // no change
@@ -183,7 +197,7 @@ function Drag() {
 	} else if ((this.orig_io.type == "output") && (io.type == "output")) {
 	    this.gen_old_wires(this.orig_io);
 	    for (var i = 0; i < this.old_wires.length; i++){
-		this.new_wires.push(new Wire(this.old_wires[i].i, this.new_io));
+		this.new_wires.push(new Wire(this.be, this.old_wires[i].i, this.new_io));
 	    }
 	} else if ((this.orig_io.type == "input") && (io.type == "output")) {
 	    this.connect_o_to_i(io, this.orig_io);
@@ -196,11 +210,11 @@ function Drag() {
 		// events), do nothing instead.
 	    } else {
 		this.gen_old_wires(io);
-		this.new_wires.push(new Wire(this.orig_io.w[0].o, io));
+		this.new_wires.push(new Wire(this.be, this.orig_io.w[0].o, io));
 	    }
 	} else {
 	    // This should never happen.
-	    this.update_new_io(this.null_io, event);
+	    this.update_new_io(this.be.null_io, event);
 	}
 	this.mark_new_wires();
     };

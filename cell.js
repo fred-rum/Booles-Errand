@@ -1,7 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Cell(type, x, y) {
-    var paper = this.paper;
+function Cell(be, type, x, y) {
+    this.be = be;
     this.type = type;
     this.x = x;
     this.y = y;
@@ -74,7 +74,7 @@ function Cell(type, x, y) {
 	// value per tick.  If that happens, record the last value, but don't
 	// re-register the cell for ticking.
 	if (this.newest_value === null) {
-	    this.sim.register_obj(this);
+	    this.be.sim.register_obj(this);
 	}
 	this.newest_value = value;
     };
@@ -144,10 +144,10 @@ function Cell(type, x, y) {
     function cell_drag_start(x, y, event) {
 	this.drag_dx = 0;
 	this.drag_dy = 0;
-	this.drag.disable_hover();
+	this.be.drag.disable_hover();
 
 	// Pop cell to top for more natural dragging.
-	this.draw_cell.insertBefore(this.null_cell.draw);
+	this.draw_cell.insertBefore(this.be.null_cell.draw);
     }
 
     function cell_drag_move(dx, dy, x, y, event) {
@@ -163,7 +163,7 @@ function Cell(type, x, y) {
     }
 
     function cell_drag_end() {
-	this.drag.enable_hover();
+	this.be.drag.enable_hover();
     }
 
     this.init_io = function(inv, ni, left, right) {
@@ -172,12 +172,13 @@ function Cell(type, x, y) {
 
 	if (inv) right += this.inv_size;
 
-	var io_obj = new Io(this, "o", "output", right+cw, 0);
+	var io_obj = new Io(this.be, this, "o", "output", right+cw, 0);
 	this.io[io_obj.name] = io_obj;
 
 	for (var i = 0; i < ni; i++) {
 	    var y = ((i+0.5)*cs)-(ni*cs/2);
-	    var io_obj = new Io(this, (ni > 1) ? "i" + i : "i", "input",
+	    var io_obj = new Io(this.be, this,
+				(ni > 1) ? "i" + i : "i", "input",
 				left-cw, y);
 	    this.io[io_obj.name] = io_obj;
 	}
@@ -192,7 +193,7 @@ function Cell(type, x, y) {
 	for (var name in this.io) {
 	    stub_path = stub_path.concat(this.io[name].path);
 	}
-	this.draw.push(paper.path(stub_path).attr(this.stub_bg_attr));
+	this.draw.push(this.be.paper.path(stub_path).attr(this.stub_bg_attr));
 
 	// In contrast, the stub foregrounds can be drawn in different
 	// colors depending on the IO state.  Therefore, each is its own
@@ -223,7 +224,7 @@ function Cell(type, x, y) {
 		    fill: "#fff"
 		};
 	    }
-	    this.draw.push(paper.circle(inv_cx, 0, inv_r).attr(attr));
+	    this.draw.push(this.be.paper.circle(inv_cx, 0, inv_r).attr(attr));
 	}
     };
 
@@ -240,10 +241,10 @@ function Cell(type, x, y) {
 			 "v", height,
 			 "l", width, -height/2,
 			 "z"];
-	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
+	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
+	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -267,10 +268,10 @@ function Cell(type, x, y) {
 			 "h", -box_width,
 			 "z"];
 
-	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
+	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
+	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -298,10 +299,10 @@ function Cell(type, x, y) {
 			 "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 			 "z"];
 
-	this.draw.push(paper.path(cell_path).attr(this.cell_bg_attr));
+	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(paper.path(cell_path).attr(this.cell_fg_attr));
+	this.draw.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -338,11 +339,11 @@ function Cell(type, x, y) {
 			    "h", -bar_space,
 			    "z"];
 
-	this.draw.push(paper.path(cell_path_bg).attr(this.cell_bg_attr));
+	this.draw.push(this.be.paper.path(cell_path_bg).attr(this.cell_bg_attr));
 	this.draw_inv(inv, right, true);
 	this.draw_stubs();
-	this.draw.push(paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
-	this.draw.push(paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
+	this.draw.push(this.be.paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
+	this.draw.push(this.be.paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
 	this.draw_inv(inv, right, false);
     };
 
@@ -355,34 +356,34 @@ function Cell(type, x, y) {
 
 	this.init_io(false, 0, left, right);
 
-	this.draw.push(paper.rect(left, top, width, height).attr(this.cell_bg_attr));
+	this.draw.push(this.be.paper.rect(left, top, width, height).attr(this.cell_bg_attr));
 	this.draw_stubs();
-	this.draw.push(paper.rect(left, top, width, height).attr(this.cell_fg_attr));
+	this.draw.push(this.be.paper.rect(left, top, width, height).attr(this.cell_fg_attr));
     };
 
     this.null = function() {
 	// A "null" port is used as the connection point for wires
 	// currently being dragged.
-	var io_obj = new Io(this, "null", "null", 0, 0);
+	var io_obj = new Io(this.be, this, "null", "null", 0, 0);
 	this.io["null"] = io_obj;
 
 	// A blank graphic element is used as a reference point for Z ordering.
-	this.draw.push(paper.path("M0,0"));
+	this.draw.push(this.be.paper.path("M0,0"));
     };
 
-    this.draw = paper.set();
+    this.draw = this.be.paper.set();
     this[type](); // Call cell-type initiator function by name
     if (type == "null") return; // do nothing else for the null cell
 
     // Do these things to the cell graphic before before adding
     // the IO handles to the draw set.
-    this.draw.insertBefore(this.null_cell.draw);
+    this.draw.insertBefore(this.be.null_cell.draw);
     this.draw.drag($.proxy(cell_drag_move, this),
 		   $.proxy(cell_drag_start, this),
 		   $.proxy(cell_drag_end, this));
 
     // Add the IO handles to the draw set so that they get moved with the cell.
-    this.draw_cell = paper.set();
+    this.draw_cell = this.be.paper.set();
     this.draw.forEach($.proxy(function(el) {this.draw_cell.push(el);}),
 		      this);
     for (var port_name in this.io) {

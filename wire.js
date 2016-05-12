@@ -1,6 +1,8 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Wire(io1, io2) {
+function Wire(be, io1, io2) {
+    this.be = be;
+
     // When the user drags out new wires, he could be dragging in either
     // direction, so we reverse the ports as appropriate.  Note that the
     // null_cell has port type "null", so we have to look at the other
@@ -185,7 +187,7 @@ function Wire(io1, io2) {
 	// If any values are in flight, the wire is already registered
 	// to receive the next tick, so don't duplicate the registration.
 	if ((!this.in_flight.length) && (this.newest_value === null)) {
-	    this.sim.register_obj(this);
+	    this.be.sim.register_obj(this);
 	}
 
 	// A cell should only produce one value per tick, but if the user
@@ -218,7 +220,7 @@ function Wire(io1, io2) {
 		    "stroke-width": 1,
 		    stroke: Wire.color(fl_obj.value)
 		};
-		fl_obj.draw = this.paper.path("M0,0").attr(attr);
+		fl_obj.draw = this.be.paper.path("M0,0").attr(attr);
 		fl_obj.draw.insertAfter(older_draw);
 	    }
 
@@ -281,7 +283,7 @@ function Wire(io1, io2) {
 	}
 
 	if (this.in_flight.length){
-	    this.sim.register_obj(this);
+	    this.be.sim.register_obj(this);
 	}
     };
 
@@ -465,13 +467,13 @@ function Wire(io1, io2) {
 	"stroke-width": 7,
 	stroke: "#eee"
     };
-    this.draw_bg = this.paper.path(this.path).attr(attr);
+    this.draw_bg = this.be.paper.path(this.path).attr(attr);
 
     var attr = {
 	"stroke-width": 1,
 	stroke: "#000"
     };
-    this.draw_fg = this.paper.path(this.path).attr(attr);
+    this.draw_fg = this.be.paper.path(this.path).attr(attr);
 
     this.draw_bg.setAttr("pointer-events", "none");
     this.draw_fg.setAttr("pointer-events", "none");
@@ -479,7 +481,7 @@ function Wire(io1, io2) {
     // Insert the new wire just above the null gate so that it is below
     // IO handles.  This is its default position, but its Z order may be
     // changed by o.connect().
-    this.draw_bg.insertBefore(this.null_io.draw);
+    this.draw_bg.insertBefore(this.be.null_io.draw);
     this.draw_fg.insertAfter(this.draw_bg);
 
     this.o.connect(this);
