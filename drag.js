@@ -88,6 +88,7 @@ function Drag(be) {
     };
 
     this.drag_end = function(io, event) {
+	io.display_fail(false);
 	this.orig_io.set_vis("drag", false);
 	if (this.new_io == this.be.null_io){
 	    this.restore_old_wires();
@@ -147,6 +148,7 @@ function Drag(be) {
     };
 
     this.hover_end = function(io, event) {
+	io.display_fail(false);
 	io.set_vis("hover", false);
 	this.pending_hover_io = undefined;
 
@@ -175,6 +177,7 @@ function Drag(be) {
 	// when the new IO is the same as the original IO.
 	if (this.orig_empty && (this.orig_io.type == io.type) &&
 	    (io != this.orig_io)){
+	    io.display_fail(true);
 	    io = this.be.null_io;
 	}
 

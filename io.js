@@ -72,8 +72,8 @@ function Io(be, cell, name, type, x, y) {
 	}
     };
 
-    this.set_vis = function(type, value) {
-	this.vis_state[type] = value;
+    this.set_vis = function(type, vis) {
+	this.vis_state[type] = vis;
 	for (var name in this.vis_state){
 	    if (this.vis_state[name]){
 		this.el_handle.setAttr("visibility", "visible");
@@ -81,6 +81,34 @@ function Io(be, cell, name, type, x, y) {
 	    }
 	}
 	this.el_handle.setAttr("visibility", "hidden");
+    };
+
+    this.display_fail = function(fail) {
+	if (fail){
+	    var tw = this.be.io_handle_size;
+	    var attr = {
+		"stroke-width": tw/5,
+		stroke: "#f00",
+		fill: "#fff"
+	    };
+	    var cx = this.cell.x + this.x;
+	    var cy = this.cell.y + this.y;
+
+	    this.el_fail_circle = this.be.paper.circle(cx, cy, tw/2, tw/2);
+	    this.el_fail_circle.attr(attr);
+	    this.el_fail_circle.setAttr("pointer-events", "none");
+
+	    // Rather than doing trigonometry to draw the diagonal slash,
+	    // we just draw it straight and then rotate it.
+	    this.el_fail_slash = this.be.paper.path(["M", cx, cy-tw/2,
+						     "v", tw]);
+	    this.el_fail_slash.attr(attr);
+	    this.el_fail_slash.rotate(45, cx, cy);
+	    this.el_fail_slash.setAttr("pointer-events", "none");
+	} else if (this.el_fail_circle){
+	    this.el_fail_circle.remove();
+	    this.el_fail_slash.remove();
+	}
     };
 
     this.update_value = function(value) {
