@@ -22,22 +22,16 @@ function Drag(be) {
     };
 
     this.gen_old_wires = function(io) {
-	if (this.new_io == this.be.null_io){
-	    var attr = {stroke: "#aaa"}; // gray
-	} else {
-	    var attr = {stroke: "#e88", // red
-		       "stroke-dasharray": "-"};
-	}
+	var type = (this.new_io == this.be.null_io) ? "null" : "del";
 	this.old_wires = this.old_wires.concat(io.w.slice(0));
 	for (var i = 0; i < this.old_wires.length; i++){
-	    this.old_wires[i].mark_old(attr);
+	    this.old_wires[i].mark_old(type);
 	}
     };
 
     this.restore_old_wires = function() {
-	var attr = {"stroke-dasharray": ""};
 	for (var i = 0; i < this.old_wires.length; i++){
-	    this.old_wires[i].restore_old(attr);
+	    this.old_wires[i].restore_old();
 	}
 	this.old_wires = [];
     };
@@ -180,7 +174,7 @@ function Drag(be) {
 	// on the original IO that can be moved.  The exception is
 	// when the new IO is the same as the original IO.
 	if (this.orig_empty && (this.orig_io.type == io.type) &&
-	    (!io == this.orig_io)){
+	    (io != this.orig_io)){
 	    io = this.be.null_io;
 	}
 

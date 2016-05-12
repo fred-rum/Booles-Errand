@@ -116,7 +116,7 @@ function Wire(be, io1, io2) {
 	    this.redraw_fg();
 	}
 	var n1 = performance.now();
-	console.log(name, n1-n0);
+	return n1-n0;
     };
 
     this.remove = function() {
@@ -149,22 +149,16 @@ function Wire(be, io1, io2) {
 	}
     }
 
-    this.mark_old = function(attr) {
-	// If a value is propagating, draw_fg may be just the end of the path.
-	// Reset it to the whole path, then mark the wire with the "old"
-	// attributes.
-	attr.path = this.path;
-	this.draw_fg.attr(attr);
-
-	// pending_del means that the wire (end) color cannot be modified.
-	this.pending_del = true;
-
-	this.remove_subpaths();
+    this.mark_old = function(type) {
+	this.pending_del = type;
+	if (type == "del"){
+	    this.remove_subpaths();
+	}
+	this.redraw_fg();
     }
 
-    this.restore_old = function(attr) {
+    this.restore_old = function() {
 	this.pending_del = false;
-	this.draw_fg.attr(attr);
 	this.redraw_fg();
     }
 
@@ -188,33 +182,33 @@ function Wire(be, io1, io2) {
     };
 
     this.redraw_fg = function() {
-	if (this.pending_del) return;
-
 	var older_value = this.i.value;
 	var older_draw = this.draw_fg;
 	var older_age_len = this.path_length;
 
-	for (var i = 0; i < this.in_flight.length; i++){
-	    var fl_obj = this.in_flight[i];
-	    var age_len = fl_obj.age * this.path_length;
-	    var path = this.get_subpath(age_len, older_age_len);
-	    older_draw.attr({path: path});
+	if (this.pending_del != "del"){ // no sub-paths when "del"
+	    for (var i = 0; i < this.in_flight.length; i++){
+		var fl_obj = this.in_flight[i];
+		var age_len = fl_obj.age * this.path_length;
+		var path = this.get_subpath(age_len, older_age_len);
+		older_draw.attr({path: path});
 
-	    if (!fl_obj.draw){
-		// Draw a path placeholder of the appropriate color.
-		// The actual path will be inserted at the next loop
-		// iteration or the end of the loop.
-		var attr = {
-		    "stroke-width": this.be.stroke_wire_fg,
-		    stroke: Wire.color(fl_obj.value)
-		};
-		fl_obj.draw = this.be.paper.path("M0,0").attr(attr);
-		fl_obj.draw.insertAfter(older_draw);
+		if (!fl_obj.draw){
+		    // Draw a path placeholder of the appropriate color.
+		    // The actual path will be inserted at the next loop
+		    // iteration or the end of the loop.
+		    var attr = {
+			"stroke-width": this.be.stroke_wire_fg,
+			stroke: Wire.color(fl_obj.value)
+		    };
+		    fl_obj.draw = this.be.paper.path("M0,0").attr(attr);
+		    fl_obj.draw.insertAfter(older_draw);
+		}
+
+		older_value = fl_obj.value;
+		older_draw = fl_obj.draw;
+		older_age_len = age_len;
 	    }
-
-	    older_value = fl_obj.value;
-	    older_draw = fl_obj.draw;
-	    older_age_len = age_len;
 	}
 
 	var path;
@@ -224,10 +218,22 @@ function Wire(be, io1, io2) {
 	} else {
 	    path = this.get_subpath(0, older_age_len);
 	}
-	var attr = {
-	    path: path,
-	    stroke: Wire.color(older_value)
-	};
+	var attr;
+	if (this.pending_del == "del"){
+	    attr = {
+		path: path,
+		stroke: "#e88", // red
+		"stroke-dasharray": "-",
+		opacity: "1.0"
+	    };
+	} else {
+	    attr = {
+		path: path,
+		stroke: Wire.color(older_value),
+		"stroke-dasharray": "",
+		opacity: (this.pending_del == "null") ? "0.4" : "1.0"
+	    };
+	}
 	older_draw.attr(attr);
     };
 
