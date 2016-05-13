@@ -5,19 +5,22 @@ function Circuit() {
 
     // this.be is a data structure for "global" values for the whole circuit.
     this.be = {}
-    this.be.paper = Raphael("holder", "100%", "100%");
+    this.be.cdrag = Raphael("cdrag", "100%", "100%");
+    this.be.cbox = Raphael("cbox", "100%", "100%");
+    this.be.cdraw = Raphael("cdraw", "100%", "100%");
 
-    this.div_canvas = $("#holder");
+    this.div_cdraw = $("#cdraw");
+    this.div_cdrag = $("#cdrag");
     this.div_msgs = $("#msgs");
-    this.div_box_container = $("#box_container");
-    this.div_cell_box = $("#cell_box");
-    $(window).resize($.proxy(this.resizePaper, this)); 
-    this.resizePaper();
+    this.div_cbox_container = $("#cbox_container");
+    this.div_cbox = $("#cbox");
+    $(window).resize($.proxy(this.resize, this)); 
+    this.resize();
 
     // Sizes are based on the "em" size in the document.  Thus,
     // devices with very small pixels (like phones) will scale up as
     // appropriate.
-    var em_size = $('#box_container').width() / 8;
+    var em_size = $('#cbox_container').width() / 8;
     this.be.io_spacing = em_size * 10/8;
     this.be.io_handle_size = this.be.io_spacing * 3/4;
     this.be.stub_len = em_size * 5/8;
@@ -42,10 +45,10 @@ function Circuit() {
     this.be.cell_grid_y = this.be.io_spacing * 4;
 
     // Create Z-level references
-    this.be.z_cell = this.be.paper.path("M0,0");
-    this.be.z_wire = this.be.paper.path("M0,0");
-    this.be.z_io = this.be.paper.path("M0,0");
-    this.be.z_handle = this.be.paper.path("M0,0");
+    this.be.z_cell = this.be.cdraw.path("M0,0");
+    this.be.z_wire = this.be.cdraw.path("M0,0");
+    this.be.z_io = this.be.cdraw.path("M0,0");
+    this.be.z_handle = this.be.cdraw.path("M0,0");
 
     // null cell
     new Cell(this.be, "null");
@@ -67,12 +70,26 @@ function Circuit() {
     c0.drive_output(0);
 }
 
-Circuit.prototype.resizePaper = function(){
-    var width = this.div_canvas.width();
-    var height = this.div_canvas.height();
-    //this.be.paper.setSize(width, height);
-    var offset = this.div_msgs.offset();
-    this.div_box_container.height(offset.top);
+Circuit.prototype.resize = function(){
+    var overall_width = this.div_cdrag.width();
+    var overall_height = this.div_cdrag.height();
+    this.be.cdraw_left = this.div_cbox_container.outerWidth();
+    this.be.cdraw_top = this.div_msgs.outerHeight();
+    this.be.cdraw_width = overall_width - this.be.cdraw_left;
+    this.be.cdraw_height = overall_height - this.be.cdraw_top;
+    var cbox_offset = {
+	top: this.be.cdraw_top,
+	left: 0
+    };
+    this.div_cbox_container.offset(cbox_offset);
+    this.div_cbox_container.height(overall_height - this.be.cdraw_top);
+    var cdraw_offset = {
+	top: this.be.cdraw_top,
+	left: this.be.cdraw_left
+    };
+    this.div_cdraw.offset(cdraw_offset);
+    this.div_cdraw.height(this.be.cdraw_height);
+    this.div_cdraw.width(this.be.cdraw_width);
 };
 
 // This is called as soon as the DOM is ready.

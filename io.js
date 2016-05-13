@@ -22,7 +22,7 @@ function Io(be, cell, name, type, x, y) {
 	opacity: "0.80"
     };
     var tw = this.be.io_handle_size;
-    this.el_handle = this.be.paper.circle(x, y, tw/2, tw/2).attr(attr);
+    this.el_handle = this.be.cdraw.circle(x, y, tw/2, tw/2).attr(attr);
     this.el_handle.setAttr("visibility", "hidden");
     this.el_handle.setAttr("pointer-events", "all");
 
@@ -44,18 +44,18 @@ function Io(be, cell, name, type, x, y) {
 	    "font-size": text_height
 	};
 	this.value_y = 0;
-	this.el_value_text = this.be.paper.text(this.x, this.value_y, "").attr(attr);
+	this.el_value_text = this.be.cdraw.text(this.x, this.value_y, "").attr(attr);
 	this.el_value_text.setAttr("pointer-events", "none");
 
 	var attr_bg = {
 	    "stroke-width": 0,
 	    opacity: "0"
 	};
-	this.el_value_text_bg = this.be.paper.rect(0, 0, 0, 0);
+	this.el_value_text_bg = this.be.cdraw.rect(0, 0, 0, 0);
 	this.el_value_text_bg.attr(attr_bg);
 	this.el_value_text_bg.setAttr("pointer-events", "none");
 
-	this.set_io = this.be.paper.set(this.el_handle,
+	this.set_io = this.be.cdraw.set(this.el_handle,
 					this.el_value_text_bg,
 					this.el_value_text);
     }
@@ -79,11 +79,11 @@ Io.prototype.draw_stub_fg = function() {
     };
     var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
 			 "v", this.be.stub_end_len];
-    this.el_stub_end = this.be.paper.path(stub_end_path).attr(stub_end_attr);
+    this.el_stub_end = this.be.cdraw.path(stub_end_path).attr(stub_end_attr);
     this.el_stub_end.setAttr("visibility", "hidden");
     this.set_io.push(this.el_stub_end);
 
-    this.stub = this.be.paper.path(this.path).attr(stub_fg_attr);
+    this.stub = this.be.cdraw.path(this.path).attr(stub_fg_attr);
     return this.stub;
 };
 
@@ -144,13 +144,13 @@ Io.prototype.display_fail = function(fail) {
 	var cx = this.cell.x + this.x;
 	var cy = this.cell.y + this.y;
 
-	this.el_fail_circle = this.be.paper.circle(cx, cy, tw/2, tw/2);
+	this.el_fail_circle = this.be.cdraw.circle(cx, cy, tw/2, tw/2);
 	this.el_fail_circle.attr(attr);
 	this.el_fail_circle.setAttr("pointer-events", "none");
 
 	// Rather than doing trigonometry to draw the diagonal slash,
 	// we just draw it straight and then rotate it.
-	this.el_fail_slash = this.be.paper.path(["M", cx, cy-tw/2,
+	this.el_fail_slash = this.be.cdraw.path(["M", cx, cy-tw/2,
 						 "v", tw]);
 	this.el_fail_slash.attr(attr);
 	this.el_fail_slash.rotate(45, cx, cy);

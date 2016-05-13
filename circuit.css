@@ -2,19 +2,30 @@
 
 body {
     margin: 0;
-    background: #eee;
     color: #000;
     z-index: 0;
 }
-#holder {
+#cdrag {
     position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+}
+#cdraw {
+    position: fixed;
+    top: 0;
+    left: 0;
     height: 100%;
     width: 100%;
     z-index: 1;
+    background: #eee;
 }
-#box_container {
+#cbox_container {
     position: fixed;
-    top: 0;
+    bottom: 0;
+    left: 0;
     width: 8em;
     height: 100%;
     overflow-x: hidden;
@@ -22,16 +33,17 @@ body {
     z-index: 2;
     background-color: #d0ffd0;
 }
-#cell_box {
+#cbox {
     top: 0;
+    left: 0;
     width: 8em;
     height: 20em;
-    z-index: -2;
     background-color: #d0ffd0;
 }
 #msgs {
     position: fixed;
-    bottom: 0;
+    top: 0;
+    left: 0;
     width: 100%;
     z-index: 3;
 }
@@ -44,7 +56,7 @@ body {
 }
 .info {
     height: auto;
-    border-style: solid none none none;
+    border-style: none none solid none;
     border-width: thin;
     background-color: #d0d0ff;
 }

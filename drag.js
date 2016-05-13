@@ -64,8 +64,8 @@ Drag.prototype.commit_new_wires = function() {
 
 Drag.prototype.update_free_drag = function(event) {
     if (this.new_io == this.be.null_io){
-	this.be.null_io.x = event.pageX - $("#holder").offset().left;
-	this.be.null_io.y = event.pageY - $("#holder").offset().top;
+	this.be.null_io.x = event.pageX - this.be.cdraw_left;
+	this.be.null_io.y = event.pageY - this.be.cdraw_top;
 
 	if (this.null_wire){
 	    this.null_wire.redraw();

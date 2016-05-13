@@ -21,13 +21,13 @@ function Wire(be, io1, io2) {
 	"stroke-width": this.be.stroke_wire_bg,
 	stroke: "#eee"
     };
-    this.el_bg = this.be.paper.path(this.path).attr(attr);
+    this.el_bg = this.be.cdraw.path(this.path).attr(attr);
 
     var attr = {
 	"stroke-width": this.be.stroke_wire_fg,
 	stroke: "#000"
     };
-    this.el_fg = this.be.paper.path(this.path).attr(attr);
+    this.el_fg = this.be.cdraw.path(this.path).attr(attr);
 
     this.el_bg.setAttr("pointer-events", "none");
     this.el_fg.setAttr("pointer-events", "none");
@@ -450,7 +450,7 @@ Wire.prototype.redraw_fg = function() {
 		    "stroke-width": this.be.stroke_wire_fg,
 		    stroke: Wire.color(fl_obj.value)
 		};
-		fl_obj.el_subpath = this.be.paper.path("M0,0").attr(attr);
+		fl_obj.el_subpath = this.be.cdraw.path("M0,0").attr(attr);
 		fl_obj.el_subpath.insertAfter(older_el_subpath);
 	    }
 

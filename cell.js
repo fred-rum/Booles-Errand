@@ -41,13 +41,13 @@ function Cell(be, type, x, y) {
 	"stroke-linecap": "round"
     };
 
-    this.el_cell = this.be.paper.set();
+    this.el_cell = this.be.cdraw.set();
     this[type](); // Call cell-type initiator function by name
     if (type == "null") return; // do nothing else for the null cell
 
     // Make a separate xform set that includes the IO elements so that they
     // get moved with the cell.
-    this.set_xform = this.be.paper.set();
+    this.set_xform = this.be.cdraw.set();
     var set_callback = $.proxy(function(el) {this.set_xform.push(el);});
     this.el_cell.forEach(set_callback, this);
 
@@ -210,7 +210,7 @@ Cell.prototype.draw_stubs = function() {
     for (var name in this.io) {
 	stub_path = stub_path.concat(this.io[name].path);
     }
-    this.el_cell.push(this.be.paper.path(stub_path).attr(this.stub_bg_attr));
+    this.el_cell.push(this.be.cdraw.path(stub_path).attr(this.stub_bg_attr));
 
     // In contrast, the stub foregrounds can be drawn in different
     // colors depending on the IO state.  Therefore, each is its own
@@ -230,7 +230,7 @@ Cell.prototype.draw_inv = function(inv, right, bg) {
 	var sw = bg ? 9 : 3;
 	var sc = bg ? "#eee" : "#000";
 	var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
-	this.el_cell.push(this.be.paper.circle(inv_cx, 0, inv_r).attr(attr));
+	this.el_cell.push(this.be.cdraw.circle(inv_cx, 0, inv_r).attr(attr));
     }
 };
 
@@ -247,10 +247,10 @@ Cell.prototype.buf = function(inv) {
 		     "v", height,
 		     "l", width, -height/2,
 		     "z"];
-    this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_fg_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -274,10 +274,10 @@ Cell.prototype.and = function(inv) {
 		     "h", -box_width,
 		     "z"];
 
-    this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_fg_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -305,10 +305,10 @@ Cell.prototype.or = function(inv) {
 		     "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 		     "z"];
 
-    this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_bg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.paper.path(cell_path).attr(this.cell_fg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_fg_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -345,11 +345,11 @@ Cell.prototype.xor = function(inv) {
 			"h", -bar_space,
 			"z"];
 
-    this.el_cell.push(this.be.paper.path(cell_path_bg).attr(this.cell_bg_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path_bg).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.paper.path(cell_path_bg).attr(this.cell_fg_fill_attr));
-    this.el_cell.push(this.be.paper.path(cell_path_fg).attr(this.cell_fg_line_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path_bg).attr(this.cell_fg_fill_attr));
+    this.el_cell.push(this.be.cdraw.path(cell_path_fg).attr(this.cell_fg_line_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -362,9 +362,9 @@ Cell.prototype.const = function() {
 
     this.init_io(false, 0, left, right);
 
-    this.el_cell.push(this.be.paper.rect(left, top, width, height).attr(this.cell_bg_attr));
+    this.el_cell.push(this.be.cdraw.rect(left, top, width, height).attr(this.cell_bg_attr));
     this.draw_stubs();
-    this.el_cell.push(this.be.paper.rect(left, top, width, height).attr(this.cell_fg_attr));
+    this.el_cell.push(this.be.cdraw.rect(left, top, width, height).attr(this.cell_fg_attr));
 };
 
 Cell.prototype.null = function() {
