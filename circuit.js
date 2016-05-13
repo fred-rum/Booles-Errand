@@ -9,11 +9,11 @@ function Circuit() {
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
 
-  this.div_cdraw = $("#cdraw");
-  this.div_cdrag = $("#cdrag");
-  this.div_msgs = $("#msgs");
-  this.div_cbox_container = $("#cbox_container");
-  this.div_cbox = $("#cbox");
+  this.be.div_cdraw = $("#cdraw");
+  this.be.div_cdrag = $("#cdrag");
+  this.be.div_msgs = $("#msgs");
+  this.be.div_cbox_container = $("#cbox_container");
+  this.be.div_cbox = $("#cbox");
   $(window).resize($.proxy(this.resize, this)); 
   this.resize();
 
@@ -69,7 +69,7 @@ function Circuit() {
   this.add_box_cell("xor");
   this.add_box_cell("xnor");
   this.add_box_cell("const");
-  this.div_cbox.height(this.box_height);
+  this.be.div_cbox.height(this.box_height);
 
   var c0 = new Cell(this.be, "cdraw", "const", 1, 2);
   var c1 = new Cell(this.be, "cdraw", "buf", 2, 0);
@@ -85,25 +85,25 @@ function Circuit() {
 }
 
 Circuit.prototype.resize = function(){
-  var overall_width = this.div_cdrag.width();
-  var overall_height = this.div_cdrag.height();
-  this.be.cdraw_left = this.div_cbox_container.outerWidth();
-  this.be.cdraw_top = this.div_msgs.outerHeight();
+  var overall_width = this.be.div_cdrag.width();
+  var overall_height = this.be.div_cdrag.height();
+  this.be.cdraw_left = this.be.div_cbox_container.outerWidth();
+  this.be.cdraw_top = this.be.div_msgs.outerHeight();
   this.be.cdraw_width = overall_width - this.be.cdraw_left;
   this.be.cdraw_height = overall_height - this.be.cdraw_top;
   var cbox_offset = {
     top: this.be.cdraw_top,
     left: 0
   };
-  this.div_cbox_container.offset(cbox_offset);
-  this.div_cbox_container.height(overall_height - this.be.cdraw_top);
+  this.be.div_cbox_container.offset(cbox_offset);
+  this.be.div_cbox_container.height(overall_height - this.be.cdraw_top);
   var cdraw_offset = {
     top: this.be.cdraw_top,
     left: this.be.cdraw_left
   };
-  this.div_cdraw.offset(cdraw_offset);
-  this.div_cdraw.height(this.be.cdraw_height);
-  this.div_cdraw.width(this.be.cdraw_width);
+  this.be.div_cdraw.offset(cdraw_offset);
+  this.be.div_cdraw.height(this.be.cdraw_height);
+  this.be.div_cdraw.width(this.be.cdraw_width);
 };
 
 Circuit.prototype.add_box_cell = function(name) {

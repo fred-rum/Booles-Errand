@@ -2,6 +2,7 @@
 
 function Cell(be, canvas_type, type, x, y) {
   this.be = be;
+  this.canvas_type = canvas_type;
   this.box = (canvas_type != "cdraw");
   this.canvas = (canvas_type == "cdraw") ? this.be.cdraw :
                 (canvas_type == "cbox")  ? this.be.cbox :
@@ -27,7 +28,7 @@ function Cell(be, canvas_type, type, x, y) {
   this.cell_bg_attr = {
     "stroke-width": this.be.stroke_cell_bg,
     "stroke-linejoin": "round",
-    stroke: this.box ? "#d0ffd0" : "#eee"
+    stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee"
   };
 
   // For the case that the foreground lines & fill are drawn separately.
@@ -47,7 +48,7 @@ function Cell(be, canvas_type, type, x, y) {
 
   this.stub_bg_attr = {
     "stroke-width": this.be.stroke_wire_bg,
-    stroke: this.box ? "#d0ffd0" : "#eee",
+    stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee",
     "stroke-linecap": "round"
   };
 
@@ -184,6 +185,17 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   // Pop cell to top for more natural dragging.
   this.bring_to_top();
 
+  // Bring the drag div (and its associated canvas) to the top of the Z order.
+  // This allows drawn elements to cross the scrollbar, and also prevents
+  // mouse events from reaching the scrollbar.
+  $(this.be.div_cdrag).css("z-index", "99")
+
+  var cdrag_x = this.x;
+  if (this.canvas == this.be.cdraw) cdrag_x += this.be.cdraw_left;
+  var cdrag_y = this.be.cdraw_top + this.y;
+
+  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y);
+
   this.del = false;
 }
 
@@ -194,9 +206,16 @@ Cell.prototype.move = function(dx, dy) {
 }
 
 Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
-  this.move(dx - this.drag_dx, dy - this.drag_dy);
+  var ddx = dx - this.drag_dx;
+  var ddy = dy - this.drag_dy;
   this.drag_dx = dx;
   this.drag_dy = dy;
+
+  this.cdrag_cell.move(ddx, ddy);
+
+  if (this.canvas == this.be.cbox) return;
+
+  this.move(ddx, ddy);
   var del = (!this.box &&
              ((x < this.be.cdraw_left) ||
               (y < this.be.cdraw_top) ||
@@ -223,6 +242,8 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
 
 Cell.prototype.cell_drag_end = function() {
   this.be.drag.enable_hover();
+  this.cdrag_cell.remove();
+  $(this.be.div_cdrag).css("z-index", "-1")
   if (this.del) this.remove();
 }
 
@@ -240,12 +261,12 @@ Cell.prototype.init_io = function(inv, ni, left, right) {
 
   if (inv) right += this.be.inv_bubble_size;
 
-  var io_obj = new Io(this.be, this.box, this, "o", "output", right+cw, 0);
+  var io_obj = new Io(this.be, this.canvas, this, "o", "output", right+cw, 0);
   this.io[io_obj.name] = io_obj;
 
   for (var i = 0; i < ni; i++) {
     var y = ((i+0.5)*cs)-(ni*cs/2);
-    var io_obj = new Io(this.be, this.box, this,
+    var io_obj = new Io(this.be, this.canvas, this,
                         (ni > 1) ? "i" + i : "i", "input",
                         left-cw, y);
     this.io[io_obj.name] = io_obj;
@@ -285,7 +306,7 @@ Cell.prototype.draw_inv = function(inv, right, bg) {
   }
 };
 
-Cell.prototype.inv = function() { return this.buf(true); };
+Cell.prototype.inv = function() { this.buf(true); };
 Cell.prototype.buf = function(inv) {
   var height = 1.5 * this.be.io_spacing;
   var width = Math.sqrt(height*height-height*height/4); /* equilateral */
@@ -305,7 +326,7 @@ Cell.prototype.buf = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.nand = function() { return this.and(true); };
+Cell.prototype.nand = function() { this.and(true); };
 Cell.prototype.and = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
@@ -332,7 +353,7 @@ Cell.prototype.and = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.nor = function() { return this.or(true); };
+Cell.prototype.nor = function() { this.or(true); };
 Cell.prototype.or = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
@@ -363,7 +384,7 @@ Cell.prototype.or = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.xnor = function() { return this.xor(true); };
+Cell.prototype.xnor = function() { this.xor(true); };
 Cell.prototype.xor = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
@@ -421,7 +442,7 @@ Cell.prototype.const = function() {
 Cell.prototype.null = function() {
   // A "null" port is used as the connection point for wires
   // currently being dragged.
-  var io_obj = new Io(this.be, this, "null", "null", 0, 0);
+  var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0);
   this.io["null"] = io_obj;
   this.be.null_io = io_obj;
 };

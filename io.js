@@ -1,9 +1,8 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Io(be, box, cell, name, type, x, y) {
+function Io(be, canvas, cell, name, type, x, y) {
   this.be = be;
-  this.box = box;
-  this.canvas = box ? this.be.cbox : this.be.cdraw;
+  this.canvas = canvas;
 
   this.cell = cell;
   this.name = name;
@@ -25,7 +24,7 @@ function Io(be, box, cell, name, type, x, y) {
 
   // An IO for a cell in the cell box has graphics for the stub, but
   // it doesn't have a drag handle or event handling.
-  if (box){
+  if (this.canvas != this.be.cdraw){
     this.set_io = this.canvas.set();
     return;
   }
@@ -131,10 +130,12 @@ Io.prototype.remove = function() {
 
   // The Raphael source code appears to automatically remove event handlers
   // when the element is removed, so we don't have to do that here.
-  this.el_handle.remove();
-  this.el_stub_end.remove();
-  this.el_value_text.remove();
-  this.el_value_text_bg.remove();
+  if (this.canvas == this.be.cdraw){
+    this.el_handle.remove();
+    this.el_stub_end.remove();
+    this.el_value_text.remove();
+    this.el_value_text_bg.remove();
+  }
 }
 
 Io.prototype.redraw = function() {
