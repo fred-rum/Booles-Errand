@@ -94,7 +94,6 @@ Cell.prototype.update_value = function() {
 };
 
 Cell.prototype.tick = function() {
-    console.log("cell");
     // The cell could have been removed while we waited for the tick.
     // We still get the tick, but we don't do anything with it, and
     // we don't trigger any more ticks.
