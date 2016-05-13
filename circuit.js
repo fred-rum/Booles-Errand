@@ -1,16 +1,23 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Circuits() {
+function Circuit() {
     ExtendRaphael();
 
     // this.be is a data structure for "global" values for the whole circuit.
     this.be = {}
     this.be.paper = Raphael("holder", "100%", "100%");
 
+    this.div_canvas = $("#holder");
+    this.div_msgs = $("#msgs");
+    this.div_box_container = $("#box_container");
+    this.div_cell_box = $("#cell_box");
+    $(window).resize($.proxy(this.resizePaper, this)); 
+    this.resizePaper();
+
     // Sizes are based on the "em" size in the document.  Thus,
     // devices with very small pixels (like phones) will scale up as
     // appropriate.
-    var em_size = $('.box').width() / 8;
+    var em_size = $('#box_container').width() / 8;
     this.be.io_spacing = em_size * 10/8;
     this.be.io_handle_size = this.be.io_spacing * 3/4;
     this.be.stub_len = em_size * 5/8;
@@ -60,7 +67,15 @@ function Circuits() {
     c0.drive_output(0);
 }
 
+Circuit.prototype.resizePaper = function(){
+    var width = this.div_canvas.width();
+    var height = this.div_canvas.height();
+    //this.be.paper.setSize(width, height);
+    var offset = this.div_msgs.offset();
+    this.div_box_container.height(offset.top);
+};
+
 // This is called as soon as the DOM is ready.
 $(function() {
-  new Circuits();
+  new Circuit();
 });
