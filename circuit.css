@@ -10,7 +10,7 @@ body {
     top: 0;
     left: 0;
     height: 100%;
-    width: 100%;
+    width: 8em; /* must match cbox_container */
     z-index: -1;
 }
 #cdraw {
@@ -24,7 +24,7 @@ body {
 }
 #cbox_container {
     position: fixed;
-    bottom: 0;
+    top: 0;
     left: 0;
     width: 8em;
     height: 100%;

@@ -187,13 +187,11 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
 
   var cdrag_x = this.x;
   if (this.canvas == this.be.cdraw) cdrag_x += this.be.cdraw_left;
-  var cdrag_y = this.be.cdraw_top + this.y;
-  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y);
+  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, this.y);
 
   if (this.canvas == this.be.cbox){
     var cdraw_x = this.x - this.be.cdraw_left;
-    var cdraw_y = this.y;
-    this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, cdraw_y);
+    this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, this.y);
   }
 
   this.del = false;

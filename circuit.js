@@ -85,8 +85,8 @@ function Circuit() {
 }
 
 Circuit.prototype.resize = function(){
-  var overall_width = this.be.div_cdrag.width();
-  var overall_height = this.be.div_cdrag.height();
+  var overall_width = $(window).width();
+  var overall_height = $(window).height();
   this.be.cdraw_left = this.be.div_cbox_container.outerWidth();
   this.be.cdraw_top = this.be.div_msgs.outerHeight();
   this.be.cdraw_width = overall_width - this.be.cdraw_left;
@@ -97,6 +97,8 @@ Circuit.prototype.resize = function(){
   };
   this.be.div_cbox_container.offset(cbox_offset);
   this.be.div_cbox_container.height(overall_height - this.be.cdraw_top);
+  this.be.div_cdrag.offset(cbox_offset);
+  this.be.div_cdrag.height(overall_height - this.be.cdraw_top);
   var cdraw_offset = {
     top: this.be.cdraw_top,
     left: this.be.cdraw_left
