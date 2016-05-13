@@ -1,13 +1,20 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Cell(be, type, x, y, box) {
+function Cell(be, canvas_type, type, x, y) {
   this.be = be;
-  this.box = box;
-  this.canvas = box ? this.be.cbox : this.be.cdraw;
+  this.box = (canvas_type != "cdraw");
+  this.canvas = (canvas_type == "cdraw") ? this.be.cdraw :
+                (canvas_type == "cbox")  ? this.be.cbox :
+                                           this.be.cdrag;
 
   this.type = type;
-  this.x = (type == "null") ? 0 : (x+0.5) * this.be.cell_grid_x;
-  this.y = (type == "null") ? 0 : (y+0.5) * this.be.cell_grid_y;
+  if (this.box) {
+    this.x = x;
+    this.y = y;
+  } else {
+    this.x = (type == "null") ? 0 : (x+0.5) * this.be.cell_grid_x;
+    this.y = (type == "null") ? 0 : (y+0.5) * this.be.cell_grid_y;
+  }
   this.io = {};
   this.newest_value = null;
 
@@ -20,7 +27,7 @@ function Cell(be, type, x, y, box) {
   this.cell_bg_attr = {
     "stroke-width": this.be.stroke_cell_bg,
     "stroke-linejoin": "round",
-    stroke: "#eee"
+    stroke: this.box ? "#d0ffd0" : "#eee"
   };
 
   // For the case that the foreground lines & fill are drawn separately.
@@ -40,7 +47,7 @@ function Cell(be, type, x, y, box) {
 
   this.stub_bg_attr = {
     "stroke-width": this.be.stroke_wire_bg,
-    stroke: "#eee",
+    stroke: this.box ? "#d0ffd0" : "#eee",
     "stroke-linecap": "round"
   };
 
@@ -180,12 +187,16 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   this.del = false;
 }
 
+Cell.prototype.move = function(dx, dy) {
+  this.x += dx;
+  this.y += dy;
+  this.set_xform.transform("t" + this.x + "," + this.y);
+}
+
 Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
-  this.x += dx - this.drag_dx;
-  this.y += dy - this.drag_dy;
+  this.move(dx - this.drag_dx, dy - this.drag_dy);
   this.drag_dx = dx;
   this.drag_dy = dy;
-  this.set_xform.transform("t" + this.x + "," + this.y);
   var del = (!this.box &&
              ((x < this.be.cdraw_left) ||
               (y < this.be.cdraw_top) ||
