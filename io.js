@@ -1,248 +1,248 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
 function Io(be, box, cell, name, type, x, y) {
-    this.be = be;
-    this.box = box;
-    this.canvas = box ? this.be.cbox : this.be.cdraw;
+  this.be = be;
+  this.box = box;
+  this.canvas = box ? this.be.cbox : this.be.cdraw;
 
-    this.cell = cell;
-    this.name = name;
-    this.type = type;
+  this.cell = cell;
+  this.name = name;
+  this.type = type;
 
-    // x,y is the point to/from which wires are drawn.
-    this.x = x;
-    this.y = y;
+  // x,y is the point to/from which wires are drawn.
+  this.x = x;
+  this.y = y;
 
-    this.w = [];
+  this.w = [];
 
-    // The null IO has position and wire connectivity information, but
-    // it doesn't have any of the other IO features, e.g. graphics and
-    // event handling.
-    if (type == "null") return;
+  // The null IO has position and wire connectivity information, but
+  // it doesn't have any of the other IO features, e.g. graphics and
+  // event handling.
+  if (type == "null") return;
 
-    this.path = ["M", x, y,
-		 "H", 0]; // draw horizontally to the cell's center
+  this.path = ["M", x, y,
+               "H", 0]; // draw horizontally to the cell's center
 
-    // An IO for a cell in the cell box has graphics for the stub, but
-    // it doesn't have a drag handle or event handling.
-    if (box){
-	this.set_io = this.canvas.set();
-	return;
-    }
+  // An IO for a cell in the cell box has graphics for the stub, but
+  // it doesn't have a drag handle or event handling.
+  if (box){
+    this.set_io = this.canvas.set();
+    return;
+  }
 
-    // If any properties of vis_state are true, then the IO handle is visible.
-    this.vis_state = {};
+  // If any properties of vis_state are true, then the IO handle is visible.
+  this.vis_state = {};
 
-    var attr = {
-	"stroke-width": this.be.stroke_io_handle,
-	stroke: "#f80",
-	fill: "#ff0",
-	opacity: "0.80"
-    };
-    var tw = this.be.io_handle_size;
-    this.el_handle = this.canvas.circle(x, y, tw/2, tw/2).attr(attr);
-    this.el_handle.setAttr("visibility", "hidden");
-    this.el_handle.setAttr("pointer-events", "all");
+  var attr = {
+    "stroke-width": this.be.stroke_io_handle,
+    stroke: "#f80",
+    fill: "#ff0",
+    opacity: "0.80"
+  };
+  var tw = this.be.io_handle_size;
+  this.el_handle = this.canvas.circle(x, y, tw/2, tw/2).attr(attr);
+  this.el_handle.setAttr("visibility", "hidden");
+  this.el_handle.setAttr("pointer-events", "all");
 
-    this.be.drag.enable_drag(this);
+  this.be.drag.enable_drag(this);
 
-    // Placeholders to display IO value in text and rectangle object.
-    // The position of the text and the size and position of the rectangle
-    // varies depending on the value (particularly its width), so we
-    // don't bother setting useful position info here other than the
-    // x center of the text.
-    var text_height = 15;
-    var attr = {
-	fill: "#000",
-	"text-anchor": "middle",
-	//"font-family": "Verdana, Helvetica, Arial, sans-serif",
-	"font-family": "Courier New, Fixed, monospace",
-	"font-size": text_height
-    };
-    this.value_y = 0;
-    this.el_value_text = this.canvas.text(this.x, this.value_y, "").attr(attr);
-    this.el_value_text.setAttr("pointer-events", "none");
+  // Placeholders to display IO value in text and rectangle object.
+  // The position of the text and the size and position of the rectangle
+  // varies depending on the value (particularly its width), so we
+  // don't bother setting useful position info here other than the
+  // x center of the text.
+  var text_height = 15;
+  var attr = {
+    fill: "#000",
+    "text-anchor": "middle",
+    //"font-family": "Verdana, Helvetica, Arial, sans-serif",
+    "font-family": "Courier New, Fixed, monospace",
+    "font-size": text_height
+  };
+  this.value_y = 0;
+  this.el_value_text = this.canvas.text(this.x, this.value_y, "").attr(attr);
+  this.el_value_text.setAttr("pointer-events", "none");
 
-    var attr_bg = {
-	"stroke-width": 0,
-	opacity: "0"
-    };
-    this.el_value_text_bg = this.canvas.rect(0, 0, 0, 0);
-    this.el_value_text_bg.attr(attr_bg);
-    this.el_value_text_bg.setAttr("pointer-events", "none");
+  var attr_bg = {
+    "stroke-width": 0,
+    opacity: "0"
+  };
+  this.el_value_text_bg = this.canvas.rect(0, 0, 0, 0);
+  this.el_value_text_bg.attr(attr_bg);
+  this.el_value_text_bg.setAttr("pointer-events", "none");
 
-    this.set_io = this.canvas.set(this.el_handle,
-				  this.el_value_text_bg,
-				  this.el_value_text);
+  this.set_io = this.canvas.set(this.el_handle,
+                                this.el_value_text_bg,
+                                this.el_value_text);
 }
 
 Io.prototype.draw_stub_fg = function() {
-    var stub_fg_attr = {
-	"stroke-width": this.be.stroke_wire_fg,
-	stroke: "#000"
-    };
-    var stub_end_attr = {
-	"stroke-width": this.be.stroke_stub_end_undefined,
-	stroke: "#000"
-    };
-    var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
-			 "v", this.be.stub_end_len];
-    this.el_stub_end = this.canvas.path(stub_end_path).attr(stub_end_attr);
-    this.el_stub_end.setAttr("visibility", "hidden");
-    this.set_io.push(this.el_stub_end);
+  var stub_fg_attr = {
+    "stroke-width": this.be.stroke_wire_fg,
+    stroke: "#000"
+  };
+  var stub_end_attr = {
+    "stroke-width": this.be.stroke_stub_end_undefined,
+    stroke: "#000"
+  };
+  var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
+                       "v", this.be.stub_end_len];
+  this.el_stub_end = this.canvas.path(stub_end_path).attr(stub_end_attr);
+  this.el_stub_end.setAttr("visibility", "hidden");
+  this.set_io.push(this.el_stub_end);
 
-    this.stub = this.canvas.path(this.path).attr(stub_fg_attr);
-    return this.stub;
+  this.stub = this.canvas.path(this.path).attr(stub_fg_attr);
+  return this.stub;
 };
 
 Io.prototype.connect = function(wire) {
-    if (!this.w.length && this.el_stub_end){
-	this.el_stub_end.setAttr("visibility", "visible");
-    }
+  if (!this.w.length && this.el_stub_end){
+    this.el_stub_end.setAttr("visibility", "visible");
+  }
 
-    if ((this.type == "output") && (this.w.length > 0)) {
-	// We want the new wire to be ordered together with the existing
-	// wires connected to the same output.  But we also want the new
-	// wire to be on top.  So we reorder all existing wires to be
-	// displayed at the same Z height as the new wire.
-	for (var i = 0; i < this.w.length; i++) {
-	    this.w[i].reorder_z(wire.el_bg, wire.el_fg);
-	}
+  if ((this.type == "output") && (this.w.length > 0)) {
+    // We want the new wire to be ordered together with the existing
+    // wires connected to the same output.  But we also want the new
+    // wire to be on top.  So we reorder all existing wires to be
+    // displayed at the same Z height as the new wire.
+    for (var i = 0; i < this.w.length; i++) {
+      this.w[i].reorder_z(wire.el_bg, wire.el_fg);
     }
-    this.w.push(wire);
+  }
+  this.w.push(wire);
 };
 
 Io.prototype.disconnect = function(wire) {
-    for (var i = 0; i < this.w.length; i++){
-	if (wire == this.w[i]){
-	    this.w.splice(i, 1);
-	    if (!this.w.length && this.el_stub_end){
-		this.el_stub_end.setAttr("visibility", "hidden");
-	    }
-	    return;
-	}
+  for (var i = 0; i < this.w.length; i++){
+    if (wire == this.w[i]){
+      this.w.splice(i, 1);
+      if (!this.w.length && this.el_stub_end){
+        this.el_stub_end.setAttr("visibility", "hidden");
+      }
+      return;
     }
+  }
 };
 
 Io.prototype.remove = function() {
-    while (this.w.length) {
-	this.w[0].remove();
-    }
+  while (this.w.length) {
+    this.w[0].remove();
+  }
 
-    // The Raphael source code appears to automatically remove event handlers
-    // when the element is removed, so we don't have to do that here.
-    this.el_handle.remove();
-    this.el_stub_end.remove();
-    this.el_value_text.remove();
-    this.el_value_text_bg.remove();
+  // The Raphael source code appears to automatically remove event handlers
+  // when the element is removed, so we don't have to do that here.
+  this.el_handle.remove();
+  this.el_stub_end.remove();
+  this.el_value_text.remove();
+  this.el_value_text_bg.remove();
 }
 
 Io.prototype.redraw = function() {
-    for (var i = 0; i < this.w.length; i++){
-	this.w[i].redraw();
-    }
+  for (var i = 0; i < this.w.length; i++){
+    this.w[i].redraw();
+  }
 };
 
 Io.prototype.set_vis = function(type, vis) {
-    this.vis_state[type] = vis;
-    for (var name in this.vis_state){
-	if (this.vis_state[name]){
-	    this.el_handle.setAttr("visibility", "visible");
-	    return;
-	}
+  this.vis_state[type] = vis;
+  for (var name in this.vis_state){
+    if (this.vis_state[name]){
+      this.el_handle.setAttr("visibility", "visible");
+      return;
     }
-    this.el_handle.setAttr("visibility", "hidden");
+  }
+  this.el_handle.setAttr("visibility", "hidden");
 };
 
 Io.prototype.display_fail = function(fail) {
-    if (fail){
-	var tw = this.be.io_handle_size;
-	var attr = {
-	    "stroke-width": tw/5,
-	    stroke: "#f00",
-	    fill: "#fff"
-	};
-	var cx = this.cell.x + this.x;
-	var cy = this.cell.y + this.y;
+  if (fail){
+    var tw = this.be.io_handle_size;
+    var attr = {
+      "stroke-width": tw/5,
+      stroke: "#f00",
+      fill: "#fff"
+    };
+    var cx = this.cell.x + this.x;
+    var cy = this.cell.y + this.y;
 
-	this.el_fail_circle = this.canvas.circle(cx, cy, tw/2, tw/2);
-	this.el_fail_circle.attr(attr);
-	this.el_fail_circle.setAttr("pointer-events", "none");
+    this.el_fail_circle = this.canvas.circle(cx, cy, tw/2, tw/2);
+    this.el_fail_circle.attr(attr);
+    this.el_fail_circle.setAttr("pointer-events", "none");
 
-	// Rather than doing trigonometry to draw the diagonal slash,
-	// we just draw it straight and then rotate it.
-	this.el_fail_slash = this.canvas.path(["M", cx, cy-tw/2,
-					       "v", tw]);
-	this.el_fail_slash.attr(attr);
-	this.el_fail_slash.rotate(45, cx, cy);
-	this.el_fail_slash.setAttr("pointer-events", "none");
-    } else if (this.el_fail_circle){
-	this.el_fail_circle.remove();
-	this.el_fail_slash.remove();
-    }
+    // Rather than doing trigonometry to draw the diagonal slash,
+    // we just draw it straight and then rotate it.
+    this.el_fail_slash = this.canvas.path(["M", cx, cy-tw/2,
+                                           "v", tw]);
+    this.el_fail_slash.attr(attr);
+    this.el_fail_slash.rotate(45, cx, cy);
+    this.el_fail_slash.setAttr("pointer-events", "none");
+  } else if (this.el_fail_circle){
+    this.el_fail_circle.remove();
+    this.el_fail_slash.remove();
+  }
 };
 
 Io.prototype.update_value = function(value) {
-    this.value = value;
+  this.value = value;
 
-    var attr = {
-	stroke: Wire.color(value),
-    };
-    this.stub.attr(attr);
+  var attr = {
+    stroke: Wire.color(value),
+  };
+  this.stub.attr(attr);
 
-    attr["stroke-width"] =
-	(value === undefined) ? this.be.stroke_stub_end_undefined :
-	this.be.stroke_stub_end_defined;
-    this.el_stub_end.attr(attr);
+  attr["stroke-width"] =
+    (value === undefined) ? this.be.stroke_stub_end_undefined :
+    this.be.stroke_stub_end_defined;
+  this.el_stub_end.attr(attr);
 
-    if (value === undefined){
-	value = "";
-	var bg_opacity = 0;
-    } else {
-	var bg_opacity = "1.0";
+  if (value === undefined){
+    value = "";
+    var bg_opacity = 0;
+  } else {
+    var bg_opacity = "1.0";
+  }
+
+  this.el_value_text.attr({text: "" + value});
+
+  // Create a background rectangle for the text and move both of them
+  // up so that the bottom of each is just above the stub.
+  var bbox = this.el_value_text.getBBox(true);
+  var left = bbox.x;
+  var top = this.y - 2 - bbox.height;
+
+  var desiredbottom = this.y - 2;
+  var actualbottom = bbox.y + bbox.height - 1;
+  var drift_y = actualbottom - desiredbottom;
+  this.value_y -= drift_y;
+  this.el_value_text.attr({y: this.value_y});
+
+  var attr_bg = {
+    x: left,
+    y: top,
+    width: bbox.width,
+    height: bbox.height,
+    opacity: bg_opacity
+  };
+  if (value) {
+    attr_bg.fill = "#8d8";
+  } else {
+    attr_bg.fill = "#aaf";
+  }
+  this.el_value_text_bg.attr(attr_bg);
+
+  if (this.type == "output"){
+    for (var i = 0; i < this.w.length; i++) {
+      this.w[i].update_value();
     }
-
-    this.el_value_text.attr({text: "" + value});
-
-    // Create a background rectangle for the text and move both of them
-    // up so that the bottom of each is just above the stub.
-    var bbox = this.el_value_text.getBBox(true);
-    var left = bbox.x;
-    var top = this.y - 2 - bbox.height;
-
-    var desiredbottom = this.y - 2;
-    var actualbottom = bbox.y + bbox.height - 1;
-    var drift_y = actualbottom - desiredbottom;
-    this.value_y -= drift_y;
-    this.el_value_text.attr({y: this.value_y});
-
-    var attr_bg = {
-	x: left,
-	y: top,
-	width: bbox.width,
-	height: bbox.height,
-	opacity: bg_opacity
-    };
-    if (value) {
-	attr_bg.fill = "#8d8";
-    } else {
-	attr_bg.fill = "#aaf";
-    }
-    this.el_value_text_bg.attr(attr_bg);
-
-    if (this.type == "output"){
-	for (var i = 0; i < this.w.length; i++) {
-	    this.w[i].update_value();
-	}
-    } else { // input
-	this.cell.update_value();
-    }
+  } else { // input
+    this.cell.update_value();
+  }
 };
 
 Io.prototype.bring_to_top = function() {
-    this.el_value_text_bg.insertBefore(this.be.z_io);
-    this.el_value_text.insertBefore(this.be.z_io);
-    this.el_stub_end.insertBefore(this.be.z_io);
+  this.el_value_text_bg.insertBefore(this.be.z_io);
+  this.el_value_text.insertBefore(this.be.z_io);
+  this.el_stub_end.insertBefore(this.be.z_io);
 
-    this.el_handle.insertBefore(this.be.z_handle);
+  this.el_handle.insertBefore(this.be.z_handle);
 };
