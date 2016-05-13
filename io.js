@@ -1,7 +1,10 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Io(be, cell, name, type, x, y) {
+function Io(be, box, cell, name, type, x, y) {
     this.be = be;
+    this.box = box;
+    this.canvas = box ? this.be.cbox : this.be.cdraw;
+
     this.cell = cell;
     this.name = name;
     this.type = type;
@@ -11,6 +14,21 @@ function Io(be, cell, name, type, x, y) {
     this.y = y;
 
     this.w = [];
+
+    // The null IO has position and wire connectivity information, but
+    // it doesn't have any of the other IO features, e.g. graphics and
+    // event handling.
+    if (type == "null") return;
+
+    this.path = ["M", x, y,
+		 "H", 0]; // draw horizontally to the cell's center
+
+    // An IO for a cell in the cell box has graphics for the stub, but
+    // it doesn't have a drag handle or event handling.
+    if (box){
+	this.set_io = this.canvas.set();
+	return;
+    }
 
     // If any properties of vis_state are true, then the IO handle is visible.
     this.vis_state = {};
@@ -22,49 +40,40 @@ function Io(be, cell, name, type, x, y) {
 	opacity: "0.80"
     };
     var tw = this.be.io_handle_size;
-    this.el_handle = this.be.cdraw.circle(x, y, tw/2, tw/2).attr(attr);
+    this.el_handle = this.canvas.circle(x, y, tw/2, tw/2).attr(attr);
     this.el_handle.setAttr("visibility", "hidden");
     this.el_handle.setAttr("pointer-events", "all");
 
+    this.be.drag.enable_drag(this);
 
-    if (type != "null"){
-	this.be.drag.enable_drag(this);
+    // Placeholders to display IO value in text and rectangle object.
+    // The position of the text and the size and position of the rectangle
+    // varies depending on the value (particularly its width), so we
+    // don't bother setting useful position info here other than the
+    // x center of the text.
+    var text_height = 15;
+    var attr = {
+	fill: "#000",
+	"text-anchor": "middle",
+	//"font-family": "Verdana, Helvetica, Arial, sans-serif",
+	"font-family": "Courier New, Fixed, monospace",
+	"font-size": text_height
+    };
+    this.value_y = 0;
+    this.el_value_text = this.canvas.text(this.x, this.value_y, "").attr(attr);
+    this.el_value_text.setAttr("pointer-events", "none");
 
-	// Placeholders to display IO value in text and rectangle object.
-	// The position of the text and the size and position of the rectangle
-	// varies depending on the value (particularly its width), so we
-	// don't bother setting useful position info here other than the
-	// x center of the text.
-	var text_height = 15;
-	var attr = {
-	    fill: "#000",
-	    "text-anchor": "middle",
-	    //"font-family": "Verdana, Helvetica, Arial, sans-serif",
-	    "font-family": "Courier New, Fixed, monospace",
-	    "font-size": text_height
-	};
-	this.value_y = 0;
-	this.el_value_text = this.be.cdraw.text(this.x, this.value_y, "").attr(attr);
-	this.el_value_text.setAttr("pointer-events", "none");
+    var attr_bg = {
+	"stroke-width": 0,
+	opacity: "0"
+    };
+    this.el_value_text_bg = this.canvas.rect(0, 0, 0, 0);
+    this.el_value_text_bg.attr(attr_bg);
+    this.el_value_text_bg.setAttr("pointer-events", "none");
 
-	var attr_bg = {
-	    "stroke-width": 0,
-	    opacity: "0"
-	};
-	this.el_value_text_bg = this.be.cdraw.rect(0, 0, 0, 0);
-	this.el_value_text_bg.attr(attr_bg);
-	this.el_value_text_bg.setAttr("pointer-events", "none");
-
-	this.set_io = this.be.cdraw.set(this.el_handle,
-					this.el_value_text_bg,
-					this.el_value_text);
-    }
-
-
-    // Initialization code
-
-    this.path = ["M", x, y,
-		 "H", 0]; // draw horizontally to the cell's center
+    this.set_io = this.canvas.set(this.el_handle,
+				  this.el_value_text_bg,
+				  this.el_value_text);
 }
 
 Io.prototype.draw_stub_fg = function() {
@@ -78,11 +87,11 @@ Io.prototype.draw_stub_fg = function() {
     };
     var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
 			 "v", this.be.stub_end_len];
-    this.el_stub_end = this.be.cdraw.path(stub_end_path).attr(stub_end_attr);
+    this.el_stub_end = this.canvas.path(stub_end_path).attr(stub_end_attr);
     this.el_stub_end.setAttr("visibility", "hidden");
     this.set_io.push(this.el_stub_end);
 
-    this.stub = this.be.cdraw.path(this.path).attr(stub_fg_attr);
+    this.stub = this.canvas.path(this.path).attr(stub_fg_attr);
     return this.stub;
 };
 
@@ -116,6 +125,10 @@ Io.prototype.disconnect = function(wire) {
 };
 
 Io.prototype.remove = function() {
+    while (this.w.length) {
+	this.w[0].remove();
+    }
+
     // The Raphael source code appears to automatically remove event handlers
     // when the element is removed, so we don't have to do that here.
     this.el_handle.remove();
@@ -152,14 +165,14 @@ Io.prototype.display_fail = function(fail) {
 	var cx = this.cell.x + this.x;
 	var cy = this.cell.y + this.y;
 
-	this.el_fail_circle = this.be.cdraw.circle(cx, cy, tw/2, tw/2);
+	this.el_fail_circle = this.canvas.circle(cx, cy, tw/2, tw/2);
 	this.el_fail_circle.attr(attr);
 	this.el_fail_circle.setAttr("pointer-events", "none");
 
 	// Rather than doing trigonometry to draw the diagonal slash,
 	// we just draw it straight and then rotate it.
-	this.el_fail_slash = this.be.cdraw.path(["M", cx, cy-tw/2,
-						 "v", tw]);
+	this.el_fail_slash = this.canvas.path(["M", cx, cy-tw/2,
+					       "v", tw]);
 	this.el_fail_slash.attr(attr);
 	this.el_fail_slash.rotate(45, cx, cy);
 	this.el_fail_slash.setAttr("pointer-events", "none");

@@ -57,6 +57,8 @@ function Circuit() {
     this.be.sim = new Sim();
     this.be.drag = new Drag(this.be);
 
+    new Cell(this.be, "buf", 0, 0, true);
+
     var c0 = new Cell(this.be, "const", 1, 2);
     var c1 = new Cell(this.be, "buf", 2, 0);
     var c2 = new Cell(this.be, "inv", 2, 2);

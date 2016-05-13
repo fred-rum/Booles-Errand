@@ -92,8 +92,7 @@ Wire.prototype.remove = function() {
     }
 
     // In case the wire is disconnected while a value change is pending,
-    // we disconnect the wire ends so that the change can't propagate.
-    this.o = undefined;
+    // we mark the following (input) IO as no longer connected.
     this.i = undefined;
 };
 

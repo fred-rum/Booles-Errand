@@ -1,7 +1,10 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Cell(be, type, x, y) {
+function Cell(be, type, x, y, box) {
     this.be = be;
+    this.box = box;
+    this.canvas = box ? this.be.cbox : this.be.cdraw;
+
     this.type = type;
     this.x = (type == "null") ? 0 : (x+0.5) * this.be.cell_grid_x;
     this.y = (type == "null") ? 0 : (y+0.5) * this.be.cell_grid_y;
@@ -41,17 +44,18 @@ function Cell(be, type, x, y) {
 	"stroke-linecap": "round"
     };
 
-    this.el_cell = this.be.cdraw.set();
+    this.el_cell = this.canvas.set();
     this[type](); // Call cell-type initiator function by name
     if (type == "null") return; // do nothing else for the null cell
 
     // Make a separate xform set that includes the IO elements so that they
     // get moved with the cell.
-    this.set_xform = this.be.cdraw.set();
+    this.set_xform = this.canvas.set();
     var set_callback = $.proxy(function(el) {this.set_xform.push(el);});
     this.el_cell.forEach(set_callback, this);
 
-    // Add the IO elements to the draw set so that they get moved with the cell.
+    // Add the IO elements to the draw set so that they get moved
+    // with the cell.
     for (var port_name in this.io) {
 	this.set_xform.push(this.io[port_name].set_io);
     }
@@ -90,6 +94,12 @@ Cell.prototype.update_value = function() {
 };
 
 Cell.prototype.tick = function() {
+    console.log("cell");
+    // The cell could have been removed while we waited for the tick.
+    // We still get the tick, but we don't do anything with it, and
+    // we don't trigger any more ticks.
+    if (!this.io) return;
+
     this.io.o.update_value(this.newest_value);
     this.newest_value = null;
 }
@@ -152,6 +162,8 @@ Cell.prototype.calc_xor = function(inv) {
 };
 
 Cell.prototype.bring_to_top = function() {
+    if (this.box) return;
+
     this.el_cell.insertBefore(this.be.z_cell);
     for (var port_name in this.io) {
 	this.io[port_name].bring_to_top();
@@ -165,6 +177,8 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
 
     // Pop cell to top for more natural dragging.
     this.bring_to_top();
+
+    this.del = false;
 }
 
 Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
@@ -173,10 +187,11 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
     this.drag_dx = dx;
     this.drag_dy = dy;
     this.set_xform.transform("t" + this.x + "," + this.y);
-    var del = ((x < this.be.cdraw_left) ||
-	       (y < this.be.cdraw_top) ||
-	       (x >= this.be.cdraw_left + this.be.cdraw_width) ||
-	       (y >= this.be.cdraw_top + this.be.cdraw_height));
+    var del = (!this.box &&
+	       ((x < this.be.cdraw_left) ||
+		(y < this.be.cdraw_top) ||
+		(x >= this.be.cdraw_left + this.be.cdraw_width) ||
+		(y >= this.be.cdraw_top + this.be.cdraw_height)));
     if (del != this.del){
 	for (var name in this.io) {
 	    var io_w = this.io[name].w;
@@ -203,12 +218,9 @@ Cell.prototype.cell_drag_end = function() {
 
 Cell.prototype.remove = function() {
     for (var name in this.io) {
-	var io_w = this.io[name].w;
-	for (var i = 0; i < io_w.length; i++){
-	    io_w[i].remove();
-	}
 	this.io[name].remove();
     }
+    this.io = null;
     this.el_cell.remove();
 };
 
@@ -218,12 +230,12 @@ Cell.prototype.init_io = function(inv, ni, left, right) {
 
     if (inv) right += this.be.inv_bubble_size;
 
-    var io_obj = new Io(this.be, this, "o", "output", right+cw, 0);
+    var io_obj = new Io(this.be, this.box, this, "o", "output", right+cw, 0);
     this.io[io_obj.name] = io_obj;
 
     for (var i = 0; i < ni; i++) {
 	var y = ((i+0.5)*cs)-(ni*cs/2);
-	var io_obj = new Io(this.be, this,
+	var io_obj = new Io(this.be, this.box, this,
 			    (ni > 1) ? "i" + i : "i", "input",
 			    left-cw, y);
 	this.io[io_obj.name] = io_obj;
@@ -239,7 +251,7 @@ Cell.prototype.draw_stubs = function() {
     for (var name in this.io) {
 	stub_path = stub_path.concat(this.io[name].path);
     }
-    this.el_cell.push(this.be.cdraw.path(stub_path).attr(this.stub_bg_attr));
+    this.el_cell.push(this.canvas.path(stub_path).attr(this.stub_bg_attr));
 
     // In contrast, the stub foregrounds can be drawn in different
     // colors depending on the IO state.  Therefore, each is its own
@@ -259,7 +271,7 @@ Cell.prototype.draw_inv = function(inv, right, bg) {
 	var sw = bg ? 9 : 3;
 	var sc = bg ? "#eee" : "#000";
 	var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
-	this.el_cell.push(this.be.cdraw.circle(inv_cx, 0, inv_r).attr(attr));
+	this.el_cell.push(this.canvas.circle(inv_cx, 0, inv_r).attr(attr));
     }
 };
 
@@ -276,10 +288,10 @@ Cell.prototype.buf = function(inv) {
 		     "v", height,
 		     "l", width, -height/2,
 		     "z"];
-    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_bg_attr));
+    this.el_cell.push(this.canvas.path(cell_path).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_fg_attr));
+    this.el_cell.push(this.canvas.path(cell_path).attr(this.cell_fg_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -303,10 +315,10 @@ Cell.prototype.and = function(inv) {
 		     "h", -box_width,
 		     "z"];
 
-    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_bg_attr));
+    this.el_cell.push(this.canvas.path(cell_path).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_fg_attr));
+    this.el_cell.push(this.canvas.path(cell_path).attr(this.cell_fg_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -334,10 +346,10 @@ Cell.prototype.or = function(inv) {
 		     "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
 		     "z"];
 
-    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_bg_attr));
+    this.el_cell.push(this.canvas.path(cell_path).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.cdraw.path(cell_path).attr(this.cell_fg_attr));
+    this.el_cell.push(this.canvas.path(cell_path).attr(this.cell_fg_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -374,11 +386,11 @@ Cell.prototype.xor = function(inv) {
 			"h", -bar_space,
 			"z"];
 
-    this.el_cell.push(this.be.cdraw.path(cell_path_bg).attr(this.cell_bg_attr));
+    this.el_cell.push(this.canvas.path(cell_path_bg).attr(this.cell_bg_attr));
     this.draw_inv(inv, right, true);
     this.draw_stubs();
-    this.el_cell.push(this.be.cdraw.path(cell_path_bg).attr(this.cell_fg_fill_attr));
-    this.el_cell.push(this.be.cdraw.path(cell_path_fg).attr(this.cell_fg_line_attr));
+    this.el_cell.push(this.canvas.path(cell_path_bg).attr(this.cell_fg_fill_attr));
+    this.el_cell.push(this.canvas.path(cell_path_fg).attr(this.cell_fg_line_attr));
     this.draw_inv(inv, right, false);
 };
 
@@ -391,9 +403,9 @@ Cell.prototype.const = function() {
 
     this.init_io(false, 0, left, right);
 
-    this.el_cell.push(this.be.cdraw.rect(left, top, width, height).attr(this.cell_bg_attr));
+    this.el_cell.push(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
     this.draw_stubs();
-    this.el_cell.push(this.be.cdraw.rect(left, top, width, height).attr(this.cell_fg_attr));
+    this.el_cell.push(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr));
 };
 
 Cell.prototype.null = function() {
