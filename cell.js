@@ -9,13 +9,8 @@ function Cell(be, canvas_type, type, x, y) {
                                            this.be.cdrag;
 
   this.type = type;
-  if (this.box) {
-    this.x = x;
-    this.y = y;
-  } else {
-    this.x = (type == "null") ? 0 : (x+0.5) * this.be.cell_grid_x;
-    this.y = (type == "null") ? 0 : (y+0.5) * this.be.cell_grid_y;
-  }
+  this.x = x;
+  this.y = y;
   this.io = {};
   this.newest_value = null;
 
@@ -193,8 +188,13 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   var cdrag_x = this.x;
   if (this.canvas == this.be.cdraw) cdrag_x += this.be.cdraw_left;
   var cdrag_y = this.be.cdraw_top + this.y;
-
   this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y);
+
+  if (this.canvas == this.be.cbox){
+    var cdraw_x = this.x - this.be.cdraw_left;
+    var cdraw_y = this.y;
+    this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, cdraw_y);
+  }
 
   this.del = false;
 }
@@ -212,6 +212,9 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
   this.drag_dy = dy;
 
   this.cdrag_cell.move(ddx, ddy);
+  if (this.cdraw_cell){
+    this.cdraw_cell.move(ddx, ddy);
+  }
 
   if (this.canvas == this.be.cbox) return;
 

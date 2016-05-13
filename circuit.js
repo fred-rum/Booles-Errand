@@ -53,7 +53,7 @@ function Circuit() {
   this.be.z_handle = this.be.cdraw.path("M0,0");
 
   // null cell
-  new Cell(this.be, "cdraw", "null");
+  new Cell(this.be, "cdraw", "null", 0, 0);
 
 
   this.be.sim = new Sim();
@@ -71,11 +71,11 @@ function Circuit() {
   this.add_box_cell("const");
   this.be.div_cbox.height(this.box_height);
 
-  var c0 = new Cell(this.be, "cdraw", "const", 1, 2);
-  var c1 = new Cell(this.be, "cdraw", "buf", 2, 0);
-  var c2 = new Cell(this.be, "cdraw", "inv", 2, 2);
-  var c3 = new Cell(this.be, "cdraw", "and", 3, 1);
-  var c4 = new Cell(this.be, "cdraw", "xnor", 3, 0);
+  var c0 = new Cell(this.be, "cdraw", "const", 100, 300);
+  var c1 = new Cell(this.be, "cdraw", "buf", 200, 100);
+  var c2 = new Cell(this.be, "cdraw", "inv", 200, 300);
+  var c3 = new Cell(this.be, "cdraw", "and", 300, 200);
+  var c4 = new Cell(this.be, "cdraw", "xnor", 300, 100);
 
   new Wire(this.be, c1.io["o"], c2.io["i"]);
   new Wire(this.be, c2.io["o"], c1.io["i"]);
