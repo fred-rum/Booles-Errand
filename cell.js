@@ -3,8 +3,8 @@
 function Cell(be, type, x, y) {
     this.be = be;
     this.type = type;
-    this.x = x;
-    this.y = y;
+    this.x = (type == "null") ? 0 : (x+0.5) * this.be.cell_grid_x;
+    this.y = (type == "null") ? 0 : (y+0.5) * this.be.cell_grid_y;
     this.io = {};
     this.newest_value = null;
 
