@@ -173,15 +173,44 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
     this.drag_dx = dx;
     this.drag_dy = dy;
     this.set_xform.transform("t" + this.x + "," + this.y);
-    for (var port_name in this.io) {
-	var io_obj = this.io[port_name];
-	io_obj.redraw();
+    var del = ((x < this.be.cdraw_left) ||
+	       (y < this.be.cdraw_top) ||
+	       (x >= this.be.cdraw_left + this.be.cdraw_width) ||
+	       (y >= this.be.cdraw_top + this.be.cdraw_height));
+    if (del != this.del){
+	for (var name in this.io) {
+	    var io_w = this.io[name].w;
+	    for (var i = 0; i < io_w.length; i++){
+		if (del){
+		    io_w[i].mark_old("del");
+		} else {
+		    io_w[i].restore_old();
+		}
+	    }
+	}
+	this.del = del;
+    } else {
+	for (var port_name in this.io) {
+	    this.io[port_name].redraw();
+	}
     }
 }
 
 Cell.prototype.cell_drag_end = function() {
     this.be.drag.enable_hover();
+    if (this.del) this.remove();
 }
+
+Cell.prototype.remove = function() {
+    for (var name in this.io) {
+	var io_w = this.io[name].w;
+	for (var i = 0; i < io_w.length; i++){
+	    io_w[i].remove();
+	}
+	this.io[name].remove();
+    }
+    this.el_cell.remove();
+};
 
 Cell.prototype.init_io = function(inv, ni, left, right) {
     var cw = this.be.stub_len;

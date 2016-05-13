@@ -67,7 +67,6 @@ function Io(be, cell, name, type, x, y) {
 		 "H", 0]; // draw horizontally to the cell's center
 }
 
-
 Io.prototype.draw_stub_fg = function() {
     var stub_fg_attr = {
 	"stroke-width": this.be.stroke_wire_fg,
@@ -115,6 +114,15 @@ Io.prototype.disconnect = function(wire) {
 	}
     }
 };
+
+Io.prototype.remove = function() {
+    // The Raphael source code appears to automatically remove event handlers
+    // when the element is removed, so we don't have to do that here.
+    this.el_handle.remove();
+    this.el_stub_end.remove();
+    this.el_value_text.remove();
+    this.el_value_text_bg.remove();
+}
 
 Io.prototype.redraw = function() {
     for (var i = 0; i < this.w.length; i++){
