@@ -13,7 +13,7 @@ function Cell(be, canvas_type, type, x, y) {
   this.y = y;
   this.io = {};
   this.newest_value = null;
-  this.del = false;
+  this.pending_del = false;
 
   this.cell_fg_attr = {
     "stroke-width": this.be.stroke_cell_fg,
@@ -201,8 +201,8 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
     this.cdraw_cell = this;
   }
 
-  this.cdraw_cell.check_for_del(x, y);
-  this.cdrag_cell.check_for_del(x, y);
+  this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
+  this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
 }
 
 Cell.prototype.move = function(dx, dy) {
@@ -211,24 +211,42 @@ Cell.prototype.move = function(dx, dy) {
   this.set_xform.transform("t" + this.x + "," + this.y);
 }
 
-Cell.prototype.check_for_del = function(x, y) {
+Cell.prototype.check_for_del = function(x, y, is_new) {
   // We check for deletion based on the position of the mouse pointer,
   // not the center (0,0) coordinate of the cell.
-  var del = ((x < this.be.cdraw_left) ||
+  var del;
+  if (is_new &&
+      (x >= 0) &&
+      (x < this.be.cdraw_left) &&
+      (y >= this.be.cdraw_top) &&
+      (y < this.be.cdraw_top + this.be.cdraw_height)){
+    // A new cell is still within the cell box
+    // (or has been returned to the cell box.)
+    del = "new";
+  } else if ((x < this.be.cdraw_left) ||
              (y < this.be.cdraw_top) ||
              (x >= this.be.cdraw_left + this.be.cdraw_width) ||
-             (y >= this.be.cdraw_top + this.be.cdraw_height));
-  if (del != this.del){
+             (y >= this.be.cdraw_top + this.be.cdraw_height)){
+    del = "del";
+  } else {
+    del = false;
+  }
+  if (del != this.pending_del){
     var attr;
-    if (del){
+    if (del == "new"){
+      attr = {
+        stroke: "#aaa", // grey
+        "stroke-dasharray": ""
+      };
+    } else if (del == "del"){
       attr = {
         stroke: "#e88", // red
-        "stroke-dasharray": "-",
+        "stroke-dasharray": "-"
       };
     } else {
       attr = {
         stroke: "#000", // black
-        "stroke-dasharray": "",
+        "stroke-dasharray": ""
       };
     }
     this.el_s.attr(attr);
@@ -243,7 +261,7 @@ Cell.prototype.check_for_del = function(x, y) {
         }
       }
     }
-    this.del = del;
+    this.pending_del = del;
   } else {
     for (var port_name in this.io) {
       this.io[port_name].redraw();
@@ -260,15 +278,15 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
   this.cdrag_cell.move(ddx, ddy);
   this.cdraw_cell.move(ddx, ddy);
 
-  this.cdrag_cell.check_for_del(x, y);
-  this.cdraw_cell.check_for_del(x, y);
+  this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
+  this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
 }
 
 Cell.prototype.cell_drag_end = function() {
   this.be.drag.enable_hover();
   $(this.be.div_cdrag).css("z-index", "-1")
   this.cdrag_cell.remove();
-  if (this.cdraw_cell.del) this.cdraw_cell.remove();
+  if (this.cdraw_cell.pending_del) this.cdraw_cell.remove();
 }
 
 Cell.prototype.remove = function() {
