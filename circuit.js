@@ -11,7 +11,7 @@ function Circuit() {
 
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
-  this.be.div_msgs = $("#msgs");
+  this.be.div_info = $("#msgs");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
@@ -96,14 +96,46 @@ Circuit.prototype.resize = function(){
   this.be.window_width = this.be.window.width();
   this.be.window_height = this.be.window.height();
   this.be.truth_width = this.be.div_truth.outerWidth();
+
+  // Move the div_info to the right of div_truth and decrease its width
+  // accordingly.  Note that this may reflow the text and thus change the
+  // height of div_info.
+  var info_width = this.be.window_width - this.be.truth_width;
+  var info_offset = {
+    top: 0,
+    left: this.be.truth_width
+  };
+  this.be.div_info.offset(info_offset);
+  this.be.div_info.width(info_width);
+
+  // I might have set the div_truth size in the past, so if I want to
+  // measure its desired height, I have to set it back to auto first.
+  this.be.div_truth.outerHeight("auto");
   this.be.truth_height = this.be.div_truth.outerHeight();
-  var info_height = this.be.div_msgs.outerHeight();
+
+  // Make sure the truth table div is at least as tall as the info div.
+  var info_height = this.be.div_info.outerHeight();
   if (this.be.truth_height < info_height) {
-    // Make sure the truth table div is at least as tall as the info div.
-    this.be.div_truth.outerHeight(info_height);
+    this.be.truth_height = info_height;
+    this.be.div_truth.outerHeight(this.be.truth_height);
   }
   this.be.cdraw_top = info_height;
 
+  // Move the cbox below div_truth and decrease its height accordingly.
+  var cbox_height = this.be.window_height - this.be.truth_height;
+  var cbox_offset = {
+    top: this.be.truth_height,
+    left: 0
+  };
+  this.be.div_cbox_container.offset(cbox_offset);
+  this.be.div_cbox_container.height(cbox_height);
+
+  // cdrag has the same position and size as cbox.
+  this.be.div_cdrag.offset(cbox_offset);
+  this.be.div_cdrag.height(cbox_height);
+
+  // Move the cdraw area below div_info and to the right of div_cbox.
+  // Also decrease its height and width accordingly.
   var cdraw_width = this.be.window_width - this.be.cbox_width;
   var cdraw_height = this.be.window_height - this.be.cdraw_top;
   var cdraw_offset = {
@@ -113,17 +145,6 @@ Circuit.prototype.resize = function(){
   this.be.div_cdraw.offset(cdraw_offset);
   this.be.div_cdraw.height(cdraw_height);
   this.be.div_cdraw.width(cdraw_width);
-
-  var cbox_height = this.be.window_height - this.be.truth_height;
-  var cbox_offset = {
-    top: this.be.truth_height,
-    left: 0
-  };
-  this.be.div_cbox_container.offset(cbox_offset);
-  this.be.div_cbox_container.height(cbox_height);
-
-  this.be.div_cdrag.offset(cbox_offset);
-  this.be.div_cdrag.height(cbox_height);
 };
 
 Circuit.prototype.add_box_cell = function(name) {
