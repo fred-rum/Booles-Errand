@@ -64,7 +64,7 @@ body {
 }
 .info {
     height: auto;
-    border-style: none none solid none;
+    border-bottom-style: solid;
     border-width: thin;
     background-color: #d0d0ff;
 }
@@ -92,8 +92,6 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     z-index: 2;
-    border-style: none dotted none none;
-    border-width: thin;
     background-color: #d0ffd0;
 }
 #cbox {
@@ -111,6 +109,8 @@ body {
     width: 100%;
     z-index: 1;
     background: #eee;
+    border-left-style: dotted;
+    border-width: thin;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */

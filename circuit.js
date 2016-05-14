@@ -17,11 +17,16 @@ function Circuit() {
   this.be.div_cbox_container = $("#cbox_container");
   this.be.div_cbox = $("#cbox");
 
-  // cbox_container is a fixed (not resizable) width, but the CSS
-  // can't specify that the cdrag div is "8em+1px".  So we fix the
-  // cdrag width once, and then never have to touch it again.
-  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
-  this.be.div_cdrag.width(this.be.cbox_width);
+  // We want cdrag to be wide enough to overlap the border between
+  // cbox and cdraw.  The border is attached to cdraw so that the
+  // gaps between the dotted line have a grey color, which better
+  // matches the scrollbar that is potentially on the right side of
+  // cbox.  cdraw isn't positioned or sized yet, but we can still
+  // query it to get its border width.
+  var border_width = this.be.div_cdraw.outerWidth( )- this.be.div_cdraw.width();
+  this.be.cbox_width = this.be.div_cbox_container.width();
+  this.be.cdraw_left = this.be.cbox_width + border_width;
+  this.be.div_cdrag.width(this.be.cdraw_left);
 
   // Other div dimensions are resized dynamically as sppropriate.
   this.be.window.resize($.proxy(this.resize, this)); 
@@ -139,11 +144,11 @@ Circuit.prototype.resize = function(){
 
   // Move the cdraw area below div_info and to the right of div_cbox.
   // Also decrease its height and width accordingly.
-  var cdraw_width = this.be.window_width - this.be.cbox_width;
+  var cdraw_width = this.be.window_width - this.be.cdraw_left;
   var cdraw_height = this.be.window_height - this.be.cdraw_top;
   var cdraw_offset = {
     top: this.be.cdraw_top,
-    left: this.be.cbox_width
+    left: this.be.cbox_width // not cdraw_left; that doesn't include the border
   };
   this.be.div_cdraw.offset(cdraw_offset);
   this.be.div_cdraw.height(cdraw_height);
