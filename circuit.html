@@ -19,15 +19,19 @@
 <body>
   <div id="truth">
     <svg width="2em" height="2em" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-      <g stroke="#0c0">
-	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" stroke-width="7" fill="#cfc" />
-	<path d="M37,25v50l30,-25z" stroke-width="5" stroke-linejoin="round" fill="white" />
+      <g id="button-play">
+	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder" />
+	<path d="M37,25v50l30,-25z" class="playcenter" />
+      </g>
+      <g id="button-pause" style="display: none">
+	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="pauseborder" />
+	<path d="M40,26v48M60,26v48" class="pausecenter" />
       </g>
     </svg><svg width="2em" height="2em" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-      <g stroke="#0c0">
-	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" stroke-width="7" fill="#cfc" />
-	<path d="M27,25v50l30,-25z" stroke-width="5" stroke-linejoin="round" fill="white"/>
-	<path d="M47,25v50l30,-25z" stroke-width="5" stroke-linejoin="round" fill="white" />
+      <g id="button-ff">
+	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder" />
+	<path d="M27,25v50l30,-25z" class="playcenter" />
+	<path d="M47,25v50l30,-25z" class="playcenter" />
       </g>
     </svg>
   </div>

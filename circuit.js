@@ -65,9 +65,12 @@ function Circuit() {
   // null cell
   new Cell(this.be, "cdraw", "null", 0, 0);
 
-
   this.be.sim = new Sim();
   this.be.drag = new Drag(this.be);
+
+  $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));
+  $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
+
 
   this.box_height = this.be.box_spacing;
   this.add_box_cell("buf");

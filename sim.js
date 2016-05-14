@@ -3,21 +3,39 @@
 function Sim() {
   this.old_events = [];
   this.new_events = [];
+  this.running = false;
 }
 
+Sim.prototype.click_play = function () {
+  $("#button-play").hide();
+  $("#button-pause").show();
+  this.running = true;
+  this.start();
+};
+
+Sim.prototype.click_pause = function () {
+  $("#button-pause").hide();
+  $("#button-play").show();
+  this.running = false;
+  this.pause();
+};
 
 Sim.prototype.start = function() {
-  this.timer = setInterval($.proxy(this.tick, this), 50);
+  if (!this.timer && this.running){
+    this.timer = setInterval($.proxy(this.tick, this), 50);
+  }
 };
 
 Sim.prototype.pause = function() {
-  clearInterval(this.timer);
-  this.timer = undefined;
+  if (this.timer){
+    clearInterval(this.timer);
+    this.timer = undefined;
+  }
 };
 
 Sim.prototype.register_obj = function(obj) {
   this.new_events.push(obj);
-  if (!this.timer) this.start();
+  this.start();
 };
 
 Sim.prototype.tick = function() {

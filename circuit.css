@@ -5,10 +5,41 @@ body {
     color: #000;
     z-index: 0;
 }
-.vcenter{
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
+.vcenter {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.playcenter {
+    stroke: #0c0;
+    fill: #fff;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+.playborder {
+    stroke: #0c0;
+    fill: #cfc;
+    stroke-width: 7;
+    cursor: pointer;
+}
+.playborder:hover {
+    fill: #ddd;
+}
+.pausecenter {
+    stroke: #555;
+    stroke-width: 10;
+    stroke-linecap: butt;
+    pointer-events: none;
+}
+.pauseborder {
+    stroke: #555;
+    fill: #eee;
+    stroke-width: 7;
+    cursor: pointer;
+}
+.pauseborder:hover {
+    fill: #ddd;
 }
 #truth {
     position: fixed;
