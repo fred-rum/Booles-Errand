@@ -183,18 +183,22 @@ Io.prototype.display_fail = function(fail) {
   }
 };
 
-Io.prototype.update_value = function(value) {
-  this.value = value;
-
+Io.prototype.color_stub = function(value) {
   var attr = {
     stroke: Wire.color(value),
   };
-  this.stub.attr(attr);
+  if (!this.pending_del) this.stub.attr(attr);
 
   attr["stroke-width"] =
     (value === undefined) ? this.be.stroke_stub_end_undefined :
     this.be.stroke_stub_end_defined;
   this.el_stub_end.attr(attr);
+};
+
+Io.prototype.update_value = function(value) {
+  this.value = value;
+
+  this.color_stub(value);
 
   if (value === undefined){
     value = "";
@@ -246,4 +250,19 @@ Io.prototype.bring_to_top = function() {
   this.el_stub_end.insertBefore(this.be.z_io);
 
   this.el_handle.insertBefore(this.be.z_handle);
+};
+
+Io.prototype.mark_old = function(type) {
+  this.pending_del = type;
+  for (var i = 0; i < this.w.length; i++){
+    this.w[i].mark_old(type);
+  }
+};
+
+Io.prototype.restore_old = function() {
+  this.pending_del = false;
+  this.color_stub(this.value);
+  for (var i = 0; i < this.w.length; i++){
+    this.w[i].restore_old();
+  }
 };

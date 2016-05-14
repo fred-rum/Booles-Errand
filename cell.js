@@ -252,13 +252,10 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     this.el_s.attr(attr);
 
     for (var name in this.io) {
-      var io_w = this.io[name].w;
-      for (var i = 0; i < io_w.length; i++){
-        if (del){
-          io_w[i].mark_old("del");
-        } else {
-          io_w[i].restore_old();
-        }
+      if (del){
+        this.io[name].mark_old("del");
+      } else {
+        this.io[name].restore_old();
       }
     }
     this.pending_del = del;
