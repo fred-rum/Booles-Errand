@@ -361,7 +361,7 @@ Cell.prototype.draw_inv = function(inv, right, bg) {
 Cell.prototype.inv = function() { this.buf(true); };
 Cell.prototype.buf = function(inv) {
   var height = 1.5 * this.be.io_spacing;
-  var width = Math.sqrt(height*height-height*height/4); /* equilateral */
+  var width = Math.sqrt(3)/2*height; /* equilateral */
   var left = -width/2;
   var right = width/2;
 
