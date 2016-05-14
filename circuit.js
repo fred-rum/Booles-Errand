@@ -9,12 +9,22 @@ function Circuit() {
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
 
-  this.be.div_cdraw = $("#cdraw");
-  this.be.div_cdrag = $("#cdrag");
+  this.be.window = $(window);
+  this.be.div_truth = $("#truth");
   this.be.div_msgs = $("#msgs");
+  this.be.div_cdrag = $("#cdrag");
+  this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
   this.be.div_cbox = $("#cbox");
-  $(window).resize($.proxy(this.resize, this)); 
+
+  // cbox_container is a fixed (not resizable) width, but the CSS
+  // can't specify that the cdrag div is "8em+1px".  So we fix the
+  // cdrag width once, and then never have to touch it again.
+  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+  this.be.div_cdrag.width(this.be.cbox_width);
+
+  // Other div dimensions are resized dynamically as sppropriate.
+  this.be.window.resize($.proxy(this.resize, this)); 
   this.resize();
 
   // Sizes are based on the "em" size in the document.  Thus,
@@ -83,33 +93,43 @@ function Circuit() {
 }
 
 Circuit.prototype.resize = function(){
-  var overall_width = $(window).width();
-  var overall_height = $(window).height();
-  this.be.cdraw_left = this.be.div_cbox_container.outerWidth();
-  this.be.cdraw_top = this.be.div_msgs.outerHeight();
-  this.be.cdraw_width = overall_width - this.be.cdraw_left;
-  this.be.cdraw_height = overall_height - this.be.cdraw_top;
-  var cbox_offset = {
+  this.be.window_width = this.be.window.width();
+  this.be.window_height = this.be.window.height();
+  this.be.truth_width = this.be.div_truth.outerWidth();
+  this.be.truth_height = this.be.div_truth.outerHeight();
+  var info_height = this.be.div_msgs.outerHeight();
+  if (this.be.truth_height < info_height) {
+    // Make sure the truth table div is at least as tall as the info div.
+    this.be.div_truth.outerHeight(info_height);
+  }
+  this.be.cdraw_top = info_height;
+
+  var cdraw_width = this.be.window_width - this.be.cbox_width;
+  var cdraw_height = this.be.window_height - this.be.cdraw_top;
+  var cdraw_offset = {
     top: this.be.cdraw_top,
+    left: this.be.cbox_width
+  };
+  this.be.div_cdraw.offset(cdraw_offset);
+  this.be.div_cdraw.height(cdraw_height);
+  this.be.div_cdraw.width(cdraw_width);
+
+  var cbox_height = this.be.window_height - this.be.truth_height;
+  var cbox_offset = {
+    top: this.be.truth_height,
     left: 0
   };
   this.be.div_cbox_container.offset(cbox_offset);
-  this.be.div_cbox_container.height(overall_height - this.be.cdraw_top);
+  this.be.div_cbox_container.height(cbox_height);
+
   this.be.div_cdrag.offset(cbox_offset);
-  this.be.div_cdrag.height(overall_height - this.be.cdraw_top);
-  var cdraw_offset = {
-    top: this.be.cdraw_top,
-    left: this.be.cdraw_left
-  };
-  this.be.div_cdraw.offset(cdraw_offset);
-  this.be.div_cdraw.height(this.be.cdraw_height);
-  this.be.div_cdraw.width(this.be.cdraw_width);
+  this.be.div_cdrag.height(cbox_height);
 };
 
 Circuit.prototype.add_box_cell = function(name) {
   var c = new Cell(this.be, "cbox", name, 0, 0);
   var bbox = c.el_cell.getBBox(false);
-  var cx = (this.be.cdraw_left/2) - bbox.x - bbox.width/2; // align center
+  var cx = (this.be.cbox_width/2) - bbox.x - bbox.width/2; // align center
   var cy = this.box_height - bbox.y; // align top edge
   c.move(cx, cy);
   this.box_height += bbox.height + this.be.box_spacing;

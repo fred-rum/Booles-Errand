@@ -5,13 +5,72 @@ body {
     color: #000;
     z-index: 0;
 }
+.vcenter{
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+#truth {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: auto;
+    width: auto;
+    min-width: 8em;
+    background-color: #eee;
+    border-style: none solid solid none;
+    border-width: thin;
+    z-index:4;
+    text-align: center;
+}
+#msgs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 3;
+    text-align: center;
+}
+.info {
+    height: auto;
+    border-style: none none solid none;
+    border-width: thin;
+    background-color: #d0d0ff;
+}
+#error {
+    width: 100%;
+    height: auto;
+    border-style: solid none solid none;
+    border-width: thin;
+    background-color: #ffb0b0;
+}
 #cdrag {
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
-    width: 8em; /* must match cbox_container */
+    width: 8em; /* resized in Javascript to match cbox_container + border */
     z-index: -1;
+}
+#cbox_container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 8em;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    z-index: 2;
+    border-style: none dotted none none;
+    border-width: thin;
+    background-color: #d0ffd0;
+}
+#cbox {
+    top: 0;
+    left: 0;
+    width: 8em;
+    height: 20em;
+    background-color: #d0ffd0;
 }
 #cdraw {
     position: fixed;
@@ -25,49 +84,6 @@ body {
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */      
-}
-#cbox_container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 8em;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    z-index: 2;
-    background-color: #d0ffd0;
-}
-#cbox {
-    top: 0;
-    left: 0;
-    width: 8em;
-    height: 20em;
-    background-color: #d0ffd0;
-}
-#msgs {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 3;
-}
-#error {
-    width: 100%;
-    height: auto;
-    border-style: solid none solid none;
-    border-width: thin;
-    background-color: #ffb0b0;
-}
-.info {
-    height: auto;
-    border-style: none none solid none;
-    border-width: thin;
-    background-color: #d0d0ff;
-}
-#truth {
-    float: right;
-    height: auto;
-    background-color: #d0d0ff;
 }
 p {
     margin: 0 10px;
