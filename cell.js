@@ -192,9 +192,12 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   if (this.canvas == this.be.cbox){
     var cdraw_x = this.x - this.be.cdraw_left;
     this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, this.y);
+  } else {
+    this.cdraw_cell = this;
   }
 
-  this.del = false;
+  this.cdraw_cell.del = false;
+  this.cdraw_cell.check_for_del(x, y);
 }
 
 Cell.prototype.move = function(dx, dy) {
@@ -203,25 +206,13 @@ Cell.prototype.move = function(dx, dy) {
   this.set_xform.transform("t" + this.x + "," + this.y);
 }
 
-Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
-  var ddx = dx - this.drag_dx;
-  var ddy = dy - this.drag_dy;
-  this.drag_dx = dx;
-  this.drag_dy = dy;
-
-  this.cdrag_cell.move(ddx, ddy);
-  if (this.cdraw_cell){
-    this.cdraw_cell.move(ddx, ddy);
-  }
-
-  if (this.canvas == this.be.cbox) return;
-
-  this.move(ddx, ddy);
-  var del = (!this.box &&
-             ((x < this.be.cdraw_left) ||
-              (y < this.be.cdraw_top) ||
-              (x >= this.be.cdraw_left + this.be.cdraw_width) ||
-              (y >= this.be.cdraw_top + this.be.cdraw_height)));
+Cell.prototype.check_for_del = function(x, y) {
+  // We check for deletion based on the position of the mouse pointer,
+  // not the center (0,0) coordinate of the cell.
+  var del = ((x < this.be.cdraw_left) ||
+             (y < this.be.cdraw_top) ||
+             (x >= this.be.cdraw_left + this.be.cdraw_width) ||
+             (y >= this.be.cdraw_top + this.be.cdraw_height));
   if (del != this.del){
     for (var name in this.io) {
       var io_w = this.io[name].w;
@@ -239,13 +230,25 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
       this.io[port_name].redraw();
     }
   }
+};
+
+Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
+  var ddx = dx - this.drag_dx;
+  var ddy = dy - this.drag_dy;
+  this.drag_dx = dx;
+  this.drag_dy = dy;
+
+  this.cdrag_cell.move(ddx, ddy);
+  this.cdraw_cell.move(ddx, ddy);
+
+  this.cdraw_cell.check_for_del(x, y);
 }
 
 Cell.prototype.cell_drag_end = function() {
   this.be.drag.enable_hover();
-  this.cdrag_cell.remove();
   $(this.be.div_cdrag).css("z-index", "-1")
-  if (this.del) this.remove();
+  this.cdrag_cell.remove();
+  if (this.cdraw_cell.del) this.cdraw_cell.remove();
 }
 
 Cell.prototype.remove = function() {
