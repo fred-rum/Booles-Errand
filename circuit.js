@@ -80,8 +80,6 @@ function Circuit() {
   new Wire(this.be, c1.io["o"], c2.io["i"]);
   new Wire(this.be, c2.io["o"], c1.io["i"]);
   new Wire(this.be, c2.io["o"], c3.io["i1"]);
-
-  c0.drive_output(0);
 }
 
 Circuit.prototype.resize = function(){

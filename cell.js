@@ -51,6 +51,10 @@ function Cell(be, canvas_type, type, x, y) {
   this[type](); // Call cell-type initiator function by name
   if (type == "null") return; // do nothing else for the null cell
 
+  if ((type == "const") && (this.canvas == this.be.cdraw)){
+    this.drive_output(0);
+  }
+
   // Make a separate xform set that includes the IO elements so that they
   // get moved with the cell.
   this.set_xform = this.canvas.set();
