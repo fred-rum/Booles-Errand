@@ -11,7 +11,7 @@ function Circuit() {
 
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
-  this.be.div_info = $("#msgs");
+  this.be.div_info = $("#info");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
@@ -76,28 +76,8 @@ function Circuit() {
   $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));
   $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
 
-
-  this.box_height = this.be.box_spacing;
-  this.add_box_cell("buf");
-  this.add_box_cell("inv");
-  this.add_box_cell("and");
-  this.add_box_cell("nand");
-  this.add_box_cell("or");
-  this.add_box_cell("nor");
-  this.add_box_cell("xor");
-  this.add_box_cell("xnor");
-  this.add_box_cell("const");
-  this.be.div_cbox.height(this.box_height);
-
-  var c0 = new Cell(this.be, "cdraw", "const", 100, 300);
-  var c1 = new Cell(this.be, "cdraw", "buf", 200, 100);
-  var c2 = new Cell(this.be, "cdraw", "inv", 200, 300);
-  var c3 = new Cell(this.be, "cdraw", "and", 300, 200);
-  var c4 = new Cell(this.be, "cdraw", "xnor", 300, 100);
-
-  new Wire(this.be, c1.io["o"], c2.io["i"]);
-  new Wire(this.be, c2.io["o"], c1.io["i"]);
-  new Wire(this.be, c2.io["o"], c3.io["i1"]);
+  this.level = new Level(this.be);
+  this.level.begin(0);
 }
 
 Circuit.prototype.resize = function(){
@@ -153,15 +133,6 @@ Circuit.prototype.resize = function(){
   this.be.div_cdraw.offset(cdraw_offset);
   this.be.div_cdraw.height(cdraw_height);
   this.be.div_cdraw.width(cdraw_width);
-};
-
-Circuit.prototype.add_box_cell = function(name) {
-  var c = new Cell(this.be, "cbox", name, 0, 0);
-  var bbox = c.el_cell.getBBox(false);
-  var cx = (this.be.cbox_width/2) - bbox.x - bbox.width/2; // align center
-  var cy = this.box_height - bbox.y; // align top edge
-  c.move(cx, cy);
-  this.box_height += bbox.height + this.be.box_spacing;
 };
 
 // This is called as soon as the DOM is ready.

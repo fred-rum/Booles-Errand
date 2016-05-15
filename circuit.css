@@ -54,15 +54,13 @@ body {
     z-index:4;
     text-align: center;
 }
-#msgs {
+#info {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     z-index: 3;
     text-align: center;
-}
-.info {
     height: auto;
     border-bottom-style: solid;
     border-width: thin;
