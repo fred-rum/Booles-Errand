@@ -44,14 +44,6 @@ Drag.prototype.remove_new_wires = function() {
   this.new_wires = [];
 };
 
-Drag.prototype.mark_new_wires = function() {
-  var attr = {stroke: "#eeb"}
-  for (var i = 0; i < this.new_wires.length; i++){
-    this.new_wires[i].el_bg.attr(attr);
-    this.new_wires[i].pending_new = true;
-  }
-};
-
 Drag.prototype.commit_new_wires = function() {
   var attr = {stroke: "#eee"}
   for (var i = 0; i < this.new_wires.length; i++){
@@ -76,10 +68,7 @@ Drag.prototype.update_free_drag = function(event) {
       } else {
         var from_io = this.orig_io;
       }
-      this.null_wire = new Wire(this.be, from_io, this.be.null_io);
-      var attr = {stroke: "#eeb"}
-      this.null_wire.el_bg.attr(attr);
-      this.null_wire.pending_new = true;
+      this.null_wire = new Wire(this.be, from_io, this.be.null_io, true);
     }
   }
 };
@@ -168,7 +157,7 @@ Drag.prototype.connect_o_to_i = function(o, i) {
     this.gen_old_wires(i);
   } else {
     this.gen_old_wires(i);
-    this.new_wires.push(new Wire(this.be, o, i));
+    this.new_wires.push(new Wire(this.be, o, i, true));
   }
 };
 
@@ -199,7 +188,8 @@ Drag.prototype.update_new_io = function(io, event) {
   } else if ((this.orig_io.type == "output") && (io.type == "output")) {
     this.gen_old_wires(this.orig_io);
     for (var i = 0; i < this.old_wires.length; i++){
-      this.new_wires.push(new Wire(this.be, this.old_wires[i].i, this.new_io));
+      this.new_wires.push(new Wire(this.be, this.old_wires[i].i, this.new_io,
+                                   true));
     }
   } else if ((this.orig_io.type == "input") && (io.type == "output")) {
     this.connect_o_to_i(io, this.orig_io);
@@ -212,11 +202,10 @@ Drag.prototype.update_new_io = function(io, event) {
       // events), do nothing instead.
     } else {
       this.gen_old_wires(io);
-      this.new_wires.push(new Wire(this.be, this.orig_io.w[0].o, io));
+      this.new_wires.push(new Wire(this.be, this.orig_io.w[0].o, io, true));
     }
   } else {
     // This should never happen.
     this.update_new_io(this.be.null_io, event);
   }
-  this.mark_new_wires();
 };

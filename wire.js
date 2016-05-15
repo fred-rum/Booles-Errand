@@ -1,6 +1,6 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Wire(be, io1, io2) {
+function Wire(be, io1, io2, pending_new) {
   this.be = be;
 
   // When the user drags out new wires, he could be dragging in either
@@ -41,10 +41,17 @@ function Wire(be, io1, io2) {
   this.o.connect(this);
   this.i.connect(this);
 
-  this.pending_new = false;
+  this.pending_new = pending_new;
+  if (pending_new){
+    var attr = {stroke: "#eeb"};
+    this.el_bg.attr(attr);
+  }
+
   this.pending_del = false;
   this.newest_value = null;
   this.in_flight = [];
+
+  this.update_value();
 
   //    this.measure_perf("not segmented");
 }
