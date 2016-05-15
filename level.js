@@ -3,6 +3,8 @@ function Level(be) {
 }
 
 Level.prototype.begin = function(level_num) {
+  this.level_num = level_num;
+
   this.box_height = this.be.box_spacing;
   this.add_box_cell("buf");
   this.add_box_cell("inv");
@@ -27,7 +29,8 @@ Level.prototype.begin = function(level_num) {
       var cell = new Cell(this.be, "cdraw",
                           cell_obj.type,
                           cell_obj.x,
-                          cell_obj.y);
+                          cell_obj.y,
+                          cell_name);
       this.cells[cell_name] = cell;
     }
 
@@ -49,7 +52,6 @@ Level.prototype.begin = function(level_num) {
   }
 };
 
-
 Level.prototype.add_box_cell = function(name) {
   var c = new Cell(this.be, "cbox", name, 0, 0);
   var bbox = c.el_cell.getBBox(false);
@@ -58,3 +60,8 @@ Level.prototype.add_box_cell = function(name) {
   c.move(cx, cy);
   this.box_height += bbox.height + this.be.box_spacing;
 };
+
+Level.prototype.value = function(name) {
+  var truth = this.puzzle[this.level_num].truth;
+  return truth[0][name][0];
+}

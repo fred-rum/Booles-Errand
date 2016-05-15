@@ -1,7 +1,8 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Cell(be, canvas_type, type, x, y) {
+function Cell(be, canvas_type, type, x, y, name) {
   this.be = be;
+  this.name = name;
   this.canvas_type = canvas_type;
   this.box = (canvas_type != "cdraw");
   this.canvas = (canvas_type == "cdraw") ? this.be.cdraw :
@@ -51,11 +52,11 @@ function Cell(be, canvas_type, type, x, y) {
   this.el_s = this.canvas.set();
   this.el_ns = this.canvas.set();
   this.el_cell = this.canvas.set();
-  this[type](); // Call cell-type initiator function by name
+  this["init_" + type](); // Call cell-type initiator function by name
   if (type == "null") return; // do nothing else for the null cell
 
-  if ((type == "const") && (this.canvas == this.be.cdraw)){
-    this.drive_output(0);
+  if (this.canvas == this.be.cdraw){
+    this.update_value();
   }
 
   // Make a separate xform set that includes the IO elements so that they
@@ -77,10 +78,6 @@ function Cell(be, canvas_type, type, x, y) {
 
 
 // Public members
-
-Cell.prototype.drive_output = function(value) {
-  this.io["o"].update_value(value);
-};
 
 Cell.prototype.update_value = function() {
   var calc_func_name = "calc_" + this.type;
@@ -168,6 +165,15 @@ Cell.prototype.calc_xor = function(inv) {
   return value;
 };
 
+Cell.prototype.calc_const = function() {
+  return 0;
+};
+
+Cell.prototype.calc_input = function() {
+  return this.be.level.value(this.name);
+}
+
+
 Cell.prototype.bring_to_top = function() {
   if (this.box) return;
 
@@ -202,7 +208,8 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
     var cdraw_y = cdrag_y + cbox_y_offset;
     this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, cdraw_y);
   }
-  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y);
+  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y,
+                             this.name);
 
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
@@ -298,14 +305,19 @@ Cell.prototype.remove = function() {
   this.el_cell.remove();
 };
 
-Cell.prototype.init_io = function(inv, ni, left, right) {
+Cell.prototype.init_io = function(inv, no, ni, left, right) {
   var cw = this.be.stub_len;
   var cs = this.be.io_spacing;
 
   if (inv) right += this.be.inv_bubble_size;
 
-  var io_obj = new Io(this.be, this.canvas, this, "o", "output", right+cw, 0);
-  this.io[io_obj.name] = io_obj;
+  for (var i = 0; i < no; i++) {
+    var y = ((i+0.5)*cs)-(no*cs/2);
+    var io_obj = new Io(this.be, this.canvas, this,
+                        (no > 1) ? "o" + i : "o", "output",
+                        right+cw, y);
+    this.io[io_obj.name] = io_obj;
+  }
 
   for (var i = 0; i < ni; i++) {
     var y = ((i+0.5)*cs)-(ni*cs/2);
@@ -354,14 +366,14 @@ Cell.prototype.draw_inv = function(inv, right, bg) {
   }
 };
 
-Cell.prototype.inv = function() { this.buf(true); };
-Cell.prototype.buf = function(inv) {
+Cell.prototype.init_inv = function() { this.init_buf(true); };
+Cell.prototype.init_buf = function(inv) {
   var height = 1.5 * this.be.io_spacing;
   var width = Math.sqrt(3)/2*height; /* equilateral */
   var left = -width/2;
   var right = width/2;
 
-  stub_path = this.init_io(inv, 1, left, right);
+  stub_path = this.init_io(inv, 1, 1, left, right);
 
   var cell_path = ["M", left, -height/2,
                    "v", height,
@@ -374,8 +386,8 @@ Cell.prototype.buf = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.nand = function() { this.and(true); };
-Cell.prototype.and = function(inv) {
+Cell.prototype.init_nand = function() { this.init_and(true); };
+Cell.prototype.init_and = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
   var r = height/2;
@@ -385,7 +397,7 @@ Cell.prototype.and = function(inv) {
   var right = cell_width/2;
   var top = -height/2;
 
-  stub_path = this.init_io(inv, ni, left, right);
+  stub_path = this.init_io(inv, 1, ni, left, right);
 
   var cell_path = ["M", left, top,
                    "v", height,
@@ -401,8 +413,8 @@ Cell.prototype.and = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.nor = function() { this.or(true); };
-Cell.prototype.or = function(inv) {
+Cell.prototype.init_nor = function() { this.init_or(true); };
+Cell.prototype.init_or = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
   var r = height/2;
@@ -411,7 +423,7 @@ Cell.prototype.or = function(inv) {
   var right = cell_width/2;
   var top = -height/2;
 
-  stub_path = this.init_io(inv, ni, left, right);
+  stub_path = this.init_io(inv, 1, ni, left, right);
 
   // The arcs that meet at the front (output) end of the gate have
   // ary=height and arx chosen such that the back of the arc is
@@ -432,8 +444,8 @@ Cell.prototype.or = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.xnor = function() { this.xor(true); };
-Cell.prototype.xor = function(inv) {
+Cell.prototype.init_xnor = function() { this.init_xor(true); };
+Cell.prototype.init_xor = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
   var r = height/2;
@@ -445,7 +457,7 @@ Cell.prototype.xor = function(inv) {
   var bar_space = cell_width/6;
   var far_left = left - bar_space;
 
-  stub_path = this.init_io(inv, ni, far_left, right);
+  stub_path = this.init_io(inv, 1, ni, far_left, right);
 
   var ary = height;
   var arx = cell_width * 2/Math.sqrt(3);
@@ -473,21 +485,119 @@ Cell.prototype.xor = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.const = function() {
-  var height = 2 * this.be.io_spacing;
+Cell.prototype.init_input = function() {
+  var height = 1.5 * this.be.io_spacing;
+  var width = height;
+  var left = -width/2;
+  var right = width/2 + height/2;
+  var top = -height/2;
+
+  this.init_io(false, 1, 0, left, right);
+
+  var path = ["M", left, top,
+              "v", height,
+              "h", width,
+              "L", right, 0,
+              "L", width/2, top,
+              "z"];
+  this.push_ns(this.canvas.path(path).attr(this.cell_bg_attr));
+  this.draw_stubs();
+  this.push_s(this.canvas.path(path).attr(this.cell_fg_attr));
+
+  this.el_text = this.canvas.text(0, 0, "");
+  this.el_text.setAttr("pointer-events", "none");
+  this.fit_input_text();
+  this.push_ns(this.el_text);
+};
+
+Cell.prototype.init_output = function() {
+  var height = 1.5 * this.be.io_spacing;
+  var width = height;
+  var left = -width/2 - height/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.init_io(false, 0, 1, left, right);
+
+  var path = ["M", right, top,
+              "v", height,
+              "h", -width,
+              "L", left, 0,
+              "L", -width/2, top,
+              "z"];
+  this.push_ns(this.canvas.path(path).attr(this.cell_bg_attr));
+  this.draw_stubs();
+  this.push_s(this.canvas.path(path).attr(this.cell_fg_attr));
+
+  this.el_text = this.canvas.text(0, 0, "");
+  this.el_text.setAttr("pointer-events", "none");
+  this.fit_output_text();
+  this.push_ns(this.el_text);
+};
+
+Cell.prototype.fit_input_text = function() {
+  var name = this.name.toUpperCase();
+  var text = name + "=" + this.be.level.value(this.name);
+  this.el_text.attr({text: text, "font-size": "10"});
+  var bbox = this.el_text.getBBox(true);
+
+  var height = 1.5 * this.be.io_spacing;
+  var width = height;
+  var total_width = width + height/2;
+
+  // Since the text width is fitting into the angled point, we want the
+  // width + half the height to fit in the total cell width.
+  var scale = total_width / (bbox.width + bbox.height/2);
+
+  // We shift the left edge of the text to the left edge of the cell,
+  // i.e. -width/2.  But because the left stroke is close to the body
+  // of the text, whereas the right stroke only touches the corners
+  // (most likely above and below the text), we fudge a little to the
+  // right.
+  var shift = -width/2 - (bbox.x * scale) + this.be.stroke_cell_fg/2;
+
+  this.el_text.attr({x: shift, "font-size": "" + 10*scale});
+};
+
+Cell.prototype.fit_output_text = function() {
+  var name = this.name.toUpperCase();
+  var text = name + "=" + this.be.level.value(this.name) + "?";
+  this.el_text.attr({text: text, "font-size": "10"});
+  var bbox = this.el_text.getBBox(true);
+
+  var height = 1.5 * this.be.io_spacing;
+  var width = height;
+  var total_width = width + height/2;
+
+  // Since the text width is fitting into the angled point, we want the
+  // width + half the height to fit in the total cell width.
+  var scale = total_width / (bbox.width + bbox.height/2);
+
+  // We shift the right edge of the text to the right edge of the cell,
+  // i.e. width/2.  But because the right stroke is close to the body
+  // of the text, whereas the left stroke only touches the corners
+  // (most likely above and below the text), we fudge a little to the
+  // left.
+  var shift = width/2 - ((bbox.x + bbox.width) * scale) - this.be.stroke_cell_fg/2;
+
+  this.el_text.attr({x: shift, "font-size": "" + 10*scale});
+};
+
+Cell.prototype.init_const = function() {
+  var height = 1.5 * this.be.io_spacing;
   var width = height;
   var left = -width/2;
   var right = width/2;
   var top = -height/2;
 
-  this.init_io(false, 0, left, right);
+  this.init_io(false, 1, 0, left, right);
 
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
   this.draw_stubs();
   this.push_s(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr));
 };
 
-Cell.prototype.null = function() {
+Cell.prototype.init_null = function() {
   // A "null" port is used as the connection point for wires
   // currently being dragged.
   var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0);

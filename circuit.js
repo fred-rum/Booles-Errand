@@ -76,8 +76,8 @@ function Circuit() {
   $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));
   $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
 
-  this.level = new Level(this.be);
-  this.level.begin(0);
+  this.be.level = new Level(this.be);
+  this.be.level.begin(0);
 }
 
 Circuit.prototype.resize = function(){
