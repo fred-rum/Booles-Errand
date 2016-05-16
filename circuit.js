@@ -26,14 +26,9 @@ function Circuit() {
   this.be.div_cbox = $("#cbox");
 
   // We want cdrag to be wide enough to overlap the border between
-  // cbox and cdraw.  The border is attached to cdraw so that the
-  // gaps between the dotted line have a grey color, which better
-  // matches the scrollbar that is potentially on the right side of
-  // cbox.  cdraw isn't positioned or sized yet, but we can still
-  // query it to get its border width.
-  var border_width = this.be.div_cdraw.outerWidth( )- this.be.div_cdraw.width();
-  this.be.cbox_width = this.be.div_cbox_container.width();
-  this.be.cdraw_left = this.be.cbox_width + border_width;
+  // cbox and cdraw.
+  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+  this.be.cdraw_left = this.be.cbox_width;
   this.be.div_cdrag.width(this.be.cdraw_left);
 
   // Other div dimensions are resized dynamically as sppropriate.
@@ -48,7 +43,7 @@ function Circuit() {
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
   // appropriate.
-  var em_size = $('#cbox_container').width() / 8;
+  var em_size = this.be.div_cbox_container.width() / 8;
   this.be.io_spacing = em_size * 10/8;
   this.be.io_handle_size = this.be.io_spacing * 3/4;
   this.be.stub_len = em_size * 5/8;

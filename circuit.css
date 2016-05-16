@@ -87,15 +87,24 @@ body {
     left: 0;
     width: 8em;
     height: 100%;
-    overflow-y: auto;
+    background-color: #eee;
+    border-right-style: dotted;
+    border-width: thin;
     z-index: 2;
+}
+#cbox_scroll {
+    top: 0;
+    left: 0;
+    width: 8em;
+    height: 100%;
+    overflow-y: auto;
     background-color: #d0ffd0;
 }
 #cbox {
     top: 0;
     left: 0;
     width: 8em;
-    height: 20em;
+    height: 100%;
     background-color: #d0ffd0;
 }
 #cdraw {
@@ -105,9 +114,7 @@ body {
     height: 100%;
     width: 100%;
     z-index: 1;
-    background: #eee;
-    border-left-style: dotted;
-    border-width: thin;
+    background-color: #eee;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
