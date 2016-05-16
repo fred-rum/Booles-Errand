@@ -30,7 +30,7 @@ function Circuit() {
 
   // Other div dimensions are resized dynamically as sppropriate.
   this.be.window.resize($.proxy(this.resize, this)); 
-  this.resize();
+  // The first puzzle level will reflow the text and call this.resize().
 
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
@@ -73,6 +73,7 @@ function Circuit() {
   // null cell
   new Cell(this.be, "cdraw", "null", 0, 0);
 
+  this.be.circuit = this;
   this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
 
