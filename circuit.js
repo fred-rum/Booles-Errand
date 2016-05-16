@@ -51,6 +51,9 @@ function Circuit() {
   this.be.stroke_cell_fg = em_size * 3/16;
   this.be.stroke_cell_bg = em_size * 7/16;
 
+  this.be.stroke_question = em_size * 5/16;
+  this.be.stroke_check = em_size * 7/16;
+
   this.be.stroke_stub_end_undefined = em_size * 0.5/16;
   this.be.stroke_stub_end_defined   = em_size * 2/16;
 
@@ -70,7 +73,7 @@ function Circuit() {
   // null cell
   new Cell(this.be, "cdraw", "null", 0, 0);
 
-  this.be.sim = new Sim();
+  this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
 
   $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));

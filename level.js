@@ -4,6 +4,7 @@ function Level(be) {
 
 Level.prototype.begin = function(level_num) {
   this.level_num = level_num;
+  var level = this.level = this.puzzle[level_num];
 
   this.box_height = this.be.box_spacing;
   this.add_box_cell("buf");
@@ -17,7 +18,6 @@ Level.prototype.begin = function(level_num) {
   this.add_box_cell("const");
   this.be.div_cbox.height(this.box_height);
 
-  var level = this.puzzle[level_num];
   this.cells = {};
 
   this.be.div_info.html(level.intro || "");
@@ -64,4 +64,17 @@ Level.prototype.add_box_cell = function(name) {
 Level.prototype.value = function(name) {
   var truth = this.puzzle[this.level_num].truth;
   return truth[0][name][0];
-}
+};
+
+Level.prototype.done = function() {
+  var result = true;
+  for (var cell_name in this.cells){
+    if (this.cells[cell_name].type == "output"){
+      result = result && this.cells[cell_name].done_check();
+    }
+  }
+
+  if (result){
+    this.be.div_info.html(this.level.outro || "");
+  }
+};

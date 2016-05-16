@@ -1,6 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Sim() {
+function Sim(be) {
+  this.be = be;
   this.old_events = [];
   this.new_events = [];
   this.running = false;
@@ -46,5 +47,6 @@ Sim.prototype.tick = function() {
   }
   if (!this.new_events.length) {
     this.pause();
+    this.be.level.done();
   }
 };
