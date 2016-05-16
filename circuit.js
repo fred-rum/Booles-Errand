@@ -116,10 +116,13 @@ Circuit.prototype.resize = function(center) {
 
   // I might have set the div_truth size in the past, so if I want to
   // measure its desired height, I have to set it back to auto first.
-  
   this.be.div_truth.outerHeight("auto");
   var new_truth_height = this.be.div_truth.outerHeight();
   if (this.be.cdrag_cell){
+    // If div_truth changes height (e.g. due to a reflow of div_info),
+    // then cdrag will change position, which means that any cell
+    // currently being dragged will incorrectly shift on the screen.
+    // Fix that.
     this.be.cdrag_cell.move(0, this.be.truth_height - new_truth_height);
   }
   this.be.truth_height = new_truth_height;
