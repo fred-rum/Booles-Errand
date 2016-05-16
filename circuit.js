@@ -116,8 +116,13 @@ Circuit.prototype.resize = function(center) {
 
   // I might have set the div_truth size in the past, so if I want to
   // measure its desired height, I have to set it back to auto first.
+  
   this.be.div_truth.outerHeight("auto");
-  this.be.truth_height = this.be.div_truth.outerHeight();
+  var new_truth_height = this.be.div_truth.outerHeight();
+  if (this.be.cdrag_cell){
+    this.be.cdrag_cell.move(0, this.be.truth_height - new_truth_height);
+  }
+  this.be.truth_height = new_truth_height;
 
   // Make sure the truth table div is at least as tall as the info div.
   var info_height = this.be.div_info.outerHeight();

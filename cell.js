@@ -289,6 +289,10 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y,
                              this.name);
 
+  // Put the cdrag cell in a central location.
+  // The resize/reflow code will fix its position as necessory.
+  this.be.cdrag_cell = this.cdrag_cell;
+
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
 }
@@ -371,8 +375,11 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
 Cell.prototype.cell_drag_end = function() {
   this.el_cell.attr({"cursor": "grab"});
   this.be.drag.enable_hover();
+
   $(this.be.div_cdrag).css("z-index", "-1")
   this.cdrag_cell.remove();
+  this.be.cdrag_cell = undefined;
+
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
   } else {
