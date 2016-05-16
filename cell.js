@@ -81,6 +81,12 @@ function Cell(be, canvas_type, type, x, y, name) {
   this.el_cell.drag($.proxy(this.cell_drag_move, this),
                     $.proxy(this.cell_drag_start, this),
                     $.proxy(this.cell_drag_end, this));
+
+  if (this.name){
+    // If it has a name, then it is being placed by the level,
+    // and it is not being dragged.
+    this.calc_bbox();
+  }
 }
 
 
@@ -267,15 +273,17 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   $(this.be.div_cdrag).css("z-index", "99")
 
   var cbox_y_offset = this.be.truth_height - this.be.cdraw_top;
+  var view_left = this.be.view_cx - this.be.view_width/2;
+  var view_top = this.be.view_cy - this.be.view_height/2;
   if (this.canvas == this.be.cdraw){
-    var cdrag_x = this.x + this.be.cdraw_left;
-    var cdrag_y = this.y - cbox_y_offset;
+    var cdrag_x = this.x - view_left + this.be.cdraw_left;
+    var cdrag_y = this.y - view_top - cbox_y_offset;
     this.cdraw_cell = this;
   } else {
     var cdrag_x = this.x;
     var cdrag_y = this.y - this.be.div_cbox_container.scrollTop();
-    var cdraw_x = cdrag_x - this.be.cdraw_left;
-    var cdraw_y = cdrag_y + cbox_y_offset;
+    var cdraw_x = cdrag_x - this.be.cdraw_left + view_left;
+    var cdraw_y = cdrag_y + cbox_y_offset + view_top;
     this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, cdraw_y);
   }
   this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y,
@@ -365,7 +373,11 @@ Cell.prototype.cell_drag_end = function() {
   this.be.drag.enable_hover();
   $(this.be.div_cdrag).css("z-index", "-1")
   this.cdrag_cell.remove();
-  if (this.cdraw_cell.pending_del) this.cdraw_cell.remove();
+  if (this.cdraw_cell.pending_del){
+    this.cdraw_cell.remove();
+  } else {
+    this.cdraw_cell.calc_bbox();
+  }
 }
 
 Cell.prototype.remove = function() {
@@ -375,6 +387,33 @@ Cell.prototype.remove = function() {
   this.io = null;
   this.el_cell.remove();
 };
+
+Cell.prototype.calc_bbox = function() {
+  this.bbox = {};
+  for (var name in this.io) {
+    var x = this.x + this.io[name].x;
+    var y = this.y + this.io[name].y;
+    if (this.bbox.left === undefined){
+      this.bbox.left = this.bbox.right = x;
+      this.bbox.top = this.bbox.bottom = y;
+    } else {
+      if (x < this.bbox.left){
+        this.bbox.left = x;
+      }
+      if (x > this.bbox.right){
+        this.bbox.left = x;
+      }
+      if (y < this.bbox.top){
+        this.bbox.left = y;
+      }
+      if (y > this.bbox.bottom){
+        this.bbox.left = y;
+      }
+    }
+  }
+
+  this.be.circuit.add_to_viewbox(this.bbox);
+}
 
 Cell.prototype.init_io = function(inv, no, ni, left, right) {
   var cw = this.be.stub_len;

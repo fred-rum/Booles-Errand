@@ -8,6 +8,14 @@ function Circuit() {
   this.be.cdrag = Raphael("cdrag", "100%", "100%");
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
+  this.bbox = {};
+
+  // An inline SVG sits on the baseline, so if it is 100% of the div
+  // height, then the space left for descenders will cause a vertical
+  // scrollbar to appear.  Setting display: block instead of inline
+  // prevents that.
+  $("#cbox svg").attr({"display": "block"});
+  $("#cdraw svg").attr({"display": "block"});
 
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
@@ -29,8 +37,13 @@ function Circuit() {
   this.be.div_cdrag.width(this.be.cdraw_left);
 
   // Other div dimensions are resized dynamically as sppropriate.
-  this.be.window.resize($.proxy(this.resize, this)); 
   // The first puzzle level will reflow the text and call this.resize().
+  this.canvas_width = 0;
+  this.canvas_height = 0;
+  this.be.view_width = 0;
+  this.be.view_height = 0;
+
+  this.be.window.resize($.proxy(this.resize, this)); 
 
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
@@ -82,6 +95,8 @@ function Circuit() {
 
   this.be.level = new Level(this.be);
   this.be.level.begin(0);
+  this.center_view();
+  this.resize();
 }
 
 Circuit.prototype.resize = function(){
@@ -128,15 +143,64 @@ Circuit.prototype.resize = function(){
 
   // Move the cdraw area below div_info and to the right of div_cbox.
   // Also decrease its height and width accordingly.
-  var cdraw_width = this.be.window_width - this.be.cdraw_left;
-  var cdraw_height = this.be.window_height - this.be.cdraw_top;
-  var cdraw_offset = {
-    top: this.be.cdraw_top,
-    left: this.be.cbox_width // not cdraw_left; that doesn't include the border
-  };
-  this.be.div_cdraw.offset(cdraw_offset);
-  this.be.div_cdraw.height(cdraw_height);
-  this.be.div_cdraw.width(cdraw_width);
+  this.be.view_width = this.be.window_width - this.be.cdraw_left;
+  this.be.view_height = this.be.window_height - this.be.cdraw_top;
+
+  if (this.be.view_width > this.canvas_width){
+    this.canvas_width = this.be.view_width;
+    this.be.div_cdraw.width(this.be.view_width);
+  }
+  if (this.be.view_height > this.canvas_height){
+    this.canvas_height = this.be.view_height;
+    this.be.div_cdraw.height(this.be.view_height);
+  }
+  this.adjust_viewbox();
+};
+
+Circuit.prototype.add_to_viewbox = function(bbox) {
+  var changed = false;
+
+  if (this.bbox.left === undefined){
+    this.bbox.left = bbox.left;
+    this.bbox.right = bbox.right;
+    this.bbox.top = bbox.top;
+    this.bbox.bottom = bbox.bottom;
+    changed = true;
+  } else {
+    if (bbox.left < this.bbox.left){
+      this.bbox.left = bbox.left;
+      changed = true;
+    }
+    if (bbox.right > this.bbox.right){
+      this.bbox.right = bbox.right;
+      changed = true;
+    }
+    if (bbox.top < this.bbox.top){
+      this.bbox.top = bbox.top;
+      changed = true;
+    }
+    if (bbox.bottom > this.bbox.bottom){
+      this.bbox.bottom = bbox.bottom;
+      changed = true;
+    }
+  }
+};
+
+Circuit.prototype.center_view = function() {
+  this.be.view_cx = (this.bbox.left + this.bbox.right) / 2;
+  this.be.view_cy = (this.bbox.top + this.bbox.bottom) / 2;
+  this.adjust_viewbox();
+};
+
+Circuit.prototype.adjust_viewbox = function() {
+  var canvas_cx = this.canvas_width - this.be.view_width/2;
+  var canvas_cy = this.canvas_height - this.be.view_height/2;
+
+  var canvas_left = this.be.view_cx - canvas_cx;
+  var canvas_top = this.be.view_cy - canvas_cy;
+
+  this.be.cdraw.setViewBox(canvas_left, canvas_top,
+                           this.canvas_width, this.canvas_height);
 };
 
 // This is called as soon as the DOM is ready.

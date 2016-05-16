@@ -21,7 +21,6 @@ Level.prototype.begin = function(level_num) {
   this.cells = {};
 
   this.be.div_info.html(level.intro || "");
-  this.be.circuit.resize();
 
   if (level.cells){
     // First, initialize the cells while ignoring IO connections.

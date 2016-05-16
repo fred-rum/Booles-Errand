@@ -87,7 +87,6 @@ body {
     left: 0;
     width: 8em;
     height: 100%;
-    overflow-x: hidden;
     overflow-y: auto;
     z-index: 2;
     background-color: #d0ffd0;
@@ -101,8 +100,8 @@ body {
 }
 #cdraw {
     position: fixed;
-    top: 0;
-    left: 0;
+    bottom: 0;
+    right: 0;
     height: 100%;
     width: 100%;
     z-index: 1;

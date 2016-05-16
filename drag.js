@@ -56,8 +56,11 @@ Drag.prototype.commit_new_wires = function() {
 
 Drag.prototype.update_free_drag = function(event) {
   if (this.new_io == this.be.null_io){
-    this.be.null_io.x = event.pageX - this.be.cdraw_left;
-    this.be.null_io.y = event.pageY - this.be.cdraw_top;
+    var view_left = this.be.view_cx - this.be.view_width/2;
+    var view_top = this.be.view_cy - this.be.view_height/2;
+
+    this.be.null_io.x = event.pageX - this.be.cdraw_left + view_left;
+    this.be.null_io.y = event.pageY - this.be.cdraw_top + view_top;
 
     if (this.null_wire){
       this.null_wire.redraw();
