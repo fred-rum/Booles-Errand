@@ -76,6 +76,6 @@ Level.prototype.done = function() {
 
   if (result){
     this.be.div_info.html(this.level.outro || "");
-    this.be.circuit.resize();
+    this.be.circuit.resize(false);
   }
 };

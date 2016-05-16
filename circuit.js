@@ -38,7 +38,7 @@ function Circuit() {
   this.be.view_width = 0;
   this.be.view_height = 0;
 
-  this.be.window.resize($.proxy(this.resize, this)); 
+  this.be.window.resize($.proxy(this.resize_event, this)); 
 
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
@@ -91,10 +91,14 @@ function Circuit() {
   this.be.level = new Level(this.be);
   this.be.level.begin(0);
   this.center_view();
-  this.resize();
+  this.resize(true);
 }
 
-Circuit.prototype.resize = function(){
+Circuit.prototype.resize_event = function() {
+  this.resize(true);
+};
+
+Circuit.prototype.resize = function(center) {
   this.be.window_width = this.be.window.width();
   this.be.window_height = this.be.window.height();
   this.be.truth_width = this.be.div_truth.outerWidth();
@@ -138,8 +142,18 @@ Circuit.prototype.resize = function(){
 
   // Move the cdraw area below div_info and to the right of div_cbox.
   // Also decrease its height and width accordingly.
-  this.be.view_width = this.be.window_width - this.be.cdraw_left;
-  this.be.view_height = this.be.window_height - this.be.cdraw_top;
+  var new_view_width = this.be.window_width - this.be.cdraw_left;
+  var new_view_height = this.be.window_height - this.be.cdraw_top;
+
+  if (!center){
+    // If we don't want the view to change, we adjust the recorded
+    // center coordinates to continue to point to the center of the view.
+    this.be.view_cx += (this.be.view_width - new_view_width)/2;
+    this.be.view_cy += (this.be.view_height - new_view_height)/2;
+  }
+
+  this.be.view_width = new_view_width;
+  this.be.view_height = new_view_height;
 
   if (this.be.view_width > this.canvas_width){
     this.canvas_width = this.be.view_width;
