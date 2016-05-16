@@ -17,6 +17,17 @@ function Circuit() {
   $("#cbox svg").attr({"display": "block"});
   $("#cdraw svg").attr({"display": "block"});
 
+  // Create a background rectangle that the user can grab in order
+  // to pan the drawing area.
+  var attr = {
+    stroke: 0,
+    fill: "#eee"
+  };
+  this.canvas_rect = this.be.cdraw.rect(0, 0, 0, 0).attr(attr);
+  this.canvas_rect.drag($.proxy(this.canvas_drag_move, this),
+                        $.proxy(this.canvas_drag_start, this),
+                        $.proxy(this.canvas_drag_end, this));
+
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
   this.be.div_info = $("#info");
@@ -164,12 +175,12 @@ Circuit.prototype.resize = function(center) {
   this.be.view_height = new_view_height;
 
   if (this.be.view_width > this.canvas_width){
-    this.canvas_width = this.be.view_width;
-    this.be.div_cdraw.width(this.be.view_width);
+    this.canvas_width = this.be.view_width + 1000;
+    this.be.div_cdraw.width(this.canvas_width);
   }
   if (this.be.view_height > this.canvas_height){
-    this.canvas_height = this.be.view_height;
-    this.be.div_cdraw.height(this.be.view_height);
+    this.canvas_height = this.be.view_height + 1000;
+    this.be.div_cdraw.height(this.canvas_height);
   }
   this.adjust_viewbox();
 };
@@ -218,6 +229,38 @@ Circuit.prototype.adjust_viewbox = function() {
 
   this.be.cdraw.setViewBox(canvas_left, canvas_top,
                            this.canvas_width, this.canvas_height);
+
+  // Keep the background rectangle covering at least the whole
+  // viewable area.  (It's easiest to simply cover the canvas.)
+  var attr = {
+    x: canvas_left,
+    y: canvas_top,
+    width: this.canvas_width,
+    height: this.canvas_height
+  };
+  this.canvas_rect.attr(attr);
+};
+
+Circuit.prototype.canvas_drag_start = function(x, y, event) {
+  this.drag_dx = 0;
+  this.drag_dy = 0;
+
+  this.canvas_rect.attr({"cursor": "move"});
+};
+
+Circuit.prototype.canvas_drag_move = function(dx, dy, x, y, event) {
+  var ddx = dx - this.drag_dx;
+  var ddy = dy - this.drag_dy;
+  this.drag_dx = dx;
+  this.drag_dy = dy;
+
+  this.be.view_cx -= ddx;
+  this.be.view_cy -= ddy;
+  this.adjust_viewbox();
+};
+
+Circuit.prototype.canvas_drag_end = function() {
+  this.canvas_rect.attr({"cursor": "default"});
 };
 
 // This is called as soon as the DOM is ready.
