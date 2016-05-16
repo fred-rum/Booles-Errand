@@ -87,7 +87,7 @@ Cell.prototype.update_value = function() {
   // Don't propagate the value if it is the same as the value at
   // the cell's output.  (Eventually this should look at
   // the newest progating value in the cell, once that's supported.)
-  if (value === this.io.o.value) return;
+  if ((!this.io.o) || (value === this.io.o.value)) return;
 
   // Due to changing inputs, a cell may calculate more than one new
   // value per tick.  If that happens, record the last value, but don't
@@ -173,6 +173,36 @@ Cell.prototype.calc_input = function() {
   return this.be.level.value(this.name);
 }
 
+Cell.prototype.calc_output = function() {
+  var value = this.io.i.value;
+  if (value === this.value) return;
+  this.value = value;
+
+  if (value === undefined){
+    this.el_check.setAttr("visibility", "hidden");
+  } else {
+    this.el_check.setAttr("visibility", "visible");
+    var height = 1.5 * this.be.io_spacing;
+    var width = height;
+    var right = width/2;
+    var attr = {};
+    if (value === this.be.level.value(this.name)) {
+      attr.stroke = "#8d8";
+      attr.path = ["M", right + height*1/3, 0,
+                   "l", height*1/6, height*1/3,
+                   "l", height*2/6, -height*2/3];
+    } else {
+      attr.stroke = "#f00";
+      attr.path = ["M", right + height*1/3, -height*1/3,
+                   "l", height*2/3, height*2/3,
+                   "m", 0, -height*2/3,
+                   "l", -height*2/3, height*2/3];
+    }
+    this.el_check.attr(attr);
+  }
+
+  return undefined; // This cell has no output port.
+}
 
 Cell.prototype.bring_to_top = function() {
   if (this.box) return;
@@ -533,6 +563,16 @@ Cell.prototype.init_output = function() {
   this.el_text.setAttr("pointer-events", "none");
   this.fit_output_text();
   this.push_ns(this.el_text);
+
+  // Placeholder for output check result.
+  var attr = {
+    "stroke-width": this.be.stroke_check,
+    "stroke-linejoin": "round",
+    "stroke-linecap": "round",
+    //"stroke-dasharray": "-"
+  };
+  this.el_check = this.canvas.path(0, 0, "M0,0").attr(attr);
+  this.push_ns(this.el_check);
 };
 
 Cell.prototype.fit_input_text = function() {
