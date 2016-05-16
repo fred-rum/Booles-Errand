@@ -71,6 +71,13 @@ function Cell(be, canvas_type, type, x, y, name) {
   this.set_xform.transform("t" + this.x + "," + this.y);
 
   this.bring_to_top();
+
+  if (this.canvas == this.be.cdrag){
+    this.el_cell.attr({"cursor": "grabbing"});
+  } else {
+    this.el_cell.attr({"cursor": "grab"});
+  }
+
   this.el_cell.drag($.proxy(this.cell_drag_move, this),
                     $.proxy(this.cell_drag_start, this),
                     $.proxy(this.cell_drag_end, this));
@@ -247,6 +254,8 @@ Cell.prototype.bring_to_top = function() {
 Cell.prototype.cell_drag_start = function(x, y, event) {
   this.drag_dx = 0;
   this.drag_dy = 0;
+
+  this.el_cell.attr({"cursor": "grabbing"});
   this.be.drag.disable_hover();
 
   // Pop cell to top for more natural dragging.
@@ -352,6 +361,7 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
 }
 
 Cell.prototype.cell_drag_end = function() {
+  this.el_cell.attr({"cursor": "grab"});
   this.be.drag.enable_hover();
   $(this.be.div_cdrag).css("z-index", "-1")
   this.cdrag_cell.remove();
