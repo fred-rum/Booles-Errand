@@ -81,12 +81,6 @@ function Cell(be, canvas_type, type, x, y, name) {
   this.el_cell.drag($.proxy(this.cell_drag_move, this),
                     $.proxy(this.cell_drag_start, this),
                     $.proxy(this.cell_drag_end, this));
-
-  if (this.name){
-    // If it has a name, then it is being placed by the level,
-    // and it is not being dragged.
-    this.calc_bbox();
-  }
 }
 
 
@@ -243,6 +237,12 @@ Cell.prototype.calc_output = function() {
   return undefined; // This cell has no output port.
 }
 
+Cell.prototype.check_pending = function() {
+  if (this.value !== undefined){
+    this.el_question.setAttr("visibility", "visible");
+  }
+}
+
 Cell.prototype.done_check = function() {
   this.el_question.setAttr("visibility", "hidden");
   return this.value === this.be.level.value(this.name);
@@ -383,7 +383,7 @@ Cell.prototype.cell_drag_end = function() {
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
   } else {
-    this.cdraw_cell.calc_bbox();
+    this.be.level.add_cell(this);
   }
 };
 

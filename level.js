@@ -19,7 +19,8 @@ Level.prototype.begin = function(level_num) {
   this.add_box_cell("const");
   this.be.div_cbox.height(this.box_height);
 
-  this.cells = {};
+  this.named_cells = {};
+  this.all_cells = [];
 
   this.be.div_info.html(level.intro || "");
 
@@ -35,7 +36,8 @@ Level.prototype.begin = function(level_num) {
                           cell_obj.x,
                           cell_obj.y,
                           cell_name);
-      this.cells[cell_name] = cell;
+      this.named_cells[cell_name] = cell;
+      this.add_cell(cell);
       if (cell_obj.type == "input") input_names += cell_name;
       if (cell_obj.type == "output") output_names += cell_name;
     }
@@ -49,8 +51,8 @@ Level.prototype.begin = function(level_num) {
           var cell_name2 = conn_list[i][1];
           var io_name2 = conn_list[i][2];
           new Wire(this.be,
-                   this.cells[cell_name].io[io_name],
-                   this.cells[cell_name2].io[io_name2],
+                   this.named_cells[cell_name].io[io_name],
+                   this.named_cells[cell_name2].io[io_name2],
                    false);
         }
       }
@@ -118,11 +120,27 @@ Level.prototype.value = function(name) {
   return truth[this.truth_row][name][0];
 };
 
+Level.prototype.add_cell = function(cell) {
+  cell.calc_bbox();
+  this.all_cells.push(cell);
+};
+
+Level.prototype.start = function() {
+  // While the circuit is running, we mark all check pins as pending
+  // to avoid confusing the user (even if we're sure of the final
+  // value).
+  for (var cell_name in this.named_cells){
+    if (this.named_cells[cell_name].type == "output"){
+      this.named_cells[cell_name].check_pending();
+    }
+  }
+};
+
 Level.prototype.done = function() {
   var result = true;
-  for (var cell_name in this.cells){
-    if (this.cells[cell_name].type == "output"){
-      result = result && this.cells[cell_name].done_check();
+  for (var cell_name in this.named_cells){
+    if (this.named_cells[cell_name].type == "output"){
+      result = result && this.named_cells[cell_name].done_check();
     }
   }
 
@@ -132,12 +150,12 @@ Level.prototype.done = function() {
     if (this.truth_row < this.level.truth.length-1){
       this.truth_row++;
       for (i = 0; i < this.input_names.length; i++){
-        var cell = this.cells[this.input_names[i]];
+        var cell = this.named_cells[this.input_names[i]];
         cell.update_value();
         cell.fit_input_text();
       }
       for (i = 0; i < this.input_names.length; i++){
-        var cell = this.cells[this.output_names[i]];
+        var cell = this.named_cells[this.output_names[i]];
         cell.fit_output_text();
       }
     } else {

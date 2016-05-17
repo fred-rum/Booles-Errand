@@ -23,6 +23,7 @@ Sim.prototype.click_pause = function () {
 
 Sim.prototype.start = function() {
   if (!this.timer && this.running){
+    this.be.level.start();
     this.timer = setInterval($.proxy(this.tick, this), 50);
   }
 };
