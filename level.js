@@ -140,7 +140,8 @@ Level.prototype.done = function() {
   var result = true;
   for (var cell_name in this.named_cells){
     if (this.named_cells[cell_name].type == "output"){
-      result = result && this.named_cells[cell_name].done_check();
+      var cell_result = this.named_cells[cell_name].done_check()
+      result = result && cell_result;
     }
   }
 
