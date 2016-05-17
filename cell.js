@@ -1,10 +1,10 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-function Cell(be, canvas_type, type, x, y, name) {
+function Cell(be, canvas_type, type, x, y, name, locked) {
   this.be = be;
   this.name = name;
+  this.locked = locked;
   this.canvas_type = canvas_type;
-  this.box = (canvas_type != "cdraw");
   this.canvas = (canvas_type == "cdraw") ? this.be.cdraw :
                 (canvas_type == "cbox")  ? this.be.cbox :
                                            this.be.cdrag;
@@ -72,15 +72,19 @@ function Cell(be, canvas_type, type, x, y, name) {
 
   this.bring_to_top();
 
-  if (this.canvas == this.be.cdrag){
-    this.el_cell.attr({"cursor": "grabbing"});
+  if (this.locked){
+    this.el_cell.attr({"cursor": "not-allowed"});
   } else {
-    this.el_cell.attr({"cursor": "grab"});
-  }
+    if (this.canvas == this.be.cdrag){
+      this.el_cell.attr({"cursor": "grabbing"});
+    } else {
+      this.el_cell.attr({"cursor": "grab"});
+    }
 
-  this.el_cell.drag($.proxy(this.cell_drag_move, this),
-                    $.proxy(this.cell_drag_start, this),
-                    $.proxy(this.cell_drag_end, this));
+    this.el_cell.drag($.proxy(this.cell_drag_move, this),
+                      $.proxy(this.cell_drag_start, this),
+                      $.proxy(this.cell_drag_end, this));
+  }
 }
 
 
@@ -235,7 +239,7 @@ Cell.prototype.done_check = function() {
 };
 
 Cell.prototype.bring_to_top = function() {
-  if (this.box) return;
+  if (this.canvas_type != "cdraw") return;
 
   this.el_cell.insertBefore(this.be.z_cell);
   for (var port_name in this.io) {
