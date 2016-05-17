@@ -3,8 +3,20 @@ function Level(be) {
 }
 
 Level.prototype.begin = function(level_num) {
+  if (level_num === undefined){
+    level_num = 0;
+    var anchor = decodeURI(window.location.hash.substring(1));
+    for (i = 0; i < this.puzzle.length; i++){
+      if (this.puzzle[i].name == anchor){
+        level_num = i;
+        break;
+      }
+    }
+  }
+
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
+  window.location.hash = encodeURI(level.name);
   this.truth_row = 0;
 
   this.box_height = this.be.box_spacing;

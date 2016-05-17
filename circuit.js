@@ -103,7 +103,7 @@ function Circuit() {
   $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
 
   this.be.level = new Level(this.be);
-  this.be.level.begin(0);
+  this.be.level.begin();
   this.center_view();
   this.resize(true);
 }
