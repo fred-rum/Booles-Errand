@@ -37,7 +37,9 @@ function Circuit() {
   this.be.div_cbox = $("#cbox");
 
   // We want cdrag to be wide enough to overlap the border between
-  // cbox and cdraw.
+  // cbox and cdraw.  I have *hopefully* arranged for cbox_container
+  // to be an integer number of pixels wide so that we don't have to
+  // worry about sub-pixel issues here.
   this.be.cbox_width = this.be.div_cbox_container.outerWidth();
   this.be.cdraw_left = this.be.cbox_width;
   this.be.div_cdrag.width(this.be.cdraw_left);
@@ -117,10 +119,15 @@ Circuit.prototype.resize = function(center) {
   // Move the div_info to the right of div_truth and decrease its width
   // accordingly.  Note that this may reflow the text and thus change the
   // height of div_info.
-  var info_width = this.be.window_width - this.be.truth_width;
+  //
+  // The truth div may be a non-integer width.  To avoid a gap,
+  // shoot for a 1 pixel overlap.  Since info is below truth in the
+  // z-index, this won't be visible, and the minor difference in text
+  // position won't be noticeable, either.
+  var info_width = this.be.window_width - this.be.truth_width + 1;
   var info_offset = {
     top: 0,
-    left: this.be.truth_width
+    left: this.be.truth_width - 1
   };
   this.be.div_info.offset(info_offset);
   this.be.div_info.width(info_width);
@@ -174,12 +181,12 @@ Circuit.prototype.resize = function(center) {
   this.be.view_width = new_view_width;
   this.be.view_height = new_view_height;
 
-  if (this.be.view_width > this.canvas_width){
-    this.canvas_width = this.be.view_width + 1000;
+  if (this.be.window_width > this.canvas_width){
+    this.canvas_width = this.be.window_width + 1000;
     this.be.div_cdraw.width(this.canvas_width);
   }
-  if (this.be.view_height > this.canvas_height){
-    this.canvas_height = this.be.view_height + 1000;
+  if (this.be.window_height > this.canvas_height){
+    this.canvas_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.canvas_height);
   }
   this.adjust_viewbox();
@@ -221,12 +228,15 @@ Circuit.prototype.center_view = function() {
 };
 
 Circuit.prototype.adjust_viewbox = function() {
-  var canvas_cx = this.canvas_width - this.be.view_width/2;
-  var canvas_cy = this.canvas_height - this.be.view_height/2;
+  var canvas_cx = (this.be.window_width + this.be.cdraw_left)/2;
+  var canvas_cy = (this.be.window_height + this.be.cdraw_top)/2;
 
   var canvas_left = this.be.view_cx - canvas_cx;
   var canvas_top = this.be.view_cy - canvas_cy;
 
+  console.log("w", this.be.window_width, this.be.cdraw_left);
+  console.log("c", this.be.view_cx, canvas_cx);
+  console.log("vb", canvas_left, canvas_top, this.canvas_width, this.canvas_height);
   this.be.cdraw.setViewBox(canvas_left, canvas_top,
                            this.canvas_width, this.canvas_height);
 
