@@ -174,7 +174,7 @@ Io.prototype.display_fail = function(fail) {
     this.el_fail_slash = this.canvas.path(["M", cx, cy-tw/2,
                                            "v", tw]);
     this.el_fail_slash.attr(attr);
-    this.el_fail_slash.rotate(45, cx, cy);
+    this.el_fail_slash.rotate(-45, cx, cy);
     this.el_fail_slash.setAttr("pointer-events", "none");
   } else if (this.el_fail_circle){
     this.el_fail_circle.remove();
