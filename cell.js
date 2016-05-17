@@ -187,22 +187,20 @@ Cell.prototype.calc_output = function() {
 
   if (value === undefined){
     this.el_check.setAttr("visibility", "hidden");
-    this.el_question.setAttr("visibility", "hidden");
+    this.el_question.setAttr("visibility", "visible");
   } else {
     var attr = {};
     var height = 1.5 * this.be.io_spacing;
     var width = height;
     var right = width/2;
     var left = right + height*1/3;
-    var cx;
+    var cx = left + (height*2/3/2);
     if (value === this.be.level.value(this.name)) {
-      cx = left + (height*3/6/2);
       attr.stroke = "#0c0";
       attr.path = ["M", left, 0,
                    "l", height*1/6, height*1/3,
                    "l", height*2/6, -height*2/3];
     } else {
-      cx = left + (height*2/3/2);
       attr.stroke = "#f00";
       attr.path = ["M", left, -height*1/3,
                    "l", height*2/3, height*2/3,
@@ -211,40 +209,19 @@ Cell.prototype.calc_output = function() {
     }
     this.el_check.attr(attr);
     this.el_check.setAttr("visibility", "visible");
-
-    // Rather than try to shift the question mark via the translate
-    // attribute (which would have to be added to the cell
-    // translation), we simply redraw it at the shifted location.
-    var deg30 = Math.PI/6;
-    var cos30 = Math.cos(deg30);
-    var cwidth = height*3/6;
-    var rx = cwidth/2;
-    var cheight = height*2/3;
-    var gap = this.be.stroke_question*1.5;
-    var uheight = cheight - gap;
-    var nheight = 1+cos30*2;
-    var ry = uheight/nheight;
-    var attr = {};
-    attr.path = ["M", cx - rx, -cheight/2+ry,
-                 "a", rx, ry, 0, 1, 1, cwidth*3/4, cos30*ry,
-                 "a", rx, ry, 0, 0, 0, -cwidth*1/4, cos30*ry,
-                 "m", 0, gap,
-                 "l", 0, 0];
-    this.el_question.attr(attr);
-    this.el_question.setAttr("visibility", "visible");
   }
 
   return undefined; // This cell has no output port.
 }
 
 Cell.prototype.check_pending = function() {
-  if (this.value !== undefined){
-    this.el_question.setAttr("visibility", "visible");
-  }
+  this.el_question.setAttr("visibility", "visible");
 }
 
 Cell.prototype.done_check = function() {
-  this.el_question.setAttr("visibility", "hidden");
+  if (this.value !== undefined){
+    this.el_question.setAttr("visibility", "hidden");
+  }
   return this.value === this.be.level.value(this.name);
 };
 
@@ -661,15 +638,32 @@ Cell.prototype.init_output = function() {
   this.el_check.setAttr("visibility", "hidden");
   this.push_ns(this.el_check);
 
-  // Placeholder for the "question mark" when the output check is pending.
+  // Draw a "question mark" when the output check is pending.  If a
+  // value creates a checkmark or X, the question mark remains on top
+  // of it until simulation is done.
+  var deg30 = Math.PI/6;
+  var cos30 = Math.cos(deg30);
+  var cleft = right + height*1/3;
+  var cx = cleft + (height*2/3/2);
+  var cwidth = height*3/6;
+  var rx = cwidth/2;
+  var cheight = height*2/3;
+  var gap = this.be.stroke_question*1.5;
+  var uheight = cheight - gap;
+  var nheight = 1+cos30*2;
+  var ry = uheight/nheight;
   var attr = {
     stroke: "#888", // gray
     "stroke-width": this.be.stroke_question,
     "stroke-linejoin": "round",
     "stroke-linecap": "round"
   };
-  this.el_question = this.canvas.path("M0,0").attr(attr);
-  this.el_question.setAttr("visibility", "hidden");
+  var path = ["M", cx - rx, -cheight/2+ry,
+              "a", rx, ry, 0, 1, 1, cwidth*3/4, cos30*ry,
+              "a", rx, ry, 0, 0, 0, -cwidth*1/4, cos30*ry,
+              "m", 0, gap,
+              "l", 0, 0];
+  this.el_question = this.canvas.path(path).attr(attr);
   this.push_ns(this.el_question);
 
 };
