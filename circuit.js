@@ -34,6 +34,7 @@ function Circuit() {
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
+  this.be.div_cbox_scroll = $("#cbox_scroll");
   this.be.div_cbox = $("#cbox");
 
   // We want cdrag to be wide enough to overlap the border between
@@ -153,7 +154,12 @@ Circuit.prototype.resize = function(center) {
   }
   this.be.cdraw_top = info_height;
 
-  // Move the cbox below div_truth and decrease its height accordingly.
+  // Move the cbox below div_truth and decrease its height
+  // accordingly.  div_truth may not be an exact integer height, but
+  // jQuery always reports its height as an integer, and so the top of
+  // cbox is always at an integer offset (which is necessary to allow
+  // smooth dragging from cbox to cdraw, which is also at an integer
+  // offset).
   var cbox_height = this.be.window_height - this.be.truth_height;
   var cbox_offset = {
     top: this.be.truth_height,

@@ -258,7 +258,7 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
     this.cdraw_cell = this;
   } else {
     var cdrag_x = this.x;
-    var cdrag_y = this.y - this.be.div_cbox_container.scrollTop();
+    var cdrag_y = this.y - this.be.div_cbox_scroll.scrollTop();
     var cdraw_x = cdrag_x - this.be.cdraw_left + view_left;
     var cdraw_y = cdrag_y + cbox_y_offset + view_top;
     this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, cdraw_y);
