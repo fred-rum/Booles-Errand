@@ -62,6 +62,7 @@ Level.prototype.begin = function(level_num) {
   this.output_names = output_names;
 
   if (level.truth){
+    this.result = [];
     var html = [];
     html.push('<table><tr>');
     this.table_header(html, input_names);
@@ -72,6 +73,8 @@ Level.prototype.begin = function(level_num) {
       this.table_row(html, input_names, level.truth[i]);
       this.table_row(html, output_names, level.truth[i]);
       html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
+
+      this.result.push(undefined);
     }
     html.push('</table>');
     $("#truthtable").html(html.join(''));
@@ -136,6 +139,14 @@ Level.prototype.start = function() {
   }
 };
 
+Level.prototype.circuit_changed = function() {
+  for (i = 0; i < this.result.length; i++){
+    this.record_result(i, undefined);
+  }
+
+  this.start();
+};
+
 Level.prototype.done = function() {
   var result = true;
   for (var cell_name in this.named_cells){
@@ -144,12 +155,22 @@ Level.prototype.done = function() {
       result = result && cell_result;
     }
   }
+  this.record_result(this.truth_row, result);
 
-  var id = "#check" + this.truth_row;
   if (result){
-    $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>');
-    if (this.truth_row < this.level.truth.length-1){
-      this.truth_row++;
+    // Look for the first failure after the current truth_row, if any;
+    // otherwise, the first failure overall.
+    var first_failure = null;
+    for (i = 0; i < this.result.length; i++){
+      if (!this.result[i] &&
+          ((first_failure === null) ||
+           ((first_failure < this.truth_row) && (i >= this.truth_row)))){
+        first_failure = i;
+      }
+    }
+
+    if (first_failure !== null){
+      this.truth_row = first_failure;
       for (i = 0; i < this.input_names.length; i++){
         var cell = this.named_cells[this.input_names[i]];
         cell.update_value();
@@ -163,6 +184,17 @@ Level.prototype.done = function() {
       this.be.div_info.html(this.level.outro || "");
       this.be.circuit.resize(false);
     }
+  }
+};
+
+Level.prototype.record_result = function(row, result) {
+  this.result[row] = result;
+
+  var id = "#check" + row;
+  if (result === undefined){
+    $(id).html('');
+  } else if (result){
+    $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>');
   } else {
     $(id).html('<path d="M4.5,4.5l24,24m0,-24l-24,24" class="xmark"/>');
   }

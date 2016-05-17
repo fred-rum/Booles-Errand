@@ -94,8 +94,13 @@ Wire.prototype.remove = function() {
 
   if (!this.pending_new){
     // Update the attached cell input with the fact that it's
-    // disconnected.
-    this.i.update_value(undefined);
+    // disconnected.  If that changes the value, then the circuit has
+    // changed in a fundamental way, and the check results must be
+    // updated accordingly.
+    if (this.i.value !== undefined){
+      this.i.update_value(undefined);
+      this.be.level.circuit_changed();
+    }
   }
 
   // In case the wire is disconnected while a value change is pending,
