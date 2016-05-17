@@ -52,7 +52,6 @@ function Io(be, canvas, cell, name, type, x, y) {
   // x center of the text.
   var text_height = 15;
   var attr = {
-    fill: "#000",
     "text-anchor": "middle",
     //"font-family": "Verdana, Helvetica, Arial, sans-serif",
     "font-family": "Courier New, Fixed, monospace",
@@ -78,11 +77,11 @@ function Io(be, canvas, cell, name, type, x, y) {
 Io.prototype.draw_stub_fg = function() {
   var stub_fg_attr = {
     "stroke-width": this.be.stroke_wire_fg,
-    stroke: "#000"
+    stroke: Wire.color(undefined)
   };
   var stub_end_attr = {
     "stroke-width": this.be.stroke_stub_end_undefined,
-    stroke: "#000"
+    stroke: Wire.color(undefined)
   };
   var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
                        "v", this.be.stub_end_len];

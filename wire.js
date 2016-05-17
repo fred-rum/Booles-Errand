@@ -25,7 +25,7 @@ function Wire(be, io1, io2, pending_new) {
 
   var attr = {
     "stroke-width": this.be.stroke_wire_fg,
-    stroke: "#000"
+    stroke: Wire.color(undefined)
   };
   this.el_fg = this.be.cdraw.path(this.path).attr(attr);
 
@@ -61,11 +61,11 @@ function Wire(be, io1, io2, pending_new) {
 
 Wire.color = function(value) {
   if (value === undefined) {
-    return "#000";
+    return "#888";
   } else if (value === 0){
-    return "#aaf";
+    return "#00f";
   } else if (value === 1) {
-    return "#6c6";
+    return "#0c0";
   }
 };
 
