@@ -224,7 +224,6 @@ Circuit.prototype.add_to_viewbox = function(bbox) {
 Circuit.prototype.center_view = function() {
   this.be.view_cx = (this.bbox.left + this.bbox.right) / 2;
   this.be.view_cy = (this.bbox.top + this.bbox.bottom) / 2;
-  this.adjust_viewbox();
 };
 
 Circuit.prototype.adjust_viewbox = function() {
@@ -234,9 +233,6 @@ Circuit.prototype.adjust_viewbox = function() {
   var canvas_left = this.be.view_cx - canvas_cx;
   var canvas_top = this.be.view_cy - canvas_cy;
 
-  console.log("w", this.be.window_width, this.be.cdraw_left);
-  console.log("c", this.be.view_cx, canvas_cx);
-  console.log("vb", canvas_left, canvas_top, this.canvas_width, this.canvas_height);
   this.be.cdraw.setViewBox(canvas_left, canvas_top,
                            this.canvas_width, this.canvas_height);
 
