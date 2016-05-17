@@ -70,8 +70,8 @@ Level.prototype.begin = function(level_num) {
     html.push('<th class="check"></th></tr>');
     for (i = 0; i < level.truth.length; i++){
       html.push('<tr class="truthbody" id="row', i, '">');
-      this.table_row(html, "input"+i, input_names, level.truth[i]);
-      this.table_row(html, "output"+i, output_names, level.truth[i]);
+      this.table_row(html, input_names, level.truth[i]);
+      this.table_row(html, output_names, level.truth[i]);
       html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
 
       this.result.push(undefined);
@@ -95,9 +95,9 @@ Level.prototype.table_header = function(html, port_names) {
   }
 };
 
-Level.prototype.table_row = function(html, id, port_names, truth_row) {
+Level.prototype.table_row = function(html, port_names, truth_row) {
   for (i = 0; i < port_names.length; i++){
-    html.push('<td id="', id, '"');
+    html.push('<td');
     this.push_padding(html, i, port_names.length);
     html.push('>', truth_row[port_names[i]][0], '</td>');
   }
@@ -120,11 +120,9 @@ Level.prototype.row_click = function(row, event) {
 };
 
 Level.prototype.select_row = function(row) {
-  $("#input" + this.truth_row).css({"background-color": ""});
-  $("#output" + this.truth_row).css({"background-color": ""});
+  $("#row" + this.truth_row).css({"background-color": ""});
   this.truth_row = row;
-  $("#input" + this.truth_row).css({"background-color": "#ff8"});
-  $("#output" + this.truth_row).css({"background-color": "#ff8"});
+  $("#row" + this.truth_row).css({"background-color": "#ff8"});
   this.reset_sim();
   for (i = 0; i < this.input_names.length; i++){
     var cell = this.named_cells[this.input_names[i]];
