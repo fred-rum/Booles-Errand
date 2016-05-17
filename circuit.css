@@ -50,6 +50,11 @@ body {
     min-width: 8em;
     background-color: #eee;
     z-index:4;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */      
+
 }
 #truthborder {
     top: 0;
