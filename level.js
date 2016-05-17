@@ -69,7 +69,7 @@ Level.prototype.begin = function(level_num) {
     this.table_header(html, output_names);
     html.push('<th class="check"></th></tr>');
     for (i = 0; i < level.truth.length; i++){
-      html.push('<tr class="truthbody">');
+      html.push('<tr class="truthbody" id="row', i, '">');
       this.table_row(html, input_names, level.truth[i]);
       this.table_row(html, output_names, level.truth[i]);
       html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
@@ -78,6 +78,27 @@ Level.prototype.begin = function(level_num) {
     }
     html.push('</table>');
     $("#truthtable").html(html.join(''));
+
+    for (i = 0; i < level.truth.length; i++){
+      $('#row' + i).click($.proxy(this.row_click, this, i));
+    }
+  }
+};
+
+Level.prototype.row_click = function(row, event) {
+  this.select_row(row);
+};
+
+Level.prototype.select_row = function(row) {
+  this.truth_row = row;
+  for (i = 0; i < this.input_names.length; i++){
+    var cell = this.named_cells[this.input_names[i]];
+    cell.update_value();
+    cell.fit_input_text();
+  }
+  for (i = 0; i < this.input_names.length; i++){
+    var cell = this.named_cells[this.output_names[i]];
+    cell.fit_output_text();
   }
 };
 
@@ -170,16 +191,7 @@ Level.prototype.done = function() {
     }
 
     if (first_failure !== null){
-      this.truth_row = first_failure;
-      for (i = 0; i < this.input_names.length; i++){
-        var cell = this.named_cells[this.input_names[i]];
-        cell.update_value();
-        cell.fit_input_text();
-      }
-      for (i = 0; i < this.input_names.length; i++){
-        var cell = this.named_cells[this.output_names[i]];
-        cell.fit_output_text();
-      }
+      this.select_row(first_failure);
     } else {
       this.be.div_info.html(this.level.outro || "");
       this.be.circuit.resize(false);
