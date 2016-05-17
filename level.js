@@ -70,8 +70,8 @@ Level.prototype.begin = function(level_num) {
     html.push('<th class="check"></th></tr>');
     for (i = 0; i < level.truth.length; i++){
       html.push('<tr class="truthbody" id="row', i, '">');
-      this.table_row(html, input_names, level.truth[i]);
-      this.table_row(html, output_names, level.truth[i]);
+      this.table_row(html, "input"+i, input_names, level.truth[i]);
+      this.table_row(html, "output"+i, output_names, level.truth[i]);
       html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
 
       this.result.push(undefined);
@@ -82,6 +82,36 @@ Level.prototype.begin = function(level_num) {
     for (i = 0; i < level.truth.length; i++){
       $('#row' + i).click($.proxy(this.row_click, this, i));
     }
+
+    this.select_row(0);
+  }
+};
+
+Level.prototype.table_header = function(html, port_names) {
+  for (i = 0; i < port_names.length; i++){
+    html.push('<th');
+    this.push_padding(html, i, port_names.length);
+    html.push('>', port_names[i].toUpperCase(), '</th>');
+  }
+};
+
+Level.prototype.table_row = function(html, id, port_names, truth_row) {
+  for (i = 0; i < port_names.length; i++){
+    html.push('<td id="', id, '"');
+    this.push_padding(html, i, port_names.length);
+    html.push('>', truth_row[port_names[i]][0], '</td>');
+  }
+};
+
+Level.prototype.push_padding = function(html, i, num) {
+  if (i == 0){
+    if (i < num-1){
+      html.push(' class="tdl"');
+    } else {
+      html.push(' class="tdlr"');
+    }
+  } else if (i == num-1){
+    html.push(' class="tdr"');
   }
 };
 
@@ -90,7 +120,11 @@ Level.prototype.row_click = function(row, event) {
 };
 
 Level.prototype.select_row = function(row) {
+  $("#input" + this.truth_row).css({"background-color": ""});
+  $("#output" + this.truth_row).css({"background-color": ""});
   this.truth_row = row;
+  $("#input" + this.truth_row).css({"background-color": "#ff8"});
+  $("#output" + this.truth_row).css({"background-color": "#ff8"});
   this.reset_sim();
   for (i = 0; i < this.input_names.length; i++){
     var cell = this.named_cells[this.input_names[i]];
@@ -107,34 +141,6 @@ Level.prototype.reset_sim = function() {
   this.be.sim.reset();
   for (i = 0; i < this.all_cells.length; i++){
     this.all_cells[i].reset();
-  }
-};
-
-Level.prototype.table_header = function(html, port_names) {
-  for (i = 0; i < port_names.length; i++){
-    html.push('<th');
-    this.push_padding(html, i, port_names.length);
-    html.push('>', port_names[i].toUpperCase(), '</th>');
-  }
-};
-
-Level.prototype.table_row = function(html, port_names, truth_row) {
-  for (i = 0; i < port_names.length; i++){
-    html.push('<td');
-    this.push_padding(html, i, port_names.length);
-    html.push('>', truth_row[port_names[i]][0], '</td>');
-  }
-};
-
-Level.prototype.push_padding = function(html, i, num) {
-  if (i == 0){
-    if (i < num-1){
-      html.push(' class="tdl"');
-    } else {
-      html.push(' class="tdlr"');
-    }
-  } else if (i == num-1){
-    html.push(' class="tdr"');
   }
 };
 
@@ -155,7 +161,6 @@ Level.prototype.value = function(name) {
 Level.prototype.add_cell = function(cell) {
   cell.calc_bbox();
   this.all_cells.push(cell);
-  console.log("+", this.all_cells.length);
 };
 
 Level.prototype.remove_cell = function(cell) {
@@ -164,7 +169,6 @@ Level.prototype.remove_cell = function(cell) {
       this.all_cells.splice(i, 1);
     }
   }
-  console.log("-", this.all_cells.length);
 };
 
 Level.prototype.start = function() {

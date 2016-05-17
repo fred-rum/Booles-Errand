@@ -147,22 +147,15 @@ table {
     margin-bottom: 0.5em;
     border-collapse: collapse;
 }
-tr.truthbody:hover {
+.truthbody {
+    cursor: pointer;
+}
+.truthbody:hover {
     background-color: #ddd;
 }
-td, th {
+td {
     text-align: center;
-    border-bottom: thin solid;
-}
-td.tdl {
-    border-left: thin solid;
-}
-td.tdr {
-    border-right: thin solid;
-}
-td.tdlr {
-    border-left: thin solid;
-    border-right: thin solid;
+    border: thin solid;
 }
 .tdl {
     padding-left: 1em;
