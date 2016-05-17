@@ -123,3 +123,56 @@ body {
 p {
     margin: 0 10px;
 }
+table {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0.5em;
+    border-collapse: collapse;
+}
+tr.truthbody:hover {
+    background-color: #ddd;
+}
+td, th {
+    text-align: center;
+    border-bottom: thin solid;
+}
+td.tdl {
+    border-left: thin solid;
+}
+td.tdr {
+    border-right: thin solid;
+}
+td.tdlr {
+    border-left: thin solid;
+    border-right: thin solid;
+}
+.tdl {
+    padding-left: 1em;
+}
+.tdr {
+    padding-right: 1em;
+}
+.tdlr {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+th.check, td.check {
+    border: none;
+    background-color: #eee !important;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
+.checkmark {
+    stroke: #0c0;
+    fill: none;
+    stroke-width: 8.4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+.xmark {
+    stroke: #f00;
+    fill: none;
+    stroke-width: 8.4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}

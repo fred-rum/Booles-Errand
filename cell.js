@@ -203,7 +203,7 @@ Cell.prototype.calc_output = function() {
     var cx;
     if (value === this.be.level.value(this.name)) {
       cx = left + (height*3/6/2);
-      attr.stroke = "#8d8";
+      attr.stroke = "#0c0";
       attr.path = ["M", left, 0,
                    "l", height*1/6, height*1/3,
                    "l", height*2/6, -height*2/3];
@@ -295,13 +295,13 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
 
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
-}
+};
 
 Cell.prototype.move = function(dx, dy) {
   this.x += dx;
   this.y += dy;
   this.set_xform.transform("t" + this.x + "," + this.y);
-}
+};
 
 Cell.prototype.check_for_del = function(x, y, is_new) {
   // We check for deletion based on the position of the mouse pointer,
@@ -370,7 +370,7 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
 
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
-}
+};
 
 Cell.prototype.cell_drag_end = function() {
   this.el_cell.attr({"cursor": "grab"});
@@ -385,7 +385,7 @@ Cell.prototype.cell_drag_end = function() {
   } else {
     this.cdraw_cell.calc_bbox();
   }
-}
+};
 
 Cell.prototype.remove = function() {
   for (var name in this.io) {

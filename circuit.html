@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <!-- Copyright 2016 Christopher P. Nelson - All rights reserved. -->
 
-<html lang="en"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <meta charset="utf-8">
-        <title>Boole's Errand</title>
-        <link rel="stylesheet" href="circuit.css">
-        <script src="circuit_files/raphael-2.2.0.min.js"></script>
-        <script src="circuit_files/jquery-1.12.3.min.js"></script>
-        <script src="raphael-ext.js"></script>
-        <script src="circuit.js"></script>
-        <script src="cell.js"></script>
-        <script src="io.js"></script>
-        <script src="wire.js"></script>
-        <script src="drag.js"></script>
-        <script src="sim.js"></script>
-        <script src="level.js"></script>
-        <script src="puzzle.js"></script>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Boole's Errand</title>
+  <link rel="stylesheet" href="circuit.css">
+  <script src="circuit_files/raphael-2.2.0.min.js"></script>
+  <script src="circuit_files/jquery-1.12.3.min.js"></script>
+  <script src="raphael-ext.js"></script>
+  <script src="circuit.js"></script>
+  <script src="cell.js"></script>
+  <script src="io.js"></script>
+  <script src="wire.js"></script>
+  <script src="drag.js"></script>
+  <script src="sim.js"></script>
+  <script src="level.js"></script>
+  <script src="puzzle.js"></script>
 </head>
 <body>
   <div id="truth">
-    <svg width="2em" height="2em" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+    <div id="truthtable">
+    </div>
+    <svg width="2em" height="2em" viewBox="0 0 100 100">
       <g id="button-play">
 	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder" />
 	<path d="M37,25v50l30,-25z" class="playcenter" />
@@ -29,7 +32,7 @@
 	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="pauseborder" />
 	<path d="M40,26v48M60,26v48" class="pausecenter" />
       </g>
-    </svg><svg id="button-ff" width="2em" height="2em" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" style="display: none">
+    </svg><svg id="button-ff" width="2em" height="2em" viewBox="0 0 100 100" style="display: none">
       <g>
 	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder" />
 	<path d="M27,25v50l30,-25z" class="playcenter" />

@@ -22,6 +22,9 @@ Level.prototype.begin = function(level_num) {
 
   this.be.div_info.html(level.intro || "");
 
+  var input_names = [];
+  var output_names = [];
+
   if (level.cells){
     // First, initialize the cells while ignoring IO connections.
     for (var cell_name in level.cells){
@@ -32,6 +35,8 @@ Level.prototype.begin = function(level_num) {
                           cell_obj.y,
                           cell_name);
       this.cells[cell_name] = cell;
+      if (cell_obj.type == "input") input_names += cell_name;
+      if (cell_obj.type == "output") output_names += cell_name;
     }
 
     // Now connect IOs according to the cell data.
@@ -49,6 +54,50 @@ Level.prototype.begin = function(level_num) {
         }
       }
     }
+  }
+
+  if (level.truth){
+    var html = [];
+    html.push('<table><tr>');
+    this.table_header(html, input_names);
+    this.table_header(html, output_names);
+    html.push('<th class="check"></th></tr>');
+    for (i = 0; i < level.truth.length; i++){
+      html.push('<tr class="truthbody">');
+      this.table_row(html, input_names, level.truth[i]);
+      this.table_row(html, output_names, level.truth[i]);
+      html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
+    }
+    html.push('</table>');
+    $("#truthtable").html(html.join(''));
+  }
+};
+
+Level.prototype.table_header = function(html, port_names) {
+  for (i = 0; i < port_names.length; i++){
+    html.push('<th');
+    this.push_padding(html, i, port_names.length);
+    html.push('>', port_names[i].toUpperCase(), '</th>');
+  }
+};
+
+Level.prototype.table_row = function(html, port_names, truth_row) {
+  for (i = 0; i < port_names.length; i++){
+    html.push('<td');
+    this.push_padding(html, i, port_names.length);
+    html.push('>', truth_row[port_names[i]][0], '</td>');
+  }
+};
+
+Level.prototype.push_padding = function(html, i, num) {
+  if (i == 0){
+    if (i < num-1){
+      html.push(' class="tdl"');
+    } else {
+      html.push(' class="tdlr"');
+    }
+  } else if (i == num-1){
+    html.push(' class="tdr"');
   }
 };
 
@@ -75,7 +124,10 @@ Level.prototype.done = function() {
   }
 
   if (result){
+    $("#check0").html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>');
     this.be.div_info.html(this.level.outro || "");
     this.be.circuit.resize(false);
+  } else {
+    $("#check0").html('<path d="M4.5,4.5l24,24m0,-24l-24,24" class="xmark"/>');
   }
 };
