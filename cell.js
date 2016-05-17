@@ -336,6 +336,14 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
       }
     }
     this.pending_del = del;
+
+    if (this.canvas_type == "cdraw"){
+      if (del){
+        this.be.level.remove_cell(this);
+      } else {
+        this.be.level.add_cell(this);
+      }
+    }
   } else {
     for (var port_name in this.io) {
       this.io[port_name].redraw();
@@ -366,8 +374,6 @@ Cell.prototype.cell_drag_end = function() {
 
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
-  } else {
-    this.be.level.add_cell(this.cdraw_cell);
   }
 };
 

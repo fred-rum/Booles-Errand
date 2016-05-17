@@ -155,6 +155,16 @@ Level.prototype.value = function(name) {
 Level.prototype.add_cell = function(cell) {
   cell.calc_bbox();
   this.all_cells.push(cell);
+  console.log("+", this.all_cells.length);
+};
+
+Level.prototype.remove_cell = function(cell) {
+  for (i = 0; i < this.all_cells.length; i++){
+    if (cell == this.all_cells[i]){
+      this.all_cells.splice(i, 1);
+    }
+  }
+  console.log("-", this.all_cells.length);
 };
 
 Level.prototype.start = function() {
