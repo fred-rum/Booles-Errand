@@ -226,10 +226,12 @@ Cell.prototype.check_pending = function() {
 }
 
 Cell.prototype.done_check = function() {
-  if (this.value !== undefined){
+  if (this.value === undefined){
+    return undefined;
+  } else {
     this.el_question.setAttr("visibility", "hidden");
+    return this.value === this.be.level.value(this.name);
   }
-  return this.value === this.be.level.value(this.name);
 };
 
 Cell.prototype.bring_to_top = function() {

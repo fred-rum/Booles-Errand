@@ -187,7 +187,7 @@ Level.prototype.circuit_changed = function() {
     this.record_result(i, undefined);
   }
 
-  this.start();
+  this.be.sim.start();
 };
 
 Level.prototype.done = function() {
