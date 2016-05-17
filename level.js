@@ -5,6 +5,7 @@ function Level(be) {
 Level.prototype.begin = function(level_num) {
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
+  this.truth_row = 0;
 
   this.box_height = this.be.box_spacing;
   this.add_box_cell("buf");
@@ -55,6 +56,8 @@ Level.prototype.begin = function(level_num) {
       }
     }
   }
+  this.input_names = input_names;
+  this.output_names = output_names;
 
   if (level.truth){
     var html = [];
@@ -112,7 +115,7 @@ Level.prototype.add_box_cell = function(name) {
 
 Level.prototype.value = function(name) {
   var truth = this.puzzle[this.level_num].truth;
-  return truth[0][name][0];
+  return truth[this.truth_row][name][0];
 };
 
 Level.prototype.done = function() {
@@ -123,11 +126,25 @@ Level.prototype.done = function() {
     }
   }
 
+  var id = "#check" + this.truth_row;
   if (result){
-    $("#check0").html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>');
-    this.be.div_info.html(this.level.outro || "");
-    this.be.circuit.resize(false);
+    $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>');
+    if (this.truth_row < this.level.truth.length-1){
+      this.truth_row++;
+      for (i = 0; i < this.input_names.length; i++){
+        var cell = this.cells[this.input_names[i]];
+        cell.update_value();
+        cell.fit_input_text();
+      }
+      for (i = 0; i < this.input_names.length; i++){
+        var cell = this.cells[this.output_names[i]];
+        cell.fit_output_text();
+      }
+    } else {
+      this.be.div_info.html(this.level.outro || "");
+      this.be.circuit.resize(false);
+    }
   } else {
-    $("#check0").html('<path d="M4.5,4.5l24,24m0,-24l-24,24" class="xmark"/>');
+    $(id).html('<path d="M4.5,4.5l24,24m0,-24l-24,24" class="xmark"/>');
   }
 };

@@ -677,7 +677,7 @@ Cell.prototype.init_output = function() {
 Cell.prototype.fit_input_text = function() {
   var name = this.name.toUpperCase();
   var text = name + "=" + this.be.level.value(this.name);
-  this.el_text.attr({text: text, "font-size": "10"});
+  this.el_text.attr({text: text, x: 0, "font-size": "10"});
   var bbox = this.el_text.getBBox(true);
 
   var height = 1.5 * this.be.io_spacing;
@@ -701,7 +701,7 @@ Cell.prototype.fit_input_text = function() {
 Cell.prototype.fit_output_text = function() {
   var name = this.name.toUpperCase();
   var text = name + "=" + this.be.level.value(this.name) + "?";
-  this.el_text.attr({text: text, "font-size": "10"});
+  this.el_text.attr({text: text, x: 0, "font-size": "10"});
   var bbox = this.el_text.getBBox(true);
 
   var height = 1.5 * this.be.io_spacing;
