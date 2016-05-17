@@ -105,6 +105,13 @@ Cell.prototype.update_value = function() {
   this.newest_value = value;
 };
 
+Cell.prototype.reset = function() {
+  this.newest_value = null;
+  for (var port_name in this.io){
+    this.io[port_name].update_value(undefined, true);
+  }
+}
+
 Cell.prototype.tick = function() {
   // The cell could have been removed while we waited for the tick.
   // We still get the tick, but we don't do anything with it, and
@@ -360,7 +367,7 @@ Cell.prototype.cell_drag_end = function() {
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
   } else {
-    this.be.level.add_cell(this);
+    this.be.level.add_cell(this.cdraw_cell);
   }
 };
 

@@ -51,3 +51,8 @@ Sim.prototype.tick = function() {
     this.be.level.done();
   }
 };
+
+Sim.prototype.reset = function() {
+  this.pause();
+  this.new_events = [];
+}

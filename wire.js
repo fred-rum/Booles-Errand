@@ -140,6 +140,13 @@ Wire.prototype.update_value = function() {
   this.newest_value = value;
 };
 
+Wire.prototype.reset = function() {
+  this.newest_value = null;
+  this.remove_subpaths();
+  this.in_flight = [];
+  this.redraw_fg();
+};
+
 Wire.prototype.tick = function() {
   // The wire could have been removed while we waited for the tick.
   // We still get the tick, but we don't do anything with it, and

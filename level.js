@@ -91,6 +91,7 @@ Level.prototype.row_click = function(row, event) {
 
 Level.prototype.select_row = function(row) {
   this.truth_row = row;
+  this.reset_sim();
   for (i = 0; i < this.input_names.length; i++){
     var cell = this.named_cells[this.input_names[i]];
     cell.update_value();
@@ -99,6 +100,13 @@ Level.prototype.select_row = function(row) {
   for (i = 0; i < this.input_names.length; i++){
     var cell = this.named_cells[this.output_names[i]];
     cell.fit_output_text();
+  }
+};
+
+Level.prototype.reset_sim = function() {
+  this.be.sim.reset();
+  for (i = 0; i < this.all_cells.length; i++){
+    this.all_cells[i].reset();
   }
 };
 

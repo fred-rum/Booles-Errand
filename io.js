@@ -194,7 +194,7 @@ Io.prototype.color_stub = function(value) {
   this.el_stub_end.attr(attr);
 };
 
-Io.prototype.update_value = function(value) {
+Io.prototype.update_value = function(value, reset) {
   this.value = value;
 
   this.color_stub(value);
@@ -234,7 +234,13 @@ Io.prototype.update_value = function(value) {
   }
   this.el_value_text_bg.attr(attr_bg);
 
-  if (this.type == "output"){
+  if (reset){
+    if (this.type == "input"){
+      for (var i = 0; i < this.w.length; i++) {
+        this.w[i].reset();
+      }
+    }
+  } else if (this.type == "output"){
     for (var i = 0; i < this.w.length; i++) {
       this.w[i].update_value();
     }
