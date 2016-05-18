@@ -48,17 +48,12 @@ Level.prototype.begin = function(level_num) {
     // First, initialize the cells while ignoring IO connections.
     for (var cell_name in level.cells){
       var cell_obj = level.cells[cell_name];
-      if ((cell_obj.type == "input") || (cell_obj.type == "output")){
-        // Other cells can be locked in puzzle.js, but I/O cells are
-        // *always* locked.
-        cell_obj.locked = true;
-      }
       var cell = new Cell(this.be, "cdraw",
                           cell_obj.type,
                           cell_obj.x,
                           cell_obj.y,
                           cell_name,
-                          cell_obj.locked);
+                          true);
       this.named_cells[cell_name] = cell;
       this.add_cell(cell);
       if (cell_obj.type == "input") input_names += cell_name;
@@ -239,7 +234,7 @@ Level.prototype.done = function() {
     } else {
       var outro = this.level.outro || ""
       if (this.level_num < this.puzzle.length-1){
-        var html = outro + '<button id="next-level">Next level</button>';
+        var html = outro + '<button type="button" id="next-level">Next level</button>';
         this.be.div_info.html(html);
         $("#next-level").click($.proxy(this.change_level, this,
                                        this.level_num+1));

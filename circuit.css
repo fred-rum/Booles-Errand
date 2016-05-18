@@ -71,7 +71,6 @@ body {
     left: 8em;
     width: 100%;
     z-index: 3;
-    text-align: center;
     height: auto;
     border-bottom-style: solid;
     border-width: thin;
@@ -139,7 +138,7 @@ body {
     user-select: none;          /* Likely future */      
 }
 p {
-    margin: 0 10px;
+    margin: 10px;
 }
 table {
     margin-left: auto;
