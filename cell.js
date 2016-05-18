@@ -314,8 +314,8 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
 
   this.dragging = true;
 
-  this.drag_dx = 0;
-  this.drag_dy = 0;
+  this.old_drag_x = x;
+  this.old_drag_y = y;
 
   this.change_cursor("grabbing");
   this.be.drag.disable_hover();
@@ -333,20 +333,18 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
   $(this.be.div_cdrag).css("z-index", "99")
 
   var cbox_y_offset = this.be.truth_height - this.be.cdraw_top;
-  var view_left = this.be.view_cx - this.be.view_width/2;
-  var view_top = this.be.view_cy - this.be.view_height/2;
+  var view_left = this.be.canvas_cx - this.be.view_width/2/this.be.scale;
+  var view_top = this.be.canvas_cy - this.be.view_height/2/this.be.scale;
   if (this.canvas == this.be.cdraw){
-    var cdrag_x = this.x - view_left + this.be.cdraw_left;
-    var cdrag_y = this.y - view_top - cbox_y_offset;
+    var canvas_x = this.x;
+    var canvas_y = this.y;
     this.cdraw_cell = this;
   } else {
-    var cdrag_x = this.x;
-    var cdrag_y = this.y - this.be.div_cbox_scroll.scrollTop();
-    var cdraw_x = cdrag_x - this.be.cdraw_left + view_left;
-    var cdraw_y = cdrag_y + cbox_y_offset + view_top;
-    this.cdraw_cell = new Cell(this.be, "cdraw", this.type, cdraw_x, cdraw_y);
+    var canvas_x = this.be.circuit.cdraw_to_canvas_x(x);
+    var canvas_y = this.be.circuit.cdraw_to_canvas_y(y);
+    this.cdraw_cell = new Cell(this.be, "cdraw", this.type, canvas_x, canvas_y);
   }
-  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, cdrag_x, cdrag_y,
+  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, canvas_x, canvas_y,
                              this.name);
 
   // Put the cdrag cell in a central location.
@@ -433,16 +431,18 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
 Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
   if (!this.dragging) return;
 
-  var ddx = dx - this.drag_dx;
-  var ddy = dy - this.drag_dy;
-  this.drag_dx = dx;
-  this.drag_dy = dy;
-
-  this.cdrag_cell.move(ddx, ddy);
-  this.cdraw_cell.move(ddx, ddy);
+  var screen_dx = x - this.old_drag_x;
+  var screen_dy = y - this.old_drag_y;
+  var canvas_dx = screen_dx / this.be.scale;
+  var canvas_dy = screen_dy / this.be.scale;
+  this.cdrag_cell.move(canvas_dx, canvas_dy);
+  this.cdraw_cell.move(canvas_dx, canvas_dy);
 
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
+
+  this.old_drag_x = x;
+  this.old_drag_y = y;
 };
 
 Cell.prototype.cell_drag_end = function() {
