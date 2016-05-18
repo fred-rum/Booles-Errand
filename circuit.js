@@ -29,6 +29,7 @@ function Circuit() {
   this.canvas_rect.drag($.proxy(this.canvas_drag_move, this),
                         $.proxy(this.canvas_drag_start, this),
                         $.proxy(this.canvas_drag_end, this));
+  $("#cdraw").mousewheel($.proxy(this.canvas_mousewheel, this));
 
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
@@ -240,6 +241,8 @@ Circuit.prototype.center_view = function() {
     this.be.canvas_cx = (this.bbox.left + this.bbox.right) / 2;
     this.be.canvas_cy = (this.bbox.top + this.bbox.bottom) / 2;
   }
+
+  this.be.scale = 1.0;
 };
 
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
@@ -275,8 +278,6 @@ Circuit.prototype.adjust_viewbox = function() {
   // in cdraw/screen coordinates.
   var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
   var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
-
-  this.be.scale = 1.0;
 
   // canvas_cdraw_left/top/width/height indicates the bounds of the
   // overall cdraw (larger than viewable) area in canvas coordinates.
@@ -330,6 +331,26 @@ Circuit.prototype.canvas_drag_move = function(dx, dy, x, y, event) {
 
 Circuit.prototype.canvas_drag_end = function() {
   this.canvas_rect.attr({"cursor": "default"});
+};
+
+Circuit.prototype.canvas_mousewheel = function(event) {
+  var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
+  if (new_scale > 2.0) new_scale = 2.0;
+
+  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2
+  var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
+  var cdraw_mouse_offset_x = event.pageX - cdraw_cx;
+  var cdraw_mouse_offset_y = event.pageY - cdraw_cy;
+  var old_canvas_mouse_offset_x = cdraw_mouse_offset_x / this.be.scale;
+  var old_canvas_mouse_offset_y = cdraw_mouse_offset_y / this.be.scale;
+  var new_canvas_mouse_offset_x = cdraw_mouse_offset_x / new_scale;
+  var new_canvas_mouse_offset_y = cdraw_mouse_offset_y / new_scale;
+  this.be.canvas_cx -= (new_canvas_mouse_offset_x - old_canvas_mouse_offset_x);
+  this.be.canvas_cy -= (new_canvas_mouse_offset_y - old_canvas_mouse_offset_y);
+
+  this.be.scale = new_scale;
+
+  this.adjust_viewbox();
 };
 
 // This is called as soon as the DOM is ready.
