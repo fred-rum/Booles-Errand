@@ -103,10 +103,14 @@ function Circuit() {
   $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
 
   this.be.level = new Level(this.be);
-  this.be.level.begin();
+  this.begin_level();
+}
+
+Circuit.prototype.begin_level = function(level_num) {
+  this.be.level.begin(level_num);
   this.center_view();
   this.resize(true);
-}
+};
 
 Circuit.prototype.resize_event = function() {
   this.resize(true);

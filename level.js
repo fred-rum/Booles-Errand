@@ -6,7 +6,7 @@ Level.prototype.begin = function(level_num) {
   if (level_num === undefined){
     level_num = 0;
     var anchor = decodeURI(window.location.hash.substring(1));
-    for (i = 0; i < this.puzzle.length; i++){
+    for (var i = 0; i < this.puzzle.length; i++){
       if (this.puzzle[i].name == anchor){
         level_num = i;
         break;
@@ -19,16 +19,17 @@ Level.prototype.begin = function(level_num) {
   window.location.hash = encodeURI(level.name);
   this.truth_row = 0;
 
+  this.box_cells = [];
   this.box_height = this.be.box_spacing;
-  this.add_box_cell("buf");
-  this.add_box_cell("inv");
-  this.add_box_cell("and");
-  this.add_box_cell("nand");
-  this.add_box_cell("or");
-  this.add_box_cell("nor");
-  this.add_box_cell("xor");
-  this.add_box_cell("xnor");
-  this.add_box_cell("const");
+  if (level.avail === undefined){
+    level.avail = ['buf', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor',
+                   'const'];
+  }
+  for (var i = 0; i < level.avail.length; i++){
+    var name = level.avail[i];
+    if (typeof name == 'string')
+      this.add_box_cell(name);
+  }
   this.be.div_cbox.height(this.box_height);
 
   this.named_cells = {};
@@ -86,7 +87,7 @@ Level.prototype.begin = function(level_num) {
     this.table_header(html, input_names);
     this.table_header(html, output_names);
     html.push('<th class="check"></th></tr>');
-    for (i = 0; i < level.truth.length; i++){
+    for (var i = 0; i < level.truth.length; i++){
       html.push('<tr class="truthbody" id="row', i, '">');
       this.table_row(html, input_names, level.truth[i]);
       this.table_row(html, output_names, level.truth[i]);
@@ -97,7 +98,7 @@ Level.prototype.begin = function(level_num) {
     html.push('</table>');
     $("#truthtable").html(html.join(''));
 
-    for (i = 0; i < level.truth.length; i++){
+    for (var i = 0; i < level.truth.length; i++){
       $('#row' + i).click($.proxy(this.row_click, this, i));
     }
 
@@ -106,7 +107,7 @@ Level.prototype.begin = function(level_num) {
 };
 
 Level.prototype.table_header = function(html, port_names) {
-  for (i = 0; i < port_names.length; i++){
+  for (var i = 0; i < port_names.length; i++){
     html.push('<th');
     this.push_padding(html, i, port_names.length);
     html.push('>', port_names[i].toUpperCase(), '</th>');
@@ -114,7 +115,7 @@ Level.prototype.table_header = function(html, port_names) {
 };
 
 Level.prototype.table_row = function(html, port_names, truth_row) {
-  for (i = 0; i < port_names.length; i++){
+  for (var i = 0; i < port_names.length; i++){
     html.push('<td');
     this.push_padding(html, i, port_names.length);
     html.push('>', truth_row[port_names[i]][0], '</td>');
@@ -142,12 +143,12 @@ Level.prototype.select_row = function(row) {
   this.truth_row = row;
   $("#row" + this.truth_row).css({"background-color": "#ff8"});
   this.reset_sim();
-  for (i = 0; i < this.input_names.length; i++){
+  for (var i = 0; i < this.input_names.length; i++){
     var cell = this.named_cells[this.input_names[i]];
     cell.update_value();
     cell.fit_input_text();
   }
-  for (i = 0; i < this.input_names.length; i++){
+  for (var i = 0; i < this.input_names.length; i++){
     var cell = this.named_cells[this.output_names[i]];
     cell.fit_output_text();
   }
@@ -155,13 +156,14 @@ Level.prototype.select_row = function(row) {
 
 Level.prototype.reset_sim = function() {
   this.be.sim.reset();
-  for (i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++){
     this.all_cells[i].reset();
   }
 };
 
 Level.prototype.add_box_cell = function(name) {
   var c = new Cell(this.be, "cbox", name, 0, 0);
+  this.box_cells.push(c);
   var bbox = c.el_cell.getBBox(false);
   var cx = (this.be.cbox_width/2) - bbox.x - bbox.width/2; // align center
   var cy = this.box_height - bbox.y; // align top edge
@@ -180,7 +182,7 @@ Level.prototype.add_cell = function(cell) {
 };
 
 Level.prototype.remove_cell = function(cell) {
-  for (i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++){
     if (cell == this.all_cells[i]){
       this.all_cells.splice(i, 1);
     }
@@ -199,7 +201,7 @@ Level.prototype.start = function() {
 };
 
 Level.prototype.circuit_changed = function() {
-  for (i = 0; i < this.result.length; i++){
+  for (var i = 0; i < this.result.length; i++){
     this.record_result(i, undefined);
   }
 
@@ -220,7 +222,7 @@ Level.prototype.done = function() {
     // Look for the first failure after the current truth_row, if any;
     // otherwise, the first failure overall.
     var first_failure = null;
-    for (i = 0; i < this.result.length; i++){
+    for (var i = 0; i < this.result.length; i++){
       if (!this.result[i] &&
           ((first_failure === null) ||
            ((first_failure < this.truth_row) && (i >= this.truth_row)))){
@@ -231,10 +233,33 @@ Level.prototype.done = function() {
     if (first_failure !== null){
       this.select_row(first_failure);
     } else {
-      this.be.div_info.html(this.level.outro || "");
+      var outro = this.level.outro || ""
+      if (this.level_num < this.puzzle.length-1){
+        var html = outro + '<button id="next-level">Next level</button>';
+        this.be.div_info.html(html);
+        $("#next-level").click($.proxy(this.change_level, this,
+                                       this.level_num+1));
+      } else {
+        var html = outro + '<p>That\'s all the puzzles!</p>';
+        this.be.div_info.html(html);
+      }
       this.be.circuit.resize(false);
     }
   }
+};
+
+Level.prototype.change_level = function(level_num) {
+  for (var i = 0; i < this.all_cells.length; i++){
+    this.all_cells[i].remove();
+  }
+  this.be.sim.click_pause();
+  this.be.sim.reset();
+
+  for (var i = 0; i < this.box_cells.length; i++){
+    this.box_cells[i].remove();
+  }
+
+  this.be.circuit.begin_level(level_num);
 };
 
 Level.prototype.record_result = function(row, result) {
