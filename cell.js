@@ -414,8 +414,6 @@ Cell.prototype.calc_bbox = function() {
       }
     }
   }
-
-  this.be.circuit.add_to_viewbox(this.bbox);
 }
 
 Cell.prototype.init_io = function(inv, no, ni, left, right) {

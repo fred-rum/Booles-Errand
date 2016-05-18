@@ -203,37 +203,40 @@ Circuit.prototype.resize = function(center) {
 };
 
 Circuit.prototype.add_to_viewbox = function(bbox) {
-  var changed = false;
-
   if (this.bbox.left === undefined){
     this.bbox.left = bbox.left;
     this.bbox.right = bbox.right;
     this.bbox.top = bbox.top;
     this.bbox.bottom = bbox.bottom;
-    changed = true;
   } else {
     if (bbox.left < this.bbox.left){
       this.bbox.left = bbox.left;
-      changed = true;
     }
     if (bbox.right > this.bbox.right){
       this.bbox.right = bbox.right;
-      changed = true;
     }
     if (bbox.top < this.bbox.top){
       this.bbox.top = bbox.top;
-      changed = true;
     }
     if (bbox.bottom > this.bbox.bottom){
       this.bbox.bottom = bbox.bottom;
-      changed = true;
     }
   }
 };
 
 Circuit.prototype.center_view = function() {
-  this.be.view_cx = (this.bbox.left + this.bbox.right) / 2;
-  this.be.view_cy = (this.bbox.top + this.bbox.bottom) / 2;
+  var all_cells = this.be.level.all_cells;
+  for (var i = 0; i < all_cells.length; i++){
+    this.add_to_viewbox(all_cells[i].bbox);
+  }
+ 
+  if (this.bbox.left === undefined){
+    this.be.view_cx = 0;
+    this.be.view_cy = 0;
+  } else {
+    this.be.view_cx = (this.bbox.left + this.bbox.right) / 2;
+    this.be.view_cy = (this.bbox.top + this.bbox.bottom) / 2;
+  }
 };
 
 Circuit.prototype.adjust_viewbox = function() {
