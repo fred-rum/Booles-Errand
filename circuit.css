@@ -59,7 +59,7 @@ body {
 #truthborder {
     top: 0;
     left: 0;
-    height: auto;
+    height: 100%;
     width: auto;
     border-style: none solid solid none;
     border-width: thin;
