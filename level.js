@@ -1,3 +1,7 @@
+// Copyright 2016 Christopher P. Nelson - All rights reserved.
+
+"use strict";
+
 function Level(be) {
   this.be = be;
 }

@@ -1,5 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
+"use strict";
+
 function Io(be, canvas, cell, name, type, x, y) {
   this.be = be;
   this.canvas = canvas;

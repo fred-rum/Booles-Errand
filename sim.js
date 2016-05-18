@@ -1,5 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
+"use strict";
+
 function Sim(be) {
   this.be = be;
   this.old_events = [];

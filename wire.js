@@ -1,5 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
+"use strict";
+
 function Wire(be, io1, io2, pending_new) {
   this.be = be;
 
@@ -220,7 +222,7 @@ Wire.prototype.get_subpath = function(z1, z2) {
   var path_length = this.path_length;
 
   function get_point(z) {
-    var point;
+    var point, xd, yd;
     if (z < len_aa){
       var angle = z / aw.r;
       var sign_ya = aw.cwa ? 1 : -1;
@@ -297,7 +299,7 @@ Wire.prototype.arcwire = function (x1, y1, xc, yc) {
   var r = this.be.wire_arc_radius;
   var dx = (x2-x1)/r;
   var dy = (y2-y1)/r;
-  var slope, angle;
+  var slope, angle, angle_a, angle_b;
   var xd, yd, xa, ya, xb, yb, cwa, cwb, la, lb;
 
   if ((dx > 0) || (dy >= 4) || (dy <= -4)) {
@@ -439,10 +441,10 @@ Wire.prototype.arcwire = function (x1, y1, xc, yc) {
 };
 
 Wire.prototype.compute = function() {
-  x1 = this.o.cell.x + this.o.x;
-  y1 = this.o.cell.y + this.o.y;
-  x2 = this.i.cell.x + this.i.x;
-  y2 = this.i.cell.y + this.i.y;
+  var x1 = this.o.cell.x + this.o.x;
+  var y1 = this.o.cell.y + this.o.y;
+  var x2 = this.i.cell.x + this.i.x;
+  var y2 = this.i.cell.y + this.i.y;
   this.arcwire(x1, y1, x2-x1, y2-y1);
 };
 

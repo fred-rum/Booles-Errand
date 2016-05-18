@@ -1,5 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
+"use strict";
+
 function Cell(be, canvas_type, type, x, y, name, locked) {
   this.be = be;
   this.name = name;
@@ -484,7 +486,7 @@ Cell.prototype.init_buf = function(inv) {
   var left = -width/2;
   var right = width/2;
 
-  stub_path = this.init_io(inv, 1, 1, left, right);
+  var stub_path = this.init_io(inv, 1, 1, left, right);
 
   var cell_path = ["M", left, -height/2,
                    "v", height,
@@ -508,7 +510,7 @@ Cell.prototype.init_and = function(inv) {
   var right = cell_width/2;
   var top = -height/2;
 
-  stub_path = this.init_io(inv, 1, ni, left, right);
+  var stub_path = this.init_io(inv, 1, ni, left, right);
 
   var cell_path = ["M", left, top,
                    "v", height,
@@ -534,7 +536,7 @@ Cell.prototype.init_or = function(inv) {
   var right = cell_width/2;
   var top = -height/2;
 
-  stub_path = this.init_io(inv, 1, ni, left, right);
+  var stub_path = this.init_io(inv, 1, ni, left, right);
 
   // The arcs that meet at the front (output) end of the gate have
   // ary=height and arx chosen such that the back of the arc is
@@ -568,7 +570,7 @@ Cell.prototype.init_xor = function(inv) {
   var bar_space = cell_width/6;
   var far_left = left - bar_space;
 
-  stub_path = this.init_io(inv, 1, ni, far_left, right);
+  var stub_path = this.init_io(inv, 1, ni, far_left, right);
 
   var ary = height;
   var arx = cell_width * 2/Math.sqrt(3);

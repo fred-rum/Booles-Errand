@@ -1,5 +1,7 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
+"use strict";
+
 function Drag(be) {
   this.be = be;
 }
