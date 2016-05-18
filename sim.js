@@ -2,6 +2,20 @@
 
 "use strict";
 
+// Timer states:
+//   timer = defined:
+//     new_events = empty
+//       may be checking for new events (with running = true), or
+//       waiting for delay timout; can be interrupted by new registry.
+//         in which case running may be true or false.
+//     new_events = non-empty
+//       simulating
+//   timer = undefined:
+//     new_events = empty
+//       running may be true or false, but there's nothing to do
+//     new_events = non-empty
+//       running must be false; simulation is paused
+
 function Sim(be) {
   this.be = be;
   this.old_events = [];
@@ -24,6 +38,10 @@ Sim.prototype.click_pause = function () {
 };
 
 Sim.prototype.start = function() {
+  if (this.timer && !this.new_events.length){
+    // It must be a delay.  Cancel it and go back to normal running.
+    this.pause();
+  }
   if (!this.timer && this.running){
     this.be.level.start();
     this.timer = setInterval($.proxy(this.tick, this), 50);
@@ -38,8 +56,8 @@ Sim.prototype.pause = function() {
 };
 
 Sim.prototype.register_obj = function(obj) {
-  this.new_events.push(obj);
   this.start();
+  this.new_events.push(obj);
 };
 
 Sim.prototype.tick = function() {
@@ -57,4 +75,8 @@ Sim.prototype.tick = function() {
 Sim.prototype.reset = function() {
   this.pause();
   this.new_events = [];
-}
+};
+
+Sim.prototype.delay = function(func, milliseconds) {
+  this.timer = setTimeout(func, milliseconds)
+};

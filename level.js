@@ -230,7 +230,7 @@ Level.prototype.done = function() {
     }
 
     if (first_failure !== null){
-      this.select_row(first_failure);
+      this.be.sim.delay($.proxy(this.select_row, this, first_failure), 1000);
     } else {
       var outro = this.level.outro || ""
       if (this.level_num < this.puzzle.length-1){
