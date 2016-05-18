@@ -116,6 +116,10 @@ Cell.prototype.reset = function() {
   for (var port_name in this.io){
     this.io[port_name].update_value(undefined, true);
   }
+  if (this.type == "output"){
+    // Ensure that only a question mark is visible next to the text pin.
+    this.calc_output();
+  }
 }
 
 Cell.prototype.tick = function() {
