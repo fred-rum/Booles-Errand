@@ -51,8 +51,6 @@ function Circuit() {
   // The first puzzle level will reflow the text and call this.resize().
   this.cdraw_width = 0;
   this.cdraw_height = 0;
-  this.be.view_width = 0;
-  this.be.view_height = 0;
 
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
@@ -181,11 +179,6 @@ Circuit.prototype.resize = function(center) {
   this.be.div_cdrag.offset(cbox_offset);
   this.be.div_cdrag.height(cbox_height);
 
-  // Move the cdraw area below div_info and to the right of div_cbox.
-  // Also decrease its height and width accordingly.
-  var new_view_width = this.be.window_width - this.be.cdraw_left;
-  var new_view_height = this.be.window_height - this.be.cdraw_top;
-
   if (!center){
     // If we don't want the view to change, we adjust the recorded
     // center coordinates to continue to point to the center of the view.
@@ -198,9 +191,6 @@ Circuit.prototype.resize = function(center) {
     this.be.canvas_cx += canvas_dx;
     this.be.canvas_cy += canvas_dy;
   }
-
-  this.be.view_width = new_view_width;
-  this.be.view_height = new_view_height;
 
   if (this.be.window_width > this.cdraw_width){
     this.cdraw_width = this.be.window_width + 1000;
