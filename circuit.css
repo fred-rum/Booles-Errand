@@ -155,7 +155,18 @@ table {
 }
 td {
     text-align: center;
-    border: thin solid;
+    border-top: thin solid;
+    border-bottom: thin solid;
+}
+td.tdl {
+    border-left: thin solid;
+}
+td.tdr {
+    border-right: thin solid;
+}
+td.tdlr {
+    border-left: thin solid;
+    border-right: thin solid;
 }
 .tdl {
     padding-left: 1em;
