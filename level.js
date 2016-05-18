@@ -31,8 +31,11 @@ Level.prototype.begin = function(level_num) {
   }
   for (var i = 0; i < level.avail.length; i++){
     var name = level.avail[i];
-    if (typeof name == 'string')
+    if (typeof name == 'string'){
       this.add_box_cell(name);
+    } else {
+      this.box_cells[this.box_cells.length-1].update_quantity(name);
+    }
   }
   this.be.div_cbox.height(this.box_height);
 

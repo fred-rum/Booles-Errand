@@ -75,12 +75,12 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   this.bring_to_top();
 
   if (this.locked){
-    this.el_cell.attr({"cursor": "not-allowed"});
+    this.change_cursor("not-allowed");
   } else {
     if (this.canvas == this.be.cdrag){
-      this.el_cell.attr({"cursor": "grabbing"});
+      this.change_cursor("grabbing");
     } else {
-      this.el_cell.attr({"cursor": "grab"});
+      this.change_cursor("grab");
     }
 
     this.el_cell.drag($.proxy(this.cell_drag_move, this),
@@ -91,6 +91,62 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
 
 
 // Public members
+
+Cell.prototype.change_cursor = function(cursor) {
+  // Try various cursor possibilities from least preferred to most
+  // preferred.  If the browser doesn't support one of the preferred
+  // values, then it keeps the last value that worked.
+  this.el_cell.attr({cursor: "default"});
+
+  if ((cursor == "grab") || (cursor == "grabbing")){
+    this.el_cell.attr({cursor: "-webkit-" + cursor});
+    this.el_cell.attr({cursor: "-moz-" + cursor});
+  }
+
+  this.el_cell.attr({cursor: cursor});
+};
+
+Cell.prototype.update_quantity = function(n) {
+  if (this.quantity === undefined){
+    var text_height = 11;
+    var attr = {
+      "text-anchor": "middle",
+      "font-family": "Verdana, Helvetica, Arial, sans-serif",
+      //"font-family": "Courier New, Fixed, monospace",
+      "font-size": text_height
+    };
+    this.qty_x = this.io.o.x;
+    this.qty_y = 0;
+    this.el_qty_text = this.canvas.text(this.qty_x, this.qty_y, "").attr(attr);
+    this.el_qty_text.setAttr("pointer-events", "none");
+    this.el_qty_text.transform("t" + this.x + "," + this.y);
+    this.push_ns(this.el_qty_text);
+  }
+
+  var attr = {
+    text: "x" + n,
+    fill: n ? "#000" : "#aaa"
+  };
+  this.el_qty_text.attr(attr);
+  var bbox = this.el_qty_text.getBBox(true);
+  var desiredtop = this.io.o.y + 2;
+  var actualtop = bbox.y;
+  var drift_y = actualtop - desiredtop;
+  this.qty_y -= drift_y;
+  this.el_qty_text.attr({y: this.qty_y});
+
+  // Since the quantity is only show with cbox, we don't have to worry
+  // about interactions with pending_del.
+  if (n && !this.quantity){
+    this.el_s.attr({stroke: "#000"});
+    this.change_cursor("grab");
+  } else if (!n && this.quantity){
+    this.el_s.attr({stroke: "#aaa"});
+    this.change_cursor("not-allowed");
+  }
+
+  this.quantity = n;
+};
 
 Cell.prototype.update_value = function() {
   var calc_func_name = "calc_" + this.type;
@@ -254,14 +310,22 @@ Cell.prototype.bring_to_top = function() {
 };
 
 Cell.prototype.cell_drag_start = function(x, y, event) {
+  if (this.quantity === 0) return;
+
+  this.dragging = true;
+
   this.drag_dx = 0;
   this.drag_dy = 0;
 
-  this.el_cell.attr({"cursor": "grabbing"});
+  this.change_cursor("grabbing");
   this.be.drag.disable_hover();
 
   // Pop cell to top for more natural dragging.
   this.bring_to_top();
+
+  if ((this.canvas_type == "cbox") && (this.quantity !== undefined)){
+    this.update_quantity(this.quantity - 1);
+  }
 
   // Bring the drag div (and its associated canvas) to the top of the Z order.
   // This allows drawn elements to cross the scrollbar, and also prevents
@@ -291,6 +355,9 @@ Cell.prototype.cell_drag_start = function(x, y, event) {
 
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
+
+  this.cdraw_cell.change_cursor("grabbing");
+  this.cdrag_cell.change_cursor("grabbing");
 };
 
 Cell.prototype.move = function(dx, dy) {
@@ -364,6 +431,8 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
 };
 
 Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
+  if (!this.dragging) return;
+
   var ddx = dx - this.drag_dx;
   var ddy = dy - this.drag_dy;
   this.drag_dx = dx;
@@ -377,7 +446,13 @@ Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
 };
 
 Cell.prototype.cell_drag_end = function() {
-  this.el_cell.attr({"cursor": "grab"});
+  if (!this.dragging) return;
+
+  if (this.quantity !== 0){
+    this.change_cursor("grab");
+  }
+  this.cdraw_cell.change_cursor("grab");
+
   this.be.drag.enable_hover();
 
   $(this.be.div_cdrag).css("z-index", "-1")
@@ -386,7 +461,24 @@ Cell.prototype.cell_drag_end = function() {
 
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
+
+    // Increment the number of available cells of the deleted type.
+    // If this cell was dragged from the box, it'd be simple to
+    // increase its quantity.  But in case it was dragged from cdraw,
+    // we have to search through cbox to find it.
+    var box_cells = this.be.level.box_cells;
+    for (var i = 0; i < box_cells.length; i++){
+      var cell = box_cells[i];
+      if (cell.type == this.type){
+        if (cell.quantity !== undefined){
+          cell.update_quantity(cell.quantity + 1);
+        }
+        break;
+      }
+    }
   }
+
+  this.dragging = false;
 };
 
 Cell.prototype.remove = function() {

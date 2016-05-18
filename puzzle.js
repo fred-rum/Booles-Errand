@@ -135,7 +135,7 @@ Level.prototype.puzzle = [
    outro: '<p>It looks like you\'re getting the hang of it!</p>',
    truth: [{a: [1], z: [1], y: [0]},
            {a: [0], z: [0], y: [1]}],
-   avail: ["inv"],
+   avail: ["inv", 1],
    cells: {
      a: {type: 'input',
          x: 100,

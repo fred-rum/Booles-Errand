@@ -54,7 +54,6 @@ body {
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */      
-
 }
 #truthborder {
     top: 0;
@@ -123,6 +122,10 @@ body {
     width: 8em;
     height: 100%;
     background-color: #d0ffd0;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */      
 }
 #cdraw {
     position: fixed;
