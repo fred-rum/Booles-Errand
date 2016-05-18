@@ -458,15 +458,15 @@ Wire.prototype.redraw_fg = function() {
       var fl_obj = this.in_flight[i];
       var age_len = fl_obj.age * this.path_length;
       var path = this.get_subpath(age_len, older_age_len);
-      older_el_subpath.attr({path: path});
+      older_el_subpath.attr({path: path,
+                             stroke: Wire.color(older_value)});
 
       if (!fl_obj.el_subpath){
         // Draw a path placeholder of the appropriate color.
         // The actual path will be inserted at the next loop
         // iteration or the end of the loop.
         var attr = {
-          "stroke-width": this.be.stroke_wire_fg,
-          stroke: Wire.color(fl_obj.value)
+          "stroke-width": this.be.stroke_wire_fg
         };
         fl_obj.el_subpath = this.be.cdraw.path("M0,0").attr(attr);
         fl_obj.el_subpath.insertAfter(older_el_subpath);
