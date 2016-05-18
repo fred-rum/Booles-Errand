@@ -334,6 +334,10 @@ Circuit.prototype.canvas_drag_end = function() {
 };
 
 Circuit.prototype.canvas_mousewheel = function(event) {
+  // Ignore events with bucky-key modifiers.  E.g. ctrl-scroll zooms the
+  // whole window, so we don't want to also zoom the draw view.
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
   var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
   if (new_scale > 2.0) new_scale = 2.0;
 
