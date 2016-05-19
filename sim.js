@@ -80,3 +80,15 @@ Sim.prototype.reset = function() {
 Sim.prototype.delay = function(func, milliseconds) {
   this.timer = setTimeout(func, milliseconds)
 };
+
+Sim.prototype.keydown = function(event) {
+  console.log(event.which);
+
+  var key = String.fromCharCode(event.which);
+  var bucky = event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
+    
+  if ((key == 'F') && !bucky){
+    this.be.circuit.fit_view();
+    this.be.circuit.update_view();
+  }
+};

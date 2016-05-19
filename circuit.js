@@ -100,11 +100,12 @@ function Circuit() {
   this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
 
-  $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));
-  $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
-
   this.be.level = new Level(this.be);
   this.begin_level();
+
+  $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));
+  $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
+  $(document).keydown($.proxy(this.be.sim.keydown, this.be.sim));
 }
 
 Circuit.prototype.begin_level = function(level_num) {
