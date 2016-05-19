@@ -82,8 +82,6 @@ Sim.prototype.delay = function(func, milliseconds) {
 };
 
 Sim.prototype.keydown = function(event) {
-  console.log(event.which);
-
   var key = String.fromCharCode(event.which);
   var bucky = event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
     
