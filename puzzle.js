@@ -232,6 +232,25 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'NOT as NAND',
+   intro: '<p>By tying its inputs to the same source, <b>a NAND gate can perform the same function as a NOT gate.</b></p>',
+   outro: '<p>NAND gates are particularly small and fast in modern silicon circuits, so it is convenient that they are also so versatile.</p>',
+   truth: [{a:0,  z:1},
+           {a:1,  z:0}],
+   avail: ["nand", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'seven segment decode',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '',
