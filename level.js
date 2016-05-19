@@ -7,11 +7,16 @@ function Level(be) {
 }
 
 Level.prototype.begin = function(level_num) {
+  var save_str = undefined;
+
   if (level_num === undefined){
     level_num = 0;
     var anchor = decodeURI(window.location.hash.substring(1));
+    var a = anchor.split('?', 2);
+    var level_name = a[0];
+    if (a.length == 2) save_str = a[1];
     for (var i = 0; i < this.puzzle.length; i++){
-      if (this.puzzle[i].name == anchor){
+      if (this.puzzle[i].name == level_name){
         level_num = i;
         break;
       }
@@ -20,7 +25,6 @@ Level.prototype.begin = function(level_num) {
 
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
-  window.location.hash = encodeURI(level.name);
   this.truth_row = 0;
 
   this.box_cells = [];
@@ -63,20 +67,24 @@ Level.prototype.begin = function(level_num) {
       if (cell_obj.type == "output") output_names.push(cell_name);
     }
 
-    // Now connect IOs according to the cell data.
-    for (var cell_name in level.cells){
-      var conn_list = level.cells[cell_name].io;
-      if (conn_list){
-        for (var i = 0; i < conn_list.length; i++){
-          var io_name = conn_list[i][0];
-          var cell_name2 = conn_list[i][1];
-          var io_name2 = conn_list[i][2];
-          new Wire(this.be,
-                   this.named_cells[cell_name].io[io_name],
-                   this.named_cells[cell_name2].io[io_name2],
-                   false);
+    if (save_str === undefined){
+      // Connect IOs according to the cell data.
+      for (var cell_name in level.cells){
+        var conn_list = level.cells[cell_name].io;
+        if (conn_list){
+          for (var i = 0; i < conn_list.length; i++){
+            var io_name = conn_list[i][0];
+            var cell_name2 = conn_list[i][1];
+            var io_name2 = conn_list[i][2];
+            new Wire(this.be,
+                     this.named_cells[cell_name].io[io_name],
+                     this.named_cells[cell_name2].io[io_name2],
+                     false);
+          }
         }
       }
+    } else {
+      this.decode_save(save_str);
     }
   }
   this.input_names = input_names;
@@ -192,6 +200,116 @@ Level.prototype.remove_cell = function(cell) {
     if (cell == this.all_cells[i]){
       this.all_cells.splice(i, 1);
     }
+  }
+};
+
+Level.prototype.update_url = function() {
+  var save = [this.level.name];
+
+  for (var i = 0; i < this.all_cells.length; i++) {
+    if (!this.all_cells[i].locked) break;
+  }
+  save.push('?1s', i);
+
+  for (var i = 0; i < this.all_cells.length; i++) {
+    var emitted_cell = false;
+    var cell = this.all_cells[i];
+    if (!cell.locked){
+      save.push(';', Math.round(cell.x),
+                ',', cell.type,
+                ',', Math.round(cell.y));
+      emitted_cell = true;
+    }
+    for (var port_name in cell.io) {
+      var io = cell.io[port_name];
+      if (io.type == 'output'){
+        for (var j = 0; j < io.w.length; j++) {
+          var wire = io.w[j];
+          if (emitted_cell) {
+            save.push('+');
+          } else {
+            save.push('-', i, ',');
+          }
+          save.push(port_name,
+                    ',', this.all_cells.indexOf(wire.i.cell),
+                    ',', wire.i.name);
+        }
+      }
+    }
+  }
+
+  var hash_str = save.join('');
+  window.location.hash = encodeURI(hash_str);
+};
+
+Level.prototype.decode_save = function(save_str) {
+  try {
+    var ex_version_skip = /^1s([0-9]+)/;
+    var ex_cell = /^;(-?[0-9]+),([a-z][a-z0-9]*),(-?[0-9]+)/;
+    var ex_plus = /^\+([a-z][a-z0-9]*),([0-9]+),([a-z][a-z0-9]*)/;
+    var ex_minus = /^-([0-9]+),([a-z][a-z0-9]*),([0-9]+),([a-z][a-z0-9]*)/;
+
+    var m;
+    var wires = [];
+
+    if (m = ex_version_skip.exec(save_str)){
+      var skip = Number(m[1]);
+      if (skip != this.all_cells.length) throw "wrong skip";
+      save_str = save_str.substring(m[0].length);
+    } else {
+      throw "bad version/skip string";
+    }
+
+    while (save_str != ''){
+      if (m = ex_cell.exec(save_str)){
+        var x = Number(m[1]);
+        var type = m[2];
+        var y = Number(m[3]);
+        if ((type == "io") || (type == "null")) throw "bad cell type" + type;
+        this.add_cell(new Cell(this.be, "cdraw", type, x, y));
+
+        save_str = save_str.substring(m[0].length);
+
+        while (save_str != ''){
+          if (m = ex_plus.exec(save_str)){
+            wires.push({o_cell: this.all_cells.length-1,
+                        o_port: m[1],
+                        i_cell: Number(m[2]),
+                        i_port: m[3]});
+            save_str = save_str.substring(m[0].length);
+          } else {
+            break;
+          }
+        }
+      } else if (m = ex_minus.exec(save_str)){
+        wires.push({o_cell: Number(m[1]),
+                    o_port: m[2],
+                    i_cell: Number(m[3]),
+                    i_port: m[4]});
+        save_str = save_str.substring(m[0].length);
+      } else {
+        throw "not recognized: " + save_str;
+      }
+    }
+
+    for (var i = 0; i < wires.length; i++){
+      var w = wires[i];
+      if (w.o_cell >= this.all_cells.length) throw "bad o_cell #: " + w.o_cell;
+      if (w.i_cell >= this.all_cells.length) throw "bad i_cell #: " + w.i_cell;
+      var o_cell = this.all_cells[w.o_cell];
+      var i_cell = this.all_cells[w.i_cell];
+      var io_o = o_cell.io[w.o_port];
+      var io_i = i_cell.io[w.i_port];
+      if (!io_o) throw "bad o port: " + w.o_port;
+      if (!io_i) throw "bad i port: " + w.i_port;
+      if (io_i.w.length > 0) throw "input port busy: " + w.i_port;
+      new Wire(this.be, io_o, io_i);
+    }
+  }
+  catch (ex) {
+    console.log(ex);
+    console.log("remaining:", save_str)
+    // Exit without decoding any more.
   }
 };
 

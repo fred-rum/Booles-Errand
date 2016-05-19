@@ -54,6 +54,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   this.el_s = this.canvas.set();
   this.el_ns = this.canvas.set();
   this.el_cell = this.canvas.set();
+  if (typeof this["init_" + type] != "function") throw "bad cell type" + type;
   this["init_" + type](); // Call cell-type initiator function by name
   if (type == "null") return; // do nothing else for the null cell
 
@@ -482,6 +483,7 @@ Cell.prototype.cell_drag_end = function() {
     }
   }
 
+  this.be.level.update_url();
   this.dragging = false;
 };
 

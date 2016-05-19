@@ -47,13 +47,15 @@ Drag.prototype.remove_new_wires = function() {
 };
 
 Drag.prototype.commit_new_wires = function() {
-  var attr = {stroke: "#eee"}
-  for (var i = 0; i < this.new_wires.length; i++){
-    this.new_wires[i].el_bg.attr(attr);
-    this.new_wires[i].pending_new = false;
-    this.new_wires[i].update_value();
+  if (this.new_wires.length){
+    var attr = {stroke: "#eee"}
+    for (var i = 0; i < this.new_wires.length; i++){
+      this.new_wires[i].el_bg.attr(attr);
+      this.new_wires[i].pending_new = false;
+      this.new_wires[i].update_value();
+    }
+    this.new_wires = [];
   }
-  this.new_wires = [];
 };
 
 Drag.prototype.update_free_drag = function(event) {
@@ -95,10 +97,12 @@ Drag.prototype.drag_end = function(io, event) {
   this.remove_null_wire();
   this.orig_io = null;
   this.new_io = null;
+  this.be.level.update_url();
 };
 
 Drag.prototype.double_click = function(io, event) {
   while (io.w.length > 0) io.w[0].remove();
+  this.be.level.update_url();
 };
 
 Drag.prototype.enable_drag = function(io) {
