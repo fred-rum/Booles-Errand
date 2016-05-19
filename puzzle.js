@@ -154,13 +154,65 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'AND gate',
-   intro: '<p><b>An AND gate outputs a 1 if (and only if) its first input is 1 <i>AND</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
+   intro: '<p><b>An AND gate outputs a 1 only if its first input is 1 <i>AND</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
    outro: '<p>With AND gates and inverters, you have enough tools to take over the world!  Or, at least, the Boolean part of the world.</p>',
    truth: [{a:0, b:0,   z:0},
            {a:0, b:1,   z:0},
            {a:1, b:0,   z:0},
            {a:1, b:1,   z:1}],
    avail: ["and", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'NAND gate',
+   intro: '<p><b>A NAND gate outputs the opposite value as an AND gate.</b></p><p>Be careful when speaking aloud: "a NAND gate" is not "an AND gate".</p>',
+   outro: '<p>Actually, who needs AND gates and inverters.  We can take over the world with NAND gates alone!</p>',
+   truth: [{a:0, b:0,   z:1},
+           {a:0, b:1,   z:1},
+           {a:1, b:0,   z:1},
+           {a:1, b:1,   z:0}],
+   avail: ["nand", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'NOT-AND',
+   intro: '<p><b>A NAND gate can be decomposed into an AND gate followed by an inverter.</b> The result is NOT 1 only if the AND gate\'s output is 1.  In other words, it forms a NOT-AND circuit, also known as NAND.</p>',
+   outro: '<p>An inverter is sometimes called a NOT gate.  The output of the NOT gate is 1 only if the input is NOT 1.</p>',
+   truth: [{a:0, b:0,   z:1},
+           {a:0, b:1,   z:1},
+           {a:1, b:0,   z:1},
+           {a:1, b:1,   z:0}],
+   avail: ["inv", 1, "and", 1],
    cells: {
      a: {type: 'input',
          x: 100,
