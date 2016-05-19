@@ -27,6 +27,12 @@ Level.prototype.begin = function(level_num) {
   var level = this.level = this.puzzle[level_num];
   this.truth_row = 0;
 
+  if (level.hide === undefined){
+    level.hide = new Set();
+  } else if (Array.isArray(level.hide)){
+    level.hide = new Set(level.hide);
+  }
+
   this.box_cells = [];
   this.box_height = this.be.box_spacing;
   if (level.avail === undefined){
@@ -95,7 +101,14 @@ Level.prototype.begin = function(level_num) {
   if (level.truth){
     this.result = [];
     var html = [];
-    html.push('<table><tr>');
+    if (level.hide.has("truth")){
+      // Create the truth table HTML, but hidden.  This is easier than
+      // not creating the HTML and trying to prevent the various
+      // actions that normally happen in the truth table.
+      html.push('<table style="display: none;"><tr>');
+    } else {
+      html.push('<table><tr>');
+    }
     this.table_header(html, input_names);
     this.table_header(html, output_names);
     html.push('<th class="check"></th></tr>');

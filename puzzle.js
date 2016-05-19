@@ -7,6 +7,7 @@ Level.prototype.puzzle = [
    intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the supply pin "A" to the test pin "Z". &#9733</p>',
    outro: '<p>Congratulations!</p>',
    truth: [{a: [1], z: [1]}],
+   hide: ["truth"],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -26,6 +27,7 @@ Level.prototype.puzzle = [
    intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press "play" to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction.  The direction that data flows on the wire is determined by what it\'s connected to.</p>',
    truth: [{a: [1], z: [1]}],
+   hide: ["truth"],
    avail: [],
    cells: {
      a: {type: 'input',
