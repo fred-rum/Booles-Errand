@@ -82,7 +82,10 @@ Drag.prototype.drag_move = function(io, dx, dy, x, y, event) {
 };
 
 Drag.prototype.drag_end = function(io, event) {
-  io.display_fail(false);
+  if (this.fail_io){
+    this.fail_io.display_fail(false);
+    this.fail_io = undefined;
+  }
   this.orig_io.set_vis("drag", false);
   if (this.new_io == this.be.null_io){
     this.restore_old_wires();
@@ -144,7 +147,10 @@ Drag.prototype.hover_start = function(io, event) {
 };
 
 Drag.prototype.hover_end = function(io, event) {
-  io.display_fail(false);
+  if (io == this.fail_io){
+    this.fail_io.display_fail(false);
+    this.fail_io = undefined;
+  }
   io.set_vis("hover", false);
   this.pending_hover_io = undefined;
 
@@ -174,6 +180,7 @@ Drag.prototype.update_new_io = function(io, event) {
   if (this.orig_empty && (this.orig_io.type == io.type) &&
       (io != this.orig_io)){
     io.display_fail(true);
+    this.fail_io = io;
     io = this.be.null_io;
   }
 
