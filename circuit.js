@@ -48,7 +48,7 @@ function Circuit() {
   this.be.cdraw_left = this.be.cbox_width;
   this.be.div_cdrag.width(this.be.cdraw_left);
 
-  // Other div dimensions are resized dynamically as sppropriate.
+  // Other div dimensions are resized dynamically as appropriate.
   // The first puzzle level will reflow the text and call this.resize().
   this.cdraw_width = 0;
   this.cdraw_height = 0;
@@ -109,15 +109,14 @@ function Circuit() {
 
 Circuit.prototype.begin_level = function(level_num) {
   this.be.level.begin(level_num);
-  this.be.canvas_cx = 0;
-  this.be.canvas_cy = 0;
-  this.be.scale = 1.0;
   this.resize(true);
-  this.center_view();
+  this.fit_view();
+  this.update_view();
 };
 
 Circuit.prototype.resize_event = function() {
   this.resize(true);
+  this.update_view();
 };
 
 Circuit.prototype.resize = function(center) {
@@ -204,10 +203,9 @@ Circuit.prototype.resize = function(center) {
     this.cdraw_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.cdraw_height);
   }
-  this.adjust_viewbox();
 };
 
-Circuit.prototype.center_view = function() {
+Circuit.prototype.fit_view = function() {
   var all_cells = this.be.level.all_cells;
   for (var i = 0; i < all_cells.length; i++){
     var bbox_left = all_cells[i].bbox.x + all_cells[i].x;
@@ -276,8 +274,6 @@ Circuit.prototype.center_view = function() {
       this.be.canvas_cy -= (this.be.truth_height - this.be.cdraw_top)/2/scale;
     }
   }
-
-  this.adjust_viewbox();
 };
 
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
@@ -308,7 +304,7 @@ Circuit.prototype.canvas_to_cdraw_y = function(canvas_y) {
   return (canvas_y - this.be.canvas_cy) * this.be.scale + cdraw_cy;
 };
 
-Circuit.prototype.adjust_viewbox = function() {
+Circuit.prototype.update_view = function() {
   // cdraw_cx/cy indicates the center of the viewable cdraw area
   // in cdraw/screen coordinates.
   var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
@@ -358,7 +354,7 @@ Circuit.prototype.canvas_drag_move = function(dx, dy, x, y, event) {
   var canvas_dy = screen_dy / this.be.scale;
   this.be.canvas_cx -= canvas_dx;
   this.be.canvas_cy -= canvas_dy;
-  this.adjust_viewbox();
+  this.update_view();
 
   this.old_drag_x = x;
   this.old_drag_y = y;
@@ -389,7 +385,7 @@ Circuit.prototype.canvas_mousewheel = function(event) {
 
   this.be.scale = new_scale;
 
-  this.adjust_viewbox();
+  this.update_view();
 };
 
 // This is called as soon as the DOM is ready.
