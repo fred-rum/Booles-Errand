@@ -57,6 +57,10 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   this["init_" + type](); // Call cell-type initiator function by name
   if (type == "null") return; // do nothing else for the null cell
 
+  if (this.canvas_type != "cdrag"){
+    this.bbox = this.el_ns.getBBox(true);
+  }
+
   if (this.canvas == this.be.cdraw){
     this.update_value();
   }
@@ -488,31 +492,6 @@ Cell.prototype.remove = function() {
   this.io = null;
   this.el_cell.remove();
 };
-
-Cell.prototype.calc_bbox = function() {
-  this.bbox = {};
-  for (var name in this.io) {
-    var x = this.x + this.io[name].x;
-    var y = this.y + this.io[name].y;
-    if (this.bbox.left === undefined){
-      this.bbox.left = this.bbox.right = x;
-      this.bbox.top = this.bbox.bottom = y;
-    } else {
-      if (x < this.bbox.left){
-        this.bbox.left = x;
-      }
-      if (x > this.bbox.right){
-        this.bbox.left = x;
-      }
-      if (y < this.bbox.top){
-        this.bbox.left = y;
-      }
-      if (y > this.bbox.bottom){
-        this.bbox.left = y;
-      }
-    }
-  }
-}
 
 Cell.prototype.init_io = function(inv, no, ni, left, right) {
   var cw = this.be.stub_len;

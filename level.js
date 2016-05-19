@@ -171,7 +171,7 @@ Level.prototype.reset_sim = function() {
 Level.prototype.add_box_cell = function(name) {
   var c = new Cell(this.be, "cbox", name, 0, 0);
   this.box_cells.push(c);
-  var bbox = c.el_cell.getBBox(false);
+  var bbox = c.bbox;
   var cx = (this.be.cbox_width/2) - bbox.x - bbox.width/2; // align center
   var cy = this.box_height - bbox.y; // align top edge
   c.move(cx, cy);
@@ -184,7 +184,6 @@ Level.prototype.value = function(name) {
 };
 
 Level.prototype.add_cell = function(cell) {
-  cell.calc_bbox();
   this.all_cells.push(cell);
 };
 

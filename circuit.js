@@ -109,8 +109,11 @@ function Circuit() {
 
 Circuit.prototype.begin_level = function(level_num) {
   this.be.level.begin(level_num);
-  this.center_view();
+  this.be.canvas_cx = 0;
+  this.be.canvas_cy = 0;
+  this.be.scale = 1.0;
   this.resize(true);
+  this.center_view();
 };
 
 Circuit.prototype.resize_event = function() {
@@ -204,45 +207,77 @@ Circuit.prototype.resize = function(center) {
   this.adjust_viewbox();
 };
 
-Circuit.prototype.add_to_viewbox = function(bbox) {
-  if (this.bbox.left === undefined){
-    this.bbox.left = bbox.left;
-    this.bbox.right = bbox.right;
-    this.bbox.top = bbox.top;
-    this.bbox.bottom = bbox.bottom;
-  } else {
-    if (bbox.left < this.bbox.left){
-      this.bbox.left = bbox.left;
-    }
-    if (bbox.right > this.bbox.right){
-      this.bbox.right = bbox.right;
-    }
-    if (bbox.top < this.bbox.top){
-      this.bbox.top = bbox.top;
-    }
-    if (bbox.bottom > this.bbox.bottom){
-      this.bbox.bottom = bbox.bottom;
-    }
-  }
-};
-
 Circuit.prototype.center_view = function() {
   var all_cells = this.be.level.all_cells;
   for (var i = 0; i < all_cells.length; i++){
-    this.add_to_viewbox(all_cells[i].bbox);
+    var bbox_left = all_cells[i].bbox.x + all_cells[i].x;
+    var bbox_top = all_cells[i].bbox.y + all_cells[i].y;
+    var bbox_right = bbox_left + all_cells[i].bbox.width;
+    var bbox_bottom = bbox_top + all_cells[i].bbox.height;
+    if (this.bbox.left === undefined){
+      this.bbox.left = bbox_left;
+      this.bbox.top = bbox_top;
+      this.bbox.right = bbox_right;
+      this.bbox.bottom = bbox_bottom;
+    } else {
+      if (bbox_left < this.bbox.left){
+        this.bbox.left = bbox_left;
+      }
+      if (bbox_top < this.bbox.top){
+        this.bbox.top = bbox_top;
+      }
+      if (bbox_right > this.bbox.right){
+        this.bbox.right = bbox_right;
+      }
+      if (bbox_bottom > this.bbox.bottom){
+        this.bbox.bottom = bbox_bottom;
+      }
+    }
   }
 
   // canvas_cx/cy indicates the center of the overall cell bbox
   // in canvas coordinates.
   if (this.bbox.left === undefined){
+    // Handle the case that no cells are in cdraw.
     this.be.canvas_cx = 0;
     this.be.canvas_cy = 0;
+    this.be.scale = 1.0;
   } else {
     this.be.canvas_cx = (this.bbox.left + this.bbox.right) / 2;
     this.be.canvas_cy = (this.bbox.top + this.bbox.bottom) / 2;
+    var canvas_width = (this.bbox.right - this.bbox.left +
+                        this.be.wire_arc_radius * 3);
+    var canvas_height = (this.bbox.bottom - this.bbox.top +
+                         this.be.wire_arc_radius * 4);
+
+    // The truth table cuts a corner out of the viewable screen
+    // area, so we try two different aspect ratios to avoid it
+    // and see which one is better.
+
+    // Try to the right of the truth table.
+    var cdraw_width1 = this.be.window_width - this.be.truth_width;
+    var cdraw_height1 = this.be.window_height - this.be.cdraw_top;
+    var x_scale1 = cdraw_width1 / canvas_width;
+    var y_scale1 = cdraw_height1 / canvas_height;
+    var scale1 = Math.min(x_scale1, y_scale1);
+
+    // Try below the truth table.
+    var cdraw_width2 = this.be.window_width - this.be.cdraw_left;
+    var cdraw_height2 = this.be.window_height - this.be.truth_height;
+    var x_scale2 = cdraw_width2 / canvas_width;
+    var y_scale2 = cdraw_height2 / canvas_height;
+    var scale2 = Math.min(x_scale2, y_scale2);
+
+    if (scale1 > scale2){
+      var scale = this.be.scale = Math.min(scale1, 2.0);
+      this.be.canvas_cx -= (this.be.truth_width - this.be.cdraw_left)/2/scale;
+    } else {
+      var scale = this.be.scale = Math.min(scale2, 2.0);
+      this.be.canvas_cy -= (this.be.truth_height - this.be.cdraw_top)/2/scale;
+    }
   }
 
-  this.be.scale = 1.0;
+  this.adjust_viewbox();
 };
 
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
@@ -341,7 +376,7 @@ Circuit.prototype.canvas_mousewheel = function(event) {
   var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
   if (new_scale > 2.0) new_scale = 2.0;
 
-  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2
+  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
   var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
   var cdraw_mouse_offset_x = event.pageX - cdraw_cx;
   var cdraw_mouse_offset_y = event.pageY - cdraw_cy;
