@@ -368,7 +368,7 @@ Circuit.prototype.canvas_drag_start = function(x, y, event) {
   this.old_drag_x = x;
   this.old_drag_y = y;
 
-  this.canvas_rect.attr({"cursor": "move"});
+  this.canvas_rect.attr({"cursor": "all-scroll"});
 };
 
 Circuit.prototype.canvas_drag_move = function(dx, dy, x, y, event) {
