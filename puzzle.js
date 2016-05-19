@@ -62,7 +62,6 @@ Level.prototype.puzzle = [
   {name: 'inverter',
    intro: '<p><b>An inverter gate changes a 0 to 1, or changes a 1 to a 0.</b></p>',
    outro: '<p>The bubble on the side of the inverter gate is what flips the value.  A triangular gate without a bubble would simply transmit the value unchanged, like a wire.</p>',
-//   outro: '<p>Check how the circuit is connected.  You\'ll have to do it yourself in the next puzzle!</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
    avail: [],
@@ -150,6 +149,32 @@ Level.prototype.puzzle = [
      y: {type: 'output',
          x: 400,
          y: 200
+        }
+   }
+  }
+,
+  {name: 'AND gate',
+   intro: '<p><b>An AND gate outputs a 1 if (and only if) its first input is 1 <i>AND</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
+   outro: '<p>With AND gates and inverters, you have enough tools to take over the world!  Or, at least, the Boolean part of the world.</p>',
+   truth: [{a:0, b:0,   z:0},
+           {a:0, b:1,   z:0},
+           {a:1, b:0,   z:0},
+           {a:1, b:1,   z:1}],
+   avail: ["and", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
         }
    }
   }
