@@ -48,29 +48,29 @@ body {
     height: auto;
     width: auto;
     min-width: 8em;
+    max-width: 50vw;
+    max-height: 50vh;
+    overflow: auto;
     background-color: #eee;
-    z-index:4;
+    border-style: none solid solid none;
+    border-width: thin;
+    text-align: center;
+    display: block;
+    z-index: 101;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */      
-}
-#truthborder {
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: auto;
-    border-style: none solid solid none;
-    border-width: thin;
-    text-align: center;
 }
 #info {
     position: fixed;
     top: 0;
     left: 8em;
     width: 100%;
-    z-index: 3;
     height: auto;
+    max-height: 50vh;
+    overflow: auto;
+    z-index: 100;
     border-bottom-style: solid;
     border-width: thin;
     background-color: #d0d0ff;

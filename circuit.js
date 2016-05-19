@@ -120,12 +120,39 @@ Circuit.prototype.resize_event = function() {
 };
 
 Circuit.prototype.resize = function(center) {
+  // Adjust the sizes and positions of the various divs to fit the
+  // window size.
+
   var old_cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2
   var old_cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
 
   this.be.window_width = this.be.window.width();
   this.be.window_height = this.be.window.height();
+
+  // I might have set the div_truth dimensions in the past, so if I
+  // want to measure its natural dimensions to fit its contents, I
+  // have to set them back to auto first.
+
+  // Both Chrome and Firefox do a *terrible* job with overflow-auto.
+  // When the browser decides that vertical scrollbar is needed, it
+  // refuses to expand the div width to accommodate it.  I've tried
+  // everything, and the only solution that looks somewhat decent is
+  // to artificially widen the div by 20 pixels over its natural width
+  // so that if a vertical scrollbar is needed, it has enough room to
+  // appear without triggering a horizontal scrollbar.  And worst that
+  // can happen if the hack is not completely successful for some
+  // browser is that both scrollbars appear.
+  this.be.div_truth.outerWidth("auto");
   this.be.truth_width = this.be.div_truth.outerWidth();
+  this.be.div_truth.outerWidth(this.be.truth_width + 20);
+
+  // The actual div_truth may be smaller than what we just set due to
+  // the max-width property, so we measure it again to get the final
+  // width.
+  this.be.truth_width = this.be.div_truth.outerWidth();
+
+  this.be.div_truth.outerHeight("auto");
+  var new_truth_height = this.be.div_truth.outerHeight();
 
   // Move the div_info to the right of div_truth and decrease its width
   // accordingly.  Note that this may reflow the text and thus change the
@@ -143,10 +170,6 @@ Circuit.prototype.resize = function(center) {
   this.be.div_info.offset(info_offset);
   this.be.div_info.width(info_width);
 
-  // I might have set the div_truth size in the past, so if I want to
-  // measure its desired height, I have to set it back to auto first.
-  this.be.div_truth.outerHeight("auto");
-  var new_truth_height = this.be.div_truth.outerHeight();
   if (this.be.cdrag_cell){
     // If div_truth changes height (e.g. due to a reflow of div_info),
     // then cdrag will change position, which means that any cell
@@ -154,14 +177,14 @@ Circuit.prototype.resize = function(center) {
     // Fix that.
     this.be.cdrag_cell.move(0, this.be.truth_height - new_truth_height);
   }
-  this.be.truth_height = new_truth_height;
 
   // Make sure the truth table div is at least as tall as the info div.
   var info_height = this.be.div_info.outerHeight();
-  if (this.be.truth_height < info_height) {
-    this.be.truth_height = info_height;
-    this.be.div_truth.outerHeight(this.be.truth_height);
+  if (new_truth_height < info_height) {
+    new_truth_height = info_height;
+    this.be.div_truth.outerHeight(new_truth_height);
   }
+  this.be.truth_height = new_truth_height;
   this.be.cdraw_top = info_height;
 
   // Move the cbox below div_truth and decrease its height
