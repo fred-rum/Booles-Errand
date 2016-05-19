@@ -267,7 +267,18 @@ Level.prototype.decode_save = function(save_str) {
         var x = Number(m[1]);
         var type = m[2];
         var y = Number(m[3]);
-        if ((type == "io") || (type == "null")) throw "bad cell type" + type;
+        if ((type == "io") || (type == "null")) throw "bad cell type: " + type;
+        for (var i = 0; i < this.box_cells.length; i++){
+          var bcell = this.box_cells[i];
+          if (bcell.type == type){
+            if (bcell.quantity !== undefined){
+              if (bcell.quantity == 0) throw "exhausted cell type: " + type
+              bcell.update_quantity(bcell.quantity - 1);
+            }
+            break;
+          }
+        }
+        if (i == this.box_cells.length) throw "disallowed cell type: " + type;
         this.add_cell(new Cell(this.be, "cdraw", type, x, y));
 
         save_str = save_str.substring(m[0].length);
@@ -309,8 +320,8 @@ Level.prototype.decode_save = function(save_str) {
     }
   }
   catch (ex) {
-    console.log(ex);
-    console.log("remaining:", save_str)
+    //onsole.log(ex);
+    //onsole.log("remaining:", save_str)
     // Exit without decoding any more.
   }
 };
