@@ -59,8 +59,8 @@ Level.prototype.begin = function(level_num) {
                           true);
       this.named_cells[cell_name] = cell;
       this.add_cell(cell);
-      if (cell_obj.type == "input") input_names += cell_name;
-      if (cell_obj.type == "output") output_names += cell_name;
+      if (cell_obj.type == "input") input_names.push(cell_name);
+      if (cell_obj.type == "output") output_names.push(cell_name);
     }
 
     // Now connect IOs according to the cell data.
@@ -118,6 +118,11 @@ Level.prototype.table_header = function(html, port_names) {
 
 Level.prototype.table_row = function(html, port_names, truth_row) {
   for (var i = 0; i < port_names.length; i++){
+    if (typeof truth_row[port_names[i]] == "number"){
+      // A non-sequencing table row can be specified without the array,
+      // but we force it into array format here.
+      truth_row[port_names[i]] = [truth_row[port_names[i]]];
+    }
     html.push('<td');
     this.push_padding(html, i, port_names.length);
     html.push('>', truth_row[port_names[i]][0], '</td>');
@@ -150,7 +155,7 @@ Level.prototype.select_row = function(row) {
     cell.update_value();
     cell.fit_input_text();
   }
-  for (var i = 0; i < this.input_names.length; i++){
+  for (var i = 0; i < this.output_names.length; i++){
     var cell = this.named_cells[this.output_names[i]];
     cell.fit_output_text();
   }

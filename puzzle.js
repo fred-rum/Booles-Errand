@@ -153,4 +153,76 @@ Level.prototype.puzzle = [
         }
    }
   }
+,
+  {name: 'seven segment decode',
+   intro: '<p><b>Decode each decimal value 0-9 to drive a seven-segment display.</b></p>',
+   outro: '',
+   truth:[{a3:0, a2:0, a1:0, a0:0,   t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1},
+          {a3:0, a2:0, a1:0, a0:1,   t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0},
+          {a3:0, a2:0, a1:1, a0:0,   t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1},
+          {a3:0, a2:0, a1:1, a0:1,   t:1, tl:0, tr:1, c:1, bl:0, br:1, b:1},
+          {a3:0, a2:1, a1:0, a0:0,   t:0, tl:1, tr:1, c:1, bl:0, br:1, b:0},
+          {a3:0, a2:1, a1:0, a0:1,   t:1, tl:1, tr:0, c:1, bl:0, br:1, b:1},
+          {a3:0, a2:1, a1:1, a0:0,   t:1, tl:1, tr:0, c:1, bl:1, br:1, b:1},
+          {a3:0, a2:1, a1:1, a0:1,   t:1, tl:0, tr:1, c:0, bl:0, br:1, b:0},
+          {a3:1, a2:0, a1:0, a0:0,   t:1, tl:1, tr:1, c:1, bl:1, br:1, b:1},
+          {a3:1, a2:0, a1:0, a0:1,   t:1, tl:1, tr:1, c:1, bl:0, br:1, b:1}
+         ],
+   cells: {
+     a3: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     a2: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     a1: {type: 'input',
+         x: 0,
+         y: 200
+        }
+     ,
+     a0: {type: 'input',
+         x: 0,
+         y: 300
+        }
+     ,
+     t: {type: 'output',
+         x: 875,
+         y: 0
+        }
+     ,
+     tl: {type: 'output',
+         x: 800,
+         y: 75
+        }
+     ,
+     tr: {type: 'output',
+         x: 950,
+         y: 75
+        }
+     ,
+     c: {type: 'output',
+         x: 875,
+         y: 150
+        }
+     ,
+     bl: {type: 'output',
+         x: 800,
+         y: 225
+        }
+     ,
+     br: {type: 'output',
+         x: 950,
+         y: 225
+        }
+     ,
+     b: {type: 'output',
+         x: 875,
+         y: 300
+        }
+   }
+  }
 ];
