@@ -83,6 +83,8 @@ Level.prototype.begin = function(level_num) {
           }
         }
       }
+
+      window.location.hash = encodeURI(level.name);
     } else {
       this.decode_save(save_str);
     }
