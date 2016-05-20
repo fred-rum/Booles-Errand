@@ -78,7 +78,8 @@ Sim.prototype.reset = function() {
 };
 
 Sim.prototype.delay = function(func, milliseconds) {
-  this.timer = setTimeout(func, milliseconds)
+  if (this.speed == Infinity) milliseconds = 0;
+  this.timer = setTimeout(func, milliseconds);
 };
 
 Sim.prototype.keydown = function(event) {
