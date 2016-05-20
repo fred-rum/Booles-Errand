@@ -64,7 +64,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'NOT gate',
-   intro: '<p><b>A NOT gate changes a&nbsp;0 to&nbsp;1, or changes a&nbsp;1 to a&nbsp;0.</b>  In other words, the output of a NOT gate is&nbsp;1 only if the input is <i>not</i> 1.</p>',
+   intro: '<p><b>A NOT gate changes a 0 to 1, or changes a 1 to a 0.</b>  In other words, the output of a NOT gate is 1 only if the input is <i>not</i> 1.</p>',
    outro: '<p>A NOT gate is also often called an inverter.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
@@ -214,7 +214,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'gate+fanout',
-   intro: '<p><b>Check the truth table</b> to see how this circuit should be connected.</p><p>Tip: The table says that when A is&nbsp;1, Z must get a&nbsp;1 value, and Y must get&nbsp;0.  It also says what values must go to the test pins when A is&nbsp;0.</p>',
+   intro: '<p><b>Check the truth table</b> to see how this circuit should be connected.</p><p>Tip: The table says that when A is 1, Z must get a 1 value, and Y must get 0.  It also says what values must go to the test pins when A is 0.</p>',
    outro: '<p>It looks like you\'re getting the hang of it!</p>',
    truth: [{a: [1], z: [1], y: [0]},
            {a: [0], z: [0], y: [1]}],
@@ -238,7 +238,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'AND gate',
-   intro: '<p><b>An AND gate outputs a&nbsp;1 only if its first input is&nbsp;1 <i>and</i> its second input is&nbsp;1.</b> Otherwise the output of the AND gate is&nbsp;0.</p>',
+   intro: '<p><b>An AND gate outputs a 1 only if its first input is 1 <i>and</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
    outro: '<p><b>Make sure you clearly understand the relationship of the AND gate\'s output with its inputs</b>, as displayed in the truth table.  You will soon learn five other simple logic gates, each of which perform a different logic function.</p>',
    truth: [{a:0, b:0,   z:0},
            {a:0, b:1,   z:0},
@@ -290,7 +290,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'NOT-AND',
-   intro: '<p><b>A NAND gate can be decomposed into an AND gate followed by an NOT gate.</b> The result is NOT&nbsp;1 only if the AND gate\'s output is&nbsp;1.  In other words, it performs a NOT-AND function, also known as NAND.</p>',
+   intro: '<p><b>A NAND gate can be decomposed into an AND gate followed by an NOT gate.</b> The result is NOT 1 only if the AND gate\'s output is 1.  In other words, it performs a NOT-AND function, also known as NAND.</p>',
    outro: '<p>Because a NAND gate combines the functions of an AND gate and an NOT gate, it combines the shape of the AND gate with the bubble from the NOT gate.</p>',
    truth: [{a:0, b:0,   z:1},
            {a:0, b:1,   z:1},
@@ -335,8 +335,8 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'OR gate',
-   intro: '<p><b>An OR gate outputs a&nbsp;1 if its first input is&nbsp;1 <i>or</i> its second input is&nbsp;1</b> (or both are&nbsp;1). Otherwise the output of the OR gate is&nbsp;0.</p>',
-   outro: '<p>An OR gate is more precisely described with the legal term "and/or" because its output is&nbsp;1 if its first input is&nbsp;1 <i>and/or</i> its second input is&nbsp;1.</p>',
+   intro: '<p><b>An OR gate outputs a 1 if its first input is 1 <i>or</i> its second input is 1</b> (or both are 1). Otherwise the output of the OR gate is 0.</p>',
+   outro: '<p>An OR gate is more precisely described with the legal term "and/or" because its output is 1 if its first input is 1 <i>and/or</i> its second input is 1.</p>',
    truth: [{a:0, b:0,   z:0},
            {a:0, b:1,   z:1},
            {a:1, b:0,   z:1},
@@ -361,7 +361,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'NOR gate',
-   intro: '<p><b>A NOR gate outputs the opposite value as an OR gate.</b></p><p>In this puzzle we introduce the concept of a "don\'t care" value.  If A is&nbsp;1, we know that the output of the NOR gate must always be&nbsp;0, so we <i>don\'t care</i> what B is.  Likewise, we <i>don\'t care</i> what A is when B is&nbsp;1.</p>',
+   intro: '<p><b>A NOR gate outputs the opposite value as an OR gate.</b></p><p>In this puzzle we introduce the concept of a "don\'t care" value.  If A is 1, we know that the output of the NOR gate must always be 0, so we <i>don\'t care</i> what B is.  Likewise, we <i>don\'t care</i> what A is when B is 1.</p>',
    outro: '<p>This circuit simulator uses a black color to represent a value that is unknown, which includes "don\'t care" values.  If a logic gate has an unknown input, a logic gate may output a known or unknown value depending on its input(s) and its logic function.</p>',
    truth: [{a:0, b:0,   z:1},
            {a:x, b:1,   z:0},
@@ -386,7 +386,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'XOR and XNOR gates',
-   intro: '<p><b>An XOR gate outputs a&nbsp;1 if its first input is <i>exclusively</i>&nbsp;1 <i>or</i> its second input is <i>exclusively</i>&nbsp;1</b>. Unlike an OR gate, an XOR gate outputs&nbsp;0 if both of its inputs are&nbsp;1.</p>',
+   intro: '<p><b>An XOR gate outputs a 1 if its first input is <i>exclusively</i> 1 <i>or</i> its second input is <i>exclusively</i> 1</b>. Unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p>',
    outro: '<p>There are no "don\'t care" cases for the XOR and XNOR gates.</p>',
    truth: [{a:0, b:0,   z:0, y:1},
            {a:0, b:1,   z:1, y:0},

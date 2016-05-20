@@ -52,7 +52,7 @@ Level.prototype.begin = function(level_num) {
   this.named_cells = {};
   this.all_cells = [];
 
-  this.be.div_info.html(level.intro || "");
+  this.be.div_info.html(this.use_special_chars(level.intro || ""));
 
   var input_names = [];
   var output_names = [];
@@ -387,7 +387,7 @@ Level.prototype.done = function() {
     if (first_failure !== null){
       this.be.sim.delay($.proxy(this.select_row, this, first_failure), 1000);
     } else {
-      var outro = this.level.outro || ""
+      var outro = this.use_special_chars(this.level.outro || "");
       if (this.level_num < this.puzzle.length-1){
         var html = outro + '<button type="button" id="next-level">Next level</button>';
         this.be.div_info.html(html);
@@ -427,4 +427,13 @@ Level.prototype.record_result = function(row, result) {
   } else {
     $(id).html('<path d="M4.5,4.5l24,24m0,-24l-24,24" class="xmark"/>');
   }
+};
+
+Level.prototype.use_special_chars = function(str) {
+  str = str.replace(/'/g, '&rsquo;');
+  str = str.replace(/"(\w)/g, '&ldquo;$1');
+  str = str.replace(/(\w)"/g, '$1&rdquo;');
+  str = str.replace(/"\s/g, '&rdquo; ');
+  str = str.replace(/([\w>])\s(\d)/g, '$1&nbsp;$2');
+  return str;
 };
