@@ -333,6 +333,32 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'OR gate',
+   intro: '<p><b>An OR gate outputs a&nbsp;1 if its first input is&nbsp;1 <i>or</i> its second input is&nbsp;1</b> (or both are&nbsp;1). Otherwise the output of the OR gate is&nbsp;0.</p>',
+   outro: '<p>An OR gate is more precisely described with the legal term "and/or" because its output is&nbsp;1 if its first input is&nbsp;1 <i>and/or</i> its second input is&nbsp;1.</p>',
+   truth: [{a:0, b:0,   z:0},
+           {a:0, b:1,   z:1},
+           {a:1, b:0,   z:1},
+           {a:1, b:1,   z:1}],
+   avail: ["or", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'seven segment decode',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '',
