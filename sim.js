@@ -97,8 +97,8 @@ Sim.prototype.init_slider = function(event) {
   var slider_offset = slider.offset();
   this.slider_left = slider_offset.left;
   this.slider_width = slider.width();
-  this.slider_knob = $("#speed-knob");
-  this.slider_text = $("#speed-text");
+  this.slider_knob = $("#speed-knob")[0];
+  this.slider_text = $("#speed-text")[0];
   this.slider_min_color = Raphael.getRGB("#88d");
   this.slider_max_color = Raphael.getRGB("#6d6");
   slider.mousedown($.proxy(this.be.sim.speed_drag, this));
@@ -130,7 +130,7 @@ Sim.prototype.speed_drag = function(event) {
     this.speed = Math.pow(2, linear);
   }
 
-  this.slider_knob.css({cx: x});
+  this.slider_knob.setAttribute('cx', x);
 
   var f = (x - slider_min) / (slider_max - slider_min);
   var min_color = this.slider_min_color;
@@ -138,5 +138,5 @@ Sim.prototype.speed_drag = function(event) {
   var r = min_color.r + (max_color.r - min_color.r) * f;
   var g = min_color.g + (max_color.g - min_color.g) * f;
   var b = min_color.b + (max_color.b - min_color.b) * f;
-  this.slider_text.css({fill: Raphael.rgb(r, g, b)});
+  this.slider_text.setAttribute('fill', Raphael.rgb(r, g, b));
 };
