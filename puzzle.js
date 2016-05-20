@@ -404,4 +404,76 @@ Level.prototype.puzzle = [
         }
    }
   }
+,
+  {name: 'seven segment encode',
+   intro: '<p><b>Recognize the value on a seven-segment display and encode it as a decimal value&nbsp;(0-9).</b></p>',
+   outro: '',
+   truth:[{t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1,   z3:0, z2:0, z1:0, z0:0},
+          {t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z3:0, z2:0, z1:0, z0:1},
+          {t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1,   z3:0, z2:0, z1:1, z0:0},
+          {t:1, tl:0, tr:1, c:1, bl:0, br:1, b:1,   z3:0, z2:0, z1:1, z0:1},
+          {t:0, tl:1, tr:1, c:1, bl:0, br:1, b:0,   z3:0, z2:1, z1:0, z0:0},
+          {t:1, tl:1, tr:0, c:1, bl:0, br:1, b:1,   z3:0, z2:1, z1:0, z0:1},
+          {t:1, tl:1, tr:0, c:1, bl:1, br:1, b:1,   z3:0, z2:1, z1:1, z0:0},
+          {t:1, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z3:0, z2:1, z1:1, z0:1},
+          {t:1, tl:1, tr:1, c:1, bl:1, br:1, b:1,   z3:1, z2:0, z1:0, z0:0},
+          {t:1, tl:1, tr:1, c:1, bl:0, br:1, b:1,   z3:1, z2:0, z1:0, z0:1}
+         ],
+   cells: {
+     t: {type: 'input',
+         x: 75,
+         y: 0
+        }
+     ,
+     tl: {type: 'input',
+         x: 0,
+         y: 75
+        }
+     ,
+     tr: {type: 'input',
+         x: 150,
+         y: 75
+        }
+     ,
+     c: {type: 'input',
+         x: 75,
+         y: 150
+        }
+     ,
+     bl: {type: 'input',
+         x: 0,
+         y: 225
+        }
+     ,
+     br: {type: 'input',
+         x: 150,
+         y: 225
+        }
+     ,
+     b: {type: 'input',
+         x: 75,
+         y: 300
+        }
+     ,
+     z3: {type: 'output',
+         x: 1000,
+         y: 0
+        }
+     ,
+     z2: {type: 'output',
+         x: 1000,
+         y: 100
+        }
+     ,
+     z1: {type: 'output',
+         x: 1000,
+         y: 200
+        }
+     ,
+     z0: {type: 'output',
+         x: 1000,
+         y: 300
+        }
+   }
+  }
 ];
