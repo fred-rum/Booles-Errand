@@ -385,7 +385,7 @@ Level.prototype.done = function() {
     }
 
     if (first_failure !== null){
-      this.be.sim.delay($.proxy(this.select_row, this, first_failure), 1000);
+      this.be.sim.pass_row($.proxy(this.select_row, this, first_failure));
     } else {
       var outro = this.use_special_chars(this.level.outro || "");
       if (this.level_num < this.puzzle.length-1){

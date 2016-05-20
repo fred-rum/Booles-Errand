@@ -21,7 +21,35 @@ function Sim(be) {
   this.old_events = [];
   this.new_events = [];
   this.running = false;
+
+  $(document).keydown($.proxy(this.keydown, this));
+
+  $("#button-play").click($.proxy(this.click_play, this));
+  $("#button-pause").click($.proxy(this.click_pause, this));
+
+  this.pause_at = 'done';
+  this.set_pause_at_color(this.pause_at, true);
+  $("#pause-at-gate").click($.proxy(this.click_pause_at, this, 'gate'));
+  $("#pause-at-flop").click($.proxy(this.click_pause_at, this, 'flop'));
+  $("#pause-at-pass").click($.proxy(this.click_pause_at, this, 'pass'));
+  $("#pause-at-done").click($.proxy(this.click_pause_at, this, 'done'));
+
+  this.speed = 1.0;
+  var slider = $("#speed-slider");
+  this.slider_knob = $("#speed-knob")[0];
+  this.slider_text = $("#speed-text")[0];
+  this.slider_min_color = Raphael.getRGB("#88d");
+  this.slider_max_color = Raphael.getRGB("#6d6");
+  slider.mousedown($.proxy(this.speed_drag, this));
+  slider.mousemove($.proxy(this.speed_drag, this));
 }
+
+Sim.prototype.resize_slider = function () {
+  var slider = $("#speed-slider");
+  var slider_offset = slider.offset();
+  this.slider_left = slider_offset.left;
+  this.slider_width = slider.width();
+};
 
 Sim.prototype.click_play = function () {
   $("#button-play").hide();
@@ -77,9 +105,12 @@ Sim.prototype.reset = function() {
   this.new_events = [];
 };
 
-Sim.prototype.delay = function(func, milliseconds) {
-  if (this.speed == Infinity) milliseconds = 0;
-  this.timer = setTimeout(func, milliseconds);
+Sim.prototype.pass_row = function(func) {
+  if (this.pause_at == 'done'){
+    this.timer = setTimeout(func, 1000/this.speed);
+  } else {
+    this.click_pause();
+  }
 };
 
 Sim.prototype.keydown = function(event) {
@@ -90,20 +121,6 @@ Sim.prototype.keydown = function(event) {
     this.be.circuit.fit_view();
     this.be.circuit.update_view();
   }
-};
-
-Sim.prototype.init_slider = function(event) {
-  this.speed = 1.0;
-  var slider = $("#speed-slider");
-  var slider_offset = slider.offset();
-  this.slider_left = slider_offset.left;
-  this.slider_width = slider.width();
-  this.slider_knob = $("#speed-knob")[0];
-  this.slider_text = $("#speed-text")[0];
-  this.slider_min_color = Raphael.getRGB("#88d");
-  this.slider_max_color = Raphael.getRGB("#6d6");
-  slider.mousedown($.proxy(this.be.sim.speed_drag, this));
-  slider.mousemove($.proxy(this.be.sim.speed_drag, this));
 };
 
 Sim.prototype.speed_drag = function(event) {
@@ -141,3 +158,14 @@ Sim.prototype.speed_drag = function(event) {
   var b = min_color.b + (max_color.b - min_color.b) * f;
   this.slider_text.setAttribute('fill', Raphael.rgb(r, g, b));
 };
+
+Sim.prototype.click_pause_at = function(type) {
+  this.set_pause_at_color(this.pause_at, false);
+  this.pause_at = type;
+  this.set_pause_at_color(this.pause_at, true);
+};
+
+Sim.prototype.set_pause_at_color = function(type, enabled) {
+  var color = enabled ? '#f0d0d0' : 'none'
+  $("#pause-at-" + type)[0].setAttribute('fill', color);
+}

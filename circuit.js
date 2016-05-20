@@ -102,10 +102,6 @@ function Circuit() {
 
   this.be.level = new Level(this.be);
   this.begin_level();
-
-  $("#button-play").click($.proxy(this.be.sim.click_play, this.be.sim));
-  $("#button-pause").click($.proxy(this.be.sim.click_pause, this.be.sim));
-  $(document).keydown($.proxy(this.be.sim.keydown, this.be.sim));
 }
 
 Circuit.prototype.begin_level = function(level_num) {
@@ -113,7 +109,6 @@ Circuit.prototype.begin_level = function(level_num) {
   this.resize(true);
   this.fit_view();
   this.update_view();
-  this.be.sim.init_slider();
 };
 
 Circuit.prototype.resize_event = function() {
@@ -228,6 +223,8 @@ Circuit.prototype.resize = function(center) {
     this.cdraw_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.cdraw_height);
   }
+
+  this.be.sim.resize_slider();
 };
 
 Circuit.prototype.fit_view = function() {
