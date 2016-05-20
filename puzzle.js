@@ -385,6 +385,37 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'XOR and XNOR gates',
+   intro: '<p><b>An XOR gate outputs a&nbsp;1 if its first input is <i>exclusively</i>&nbsp;1 <i>or</i> its second input is <i>exclusively</i>&nbsp;1</b>. Unlike an OR gate, an XOR gate outputs&nbsp;0 if both of its inputs are&nbsp;1.</p>',
+   outro: '<p>There are no "don\'t care" cases for the XOR and XNOR gates.</p>',
+   truth: [{a:0, b:0,   z:0, y:1},
+           {a:0, b:1,   z:1, y:0},
+           {a:1, b:0,   z:1, y:0},
+           {a:1, b:1,   z:0, y:1}],
+   avail: ["xor", 1, "xnor", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+     ,
+     y: {type: 'output',
+         x: 400,
+         y: 200
+        }
+   }
+  }
+,
   {name: 'seven segment decode',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '',
