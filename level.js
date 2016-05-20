@@ -387,6 +387,8 @@ Level.prototype.done = function() {
     if (first_failure !== null){
       this.be.sim.pass_row($.proxy(this.select_row, this, first_failure));
     } else {
+      this.be.sim.pass_all();
+
       var outro = this.use_special_chars(this.level.outro || "");
       if (this.level_num < this.puzzle.length-1){
         var html = outro + '<button type="button" id="next-level">Next level</button>';

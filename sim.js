@@ -113,6 +113,10 @@ Sim.prototype.pass_row = function(func) {
   }
 };
 
+Sim.prototype.pass_all = function() {
+  this.click_pause();
+};
+
 Sim.prototype.keydown = function(event) {
   var key = String.fromCharCode(event.which);
   var bucky = event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
