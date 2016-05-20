@@ -141,14 +141,18 @@ Level.prototype.table_header = function(html, port_names) {
 
 Level.prototype.table_row = function(html, port_names, truth_row) {
   for (var i = 0; i < port_names.length; i++){
-    if (typeof truth_row[port_names[i]] == "number"){
+    if (!Array.isArray(truth_row[port_names[i]])){
       // A non-sequencing table row can be specified without the array,
       // but we force it into array format here.
       truth_row[port_names[i]] = [truth_row[port_names[i]]];
     }
     html.push('<td');
     this.push_padding(html, i, port_names.length);
-    html.push('>', truth_row[port_names[i]][0], '</td>');
+    if (truth_row[port_names[i]][0] === undefined){
+      html.push('></td>');
+    } else {
+      html.push('>', truth_row[port_names[i]][0], '</td>');
+    }
   }
 };
 

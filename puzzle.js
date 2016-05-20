@@ -2,6 +2,7 @@
 
 "use strict";
 
+var x = undefined;
 Level.prototype.puzzle = [
   {name: 'press play',
    intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the supply pin "A" to the test pin "Z". &#9733</p>',
@@ -341,6 +342,31 @@ Level.prototype.puzzle = [
            {a:1, b:0,   z:1},
            {a:1, b:1,   z:1}],
    avail: ["or", 1],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'NOR gate',
+   intro: '<p><b>A NOR gate outputs the opposite value as an OR gate.</b></p><p>In this puzzle we introduce the concept of a "don\'t care" value.  If A is&nbsp;1, we know that the output of the NOR gate must always be&nbsp;0, so we <i>don\'t care</i> what B is.  Likewise, we <i>don\'t care</i> what A is when B is&nbsp;1.</p>',
+   outro: '<p>This circuit simulator uses a black color to represent a value that is unknown, which includes "don\'t care" values.  If a logic gate has an unknown input, a logic gate may output a known or unknown value depending on its input(s) and its logic function.</p>',
+   truth: [{a:0, b:0,   z:1},
+           {a:x, b:1,   z:0},
+           {a:1, b:x,   z:0}],
+   avail: ["nor", 1],
    cells: {
      a: {type: 'input',
          x: 100,
