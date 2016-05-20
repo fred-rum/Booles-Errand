@@ -113,6 +113,7 @@ Circuit.prototype.begin_level = function(level_num) {
   this.resize(true);
   this.fit_view();
   this.update_view();
+  this.be.sim.init_slider();
 };
 
 Circuit.prototype.resize_event = function() {

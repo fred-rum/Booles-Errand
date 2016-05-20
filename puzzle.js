@@ -63,7 +63,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'NOT gate',
-   intro: '<p><b>A NOT gate changes a&nbsp;0 to&nbsp;1, or changes a&nbsp;1 to a&nbsp;0.</b>  In other words, the output of a NOT gate is&nbsp;1 only if the input is <i>NOT</i> 1.</p>',
+   intro: '<p><b>A NOT gate changes a&nbsp;0 to&nbsp;1, or changes a&nbsp;1 to a&nbsp;0.</b>  In other words, the output of a NOT gate is&nbsp;1 only if the input is <i>not</i> 1.</p>',
    outro: '<p>A NOT gate is also often called an inverter.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
@@ -103,6 +103,86 @@ Level.prototype.puzzle = [
      z: {type: 'output',
          x: 400,
          y: 100
+        }
+   }
+  }
+,
+  {name: 'setting speed',
+   intro: '<p><b>Let\'s take a short break to play with new features.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when the the truth table row has been tested, or when all truth table rows have passed.</p><p>The "speed" slider adjusts the speed of data flow from "slow" to "instantaneous".</p><p>Click a row of the truth table to select that row and reset simulation with its values.</p>',
+   outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when the the truth table row has been tested, or when all truth table rows have passed.</p><p>The "speed" slider adjusts the speed of data flow from "slow" to "instantaneous".</p><p>Click a row of the truth table to select that row and reset simulation with its values.</p><p><b>What happens if you connect the inverters in a loop while data is flowing through them?</b></p>',
+   truth: [{a: [0], z: [0]},
+           {a: [1], z: [1]}],
+   avail: ['inv'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100,
+         io: [['o', 'ia', 'i']]
+        }
+     ,
+     ia: {type: 'inv',
+         x: 600,
+         y: 100,
+         io: [['o', 'i0', 'i']]
+        }
+     ,
+     i0: {type: 'inv',
+         x: 100,
+         y: 200,
+         io: [['o', 'i1', 'i']]
+        }
+     ,
+     i1: {type: 'inv',
+         x: 600,
+         y: 200,
+         io: [['o', 'i2', 'i']]
+        }
+     ,
+     i2: {type: 'inv',
+         x: 100,
+         y: 300,
+         io: [['o', 'i3', 'i']]
+        }
+     ,
+     i3: {type: 'inv',
+         x: 600,
+         y: 300,
+         io: [['o', 'i4', 'i']]
+        }
+     ,
+     i4: {type: 'inv',
+         x: 100,
+         y: 400,
+         io: [['o', 'i5', 'i']]
+        }
+     ,
+     i5: {type: 'inv',
+         x: 600,
+         y: 400,
+         io: [['o', 'i6', 'i']]
+        }
+     ,
+     i6: {type: 'inv',
+         x: 100,
+         y: 500,
+         io: [['o', 'i7', 'i']]
+        }
+     ,
+     i7: {type: 'inv',
+         x: 600,
+         y: 500,
+         io: [['o', 'i8', 'i']]
+        }
+     ,
+     i8: {type: 'inv',
+         x: 100,
+         y: 600,
+         io: [['o', 'z', 'i']]
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 600
         }
    }
   }
@@ -157,7 +237,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'AND gate',
-   intro: '<p><b>An AND gate outputs a&nbsp;1 only if its first input is&nbsp;1 <i>AND</i> its second input is&nbsp;1.</b> Otherwise the output of the AND gate is&nbsp;0.</p>',
+   intro: '<p><b>An AND gate outputs a&nbsp;1 only if its first input is&nbsp;1 <i>and</i> its second input is&nbsp;1.</b> Otherwise the output of the AND gate is&nbsp;0.</p>',
    outro: '<p><b>Make sure you clearly understand the relationship of the AND gate\'s output with its inputs</b>, as displayed in the truth table.  You will soon learn five other simple logic gates, each of which perform a different logic function.</p>',
    truth: [{a:0, b:0,   z:0},
            {a:0, b:1,   z:0},

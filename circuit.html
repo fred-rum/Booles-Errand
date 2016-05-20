@@ -33,12 +33,17 @@
 	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="pauseborder" />
 	<path d="M40,26v48M60,26v48" class="pausecenter" />
       </g>
-    </svg><svg id="button-ff" width="2em" height="2em" viewBox="0 0 100 100" style="display: none">
-      <g>
-	<rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder" />
-	<path d="M27,25v50l30,-25z" class="playcenter" />
-	<path d="M47,25v50l30,-25z" class="playcenter" />
-      </g>
+    </svg><svg id="speed-slider" width="3.5em" height="2em" viewBox="0 0 350 200" cursor="pointer">
+      <defs>
+	<linearGradient id="slidergrad">
+	  <stop offset="3%" stop-color="#88d"/>
+	  <stop offset="77%" stop-color="#6d6"/>
+	</linearGradient>
+      </defs>
+      <text id="speed-text" x="175" y="85" text-anchor="middle" font-family="Verdana" font-size="60"; fill="#7ca6b3">Speed</text>
+      <path d="M20,140H330m-30,-30l30,30l-30,30" stroke="url(#slidergrad)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M110,130v20M260,130v20" stroke="#222" stroke-width="4" stroke-linecap="butt" fill="none" opacity="0.5"/>
+      <circle id="speed-knob" cx="110" cy="140" r="30" stroke-width="0" fill="#888"/>
     </svg>
   </div>
   <div id="info">

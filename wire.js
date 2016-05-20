@@ -147,7 +147,7 @@ Wire.prototype.reset = function() {
   this.redraw_fg();
 };
 
-Wire.prototype.tick = function() {
+Wire.prototype.tick = function(speed) {
   // The wire could have been removed while we waited for the tick.
   // We still get the tick, but we don't do anything with it, and
   // we don't trigger any more ticks.
@@ -175,7 +175,7 @@ Wire.prototype.tick = function() {
 
   for (var i = 0; i < this.in_flight.length; i++){
     var fl_obj = this.in_flight[i];
-    fl_obj.age += this.be.wire_speed / this.path_length;
+    fl_obj.age += this.be.wire_speed * speed / this.path_length;
     if (fl_obj.age >= 1.0){
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
       this.i.update_value(fl_obj.value);

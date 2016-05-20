@@ -64,7 +64,7 @@ Sim.prototype.tick = function() {
   this.old_events = this.new_events;
   this.new_events = [];
   for (var i = 0; i < this.old_events.length; i++) {
-    this.old_events[i].tick();
+    this.old_events[i].tick(this.speed);
   }
   if (!this.new_events.length) {
     this.pause();
@@ -89,4 +89,54 @@ Sim.prototype.keydown = function(event) {
     this.be.circuit.fit_view();
     this.be.circuit.update_view();
   }
+};
+
+Sim.prototype.init_slider = function(event) {
+  this.speed = 1.0;
+  var slider = $("#speed-slider");
+  var slider_offset = slider.offset();
+  this.slider_left = slider_offset.left;
+  this.slider_width = slider.width();
+  this.slider_knob = $("#speed-knob");
+  this.slider_text = $("#speed-text");
+  this.slider_min_color = Raphael.getRGB("#88d");
+  this.slider_max_color = Raphael.getRGB("#6d6");
+  slider.mousedown($.proxy(this.be.sim.speed_drag, this));
+  slider.mousemove($.proxy(this.be.sim.speed_drag, this));
+};
+
+Sim.prototype.speed_drag = function(event) {
+  if (!event.buttons) return;
+
+  var x = (event.pageX - this.slider_left) * 350/this.slider_width;
+  var slider_min = 30;
+  var slider_default = 110;
+  var slider_max = 260;
+
+  if (x >= slider_max){
+    x = slider_max;
+    this.speed = Infinity;
+  } else if (x > slider_default+15){
+    // linear ranges from 0.0 at slider_default to 4.0 at slider_max.
+    var linear = 4.0 * (x - slider_default) / (slider_max - slider_default);
+    this.speed = Math.pow(2, linear);
+  } else if (x > slider_default-15){
+    x = slider_default;
+    this.speed = 1.0;
+  } else {
+    if (x < slider_min) x = slider_min;
+    // linear ranges from -2.0 at slider_min to 0.0 at slider_default.
+    var linear = -2.0 + 2.0 * (x - slider_min) / (slider_default - slider_min);
+    this.speed = Math.pow(2, linear);
+  }
+
+  this.slider_knob.css({cx: x});
+
+  var f = (x - slider_min) / (slider_max - slider_min);
+  var min_color = this.slider_min_color;
+  var max_color = this.slider_max_color;
+  var r = min_color.r + (max_color.r - min_color.r) * f;
+  var g = min_color.g + (max_color.g - min_color.g) * f;
+  var b = min_color.b + (max_color.b - min_color.b) * f;
+  this.slider_text.css({fill: Raphael.rgb(r, g, b)});
 };
