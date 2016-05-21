@@ -52,7 +52,8 @@ Level.prototype.begin = function(level_num) {
   this.named_cells = {};
   this.all_cells = [];
 
-  this.be.div_info.html(this.use_special_chars(level.intro || ""));
+  this.be.div_info.html(level.intro || "");
+  smartquotes(this.be.div_info[0]);
 
   var input_names = [];
   var output_names = [];
@@ -417,7 +418,7 @@ Level.prototype.done = function(fresh_play) {
     } else {
       this.be.sim.pass_all();
 
-      var outro = this.use_special_chars(this.level.outro || "");
+      var outro = this.level.outro || "";
       if (this.level_num < this.puzzle.length-1){
         var html = outro + '<button type="button" id="next-level">Next level</button>';
         this.be.div_info.html(html);
@@ -427,6 +428,7 @@ Level.prototype.done = function(fresh_play) {
         var html = outro + '<p>That\'s all the puzzles!</p>';
         this.be.div_info.html(html);
       }
+      smartquotes(this.be.div_info[0]);
       this.be.circuit.resize(false);
       this.be.circuit.update_view();
     }
@@ -461,10 +463,12 @@ Level.prototype.record_result = function(row, result) {
 };
 
 Level.prototype.use_special_chars = function(str) {
+/*
   str = str.replace(/'/g, '&rsquo;');
   str = str.replace(/"(\w)/g, '&ldquo;$1');
   str = str.replace(/(\w)"/g, '$1&rdquo;');
   str = str.replace(/"\s/g, '&rdquo; ');
   str = str.replace(/([\w>])\s(\d)/g, '$1&nbsp;$2');
+*/
   return str;
 };
