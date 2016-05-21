@@ -53,11 +53,7 @@ function Wire(be, io1, io2, pending_new) {
   this.newest_value = null;
   this.in_flight = [];
 
-  if (this.o.value !== undefined){
-    this.update_value();
-  }
-
-  //    this.measure_perf("not segmented");
+  // this.measure_perf("not segmented");
 }
 
 
@@ -89,19 +85,19 @@ Wire.prototype.measure_perf = function(name) {
   return n1-n0;
 };
 
-Wire.prototype.remove = function() {
+Wire.prototype.remove = function(removed_by_input_port) {
   this.o.disconnect(this);
   this.i.disconnect(this);
   this.el_fg.remove();
   this.el_bg.remove();
   this.remove_subpaths();
 
-  if (!this.pending_new){
+  if (!this.pending_new && !removed_by_input_port){
     // Update the attached cell input with the fact that it's
     // disconnected.  If that changes the value, then the circuit has
     // changed in a fundamental way, and the check results must be
     // updated accordingly.
-    this.i.update_value(undefined);
+    this.i.propagate_input(undefined);
     this.be.level.circuit_changed();
   }
 
@@ -123,23 +119,28 @@ Wire.prototype.restore_old = function() {
   this.redraw_fg();
 }
 
-Wire.prototype.update_value = function() {
+Wire.prototype.propagate_value = function() {
   // Don't propagate values across pending (uncommitted) new wires.
   // This also prevents propagating to the null cell.
   if (this.pending_new) return;
 
-  var value = this.o.value;
+  // The output IO is guaranteed to propagate no more than one value
+  // per tick, so that simplifies some things.
+  this.newest_value = this.o.value;
 
-  // If any values are in flight, the wire is already registered
-  // to receive the next tick, so don't duplicate the registration.
-  if ((!this.in_flight.length) && (this.newest_value === null)) {
-    this.be.sim.register_wire(this);
+  // The output IO always propagates its value first in the tick,
+  // before any wires have updated.  If any values are in flight, then
+  // the wire must already be registered to receive an update in this
+  // tick.  We avoid duplicating the registration, and we mark the
+  // newest value as unusable in this tick.
+  if (this.in_flight.length){
+    this.wait_on_newest = true;
+  } else {
+    // This wire isn't registered yet, so we register it in order to
+    // propagate the new value.
+    this.wait_on_newest = false;
+    this.be.sim.register_obj(this, false);
   }
-
-  // A cell should only produce one value per tick, but if the user
-  // moves the wire around, it could connect multiple values within
-  // the same tick.  If so, overwrite the last received value.
-  this.newest_value = value;
 };
 
 Wire.prototype.reset = function() {
@@ -177,12 +178,18 @@ Wire.prototype.tick = function(speed) {
 
   for (var i = 0; i < this.in_flight.length; i++){
     var fl_obj = this.in_flight[i];
-    fl_obj.age += this.be.wire_speed * speed / this.path_length;
-    if (fl_obj.age >= 1.0){
-      if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
-      this.i.update_value(fl_obj.value);
-      this.in_flight = this.in_flight.slice(1);
-      i--;
+    if ((fl_obj.age == 0) && this.wait_on_newest){
+      // We just got this value, and it shouldn't advance in this
+      // tick, but it can advance in the next tick.
+      this.wait_on_newest = false;
+    } else {
+      fl_obj.age += this.be.wire_speed * speed / this.path_length;
+      if (fl_obj.age >= 1.0){
+        if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
+        this.i.propagate_input(fl_obj.value);
+        this.in_flight.splice(0, 1); // remove the first (oldest)
+        i--;
+      }
     }
   }
 
@@ -190,7 +197,9 @@ Wire.prototype.tick = function(speed) {
   //this.measure_perf("segmented");
 
   if (this.in_flight.length){
-    this.be.sim.register_wire(this);
+    // There is still data in flight, so register the wire to tick
+    // again.
+    this.be.sim.register_obj(this, false);
   }
 };
 
@@ -451,33 +460,48 @@ Wire.prototype.compute = function() {
 };
 
 Wire.prototype.redraw_fg = function() {
+  if (this.pending_del == "del"){
+    var attr = {
+      path: path,
+      stroke: "#e88", // red
+      "stroke-dasharray": "-",
+      opacity: "1.0"
+    };
+    this.el_fg.attr(attr);
+    return;
+  }
+
   var older_value = this.i.value;
   var older_el_subpath = this.el_fg;
   var older_age_len = this.path_length;
 
-  if (this.pending_del != "del"){ // no sub-paths when "del"
-    for (var i = 0; i < this.in_flight.length; i++){
-      var fl_obj = this.in_flight[i];
-      var age_len = fl_obj.age * this.path_length;
-      var path = this.get_subpath(age_len, older_age_len);
-      older_el_subpath.attr({path: path,
-                             stroke: Wire.color(older_value)});
+  for (var i = 0; i < this.in_flight.length; i++){
+    var fl_obj = this.in_flight[i];
+    var age_len = fl_obj.age * this.path_length;
+    var path = this.get_subpath(age_len, older_age_len);
+    older_el_subpath.attr({path: path,
+                           stroke: Wire.color(older_value)});
 
-      if (!fl_obj.el_subpath){
-        // Draw a path placeholder of the appropriate color.
-        // The actual path will be inserted at the next loop
-        // iteration or the end of the loop.
-        var attr = {
-          "stroke-width": this.be.stroke_wire_fg
-        };
-        fl_obj.el_subpath = this.be.cdraw.path("M0,0").attr(attr);
-        fl_obj.el_subpath.insertAfter(older_el_subpath);
-      }
-
-      older_value = fl_obj.value;
-      older_el_subpath = fl_obj.el_subpath;
-      older_age_len = age_len;
+    if (!fl_obj.el_subpath){
+      // Draw a path placeholder of the appropriate color.
+      // The actual path will be inserted at the next loop
+      // iteration or the end of the loop.
+      var attr = {
+        "stroke-width": this.be.stroke_wire_fg
+      };
+      fl_obj.el_subpath = this.be.cdraw.path("M0,0").attr(attr);
+      fl_obj.el_subpath.insertAfter(older_el_subpath);
     }
+
+    older_value = fl_obj.value;
+    older_el_subpath = fl_obj.el_subpath;
+    older_age_len = age_len;
+  }
+
+  if (older_age_len == 0){
+    // The newest value in flight has age 0, so there's no point in
+    // drawing the last (0-length) subpath.
+    return;
   }
 
   var path;
@@ -487,22 +511,12 @@ Wire.prototype.redraw_fg = function() {
   } else {
     path = this.get_subpath(0, older_age_len);
   }
-  var attr;
-  if (this.pending_del == "del"){
-    attr = {
-      path: path,
-      stroke: "#e88", // red
-      "stroke-dasharray": "-",
-      opacity: "1.0"
-    };
-  } else {
-    attr = {
-      path: path,
-      stroke: Wire.color(older_value),
-      "stroke-dasharray": "",
-      opacity: (this.pending_del == "null") ? "0.4" : "1.0"
-    };
-  }
+  var attr = {
+    path: path,
+    stroke: Wire.color(older_value),
+    "stroke-dasharray": "",
+    opacity: (this.pending_del == "null") ? "0.4" : "1.0"
+  };
   older_el_subpath.attr(attr);
 };
 

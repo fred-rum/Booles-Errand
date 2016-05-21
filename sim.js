@@ -4,10 +4,10 @@
 
 function Sim(be) {
   this.be = be;
-  this.old_gate_events = [];
-  this.old_wire_events = [];
-  this.new_gate_events = [];
-  this.new_wire_events = [];
+  this.old_output_events = [];
+  this.old_other_events = [];
+  this.new_output_events = [];
+  this.new_other_events = [];
   this.running = false;
 
   $(document).keydown($.proxy(this.keydown, this));
@@ -44,7 +44,7 @@ Sim.prototype.click_play = function () {
   $("#button-pause").show();
   this.running = true;
   this.start();
-  if (!this.new_wire_events.length && !this.new_gate_events.length){
+  if (!this.new_other_events.length && !this.new_output_events.length){
     this.be.level.done(true);
   }
 };
@@ -75,13 +75,12 @@ Sim.prototype.pause = function() {
   }
 };
 
-Sim.prototype.register_cell = function(obj) {
-  this.new_gate_events.push(obj);
-  this.start();
-};
-
-Sim.prototype.register_wire = function(obj) {
-  this.new_wire_events.push(obj);
+Sim.prototype.register_obj = function(obj, fresh_cell_output) {
+  if (fresh_cell_output){
+    this.new_output_events.push(obj);
+  } else {
+    this.new_other_events.push(obj);
+  }
   this.start();
 };
 
@@ -89,38 +88,40 @@ Sim.prototype.tick = function() {
   // Simulate through a gate if we don't pause at gates *or* if there
   // are no wire events to process.  (The latter implies that we
   // paused at a gate boundary, but were then restarted.)
-  if ((this.pause_at != 'gate') || !this.new_wire_events.length){
-    this.old_gate_events = this.new_gate_events;
-    this.new_gate_events = [];
+  if ((this.pause_at != 'gate') || !this.new_other_events.length){
+    this.old_output_events = this.new_output_events;
+    this.new_output_events = [];
   } else {
-    this.old_gate_events = [];
+    this.old_output_events = [];
   }
-  this.old_wire_events = this.new_wire_events;
-  this.new_wire_events = [];
+  this.old_other_events = this.new_other_events;
+  this.new_other_events = [];
 
-  for (var i = 0; i < this.old_gate_events.length; i++) {
-    this.old_gate_events[i].tick(this.speed);
+  for (var i = 0; i < this.old_output_events.length; i++) {
+    this.old_output_events[i].tick(this.speed);
   }
-  for (var i = 0; i < this.old_wire_events.length; i++) {
-    this.old_wire_events[i].tick(this.speed);
+  for (var i = 0; i < this.old_other_events.length; i++) {
+    this.old_other_events[i].tick(this.speed);
   }
 
-  if (!this.new_wire_events.length && !this.new_gate_events.length){
+  if (!this.new_other_events.length && !this.new_output_events.length){
     this.pause();
     this.be.level.done(false);
-  } else if ((this.pause_at == 'gate') && !this.new_wire_events.length){
+  } else if ((this.pause_at == 'gate') && !this.new_other_events.length){
     this.click_pause();
   }
 };
 
 Sim.prototype.reset = function() {
   this.pause();
-  this.new_gate_events = [];
-  this.new_wire_events = [];
+  this.new_output_events = [];
+  this.new_other_events = [];
 };
 
 Sim.prototype.pass_row = function(next_row, fresh_play) {
-  if ((this.pause_at == 'done') || fresh_play){
+  if (fresh_play){
+    this.be.level.select_row(next_row);
+  } else if (this.pause_at == 'done') {
     var func = $.proxy(this.pass_delay_complete, this, next_row);
     this.delay_timer = setTimeout(func, 1000/this.speed);
   } else {

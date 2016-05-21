@@ -21,6 +21,8 @@ function Io(be, canvas, cell, name, type, x, y) {
   // event handling.
   if (type == "null") return;
 
+  this.has_new_value = false;
+
   this.path = ["M", x, y,
                "H", 0]; // draw horizontally to the cell's center
 
@@ -126,7 +128,7 @@ Io.prototype.disconnect = function(wire) {
 
 Io.prototype.remove = function() {
   while (this.w.length) {
-    this.w[0].remove();
+    this.w[0].remove(this.type == 'input');
   }
 
   // The Raphael source code appears to automatically remove event handlers
@@ -196,7 +198,7 @@ Io.prototype.color_stub = function(value) {
   this.el_stub_end.attr(attr);
 };
 
-Io.prototype.update_value = function(value, reset) {
+Io.prototype.update_value = function(value) {
   this.value = value;
 
   this.color_stub(value);
@@ -235,19 +237,58 @@ Io.prototype.update_value = function(value, reset) {
     attr_bg.fill = "#aaf";
   }
   this.el_value_text_bg.attr(attr_bg);
+};
 
-  if (reset){
-    if (this.type == "input"){
-      for (var i = 0; i < this.w.length; i++) {
-        this.w[i].reset();
-      }
-    }
-  } else if (this.type == "output"){
+Io.prototype.reset = function() {
+  this.update_value(undefined);
+  this.has_new_value = false;
+
+  // We know that all wires (that can potentially propagate values)
+  // are connected to cells on both ends, so we only need to reset
+  // wires in one consistent direction from each cell.
+  if (this.type == "input"){
     for (var i = 0; i < this.w.length; i++) {
-      this.w[i].update_value();
+      this.w[i].reset();
     }
-  } else { // input
-    this.cell.update_value();
+  }
+};
+
+Io.prototype.propagate_input = function(value) {
+  this.update_value(value);
+  this.cell.propagate_value();
+};
+
+Io.prototype.propagate_output = function(value) {
+  // Don't propagate the newest value if it is the same as the most
+  // recent value in flight.
+  if (value === this.value) return;
+
+  this.update_value(value);
+  this.register_output();
+};
+
+// register_ouput() is separated from propagate_output() because it
+// can also be called when there is no new IO output, but there is a
+// newly connected wire that we want to start propagating on.
+Io.prototype.register_output = function() {
+  // register_output() may be called multiple times in a tick
+  // (e.g. due to changing cell inputs, or because more wires are
+  // connected while simulation is paused).  Register the output to
+  // tick only once.
+  if (this.has_new_value) return;
+
+  this.be.sim.register_obj(this, true);
+  this.has_new_value = true;
+};
+
+Io.prototype.tick = function(speed) {
+  // tick() is called for output ports first in a tick, and the value
+  // is only propagated to the beginning of the next wire in this
+  // tick.  Thus, we know that ticking one output port cannot corrupt
+  // the pending value to be propagated on any other output port.
+  this.has_new_value = false;
+  for (var i = 0; i < this.w.length; i++) {
+    this.w[i].propagate_value();
   }
 };
 

@@ -52,7 +52,10 @@ Drag.prototype.commit_new_wires = function() {
     for (var i = 0; i < this.new_wires.length; i++){
       this.new_wires[i].el_bg.attr(attr);
       this.new_wires[i].pending_new = false;
-      this.new_wires[i].update_value();
+
+      // We want the newly connected output port to trigger on the
+      // next tick in order to propagate its value to the wire.
+      this.new_wires[i].o.register_output();
     }
     this.new_wires = [];
   }

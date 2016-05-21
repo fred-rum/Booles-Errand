@@ -15,7 +15,6 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   this.x = x;
   this.y = y;
   this.io = {};
-  this.newest_value = null;
   this.pending_del = false;
 
   this.cell_fg_attr = {
@@ -60,10 +59,6 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
 
   if (this.canvas_type != "cdrag"){
     this.bbox = this.el_ns.getBBox(true);
-  }
-
-  if (this.canvas == this.be.cdraw){
-    this.update_value();
   }
 
   // Make a separate xform set that includes the IO elements so that they
@@ -153,44 +148,17 @@ Cell.prototype.update_quantity = function(n) {
   this.quantity = n;
 };
 
-Cell.prototype.update_value = function() {
+Cell.prototype.propagate_value = function() {
   var calc_func_name = "calc_" + this.type;
   if (!this[calc_func_name]) return;
   var value = this[calc_func_name]();
-
-  // Don't propagate the value if it is the same as the value at
-  // the cell's output.  (Eventually this should look at
-  // the newest progating value in the cell, once that's supported.)
-  if ((!this.io.o) || (value === this.io.o.value)) return;
-
-  // Due to changing inputs, a cell may calculate more than one new
-  // value per tick.  If that happens, record the last value, but don't
-  // re-register the cell for ticking.
-  if (this.newest_value === null) {
-    this.be.sim.register_cell(this);
-  }
-  this.newest_value = value;
+  if (this.io.o) this.io.o.propagate_output(value);
 };
 
 Cell.prototype.reset = function() {
-  this.newest_value = null;
   for (var port_name in this.io){
-    this.io[port_name].update_value(undefined, true);
+    this.io[port_name].reset();
   }
-  if (this.type == "output"){
-    // Ensure that only a question mark is visible next to the text pin.
-    this.calc_output();
-  }
-}
-
-Cell.prototype.tick = function() {
-  // The cell could have been removed while we waited for the tick.
-  // We still get the tick, but we don't do anything with it, and
-  // we don't trigger any more ticks.
-  if (!this.io) return;
-
-  this.io.o.update_value(this.newest_value);
-  this.newest_value = null;
 }
 
 

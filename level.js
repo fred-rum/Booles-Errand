@@ -178,12 +178,17 @@ Level.prototype.select_row = function(row) {
   $("#row" + this.truth_row).css({"background-color": "#ff8"});
   this.reset_sim();
   for (var i = 0; i < this.input_names.length; i++){
+    // We want the value to appear right away on the IO stub, so we
+    // push it all the way through to the input pin's output port.
+    // This also registers the value for propagation on the next wire
+    // (if any).
     var cell = this.named_cells[this.input_names[i]];
-    cell.update_value();
+    cell.propagate_value();
     cell.fit_input_text();
   }
   for (var i = 0; i < this.output_names.length; i++){
     var cell = this.named_cells[this.output_names[i]];
+    cell.calc_output();
     cell.fit_output_text();
   }
 };
