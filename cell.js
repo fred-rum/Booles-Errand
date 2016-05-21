@@ -167,7 +167,7 @@ Cell.prototype.update_value = function() {
   // value per tick.  If that happens, record the last value, but don't
   // re-register the cell for ticking.
   if (this.newest_value === null) {
-    this.be.sim.register_obj(this);
+    this.be.sim.register_cell(this);
   }
   this.newest_value = value;
 };

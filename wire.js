@@ -53,7 +53,9 @@ function Wire(be, io1, io2, pending_new) {
   this.newest_value = null;
   this.in_flight = [];
 
-  this.update_value();
+  if (this.o.value !== undefined){
+    this.update_value();
+  }
 
   //    this.measure_perf("not segmented");
 }
@@ -131,7 +133,7 @@ Wire.prototype.update_value = function() {
   // If any values are in flight, the wire is already registered
   // to receive the next tick, so don't duplicate the registration.
   if ((!this.in_flight.length) && (this.newest_value === null)) {
-    this.be.sim.register_obj(this);
+    this.be.sim.register_wire(this);
   }
 
   // A cell should only produce one value per tick, but if the user
@@ -188,7 +190,7 @@ Wire.prototype.tick = function(speed) {
   //this.measure_perf("segmented");
 
   if (this.in_flight.length){
-    this.be.sim.register_obj(this);
+    this.be.sim.register_wire(this);
   }
 };
 

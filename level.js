@@ -385,7 +385,7 @@ Level.prototype.done = function() {
     }
 
     if (first_failure !== null){
-      this.be.sim.pass_row($.proxy(this.select_row, this, first_failure));
+      this.be.sim.pass_row(first_failure);
     } else {
       this.be.sim.pass_all();
 

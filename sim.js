@@ -2,24 +2,12 @@
 
 "use strict";
 
-// Timer states:
-//   timer = defined:
-//     new_events = empty
-//       may be checking for new events (with running = true), or
-//       waiting for delay timout; can be interrupted by new registry.
-//         in which case running may be true or false.
-//     new_events = non-empty
-//       simulating
-//   timer = undefined:
-//     new_events = empty
-//       running may be true or false, but there's nothing to do
-//     new_events = non-empty
-//       running must be false; simulation is paused
-
 function Sim(be) {
   this.be = be;
-  this.old_events = [];
-  this.new_events = [];
+  this.old_gate_events = [];
+  this.old_wire_events = [];
+  this.new_gate_events = [];
+  this.new_wire_events = [];
   this.running = false;
 
   $(document).keydown($.proxy(this.keydown, this));
@@ -66,10 +54,11 @@ Sim.prototype.click_pause = function () {
 };
 
 Sim.prototype.start = function() {
-  if (this.timer && !this.new_events.length){
-    // It must be a delay.  Cancel it and go back to normal running.
-    this.pause();
+  if (this.delay_timer){
+    clearTimeout(this.delay_timer);
+    this.delay_timer = undefined;
   }
+
   if (!this.timer && this.running){
     this.be.level.start();
     this.timer = setInterval($.proxy(this.tick, this), 50);
@@ -83,35 +72,63 @@ Sim.prototype.pause = function() {
   }
 };
 
-Sim.prototype.register_obj = function(obj) {
+Sim.prototype.register_cell = function(obj) {
+  this.new_gate_events.push(obj);
   this.start();
-  this.new_events.push(obj);
+};
+
+Sim.prototype.register_wire = function(obj) {
+  this.new_wire_events.push(obj);
+  this.start();
 };
 
 Sim.prototype.tick = function() {
-  this.old_events = this.new_events;
-  this.new_events = [];
-  for (var i = 0; i < this.old_events.length; i++) {
-    this.old_events[i].tick(this.speed);
+  // Simulate through a gate if we don't pause at gates *or* if there
+  // are no wire events to process.  (The latter implies that we
+  // paused at a gate boundary, but were then restarted.)
+  if ((this.pause_at != 'gate') || !this.new_wire_events.length){
+    this.old_gate_events = this.new_gate_events;
+    this.new_gate_events = [];
+  } else {
+    this.old_gate_events = [];
   }
-  if (!this.new_events.length) {
+  this.old_wire_events = this.new_wire_events;
+  this.new_wire_events = [];
+
+  for (var i = 0; i < this.old_gate_events.length; i++) {
+    this.old_gate_events[i].tick(this.speed);
+  }
+  for (var i = 0; i < this.old_wire_events.length; i++) {
+    this.old_wire_events[i].tick(this.speed);
+  }
+
+  if (!this.new_wire_events.length && !this.new_gate_events.length){
     this.pause();
     this.be.level.done();
+  } else if ((this.pause_at == 'gate') && !this.new_wire_events.length){
+    this.click_pause();
   }
 };
 
 Sim.prototype.reset = function() {
   this.pause();
-  this.new_events = [];
+  this.new_gate_events = [];
+  this.new_wire_events = [];
 };
 
-Sim.prototype.pass_row = function(func) {
+Sim.prototype.pass_row = function(next_row) {
   if (this.pause_at == 'done'){
-    this.timer = setTimeout(func, 1000/this.speed);
+    var func = $.proxy(this.pass_delay_complete, this, next_row);
+    this.delay_timer = setTimeout(func, 1000/this.speed);
   } else {
     this.click_pause();
   }
 };
+
+Sim.prototype.pass_delay_complete = function(next_row) {
+  this.delay_timer = undefined;
+  this.be.level.select_row(next_row);
+}
 
 Sim.prototype.pass_all = function() {
   this.click_pause();
