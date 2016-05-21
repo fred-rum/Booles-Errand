@@ -44,6 +44,9 @@ Sim.prototype.click_play = function () {
   $("#button-pause").show();
   this.running = true;
   this.start();
+  if (!this.new_wire_events.length && !this.new_gate_events.length){
+    this.be.level.done(true);
+  }
 };
 
 Sim.prototype.click_pause = function () {
@@ -104,7 +107,7 @@ Sim.prototype.tick = function() {
 
   if (!this.new_wire_events.length && !this.new_gate_events.length){
     this.pause();
-    this.be.level.done();
+    this.be.level.done(false);
   } else if ((this.pause_at == 'gate') && !this.new_wire_events.length){
     this.click_pause();
   }
@@ -116,8 +119,8 @@ Sim.prototype.reset = function() {
   this.new_wire_events = [];
 };
 
-Sim.prototype.pass_row = function(next_row) {
-  if (this.pause_at == 'done'){
+Sim.prototype.pass_row = function(next_row, fresh_play) {
+  if ((this.pause_at == 'done') || fresh_play){
     var func = $.proxy(this.pass_delay_complete, this, next_row);
     this.delay_timer = setTimeout(func, 1000/this.speed);
   } else {

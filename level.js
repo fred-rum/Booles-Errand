@@ -362,7 +362,7 @@ Level.prototype.circuit_changed = function() {
   this.be.sim.start();
 };
 
-Level.prototype.done = function() {
+Level.prototype.done = function(fresh_play) {
   var result = true;
   for (var cell_name in this.named_cells){
     if (this.named_cells[cell_name].type == "output"){
@@ -385,7 +385,7 @@ Level.prototype.done = function() {
     }
 
     if (first_failure !== null){
-      this.be.sim.pass_row(first_failure);
+      this.be.sim.pass_row(first_failure, fresh_play);
     } else {
       this.be.sim.pass_all();
 
