@@ -389,7 +389,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'XOR and XNOR gates',
-   intro: '<p><b>An XOR gate outputs a 1 if its first input is <i>exclusively</i> 1 <i>or</i> its second input is <i>exclusively</i> 1</b>. Unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p>',
+   intro: '<p><b>An XOR gate outputs a 1 if its first input is <i>exclusively</i> 1 <i>or</i> its second input is <i>exclusively</i> 1</b>. Unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p><p><b>An XNOR gate outputs the opposite value as an XOR gate.</b></p>',
    outro: '<p>There are no "don\'t care" cases for the XOR and XNOR gates.</p>',
    truth: [{a:0, b:0,   z:0, y:1},
            {a:0, b:1,   z:1, y:0},
