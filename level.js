@@ -223,6 +223,7 @@ Level.prototype.remove_cell = function(cell) {
   for (var i = 0; i < this.all_cells.length; i++){
     if (cell == this.all_cells[i]){
       this.all_cells.splice(i, 1);
+      return;
     }
   }
 };

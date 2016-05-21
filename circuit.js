@@ -10,7 +10,6 @@ function Circuit() {
   this.be.cdrag = Raphael("cdrag", "100%", "100%");
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
-  this.bbox = {};
 
   // An inline SVG sits on the baseline, so if it is 100% of the div
   // height, then the space left for descenders will cause a vertical
@@ -228,47 +227,46 @@ Circuit.prototype.resize = function(center) {
 };
 
 Circuit.prototype.fit_view = function() {
+  var bbox = {};
   var all_cells = this.be.level.all_cells;
   for (var i = 0; i < all_cells.length; i++){
     var bbox_left = all_cells[i].bbox.x + all_cells[i].x;
     var bbox_top = all_cells[i].bbox.y + all_cells[i].y;
     var bbox_right = bbox_left + all_cells[i].bbox.width;
     var bbox_bottom = bbox_top + all_cells[i].bbox.height;
-    if (this.bbox.left === undefined){
-      this.bbox.left = bbox_left;
-      this.bbox.top = bbox_top;
-      this.bbox.right = bbox_right;
-      this.bbox.bottom = bbox_bottom;
+    if (bbox.left === undefined){
+      bbox.left = bbox_left;
+      bbox.top = bbox_top;
+      bbox.right = bbox_right;
+      bbox.bottom = bbox_bottom;
     } else {
-      if (bbox_left < this.bbox.left){
-        this.bbox.left = bbox_left;
+      if (bbox_left < bbox.left){
+        bbox.left = bbox_left;
       }
-      if (bbox_top < this.bbox.top){
-        this.bbox.top = bbox_top;
+      if (bbox_top < bbox.top){
+        bbox.top = bbox_top;
       }
-      if (bbox_right > this.bbox.right){
-        this.bbox.right = bbox_right;
+      if (bbox_right > bbox.right){
+        bbox.right = bbox_right;
       }
-      if (bbox_bottom > this.bbox.bottom){
-        this.bbox.bottom = bbox_bottom;
+      if (bbox_bottom > bbox.bottom){
+        bbox.bottom = bbox_bottom;
       }
     }
   }
 
   // canvas_cx/cy indicates the center of the overall cell bbox
   // in canvas coordinates.
-  if (this.bbox.left === undefined){
+  if (bbox.left === undefined){
     // Handle the case that no cells are in cdraw.
     this.be.canvas_cx = 0;
     this.be.canvas_cy = 0;
     this.be.scale = 1.0;
   } else {
-    this.be.canvas_cx = (this.bbox.left + this.bbox.right) / 2;
-    this.be.canvas_cy = (this.bbox.top + this.bbox.bottom) / 2;
-    var canvas_width = (this.bbox.right - this.bbox.left +
-                        this.be.wire_arc_radius * 3);
-    var canvas_height = (this.bbox.bottom - this.bbox.top +
-                         this.be.wire_arc_radius * 4);
+    this.be.canvas_cx = (bbox.left + bbox.right) / 2;
+    this.be.canvas_cy = (bbox.top + bbox.bottom) / 2;
+    var canvas_width = bbox.right - bbox.left + this.be.wire_arc_radius * 3;
+    var canvas_height = bbox.bottom - bbox.top + this.be.wire_arc_radius * 4;
 
     // The truth table cuts a corner out of the viewable screen
     // area, so we try two different aspect ratios to avoid it
