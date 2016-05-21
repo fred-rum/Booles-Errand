@@ -40,6 +40,8 @@ Sim.prototype.resize_slider = function () {
 };
 
 Sim.prototype.click_play = function () {
+  if (this.running) return;
+
   $("#button-play").hide();
   $("#button-pause").show();
   this.running = true;

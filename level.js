@@ -124,7 +124,9 @@ Level.prototype.begin = function(level_num) {
     $("#truthtable").html(html.join(''));
 
     for (var i = 0; i < level.truth.length; i++){
-      $('#row' + i).click($.proxy(this.row_click, this, i));
+      var row = $('#row' + i);
+      row.click($.proxy(this.row_click, this, i));
+      row.dblclick($.proxy(this.row_dblclick, this, i));
     }
 
     this.select_row(0);
@@ -170,6 +172,10 @@ Level.prototype.push_padding = function(html, i, num) {
 
 Level.prototype.row_click = function(row, event) {
   this.select_row(row);
+};
+
+Level.prototype.row_dblclick = function(row, event) {
+  this.be.sim.click_play();
 };
 
 Level.prototype.select_row = function(row) {
