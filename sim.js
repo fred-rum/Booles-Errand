@@ -62,9 +62,14 @@ Sim.prototype.start = function() {
     this.delay_timer = undefined;
   }
 
-  if (!this.timer && this.running){
+  if (!this.timer){
+    // start() gets called when any new event is registered.  If the
+    // timer is not already running
     this.be.level.start();
-    this.timer = setInterval($.proxy(this.tick, this), 50);
+
+    if (this.running){
+      this.timer = setInterval($.proxy(this.tick, this), 50);
+    }
   }
 };
 
@@ -76,12 +81,15 @@ Sim.prototype.pause = function() {
 };
 
 Sim.prototype.register_obj = function(obj, fresh_cell_output) {
+  if (!this.new_output_events.length && !this.new_other_events.length){
+    this.start();
+  }
+
   if (fresh_cell_output){
     this.new_output_events.push(obj);
   } else {
     this.new_other_events.push(obj);
   }
-  this.start();
 };
 
 Sim.prototype.tick = function() {
