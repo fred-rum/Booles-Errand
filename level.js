@@ -98,39 +98,52 @@ Level.prototype.begin = function(level_num) {
   this.input_names = input_names;
   this.output_names = output_names;
 
-  if (level.truth){
-    this.result = [];
-    var html = [];
-    if (level.hide.has("truth")){
-      // Create the truth table HTML, but hidden.  This is easier than
-      // not creating the HTML and trying to prevent the various
-      // actions that normally happen in the truth table.
-      html.push('<table style="display: none;"><tr>');
-    } else {
-      html.push('<table><tr>');
-    }
-    this.table_header(html, input_names);
-    this.table_header(html, output_names);
-    html.push('<th class="check"></th></tr>');
-    for (var i = 0; i < level.truth.length; i++){
-      html.push('<tr class="truthbody" id="row', i, '">');
-      this.table_row(html, input_names, level.truth[i]);
-      this.table_row(html, output_names, level.truth[i]);
-      html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
-
-      this.result.push(undefined);
-    }
-    html.push('</table>');
-    $("#truthtable").html(html.join(''));
-
-    for (var i = 0; i < level.truth.length; i++){
-      var row = $('#row' + i);
-      row.click($.proxy(this.row_click, this, i));
-      row.dblclick($.proxy(this.row_dblclick, this, i));
-    }
-
-    this.select_row(0);
+  this.sequenced = false;
+  this.result = [];
+  var html = [];
+  if (level.hide.has("truth")){
+    // Create the truth table HTML, but hidden.  This is easier than
+    // not creating the HTML and trying to prevent the various
+    // actions that normally happen in the truth table.
+    html.push('<table style="display: none;"><tr>');
+  } else {
+    html.push('<table><tr>');
   }
+  this.table_header(html, input_names);
+  this.table_header(html, output_names);
+  html.push('<th class="check"></th></tr>');
+  for (var i = 0; i < level.truth.length; i++){
+    html.push('<tr class="truthbody" id="row', i, '">');
+    this.table_row(html, input_names, level.truth[i]);
+    this.table_row(html, output_names, level.truth[i]);
+    html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
+
+    this.result.push(undefined);
+  }
+  html.push('</table>');
+  $("#truthtable").html(html.join(''));
+
+  for (var i = 0; i < level.truth.length; i++){
+    var row = $('#row' + i);
+    row.click($.proxy(this.row_click, this, i));
+    row.dblclick($.proxy(this.row_dblclick, this, i));
+  }
+
+  if (level.hide.has("speed")){
+    $('#pause-at')[0].setAttribute('display', 'none');
+    $('#speed-slider')[0].setAttribute('display', 'none');
+  } else {
+    $('#pause-at')[0].setAttribute('display', '');
+    $('#speed-slider')[0].setAttribute('display', '');
+
+    if (!this.sequenced){
+      $('#pause-at-flop')[0].setAttribute('display', 'none');
+    } else {
+      $('#pause-at-flop')[0].setAttribute('display', '');
+    }
+  }
+
+  this.select_row(0);
 };
 
 Level.prototype.table_header = function(html, port_names) {
@@ -147,6 +160,9 @@ Level.prototype.table_row = function(html, port_names, truth_row) {
       // A non-sequencing table row can be specified without the array,
       // but we force it into array format here.
       truth_row[port_names[i]] = [truth_row[port_names[i]]];
+    }
+    if (truth_row[port_names[i]].length > 1){
+      this.sequenced = true;
     }
     html.push('<td');
     this.push_padding(html, i, port_names.length);

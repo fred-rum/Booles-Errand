@@ -8,7 +8,7 @@ Level.prototype.puzzle = [
    intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733</p>',
    outro: '<p>Congratulations!</p>',
    truth: [{a: [1], z: [1]}],
-   hide: ["truth"],
+   hide: ["truth", "speed"],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -28,7 +28,7 @@ Level.prototype.puzzle = [
    intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press "play" to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction.  The direction that data flows on the wire is determined by what it\'s connected to.</p>',
    truth: [{a: [1], z: [1]}],
-   hide: ["truth"],
+   hide: ["truth", "speed"],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -48,6 +48,7 @@ Level.prototype.puzzle = [
    outro: '<p>Every row of the truth table must pass with a check mark in order to move on to the next puzzle.</p>',
    truth: [{a: [0], z: [0]},
            {a: [1], z: [1]}],
+   hide: ["speed"],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -68,6 +69,7 @@ Level.prototype.puzzle = [
    outro: '<p>A NOT gate is also often called an inverter.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
+   hide: ["speed"],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -90,10 +92,11 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'first gate',
-   intro: '<p>Now you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
+   intro: '<p>Now, you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
+   hide: ["speed"],
    avail: ['inv', 1],
    cells: {
      a: {type: 'input',
@@ -109,7 +112,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'setting speed',
-   intro: '<p><b>Let\'s take a short break to play with new features.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
+   intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    truth: [{a: [0], z: [0]},
            {a: [1], z: [1]}],
