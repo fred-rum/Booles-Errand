@@ -5,7 +5,7 @@
 var x = undefined;
 Level.prototype.puzzle = [
   {name: 'press play',
-   intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the supply pin "A" to the test pin "Z". &#9733</p>',
+   intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733</p>',
    outro: '<p>Congratulations!</p>',
    truth: [{a: [1], z: [1]}],
    hide: ["truth"],
@@ -44,7 +44,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'truth table',
-   intro: '<p>A circuit must typically pass multiple tests to prove that it is correct. <b>The truth table on the left shows what values are required</b> at the test pins for each set of values at the supply pins.</p><p>Clicking "play" causes each row of the truth table to be tested until every row has passed or until some row has failed.</p>',
+   intro: '<p>A circuit must typically pass multiple tests to prove that it is correct. <b>The truth table on the left shows what values are required</b> at the test pins for each set of values on the stimulus pins.</p><p>Clicking "play" causes each row of the truth table to be tested until every row has passed or until some row has failed.</p>',
    outro: '<p>Every row of the truth table must pass with a check mark in order to move on to the next puzzle.</p>',
    truth: [{a: [0], z: [0]},
            {a: [1], z: [1]}],
@@ -90,7 +90,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'first gate',
-   intro: '<p>Now you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the supply and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
+   intro: '<p>Now you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
@@ -189,7 +189,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'fanout',
-   intro: '<p><b>Add a wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the supply pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire instead of drawing a new one.',
+   intro: '<p><b>Add a wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire instead of drawing a new one.',
    outro: '<p>As many wires as you want can "fan out" from any output port.</p>',
    truth: [{a: [0], z: [0], y: [0]},
            {a: [1], z: [1], y: [1]}],
