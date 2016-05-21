@@ -264,7 +264,13 @@ Io.prototype.propagate_output = function(value) {
   if (value === this.value) return;
 
   this.update_value(value);
-  this.register_output();
+
+  if (this.w.length){
+    // Don't register for a new tick if there are no wires to
+    // propagate to.  Doing so could cause simulation to pause at the
+    // gate output when it could otherwise complete the table row.
+    this.register_output();
+  }
 };
 
 // register_ouput() is separated from propagate_output() because it
