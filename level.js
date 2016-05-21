@@ -405,6 +405,7 @@ Level.prototype.done = function(fresh_play) {
         this.be.div_info.html(html);
       }
       this.be.circuit.resize(false);
+      this.be.circuit.update_view();
     }
   }
 };
