@@ -16,7 +16,6 @@ function Sim(be) {
   $("#button-pause").click($.proxy(this.click_pause, this));
 
   this.pause_at = 'done';
-  this.set_pause_at_color(this.pause_at, true);
   $("#pause-at-gate").click($.proxy(this.click_pause_at, this, 'gate'));
   $("#pause-at-flop").click($.proxy(this.click_pause_at, this, 'flop'));
   $("#pause-at-pass").click($.proxy(this.click_pause_at, this, 'pass'));
@@ -195,12 +194,7 @@ Sim.prototype.speed_drag = function(event) {
 };
 
 Sim.prototype.click_pause_at = function(type) {
-  this.set_pause_at_color(this.pause_at, false);
+  $("#pause-at-" + this.pause_at).removeClass('pause-at-selected');
   this.pause_at = type;
-  this.set_pause_at_color(this.pause_at, true);
+  $("#pause-at-" + this.pause_at).addClass('pause-at-selected');
 };
-
-Sim.prototype.set_pause_at_color = function(type, enabled) {
-  var color = enabled ? '#f0d0d0' : 'none'
-  $("#pause-at-" + type)[0].setAttribute('fill', color);
-}

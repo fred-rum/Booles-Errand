@@ -138,9 +138,9 @@ Level.prototype.begin = function(level_num) {
     $('#speed-slider')[0].setAttribute('display', '');
 
     if (!this.sequenced){
-      $('#pause-at-flop')[0].setAttribute('display', 'none');
+      $('#pause-at-flop').addClass('pause-at-hidden');
     } else {
-      $('#pause-at-flop')[0].setAttribute('display', '');
+      $('#pause-at-flop').removeClass('pause-at-hidden');
     }
   }
 

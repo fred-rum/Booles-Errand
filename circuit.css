@@ -44,6 +44,17 @@ body {
 .pauseborder:hover {
     fill: #ddd;
 }
+.pause-at {
+    fill: #eee;
+    cursor: pointer;
+}
+.pause-at-hidden {
+    display: none;
+    cursor: default !important;
+}
+.pause-at-selected {
+    fill: #f0d0d0 !important;
+}
 .pause-at:hover {
     fill: #ddd;
 }
