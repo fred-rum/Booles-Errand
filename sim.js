@@ -27,8 +27,7 @@ function Sim(be) {
   this.slider_text = $("#speed-text")[0];
   this.slider_min_color = Raphael.getRGB("#88d");
   this.slider_max_color = Raphael.getRGB("#6d6");
-  slider.mousedown($.proxy(this.speed_drag, this));
-  slider.mousemove($.proxy(this.speed_drag, this));
+  slider.mousedown($.proxy(this.speed_drag_start, this));
 }
 
 Sim.prototype.resize_slider = function () {
@@ -157,9 +156,15 @@ Sim.prototype.keydown = function(event) {
   }
 };
 
-Sim.prototype.speed_drag = function(event) {
-  if (!event.buttons) return;
+Sim.prototype.speed_drag_start = function(event) {
+  event.preventDefault();
+  var doc = $(document);
+  doc.on("mousemove.speed", $.proxy(this.speed_drag_move, this));
+  doc.on("mouseup.speed", $.proxy(this.speed_drag_end, this));
+  this.speed_drag_move(event);
+};
 
+Sim.prototype.speed_drag_move = function(event) {
   var x = (event.pageX - this.slider_left) * 350/this.slider_width;
   var slider_min = 30;
   var slider_default = 110;
@@ -191,6 +196,11 @@ Sim.prototype.speed_drag = function(event) {
   var g = min_color.g + (max_color.g - min_color.g) * f;
   var b = min_color.b + (max_color.b - min_color.b) * f;
   this.slider_text.setAttribute('fill', Raphael.rgb(r, g, b));
+};
+
+Sim.prototype.speed_drag_end = function(event) {
+  var doc = $(document);
+  doc.off("mousemove.speed").off("mouseup.speed");
 };
 
 Sim.prototype.click_pause_at = function(type) {
