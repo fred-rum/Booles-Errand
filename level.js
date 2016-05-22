@@ -235,7 +235,12 @@ Level.prototype.add_box_cell = function(name) {
 
 Level.prototype.value = function(name) {
   var truth = this.puzzle[this.level_num].truth;
-  return truth[this.truth_row][name][0];
+  var seq = truth[this.truth_row][name];
+  if (seq){
+    return seq[0];
+  } else {
+    return undefined;
+  }
 };
 
 Level.prototype.add_cell = function(cell) {

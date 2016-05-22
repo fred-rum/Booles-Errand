@@ -1,6 +1,6 @@
 // Copyright 2016 Christopher P. Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 var x = undefined;
 Level.prototype.puzzle = [
@@ -8,7 +8,7 @@ Level.prototype.puzzle = [
    intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733</p>',
    outro: '<p>Congratulations!</p>',
    truth: [{a: [1], z: [1]}],
-   hide: ["truth", "speed"],
+   hide: ['truth', 'speed'],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -28,7 +28,7 @@ Level.prototype.puzzle = [
    intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press "play" to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction.  The direction that data flows on the wire is determined by what it\'s connected to.</p>',
    truth: [{a: [1], z: [1]}],
-   hide: ["truth", "speed"],
+   hide: ['truth', 'speed'],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -48,7 +48,7 @@ Level.prototype.puzzle = [
    outro: '<p>Every row of the truth table must pass with a check mark in order to move on to the next puzzle.</p>',
    truth: [{a: [0], z: [0]},
            {a: [1], z: [1]}],
-   hide: ["speed"],
+   hide: ['speed'],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -69,7 +69,7 @@ Level.prototype.puzzle = [
    outro: '<p>A NOT gate is also often called an inverter.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
-   hide: ["speed"],
+   hide: ['speed'],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -96,7 +96,7 @@ Level.prototype.puzzle = [
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
    truth: [{a: [0], z: [1]},
            {a: [1], z: [0]}],
-   hide: ["speed"],
+   hide: ['speed'],
    avail: ['inv', 1],
    cells: {
      a: {type: 'input',
@@ -221,7 +221,7 @@ Level.prototype.puzzle = [
    outro: '<p>It looks like you\'re getting the hang of it!</p>',
    truth: [{a: [1], z: [1], y: [0]},
            {a: [0], z: [0], y: [1]}],
-   avail: ["inv", 1],
+   avail: ['inv', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -247,7 +247,7 @@ Level.prototype.puzzle = [
            {a:0, b:1,   z:0},
            {a:1, b:0,   z:0},
            {a:1, b:1,   z:1}],
-   avail: ["and", 1],
+   avail: ['and', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -273,7 +273,7 @@ Level.prototype.puzzle = [
            {a:0, b:1,   z:1},
            {a:1, b:0,   z:1},
            {a:1, b:1,   z:0}],
-   avail: ["nand", 1],
+   avail: ['nand', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -299,7 +299,7 @@ Level.prototype.puzzle = [
            {a:0, b:1,   z:1},
            {a:1, b:0,   z:1},
            {a:1, b:1,   z:0}],
-   avail: ["inv", 1, "and", 1],
+   avail: ['inv', 1, 'and', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -323,7 +323,7 @@ Level.prototype.puzzle = [
    outro: '<p>NAND gates are particularly small and fast in modern silicon circuits, so it is convenient that they are also so versatile.</p>',
    truth: [{a:0,  z:1},
            {a:1,  z:0}],
-   avail: ["nand", 1],
+   avail: ['nand', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -344,7 +344,7 @@ Level.prototype.puzzle = [
            {a:0, b:1,   z:1},
            {a:1, b:0,   z:1},
            {a:1, b:1,   z:1}],
-   avail: ["or", 1],
+   avail: ['or', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -369,7 +369,7 @@ Level.prototype.puzzle = [
    truth: [{a:0, b:0,   z:1},
            {a:x, b:1,   z:0},
            {a:1, b:x,   z:0}],
-   avail: ["nor", 1],
+   avail: ['nor', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -395,7 +395,7 @@ Level.prototype.puzzle = [
            {a:0, b:1,   z:1, y:0},
            {a:1, b:0,   z:1, y:0},
            {a:1, b:1,   z:0, y:1}],
-   avail: ["xor", 1, "xnor", 1],
+   avail: ['xor', 1, 'xnor', 1],
    cells: {
      a: {type: 'input',
          x: 100,
@@ -415,6 +415,106 @@ Level.prototype.puzzle = [
      y: {type: 'output',
          x: 400,
          y: 200
+        }
+   }
+  }
+,
+  {name: 'build a mux',
+   intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: if one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
+   outro: '<p>Now you\'re building real circuits!</p>',
+   truth: [{s:0, a:0,        z:0},
+           {s:0, a:1,        z:1},
+           {s:1,      b:0,   z:0},
+           {s:1,      b:1,   z:1}],
+   avail: ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     s: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     a: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 300
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 200
+        }
+   }
+  }
+,
+  {name: 'detect odd',
+   intro: '<p><b>Determine whether an odd number of stimulus pins have a 1 value.</b></p><p>Tip: Start with a circuit that works when&nbsp;C is 0, then add logic to handle the cases when C is 1.</p>',
+   outro: '<p>Notice that it doesn\'t matter what order you put the XOR gates in.  The result is always the same.</p>',
+   truth: [{a:0, b:0, c:0,   z:0},
+           {a:1, b:0, c:0,   z:1},
+           {a:0, b:1, c:0,   z:1},
+           {a:1, b:1, c:0,   z:0},
+           {a:0, b:0, c:1,   z:1},
+           {a:1, b:0, c:1,   z:0},
+           {a:0, b:1, c:1,   z:0},
+           {a:1, b:1, c:1,   z:1}],
+   avail: ['xor'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     c: {type: 'input',
+         x: 100,
+         y: 300
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 200
+        }
+   }
+  }
+,
+  {name: 'detect >= 2',
+   intro: '<p><b>Determine whether at least two stimulus pins have a 1 value.</b></p>',
+   outro: '<p>The solutions to this puzzle and the previous one together comprise a <i>full adder</i>.</p>',
+   truth: [{a:0, b:0, c:0,   z:0},
+           {a:1, b:0, c:0,   z:0},
+           {a:0, b:1, c:0,   z:0},
+           {a:1, b:1, c:0,   z:1},
+           {a:0, b:0, c:1,   z:0},
+           {a:1, b:0, c:1,   z:1},
+           {a:0, b:1, c:1,   z:1},
+           {a:1, b:1, c:1,   z:1}],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     c: {type: 'input',
+         x: 100,
+         y: 300
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 250
         }
    }
   }
