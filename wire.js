@@ -124,22 +124,31 @@ Wire.prototype.propagate_value = function() {
   // This also prevents propagating to the null cell.
   if (this.pending_new) return;
 
-  // The output IO is guaranteed to propagate no more than one value
-  // per tick, so that simplifies some things.
-  this.newest_value = this.o.value;
 
   // The output IO always propagates its value first in the tick,
   // before any wires have updated.  If any values are in flight, then
   // the wire must already be registered to receive an update in this
-  // tick.  We avoid duplicating the registration, and we mark the
-  // newest value as unusable in this tick.
+  // tick.  We avoid duplicating the registration, and we record that
+  // the newest value should not advance in age in this tick.
   if (this.in_flight.length){
-    this.wait_on_newest = true;
+    // The output IO is guaranteed to propagate no more than one value
+    // per tick, so we can record the value in a simple variable.
+    // The value is put into the in-flight queue later in the tick,
+    // so it is safe from being overwritten in later ticks.
+    this.newest_value = this.o.value;
   } else {
     // This wire isn't registered yet, so we register it in order to
-    // propagate the new value.
-    this.wait_on_newest = false;
+    // propagate the new value.  We also put the new value in the
+    // in-flight queue.  This indicates that it is OK to advance its
+    // age when the wire eventually ticks.  It also keeps the value
+    // safe from being overwritten in case the output port propagates
+    // a new value in the next tick before the wire can tick.
     this.be.sim.register_obj(this, false);
+    var fl_obj = {
+      age: 0,
+      value: this.o.value
+    };
+    this.in_flight.push(fl_obj);
   }
 };
 
@@ -167,6 +176,23 @@ Wire.prototype.tick = function(speed) {
     if (this.newest_value === this.i.value) this.newest_value = null;
   }
 
+  for (var i = 0; i < this.in_flight.length; i++){
+    var fl_obj = this.in_flight[i];
+    fl_obj.age += this.be.wire_speed * speed / this.path_length;
+    if (fl_obj.age >= 1.0){
+      if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
+      this.i.propagate_input(fl_obj.value);
+      this.in_flight.splice(0, 1); // remove the first (oldest)
+      i--;
+    }
+  }
+
+  this.redraw_fg();
+  //this.measure_perf("segmented");
+
+  // Only after everything in the in-flight queue has advanced in age
+  // can we put the newest_value (propagated from the output port
+  // earlier in this tick) into the queue.
   if (this.newest_value !== null){
     var fl_obj = {
       age: 0,
@@ -175,26 +201,6 @@ Wire.prototype.tick = function(speed) {
     this.in_flight.push(fl_obj);
     this.newest_value = null;
   }
-
-  for (var i = 0; i < this.in_flight.length; i++){
-    var fl_obj = this.in_flight[i];
-    if ((fl_obj.age == 0) && this.wait_on_newest){
-      // We just got this value, and it shouldn't advance in this
-      // tick, but it can advance in the next tick.
-      this.wait_on_newest = false;
-    } else {
-      fl_obj.age += this.be.wire_speed * speed / this.path_length;
-      if (fl_obj.age >= 1.0){
-        if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
-        this.i.propagate_input(fl_obj.value);
-        this.in_flight.splice(0, 1); // remove the first (oldest)
-        i--;
-      }
-    }
-  }
-
-  this.redraw_fg();
-  //this.measure_perf("segmented");
 
   if (this.in_flight.length){
     // There is still data in flight, so register the wire to tick
