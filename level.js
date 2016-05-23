@@ -210,8 +210,17 @@ Level.prototype.push_padding = function(html, i, num, last_line) {
 };
 
 Level.prototype.row_click = function(row, event) {
-  this.reset_sim();
-  this.select_seq(this.row_seq[row]);
+  if ((row == this.cur_row() + 1) && (this.row_seq[row] == this.cur_seq) &&
+      this.row_result[this.cur_row()] &&
+       this.be.sim.paused() && this.be.sim.no_new_events()){
+    // The user is selecting the next line of a sequence, and the
+    // current line is complete and passed.  Go ahead and advance to
+    // the next line, rather than starting the sequence over.
+    this.next_line();
+  } else {
+    this.reset_sim();
+    this.select_seq(this.row_seq[row]);
+  }
 };
 
 Level.prototype.row_dblclick = function(row, event) {
@@ -236,8 +245,8 @@ Level.prototype.select_seq = function(seq) {
 };
 
 Level.prototype.next_line = function() {
-  this.select_row(this.cur_row() + 1);
   this.start();
+  this.select_row(this.cur_row() + 1);
 };
 
 Level.prototype.update_pins = function() {

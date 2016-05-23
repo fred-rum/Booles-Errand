@@ -44,7 +44,7 @@ Sim.prototype.click_play = function () {
   $("#button-pause").show();
   this.running = true;
   this.start();
-  if (!this.new_other_events.length && !this.new_output_events.length){
+  if (this.no_new_events()) {
     this.be.level.done(true);
   }
 };
@@ -80,8 +80,16 @@ Sim.prototype.pause = function() {
   }
 };
 
+Sim.prototype.paused = function() {
+  return !this.timer;
+};
+
+Sim.prototype.no_new_events = function() {
+  return !this.new_other_events.length && !this.new_output_events.length;
+};
+
 Sim.prototype.register_obj = function(obj, fresh_cell_output) {
-  if (!this.new_output_events.length && !this.new_other_events.length){
+  if (this.no_new_events()){
     this.start();
   }
 
@@ -112,7 +120,7 @@ Sim.prototype.tick = function() {
     this.old_other_events[i].tick(this.speed);
   }
 
-  if (!this.new_other_events.length && !this.new_output_events.length){
+  if (this.no_new_events()) {
     this.pause();
     this.be.level.done(false);
   } else if ((this.pause_at == 'gate') && !this.new_other_events.length){
