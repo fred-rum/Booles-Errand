@@ -17,8 +17,8 @@ function Sim(be) {
 
   this.pause_at = 'done';
   $("#pause-at-gate").click($.proxy(this.click_pause_at, this, 'gate'));
-  $("#pause-at-flop").click($.proxy(this.click_pause_at, this, 'flop'));
-  $("#pause-at-pass").click($.proxy(this.click_pause_at, this, 'pass'));
+  $("#pause-at-line").click($.proxy(this.click_pause_at, this, 'line'));
+  $("#pause-at-seq").click($.proxy(this.click_pause_at, this, 'seq'));
   $("#pause-at-done").click($.proxy(this.click_pause_at, this, 'done'));
 
   this.speed = 1.0;
@@ -126,10 +126,11 @@ Sim.prototype.reset = function() {
   this.new_other_events = [];
 };
 
-Sim.prototype.pass_row = function(func, fresh_play) {
+Sim.prototype.pass_row = function(func, fresh_play, row_type) {
   if (fresh_play){
     func();
-  } else if (this.pause_at == 'done') {
+  } else if ((this.pause_at == 'done') ||
+             ((this.pause_at == 'seq') && (row_type != 'seq'))){
     this.delay_timer = setTimeout(func, 1000/this.speed);
   } else {
     this.click_pause();

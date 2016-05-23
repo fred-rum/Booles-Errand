@@ -169,9 +169,9 @@ Level.prototype.init_table = function() {
     $('#speed-slider')[0].setAttribute('display', '');
 
     if (!this.sequenced){
-      $('#pause-at-flop').addClass('pause-at-hidden');
+      $('#pause-at-line').addClass('pause-at-hidden');
     } else {
-      $('#pause-at-flop').removeClass('pause-at-hidden');
+      $('#pause-at-line').removeClass('pause-at-hidden');
     }
   }
 };
@@ -445,8 +445,8 @@ Level.prototype.done = function(fresh_play) {
   if (!result) return;
 
   if (this.cur_line < this.level.truth[this.cur_seq].length - 1){
-    // Advance to the next line of the sequence if not pause-at-flop.
-    this.be.sim.pass_row($.proxy(this.next_line, this), fresh_play);
+    // Advance to the next line of the sequence if not pause-at-line.
+    this.be.sim.pass_row($.proxy(this.next_line, this), fresh_play, 'line');
     return;
   }
 
@@ -465,7 +465,7 @@ Level.prototype.done = function(fresh_play) {
   // There is a failed sequence, so advance to that sequence.
   if (first_failed_seq !== null){
     this.be.sim.pass_row($.proxy(this.select_seq, this, first_failed_seq),
-                         fresh_play);
+                         fresh_play, 'seq');
     return;
   }
 
