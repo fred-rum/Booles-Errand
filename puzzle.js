@@ -7,7 +7,7 @@ Level.prototype.puzzle = [
   {name: 'press play',
    intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733</p>',
    outro: '<p>Congratulations!</p>',
-   truth: [{a: [1], z: [1]}],
+   truth: [{a: 1,   z: 1}],
    hide: ['truth', 'speed'],
    avail: [],
    cells: {
@@ -27,7 +27,7 @@ Level.prototype.puzzle = [
   {name: 'first wire',
    intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press "play" to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction.  The direction that data flows on the wire is determined by what it\'s connected to.</p>',
-   truth: [{a: [1], z: [1]}],
+   truth: [{a: 1,   z: 1}],
    hide: ['truth', 'speed'],
    avail: [],
    cells: {
@@ -46,8 +46,8 @@ Level.prototype.puzzle = [
   {name: 'truth table',
    intro: '<p>A circuit must typically pass multiple tests to prove that it is correct. <b>The truth table on the left shows what values are required</b> at the test pins for each set of values on the stimulus pins.</p><p>Clicking "play" causes each row of the truth table to be tested until every row has passed or until some row has failed.</p>',
    outro: '<p>Every row of the truth table must pass with a check mark in order to move on to the next puzzle.</p>',
-   truth: [{a: [0], z: [0]},
-           {a: [1], z: [1]}],
+   truth: [{a: 0,   z: 0},
+           {a: 1,   z: 1}],
    hide: ['speed'],
    avail: [],
    cells: {
@@ -67,8 +67,8 @@ Level.prototype.puzzle = [
   {name: 'NOT gate',
    intro: '<p><b>A NOT gate changes a 0 to 1, or changes a 1 to a 0.</b>  In other words, the output of a NOT gate is 1 only if the input is <i>not</i> 1.</p>',
    outro: '<p>A NOT gate is also often called an inverter.</p>',
-   truth: [{a: [0], z: [1]},
-           {a: [1], z: [0]}],
+   truth: [{a: 0,   z: 1},
+           {a: 1,   z: 0}],
    hide: ['speed'],
    avail: [],
    cells: {
@@ -94,8 +94,8 @@ Level.prototype.puzzle = [
   {name: 'first gate',
    intro: '<p>Now, you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
-   truth: [{a: [0], z: [1]},
-           {a: [1], z: [0]}],
+   truth: [{a: 0, z: 1},
+           {a: 1, z: 0}],
    hide: ['speed'],
    avail: ['inv', 1],
    cells: {
@@ -114,8 +114,8 @@ Level.prototype.puzzle = [
   {name: 'setting speed',
    intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table row has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
-   truth: [{a: [0], z: [0]},
-           {a: [1], z: [1]}],
+   truth: [{a: 0,   z: 0},
+           {a: 1,   z: 1}],
    avail: ['inv'],
    cells: {
      a: {type: 'input',
@@ -194,8 +194,8 @@ Level.prototype.puzzle = [
   {name: 'fanout',
    intro: '<p><b>Add a wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire instead of drawing a new one.',
    outro: '<p>As many wires as you want can "fan out" from any output port.</p>',
-   truth: [{a: [0], z: [0], y: [0]},
-           {a: [1], z: [1], y: [1]}],
+   truth: [{a: 0,   z: 0, y: 0},
+           {a: 1,   z: 1, y: 1}],
    avail: [],
    cells: {
      a: {type: 'input',
@@ -219,8 +219,8 @@ Level.prototype.puzzle = [
   {name: 'gate+fanout',
    intro: '<p><b>Check the truth table</b> to see how this circuit should be connected.</p><p>Tip: The table says that when A is 1, Z must get a 1 value, and Y must get 0.  It also says what values must go to the test pins when A is 0.</p>',
    outro: '<p>It looks like you\'re getting the hang of it!</p>',
-   truth: [{a: [1], z: [1], y: [0]},
-           {a: [0], z: [0], y: [1]}],
+   truth: [{a: 1,   z: 1, y: 0},
+           {a: 0,   z: 0, y: 1}],
    avail: ['inv', 1],
    cells: {
      a: {type: 'input',
