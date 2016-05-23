@@ -664,7 +664,6 @@ Cell.prototype.init_input = function() {
 
   this.el_text = this.canvas.text(0, 0, "");
   this.el_text.setAttr("pointer-events", "none");
-  this.fit_input_text();
   this.push_ns(this.el_text);
 };
 
@@ -689,7 +688,6 @@ Cell.prototype.init_output = function() {
 
   this.el_text = this.canvas.text(0, 0, "");
   this.el_text.setAttr("pointer-events", "none");
-  this.fit_output_text();
   this.push_ns(this.el_text);
 
   // Placeholder for output check result.

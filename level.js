@@ -25,7 +25,6 @@ Level.prototype.begin = function(level_num) {
 
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
-  this.truth_row = 0;
 
   if (level.hide === undefined){
     level.hide = new Set();
@@ -55,50 +54,63 @@ Level.prototype.begin = function(level_num) {
   this.be.div_info.html(level.intro || "");
   smartquotes(this.be.div_info[0]);
 
-  var input_names = [];
-  var output_names = [];
+  // Get a list of the input and output pins.
+  this.input_names = [];
+  this.output_names = [];
+  for (var cell_name in level.cells){
+    var cell_obj = level.cells[cell_name];
+    if (cell_obj.type == "input") this.input_names.push(cell_name);
+    if (cell_obj.type == "output") this.output_names.push(cell_name);
+  }
 
-  if (level.cells){
-    // First, initialize the cells while ignoring IO connections.
+  // Initialize the truth table with columns for the input and output pins.
+  this.init_table();
+
+  // Initialize the cells required by the level while ignoring IO connections.
+  for (var cell_name in level.cells){
+    var cell_obj = level.cells[cell_name];
+    var cell = new Cell(this.be, "cdraw",
+                        cell_obj.type,
+                        cell_obj.x,
+                        cell_obj.y,
+                        cell_name,
+                        true);
+    this.named_cells[cell_name] = cell;
+    this.add_cell(cell);
+  }
+
+  // Either connect IOs according to the puzzle data, or restore
+  // additional cells and all wire connections from the save data.
+  if (save_str === undefined){
+    // Connect IOs according to the cell data.
     for (var cell_name in level.cells){
-      var cell_obj = level.cells[cell_name];
-      var cell = new Cell(this.be, "cdraw",
-                          cell_obj.type,
-                          cell_obj.x,
-                          cell_obj.y,
-                          cell_name,
-                          true);
-      this.named_cells[cell_name] = cell;
-      this.add_cell(cell);
-      if (cell_obj.type == "input") input_names.push(cell_name);
-      if (cell_obj.type == "output") output_names.push(cell_name);
-    }
-
-    if (save_str === undefined){
-      // Connect IOs according to the cell data.
-      for (var cell_name in level.cells){
-        var conn_list = level.cells[cell_name].io;
-        if (conn_list){
-          for (var i = 0; i < conn_list.length; i++){
-            var io_name = conn_list[i][0];
-            var cell_name2 = conn_list[i][1];
-            var io_name2 = conn_list[i][2];
-            new Wire(this.be,
-                     this.named_cells[cell_name].io[io_name],
-                     this.named_cells[cell_name2].io[io_name2],
-                     false);
-          }
+      var conn_list = level.cells[cell_name].io;
+      if (conn_list){
+        for (var i = 0; i < conn_list.length; i++){
+          var io_name = conn_list[i][0];
+          var cell_name2 = conn_list[i][1];
+          var io_name2 = conn_list[i][2];
+          new Wire(this.be,
+                   this.named_cells[cell_name].io[io_name],
+                   this.named_cells[cell_name2].io[io_name2],
+                   false);
         }
       }
-
-      window.location.hash = encodeURI(level.name);
-    } else {
-      this.decode_save(save_str);
     }
-  }
-  this.input_names = input_names;
-  this.output_names = output_names;
 
+    window.location.hash = encodeURI(level.name);
+  } else {
+    this.decode_save(save_str);
+  }
+
+  // Initialize the level to the first row of the table, and
+  // correspondingly set up the initial input values and output
+  // (expected) values.
+  this.select_row(0);
+};
+
+Level.prototype.init_table = function() {
+  var level = this.level;
   this.sequenced = false;
   this.result = [];
   var html = [];
@@ -110,13 +122,13 @@ Level.prototype.begin = function(level_num) {
   } else {
     html.push('<table><tr>');
   }
-  this.table_header(html, input_names);
-  this.table_header(html, output_names);
+  this.table_header(html, this.input_names);
+  this.table_header(html, this.output_names);
   html.push('<th class="check"></th></tr>');
   for (var i = 0; i < level.truth.length; i++){
     html.push('<tr class="truthbody" id="row', i, '">');
-    this.table_row(html, input_names, level.truth[i]);
-    this.table_row(html, output_names, level.truth[i]);
+    this.table_row(html, this.input_names, level.truth[i]);
+    this.table_row(html, this.output_names, level.truth[i]);
     html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
 
     this.result.push(undefined);
@@ -143,8 +155,6 @@ Level.prototype.begin = function(level_num) {
       $('#pause-at-flop').removeClass('pause-at-hidden');
     }
   }
-
-  this.select_row(0);
 };
 
 Level.prototype.table_header = function(html, port_names) {
