@@ -217,6 +217,10 @@ Level.prototype.row_click = function(row, event) {
     // current line is complete and passed.  Go ahead and advance to
     // the next line, rather than starting the sequence over.
     this.next_line();
+  } else if ((row == this.cur_row()) && this.be.sim.still_paused()){
+    // The user is re-selecting the current line of a sequence after
+    // previously selecting it.  This is probably a double click, so
+    // this click is ignored.
   } else {
     this.reset_sim();
     this.select_seq(this.row_seq[row]);
