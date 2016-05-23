@@ -169,6 +169,9 @@ table {
 .truthbody {
     cursor: pointer;
 }
+th {
+    cursor: default;
+}
 td {
     text-align: center;
 }
