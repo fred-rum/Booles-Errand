@@ -45,6 +45,7 @@ Sim.prototype.click_play = function () {
   this.running = true;
   this.is_still_paused = false;
   this.start();
+  this.be.level.click_play();
   if (this.no_new_events()) {
     this.be.level.done(true);
   }
@@ -82,13 +83,7 @@ Sim.prototype.pause = function() {
 };
 
 Sim.prototype.paused = function() {
-  // Return true if simulation is paused, and also keep track of
-  // whether simulation remains paused thereafter.
-  return this.is_still_paused = !this.running;
-};
-
-Sim.prototype.still_paused = function() {
-  return this.is_still_paused;
+  return !this.running;
 };
 
 Sim.prototype.no_new_events = function() {

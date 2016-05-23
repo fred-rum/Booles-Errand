@@ -157,6 +157,8 @@ Level.prototype.init_table = function() {
 
   for (var i = 0; i < num_rows; i++){
     var row = $('#row' + i);
+    row.hover($.proxy(this.row_enter, this, i),
+              $.proxy(this.row_leave, this, i));
     row.click($.proxy(this.row_click, this, i));
     row.dblclick($.proxy(this.row_dblclick, this, i));
   }
@@ -209,18 +211,53 @@ Level.prototype.push_padding = function(html, i, num, last_line) {
   }
 };
 
+Level.prototype.row_enter = function(row, event) {
+  this.hover_row = row;
+  var old_row = this.cur_row();
+  if (row == this.row_allows_simple_click){
+    if (row != old_row){
+      $("#row" + row).css({"background-color": "#ddd"});
+    }
+  } else {
+    var seq = this.row_seq[row];
+    for (var i = 0; i < this.level.truth[seq].length; i++) {
+      var i_row = this.level.truth[seq].first_row + i;
+      if (i_row != old_row){
+        $("#row" + i_row).css({"background-color": "#ddd"});
+      }
+    }
+  }
+};
+
+Level.prototype.row_leave = function(row, event) {
+  this.hover_row = undefined;
+  var old_row = this.cur_row();
+  for (var i = 0; i < this.row_result.length; i++){
+    if (i != old_row) $("#row" + i).css({"background-color": ""});
+  }
+};
+
+Level.prototype.update_hover = function() {
+  if (this.hover_row !== undefined){
+    var row = this.hover_row;
+    this.row_leave(row);
+    this.row_enter(row);
+  }
+};
+
 Level.prototype.row_click = function(row, event) {
-  if ((row == this.cur_row() + 1) && (this.row_seq[row] == this.cur_seq) &&
-      this.row_result[this.cur_row()] &&
-       this.be.sim.paused() && this.be.sim.no_new_events()){
-    // The user is selecting the next line of a sequence, and the
-    // current line is complete and passed.  Go ahead and advance to
-    // the next line, rather than starting the sequence over.
-    this.next_line();
-  } else if ((row == this.cur_row()) && this.be.sim.still_paused()){
-    // The user is re-selecting the current line of a sequence after
-    // previously selecting it.  This is probably a double click, so
-    // this click is ignored.
+  var old_row = this.cur_row();
+  if (row == this.row_allows_simple_click){
+    if (row == old_row + 1){
+      // The user is selecting the next line of a sequence, and the
+      // current line is complete and passed.  Go ahead and advance to
+      // the next line, rather than starting the sequence over.
+      this.next_line();
+    } else {
+      // The user is re-selecting the current line of a sequence after
+      // previously selecting it.  This is probably a double click, so
+      // this click is ignored.
+    }
   } else {
     this.reset_sim();
     this.select_seq(this.row_seq[row]);
@@ -240,6 +277,7 @@ Level.prototype.select_row = function(row) {
   $("#row" + row).css({"background-color": "#ff8"});
   this.cur_seq = this.row_seq[row];
   this.cur_line = this.row_line[row];
+  this.update_hover();
   this.update_pins();
 };
 
@@ -271,6 +309,8 @@ Level.prototype.update_pins = function() {
 };
 
 Level.prototype.reset_sim = function() {
+  this.row_allows_simple_click = false;
+  this.update_hover();
   this.be.sim.reset();
   for (var i = 0; i < this.all_cells.length; i++){
     this.all_cells[i].reset();
@@ -426,6 +466,11 @@ Level.prototype.decode_save = function(save_str) {
   }
 };
 
+Level.prototype.click_play = function() {
+  this.row_allows_simple_click = false;
+  this.update_hover();
+};
+
 Level.prototype.start = function() {
   // While the circuit is running, we mark all check pins as pending
   // to avoid confusing the user (even if we're sure of the final
@@ -438,6 +483,9 @@ Level.prototype.start = function() {
 };
 
 Level.prototype.circuit_changed = function() {
+  this.row_allows_simple_click = false;
+  this.update_hover();
+
   for (var i = 0; i < this.row_result.length; i++){
     this.record_result(i, undefined);
   }
@@ -460,6 +508,13 @@ Level.prototype.done = function(fresh_play) {
   if (this.cur_line < this.level.truth[this.cur_seq].length - 1){
     // Advance to the next line of the sequence if not pause-at-line.
     this.be.sim.pass_row($.proxy(this.next_line, this), fresh_play, 'line');
+    if (this.be.sim.paused()){
+      // Attempting to continue to the next line triggered pause-at-line.
+      // In that case, clicking on the next line should advance simulation
+      // to that line, rather than resetting to the beginning of the sequence.
+      this.row_allows_simple_click = this.cur_row() + 1;
+      this.update_hover();
+    }
     return;
   }
 

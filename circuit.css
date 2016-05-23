@@ -169,9 +169,6 @@ table {
 .truthbody {
     cursor: pointer;
 }
-.truthbody:hover {
-    background-color: #ddd;
-}
 td {
     text-align: center;
 }
