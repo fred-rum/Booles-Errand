@@ -106,13 +106,15 @@ Level.prototype.begin = function(level_num) {
   // Initialize the level to the first row of the table, and
   // correspondingly set up the initial input values and output
   // (expected) values.
-  this.select_row(0);
+  this.cur_seq = 0;
+  this.cur_line = 0;
+  this.select_seq(0);
 };
 
 Level.prototype.init_table = function() {
   var level = this.level;
   this.sequenced = false;
-  this.result = [];
+  this.row_result = [];
   var html = [];
   if (level.hide.has("truth")){
     // Create the truth table HTML, but hidden.  This is easier than
@@ -125,7 +127,9 @@ Level.prototype.init_table = function() {
   this.table_header(html, this.input_names);
   this.table_header(html, this.output_names);
   html.push('<th class="check"></th></tr>');
-  var first_row = 0;
+  var num_rows = 0;
+  this.row_seq = [];
+  this.row_line = [];
   for (var i = 0; i < level.truth.length; i++){
     if (Array.isArray(level.truth[i])){
       if (level.truth[i].length > 1) this.sequenced = true;
@@ -134,19 +138,24 @@ Level.prototype.init_table = function() {
       // but we force it into array format here.
       level.truth[i] = [level.truth[i]];
     }
-    html.push('<tr class="truthbody" id="row', i, '">');
-    this.table_row(html, this.input_names, level.truth[i]);
-    this.table_row(html, this.output_names, level.truth[i]);
-    html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
-
-    this.result.push(undefined);
-    level.truth[i].first_row = first_row;
-    first_row += level.truth[i].length;
+    var truth_seq = level.truth[i];
+    truth_seq.first_row = num_rows;
+    for (var j = 0; j < truth_seq.length; j++){
+      var last_line = (j == truth_seq.length - 1);
+      html.push('<tr class="truthbody" id="row', num_rows, '">');
+      this.table_line(html, this.input_names, truth_seq[j], last_line);
+      this.table_line(html, this.output_names, truth_seq[j], last_line);
+      html.push('<td class="check"><svg id="check', num_rows, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
+      this.row_result.push(undefined);
+      this.row_seq.push(i);
+      this.row_line.push(j);
+      num_rows++;
+    }
   }
   html.push('</table>');
   $("#truthtable").html(html.join(''));
 
-  for (var i = 0; i < level.truth.length; i++){
+  for (var i = 0; i < num_rows; i++){
     var row = $('#row' + i);
     row.click($.proxy(this.row_click, this, i));
     row.dblclick($.proxy(this.row_dblclick, this, i));
@@ -170,58 +179,65 @@ Level.prototype.init_table = function() {
 Level.prototype.table_header = function(html, port_names) {
   for (var i = 0; i < port_names.length; i++){
     html.push('<th');
-    this.push_padding(html, i, port_names.length);
+    this.push_padding(html, i, port_names.length, true);
     html.push('>', port_names[i].toUpperCase(), '</th>');
   }
 };
 
-Level.prototype.table_row = function(html, port_names, truth_row) {
+Level.prototype.table_line = function(html, port_names, truth_line, last_line) {
   for (var i = 0; i < port_names.length; i++){
     html.push('<td');
-    this.push_padding(html, i, port_names.length);
+    this.push_padding(html, i, port_names.length, last_line);
     html.push('>');
-    for (var j = 0; j < truth_row.length; j++){
-      if (truth_row[j][port_names[i]] !== undefined){
-        html.push(truth_row[j][port_names[i]]);
-      }
-      if (j < truth_row.length-1) html.push('<br>');
+    if (truth_line[port_names[i]] !== undefined){
+      html.push(truth_line[port_names[i]]);
     }
     html.push('</td>');
   }
 };
 
-Level.prototype.push_padding = function(html, i, num) {
+Level.prototype.push_padding = function(html, i, num, last_line) {
+  var tdb = last_line ? ' tdb' : '';
   if (i == 0){
     if (i < num-1){
-      html.push(' class="tdl"');
+      html.push(' class="tdl', tdb, '"');
     } else {
-      html.push(' class="tdlr"');
+      html.push(' class="tdlr', tdb, '"');
     }
   } else if (i == num-1){
-    html.push(' class="tdr"');
+    html.push(' class="tdr', tdb, '"');
   }
 };
 
 Level.prototype.row_click = function(row, event) {
-  this.select_row(row);
+  this.reset_sim();
+  this.select_seq(this.row_seq[row]);
 };
 
 Level.prototype.row_dblclick = function(row, event) {
   this.be.sim.click_play();
 };
 
+Level.prototype.cur_row = function() {
+  return this.level.truth[this.cur_seq].first_row + this.cur_line;
+}
+
 Level.prototype.select_row = function(row) {
-  $("#row" + this.cur_seq).css({"background-color": ""});
-  this.cur_seq = row;
-  this.cur_line = 0;
-  $("#row" + this.cur_seq).css({"background-color": "#ff8"});
-  this.reset_sim();
+  $("#row" + this.cur_row()).css({"background-color": ""});
+  $("#row" + row).css({"background-color": "#ff8"});
+  this.cur_seq = this.row_seq[row];
+  this.cur_line = this.row_line[row];
   this.update_pins();
 };
 
+Level.prototype.select_seq = function(seq) {
+  this.reset_sim();
+  this.select_row(this.level.truth[seq].first_row);
+};
+
 Level.prototype.next_line = function() {
-  this.cur_line++;
-  this.update_pins();
+  this.select_row(this.cur_row() + 1);
+  this.start();
 };
 
 Level.prototype.update_pins = function() {
@@ -409,7 +425,7 @@ Level.prototype.start = function() {
 };
 
 Level.prototype.circuit_changed = function() {
-  for (var i = 0; i < this.result.length; i++){
+  for (var i = 0; i < this.row_result.length; i++){
     this.record_result(i, undefined);
   }
 
@@ -424,7 +440,7 @@ Level.prototype.done = function(fresh_play) {
       result = result && cell_result;
     }
   }
-  this.record_result(this.cur_seq, result);
+  this.record_result(this.cur_row(), result);
 
   if (!result) return;
 
@@ -434,25 +450,26 @@ Level.prototype.done = function(fresh_play) {
     return;
   }
 
-  // Look for the first failure after the current truth_row, if any;
+  // Look for the first failure after the current sequence, if any;
   // otherwise, the first failure overall.
-  var first_failure = null;
-  for (var i = 0; i < this.result.length; i++){
-    if (!this.result[i] &&
-        ((first_failure === null) ||
-         ((first_failure < this.cur_seq) && (i >= this.cur_seq)))){
-      first_failure = i;
+  var first_failed_seq = null;
+  for (var i = 0; i < this.row_result.length; i++){
+    var seq = this.row_seq[i];
+    if (!this.row_result[i] &&
+        ((first_failed_seq === null) ||
+         ((first_failed_seq < this.cur_seq) && (seq >= this.cur_seq)))){
+      first_failed_seq = seq;
     }
   }
 
-  // There is a failed row, so advance to that row.
-  if (first_failure !== null){
-    this.be.sim.pass_row($.proxy(this.select_row, this, first_failure),
+  // There is a failed sequence, so advance to that sequence.
+  if (first_failed_seq !== null){
+    this.be.sim.pass_row($.proxy(this.select_seq, this, first_failed_seq),
                          fresh_play);
     return;
   }
 
-  // There are no failed rows.
+  // There are no failed rows/sequences.
   this.be.sim.pass_all();
 
   var outro = this.level.outro || "";
@@ -485,7 +502,7 @@ Level.prototype.change_level = function(level_num) {
 };
 
 Level.prototype.record_result = function(row, result) {
-  this.result[row] = result;
+  this.row_result[row] = result;
 
   var id = "#check" + row;
   if (result === undefined){

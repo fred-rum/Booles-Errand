@@ -232,9 +232,7 @@ Cell.prototype.calc_output = function() {
   this.value = value;
 
   var exp_value = this.be.level.value(this.name);
-  if (exp_value === undefined){
-    // do nothing
-  } else if (value === undefined){
+  if ((exp_value === undefined) || (value === undefined)){
     this.el_check.setAttr("visibility", "hidden");
     this.el_question.setAttr("visibility", "visible");
   } else {
@@ -264,15 +262,13 @@ Cell.prototype.calc_output = function() {
 }
 
 Cell.prototype.check_pending = function() {
-  var exp_value = this.be.level.value(this.name);
-  if (exp_value !== undefined){
-    this.el_question.setAttr("visibility", "visible");
-  }
+  this.el_question.setAttr("visibility", "visible");
 }
 
 Cell.prototype.done_check = function() {
   var exp_value = this.be.level.value(this.name);
   if (exp_value === undefined){
+    this.el_question.setAttr("visibility", "hidden");
     return true;
   } else if (this.value === undefined){
     return undefined;

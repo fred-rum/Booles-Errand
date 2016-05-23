@@ -174,7 +174,8 @@ table {
 }
 td {
     text-align: center;
-    border-top: thin solid;
+}
+.tdb {
     border-bottom: thin solid;
 }
 td.tdl {
