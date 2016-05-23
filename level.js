@@ -208,6 +208,8 @@ Level.prototype.push_padding = function(html, i, num, last_line) {
     }
   } else if (i == num-1){
     html.push(' class="tdr', tdb, '"');
+  } else if (last_line){
+    html.push(' class="tdb"');
   }
 };
 
