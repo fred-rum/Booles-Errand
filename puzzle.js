@@ -662,4 +662,44 @@ Level.prototype.puzzle = [
         }
    }
   }
+,
+  {name: 'latch',
+   intro: '<p>Latch</p>',
+   outro: '<p></p>',
+   truth: [[{clk:0, a:0,   z:x},
+            {clk:0, a:1,   z:x},
+            {clk:1, a:1,   z:1},
+            {clk:1, a:0,   z:0},
+            {clk:0, a:0,   z:0},
+            {clk:0, a:1,   z:0}]],
+   cells: {
+     clk: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     a: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 100
+        }
+     ,
+     and: {type: 'and',
+           x: 480,
+           y: 100,
+           io: [['o', 'z', 'i'],
+                ['o', 'or', 'i0']]
+          }
+     ,
+     or: {type: 'or',
+          x: 360,
+          y: 90,
+          io: [['o', 'and', 'i0']]
+          }
+   }
+  }
 ];

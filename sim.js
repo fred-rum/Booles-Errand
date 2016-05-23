@@ -126,11 +126,10 @@ Sim.prototype.reset = function() {
   this.new_other_events = [];
 };
 
-Sim.prototype.pass_row = function(next_row, fresh_play) {
+Sim.prototype.pass_row = function(func, fresh_play) {
   if (fresh_play){
-    this.be.level.select_row(next_row);
+    func();
   } else if (this.pause_at == 'done') {
-    var func = $.proxy(this.pass_delay_complete, this, next_row);
     this.delay_timer = setTimeout(func, 1000/this.speed);
   } else {
     this.click_pause();

@@ -231,7 +231,10 @@ Cell.prototype.calc_output = function() {
   if (value === this.value) return;
   this.value = value;
 
-  if (value === undefined){
+  var exp_value = this.be.level.value(this.name);
+  if (exp_value === undefined){
+    // do nothing
+  } else if (value === undefined){
     this.el_check.setAttr("visibility", "hidden");
     this.el_question.setAttr("visibility", "visible");
   } else {
@@ -241,7 +244,7 @@ Cell.prototype.calc_output = function() {
     var right = width/2;
     var left = right + height*1/3;
     var cx = left + (height*2/3/2);
-    if (value === this.be.level.value(this.name)) {
+    if (value === exp_value) {
       attr.stroke = "#0c0";
       attr.path = ["M", left, 0,
                    "l", height*1/6, height*1/3,
@@ -261,11 +264,17 @@ Cell.prototype.calc_output = function() {
 }
 
 Cell.prototype.check_pending = function() {
-  this.el_question.setAttr("visibility", "visible");
+  var exp_value = this.be.level.value(this.name);
+  if (exp_value !== undefined){
+    this.el_question.setAttr("visibility", "visible");
+  }
 }
 
 Cell.prototype.done_check = function() {
-  if (this.value === undefined){
+  var exp_value = this.be.level.value(this.name);
+  if (exp_value === undefined){
+    return true;
+  } else if (this.value === undefined){
     return undefined;
   } else {
     this.el_question.setAttr("visibility", "hidden");
@@ -726,8 +735,8 @@ Cell.prototype.init_output = function() {
               "m", 0, gap,
               "l", 0, 0];
   this.el_question = this.canvas.path(path).attr(attr);
+  this.el_question.setAttr("visibility", "hidden");
   this.push_ns(this.el_question);
-
 };
 
 Cell.prototype.fit_input_text = function() {
@@ -761,9 +770,21 @@ Cell.prototype.fit_input_text = function() {
 
 Cell.prototype.fit_output_text = function() {
   var name = this.name.toUpperCase();
-  var text = name + "=" + this.be.level.value(this.name) + "?";
+  var value = this.be.level.value(this.name);
+  if (value === undefined){
+    var text = name;
+  } else {
+    var text = name + "=" + value + "?";
+  }
   this.el_text.attr({text: text, x: 0, "font-size": "10"});
   var bbox = this.el_text.getBBox(true);
+  if (text.length < 3){
+    // To prevent the text from getting weirdly huge, we pretend that
+    // a short text string is wider than it really is.
+    var inc = bbox.width * (3 / text.length - 1);
+    bbox.width += inc;
+    bbox.x -= inc/2;
+  }
 
   var height = 1.5 * this.be.io_spacing;
   var width = height;

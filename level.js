@@ -125,13 +125,23 @@ Level.prototype.init_table = function() {
   this.table_header(html, this.input_names);
   this.table_header(html, this.output_names);
   html.push('<th class="check"></th></tr>');
+  var first_row = 0;
   for (var i = 0; i < level.truth.length; i++){
+    if (Array.isArray(level.truth[i])){
+      if (level.truth[i].length > 1) this.sequenced = true;
+    } else {
+      // A non-sequencing table row can be specified without the array,
+      // but we force it into array format here.
+      level.truth[i] = [level.truth[i]];
+    }
     html.push('<tr class="truthbody" id="row', i, '">');
     this.table_row(html, this.input_names, level.truth[i]);
     this.table_row(html, this.output_names, level.truth[i]);
     html.push('<td class="check"><svg id="check', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
 
     this.result.push(undefined);
+    level.truth[i].first_row = first_row;
+    first_row += level.truth[i].length;
   }
   html.push('</table>');
   $("#truthtable").html(html.join(''));
@@ -167,21 +177,16 @@ Level.prototype.table_header = function(html, port_names) {
 
 Level.prototype.table_row = function(html, port_names, truth_row) {
   for (var i = 0; i < port_names.length; i++){
-    if (!Array.isArray(truth_row[port_names[i]])){
-      // A non-sequencing table row can be specified without the array,
-      // but we force it into array format here.
-      truth_row[port_names[i]] = [truth_row[port_names[i]]];
-    }
-    if (truth_row[port_names[i]].length > 1){
-      this.sequenced = true;
-    }
     html.push('<td');
     this.push_padding(html, i, port_names.length);
-    if (truth_row[port_names[i]][0] === undefined){
-      html.push('></td>');
-    } else {
-      html.push('>', truth_row[port_names[i]][0], '</td>');
+    html.push('>');
+    for (var j = 0; j < truth_row.length; j++){
+      if (truth_row[j][port_names[i]] !== undefined){
+        html.push(truth_row[j][port_names[i]]);
+      }
+      if (j < truth_row.length-1) html.push('<br>');
     }
+    html.push('</td>');
   }
 };
 
@@ -206,10 +211,20 @@ Level.prototype.row_dblclick = function(row, event) {
 };
 
 Level.prototype.select_row = function(row) {
-  $("#row" + this.truth_row).css({"background-color": ""});
-  this.truth_row = row;
-  $("#row" + this.truth_row).css({"background-color": "#ff8"});
+  $("#row" + this.cur_seq).css({"background-color": ""});
+  this.cur_seq = row;
+  this.cur_line = 0;
+  $("#row" + this.cur_seq).css({"background-color": "#ff8"});
   this.reset_sim();
+  this.update_pins();
+};
+
+Level.prototype.next_line = function() {
+  this.cur_line++;
+  this.update_pins();
+};
+
+Level.prototype.update_pins = function() {
   for (var i = 0; i < this.input_names.length; i++){
     // We want the value to appear right away on the IO stub, so we
     // push it all the way through to the input pin's output port.
@@ -245,12 +260,7 @@ Level.prototype.add_box_cell = function(name) {
 
 Level.prototype.value = function(name) {
   var truth = this.puzzle[this.level_num].truth;
-  var seq = truth[this.truth_row][name];
-  if (seq){
-    return seq[0];
-  } else {
-    return undefined;
-  }
+  return truth[this.cur_seq][this.cur_line][name];
 };
 
 Level.prototype.add_cell = function(cell) {
@@ -414,40 +424,50 @@ Level.prototype.done = function(fresh_play) {
       result = result && cell_result;
     }
   }
-  this.record_result(this.truth_row, result);
+  this.record_result(this.cur_seq, result);
 
-  if (result){
-    // Look for the first failure after the current truth_row, if any;
-    // otherwise, the first failure overall.
-    var first_failure = null;
-    for (var i = 0; i < this.result.length; i++){
-      if (!this.result[i] &&
-          ((first_failure === null) ||
-           ((first_failure < this.truth_row) && (i >= this.truth_row)))){
-        first_failure = i;
-      }
-    }
+  if (!result) return;
 
-    if (first_failure !== null){
-      this.be.sim.pass_row(first_failure, fresh_play);
-    } else {
-      this.be.sim.pass_all();
+  if (this.cur_line < this.level.truth[this.cur_seq].length - 1){
+    // Advance to the next line of the sequence if not pause-at-flop.
+    this.be.sim.pass_row($.proxy(this.next_line, this), fresh_play);
+    return;
+  }
 
-      var outro = this.level.outro || "";
-      if (this.level_num < this.puzzle.length-1){
-        var html = outro + '<button type="button" id="next-level">Next level</button>';
-        this.be.div_info.html(html);
-        $("#next-level").click($.proxy(this.change_level, this,
-                                       this.level_num+1));
-      } else {
-        var html = outro + '<p>That\'s all the puzzles!</p>';
-        this.be.div_info.html(html);
-      }
-      smartquotes(this.be.div_info[0]);
-      this.be.circuit.resize(false);
-      this.be.circuit.update_view();
+  // Look for the first failure after the current truth_row, if any;
+  // otherwise, the first failure overall.
+  var first_failure = null;
+  for (var i = 0; i < this.result.length; i++){
+    if (!this.result[i] &&
+        ((first_failure === null) ||
+         ((first_failure < this.cur_seq) && (i >= this.cur_seq)))){
+      first_failure = i;
     }
   }
+
+  // There is a failed row, so advance to that row.
+  if (first_failure !== null){
+    this.be.sim.pass_row($.proxy(this.select_row, this, first_failure),
+                         fresh_play);
+    return;
+  }
+
+  // There are no failed rows.
+  this.be.sim.pass_all();
+
+  var outro = this.level.outro || "";
+  if (this.level_num < this.puzzle.length-1){
+    var html = outro + '<button type="button" id="next-level">Next level</button>';
+    this.be.div_info.html(html);
+    $("#next-level").click($.proxy(this.change_level, this,
+                                   this.level_num+1));
+  } else {
+    var html = outro + '<p>That\'s all the puzzles!</p>';
+    this.be.div_info.html(html);
+  }
+  smartquotes(this.be.div_info[0]);
+  this.be.circuit.resize(false);
+  this.be.circuit.update_view();
 };
 
 Level.prototype.change_level = function(level_num) {
