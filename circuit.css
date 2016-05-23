@@ -171,9 +171,13 @@ table {
 }
 th {
     cursor: default;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
 }
 td {
     text-align: center;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
 }
 .tdb {
     border-bottom: thin solid;
