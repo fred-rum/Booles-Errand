@@ -462,7 +462,7 @@ Wire.prototype.compute = function() {
 Wire.prototype.redraw_fg = function() {
   if (this.pending_del == "del"){
     var attr = {
-      path: path,
+      path: this.path,
       stroke: "#e88", // red
       "stroke-dasharray": "-",
       opacity: "1.0"
