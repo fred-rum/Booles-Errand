@@ -35,8 +35,7 @@ Level.prototype.begin = function(level_num) {
   this.box_cells = [];
   this.box_height = this.be.box_spacing;
   if (level.avail === undefined){
-    level.avail = ['buf', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor',
-                   'const'];
+    level.avail = ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'];
   }
   for (var i = 0; i < level.avail.length; i++){
     var name = level.avail[i];
