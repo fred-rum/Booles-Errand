@@ -5,7 +5,9 @@
 var x = undefined;
 Level.prototype.puzzle = [
   {name: 'press play',
-   intro: '<p>&#9733 <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733</p>',
+   section: 'Introduction to circuits',
+   ui: true,
+   intro: '<p>&#9733; <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733;</p>',
    outro: '<p>Congratulations!</p>',
    truth: [{a: 1,   z: 1}],
    hide: ['truth', 'speed'],
@@ -25,6 +27,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'first wire',
+   ui: true,
    intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press "play" to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction.  The direction that data flows on the wire is determined by what it\'s connected to.</p>',
    truth: [{a: 1,   z: 1}],
@@ -44,6 +47,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'truth table',
+   ui: true,
    intro: '<p>A circuit must typically pass multiple tests to prove that it is correct. <b>The truth table on the left shows what values are required</b> at the test pins for each set of values on the stimulus pins.</p><p>Clicking "play" causes each row of the truth table to be tested until every row has passed or until some row has failed.</p>',
    outro: '<p>Every row of the truth table must pass with a check mark in order to move on to the next puzzle.</p>',
    truth: [{a: 0,   z: 0},
@@ -92,6 +96,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'first gate',
+   ui: true,
    intro: '<p>Now, you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
    truth: [{a: 0, z: 1},
@@ -112,6 +117,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'setting speed',
+   ui: true,
    intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table row has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    truth: [{a: 0,   z: 0},
@@ -192,6 +198,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'fanout',
+   ui: true,
    intro: '<p><b>Add a wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire instead of drawing a new one.',
    outro: '<p>As many wires as you want can "fan out" from any output port.</p>',
    truth: [{a: 0,   z: 0, y: 0},
@@ -420,6 +427,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'build a mux',
+   section: 'Easy combinational circuits',
    intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: if one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
    outro: '<p>Now you\'re building real circuits!</p>',
    truth: [{s:0, a:0,        z:0},
@@ -520,6 +528,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'seven segment decode',
+   section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '',
    truth:[{a3:0, a2:0, a1:0, a0:0,   t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1},
@@ -664,6 +673,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'OR-AND latch',
+   section: 'Introduction to sequential circuits',
    intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.  Whether a latch is transparent or opaque is typically determined by a clock signal connected to it.</p><p>The core recirculating elements of a latch are shown below. <b>Use appropriate gates to connect CLK (the clock signal) and&nbsp;D (the data input) such that D passes through to Z only when CLK is 1; otherwise Z is held constant.</b></p><p>Tip: the OR gate and AND gate recirculate the Z value only when their other inputs are certain values.  Otherwise, a new value replaces the recirculating value.</p>',
    outro: '<p>Congratulations, <b>you have built a transparent-high SR latch.</b>  This means that the latch is transparent when the clock signal is <i>high</i>&nbsp;(1), and the recirculating value can be altered by <i>S</i>etting the value in the OR gate or <i>R</i>esetting the value in the AND gate.</p>',
    truth: [[{clk:0, d:0,   q:x},

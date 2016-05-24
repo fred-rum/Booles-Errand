@@ -4,6 +4,7 @@
 
 function Level(be) {
   this.be = be;
+  $("#button-main").click($.proxy(this.click_main, this));
 }
 
 Level.prototype.begin = function(level_num) {
@@ -121,7 +122,7 @@ Level.prototype.init_table = function() {
     // actions that normally happen in the truth table.
     html.push('<table style="display: none;"><tr>');
   } else {
-    html.push('<table><tr>');
+    html.push('<table class="truth"><tr>');
   }
   this.table_header(html, this.input_names);
   this.table_header(html, this.output_names);
@@ -569,6 +570,8 @@ Level.prototype.done = function(fresh_play) {
 };
 
 Level.prototype.change_level = function(level_num) {
+  $("#main_container").css({display: "none"});
+
   for (var i = 0; i < this.all_cells.length; i++){
     this.all_cells[i].remove();
   }
@@ -595,13 +598,23 @@ Level.prototype.record_result = function(row, result) {
   }
 };
 
-Level.prototype.use_special_chars = function(str) {
-/*
-  str = str.replace(/'/g, '&rsquo;');
-  str = str.replace(/"(\w)/g, '&ldquo;$1');
-  str = str.replace(/(\w)"/g, '$1&rdquo;');
-  str = str.replace(/"\s/g, '&rdquo; ');
-  str = str.replace(/([\w>])\s(\d)/g, '$1&nbsp;$2');
-*/
-  return str;
+Level.prototype.click_main = function() {
+  $("#main_container").css({display: "block"});
+  var html = [];
+  html.push('<table class="levels"><tr class="levels" id="uilevels"><td>&#9733;</td><td><b>Interface lessons only (&#9733;).</b></td></tr>');
+  for (var i = 0; i < this.puzzle.length; i++){
+    if (this.puzzle[i].section){
+      html.push('<tr><td colspan="2"><b>', this.puzzle[i].section, '</b></td></tr>');
+    }
+    html.push('<tr class="levels" id="level', i, '"><td>');
+    if (this.puzzle[i].ui) html.push('&#9733;');
+    html.push('</td><td>', this.puzzle[i].name, '</td></tr>');
+  }
+  html.push('</table>');
+  $("#levels").html(html.join(''));
+
+  $('#uilevels').click($.proxy(this.click_uilevels, this));
+  for (var i = 0; i < this.puzzle.length; i++){
+    $('#level' + i).click($.proxy(this.change_level, this, i));
+  }
 };
