@@ -170,9 +170,9 @@ Level.prototype.init_table = function() {
     $('#speed-slider')[0].setAttribute('display', '');
 
     if (!this.sequenced){
-      $('#pause-at-line').addClass('pause-at-hidden');
+      $('#pause-at-seq').addClass('pause-at-hidden');
     } else {
-      $('#pause-at-line').removeClass('pause-at-hidden');
+      $('#pause-at-seq').removeClass('pause-at-hidden');
     }
   }
 };
@@ -462,7 +462,8 @@ Level.prototype.decode_save = function(save_str) {
       if (!io_i) throw "bad i port: " + w.i_port;
       if (io_i.w.length > 0){
         if (io_i.w[0].o == io_o){
-          console.log("duplicate wire");
+          // If the save data duplicates a locked wire, we silently
+          // discard it without throwing an exception.
         } else {
           throw "input port busy: " + w.i_port;
         }
