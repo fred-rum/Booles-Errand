@@ -152,10 +152,6 @@ Sim.prototype.pass_delay_complete = function(next_row) {
   this.be.level.select_row(next_row);
 }
 
-Sim.prototype.pass_all = function() {
-  this.click_pause();
-};
-
 Sim.prototype.keydown = function(event) {
   var key = String.fromCharCode(event.which);
   var bucky = event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;

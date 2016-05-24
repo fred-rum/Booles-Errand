@@ -4,6 +4,25 @@
 
 function Level(be) {
   this.be = be;
+
+  var html = [];
+  html.push('<table class="levels"><tr class="levels" id="uilevels"><td>&#9733;</td><td><b>Interface lessons only (&#9733;).</b></td></tr>');
+  for (var i = 0; i < this.puzzle.length; i++){
+    if (this.puzzle[i].section){
+      html.push('<tr><td colspan="2"><b>', this.puzzle[i].section, '</b></td></tr>');
+    }
+    html.push('<tr class="levels" id="level', i, '"><td>');
+    if (this.puzzle[i].ui) html.push('&#9733;');
+    html.push('</td><td>', this.puzzle[i].name, '</td></tr>');
+  }
+  html.push('</table>');
+  $("#levels").html(html.join(''));
+
+  $('#uilevels').click($.proxy(this.click_uilevels, this));
+  for (var i = 0; i < this.puzzle.length; i++){
+    $('#level' + i).click($.proxy(this.click_level, this, i));
+  }
+
   $("#button-main").click($.proxy(this.click_main, this));
 }
 
@@ -552,17 +571,33 @@ Level.prototype.done = function(fresh_play) {
   }
 
   // There are no failed rows/sequences.
-  this.be.sim.pass_all();
+  this.be.sim.click_pause();
 
   var outro = this.level.outro || "";
-  if (this.level_num < this.puzzle.length-1){
-    var html = outro + '<button type="button" id="next-level">Next level</button>';
-    this.be.div_info.html(html);
-    $("#next-level").click($.proxy(this.change_level, this,
-                                   this.level_num+1));
-  } else {
-    var html = outro + '<p>That\'s all the puzzles!</p>';
-    this.be.div_info.html(html);
+  if (this.uilevels){
+    for (var next = this.level_num + 1; next < this.puzzle.length; next++){
+      if (this.puzzle[next].ui) break;
+    }
+    if (next < this.puzzle.length){
+      var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
+      this.be.div_info.html(html);
+      $("#next-puzzle").click($.proxy(this.change_level, this, next));
+    } else {
+      var html = outro + '<p>You\'ve completed all of the interface lessons.  Are you ready for some puzzles? <button type="button" id="next-main">Main menu</button></p>';
+      this.be.div_info.html(html);
+      $("#next-main").click($.proxy(this.click_main, this));
+    }
+  } else { // !this.uilevels
+    var next = this.level_num + 1;
+    if (next < this.puzzle.length){
+      var html = outro + '<p><button type="button" id="next-puzzle">Next puzzle</button></p>';
+      this.be.div_info.html(html);
+      $("#next-puzzle").click($.proxy(this.change_level, this, next));
+    } else {
+      var html = outro + '<p>Congratulations!  You\'ve complete all of the puzzles! <button type="button" id="next-main">Main menu</button></p>';
+      this.be.div_info.html(html);
+      $("#next-main").click($.proxy(this.click_main, this));
+    }
   }
   smartquotes(this.be.div_info[0]);
   this.be.circuit.resize(false);
@@ -570,8 +605,6 @@ Level.prototype.done = function(fresh_play) {
 };
 
 Level.prototype.change_level = function(level_num) {
-  $("#main_container").css({display: "none"});
-
   for (var i = 0; i < this.all_cells.length; i++){
     this.all_cells[i].remove();
   }
@@ -599,22 +632,24 @@ Level.prototype.record_result = function(row, result) {
 };
 
 Level.prototype.click_main = function() {
+  this.be.sim.click_pause();
   $("#main_container").css({display: "block"});
-  var html = [];
-  html.push('<table class="levels"><tr class="levels" id="uilevels"><td>&#9733;</td><td><b>Interface lessons only (&#9733;).</b></td></tr>');
-  for (var i = 0; i < this.puzzle.length; i++){
-    if (this.puzzle[i].section){
-      html.push('<tr><td colspan="2"><b>', this.puzzle[i].section, '</b></td></tr>');
-    }
-    html.push('<tr class="levels" id="level', i, '"><td>');
-    if (this.puzzle[i].ui) html.push('&#9733;');
-    html.push('</td><td>', this.puzzle[i].name, '</td></tr>');
-  }
-  html.push('</table>');
-  $("#levels").html(html.join(''));
+  this.uilevels = false;
+};
 
-  $('#uilevels').click($.proxy(this.click_uilevels, this));
-  for (var i = 0; i < this.puzzle.length; i++){
-    $('#level' + i).click($.proxy(this.change_level, this, i));
+Level.prototype.click_level = function(level_num, event) {
+  $("#main_container").css({display: "none"});
+
+  if (level_num === this.level_num){
+    // The user selected the same level he was previously on.
+    // Return to the level without resetting it.
+    return;
+  } else {
+    this.change_level(level_num);
   }
+};
+
+Level.prototype.click_uilevels = function(event) {
+  this.uilevels = true;
+  this.click_level(0, event);
 };

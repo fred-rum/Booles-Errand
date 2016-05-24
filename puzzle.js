@@ -97,7 +97,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'first gate',
    ui: true,
-   intro: '<p>Now, you do it! <b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
+   intro: '<p><b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
    truth: [{a: 0, z: 1},
            {a: 1, z: 0}],
@@ -199,7 +199,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'fanout',
    ui: true,
-   intro: '<p><b>Add a wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire instead of drawing a new one.',
+   intro: '<p><b>Add a wire to connect A to Z and another wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire (if any), or it will fail.',
    outro: '<p>As many wires as you want can "fan out" from any output port.</p>',
    truth: [{a: 0,   z: 0, y: 0},
            {a: 1,   z: 1, y: 1}],
@@ -207,8 +207,7 @@ Level.prototype.puzzle = [
    cells: {
      a: {type: 'input',
          x: 100,
-         y: 100,
-         io: [['o', 'z', 'i']]
+         y: 100
         }
      ,
      z: {type: 'output',
