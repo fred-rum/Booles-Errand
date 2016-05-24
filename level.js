@@ -70,8 +70,8 @@ Level.prototype.begin = function(level_num) {
     var cell_obj = level.cells[cell_name];
     var cell = new Cell(this.be, "cdraw",
                         cell_obj.type,
-                        cell_obj.x,
-                        cell_obj.y,
+                        cell_obj.x / 20 * this.be.io_spacing,
+                        cell_obj.y / 20 * this.be.io_spacing,
                         cell_name,
                         true);
     this.named_cells[cell_name] = cell;
@@ -358,9 +358,9 @@ Level.prototype.update_url = function() {
     var emitted_cell = false;
     var cell = this.all_cells[i];
     if (!cell.locked){
-      save.push(';', Math.round(cell.x),
+      save.push(';', Math.round(cell.x / this.be.io_spacing * 20),
                 ',', cell.type,
-                ',', Math.round(cell.y));
+                ',', Math.round(cell.y / this.be.io_spacing * 20));
       emitted_cell = true;
     }
     for (var port_name in cell.io) {
@@ -422,7 +422,9 @@ Level.prototype.decode_save = function(save_str) {
           }
         }
         if (i == this.box_cells.length) throw "disallowed cell type: " + type;
-        this.add_cell(new Cell(this.be, "cdraw", type, x, y));
+        this.add_cell(new Cell(this.be, "cdraw", type,
+                               x / 20 * this.be.io_spacing,
+                               y / 20 * this.be.io_spacing));
 
         save_str = save_str.substring(m[0].length);
 
