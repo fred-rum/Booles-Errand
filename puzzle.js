@@ -664,30 +664,30 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'OR-AND latch',
-   intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.  Whether a latch is transparent or opaque is typically determined by a clock signal connected to it.</p><p>The core recirculating elements of a latch are shown below. <b>Use appropriate gates to connect CLK (the clock signal) and&nbsp;A (the data input) such that A passes through to Z only when CLK is 1; otherwise Z is held constant.</b></p><p>Tip: the OR gate and AND gate recirculate the Z value only when their other inputs are certain values.  Otherwise, a new value replaces the recirculating value.</p>',
+   intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.  Whether a latch is transparent or opaque is typically determined by a clock signal connected to it.</p><p>The core recirculating elements of a latch are shown below. <b>Use appropriate gates to connect CLK (the clock signal) and&nbsp;D (the data input) such that D passes through to Z only when CLK is 1; otherwise Z is held constant.</b></p><p>Tip: the OR gate and AND gate recirculate the Z value only when their other inputs are certain values.  Otherwise, a new value replaces the recirculating value.</p>',
    outro: '<p>Congratulations, <b>you have built a transparent-high SR latch.</b>  This means that the latch is transparent when the clock signal is <i>high</i>&nbsp;(1), and the recirculating value can be altered by <i>S</i>etting the value in the OR gate or <i>R</i>esetting the value in the AND gate.</p>',
-   truth: [[{clk:0, a:0,   z:x},
-            {clk:1, a:0,   z:0},
-            {clk:1, a:1,   z:1},
-            {clk:0, a:1,   z:1},
-            {clk:0, a:0,   z:1}],
-           [{clk:0, a:1,   z:x},
-            {clk:1, a:1,   z:1},
-            {clk:1, a:0,   z:0},
-            {clk:0, a:0,   z:0},
-            {clk:0, a:1,   z:0}]],
+   truth: [[{clk:0, d:0,   q:x},
+            {clk:1, d:0,   q:0},
+            {clk:1, d:1,   q:1},
+            {clk:0, d:1,   q:1},
+            {clk:0, d:0,   q:1}],
+           [{clk:0, d:1,   q:x},
+            {clk:1, d:1,   q:1},
+            {clk:1, d:0,   q:0},
+            {clk:0, d:0,   q:0},
+            {clk:0, d:1,   q:0}]],
    cells: {
      clk: {type: 'input',
          x: 100,
          y: 100
         }
      ,
-     a: {type: 'input',
+     d: {type: 'input',
          x: 100,
          y: 200
         }
      ,
-     z: {type: 'output',
+     q: {type: 'output',
          x: 600,
          y: 100
         }
@@ -695,7 +695,7 @@ Level.prototype.puzzle = [
      and: {type: 'and',
            x: 480,
            y: 100,
-           io: [['o', 'z', 'i'],
+           io: [['o', 'q', 'i'],
                 ['o', 'or', 'i0']]
           }
      ,
@@ -707,36 +707,36 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'NAND latch',
+  {name: 'NAND-NAND latch',
    intro: '<p>Because NAND gates are generally easier to implement using silicon transistors, a more common SR latch design uses a pair of NAND gates to recirculate the data. <b>Use appropriate gates to design another transparent-high SR latch.</b></p><p>This latch design has the convenient property that the latch output is available in both regular and inverted forms.</p>',
-   outro: '<p>Having a data value available in both inverted and non-inverted forms can be convenient for following logic.  For example, your solution to this puzzle probably used both A and ~A.</p>',
-   truth: [[{clk:0, a:0,   z:x, '~z':x},
-            {clk:1, a:0,   z:0, '~z':1},
-            {clk:1, a:1,   z:1, '~z':0},
-            {clk:0, a:1,   z:1, '~z':0},
-            {clk:0, a:0,   z:1, '~z':0}],
-           [{clk:0, a:1,   z:x, '~z':x},
-            {clk:1, a:1,   z:1, '~z':0},
-            {clk:1, a:0,   z:0, '~z':1},
-            {clk:0, a:0,   z:0, '~z':1},
-            {clk:0, a:1,   z:0, '~z':1}]],
+   outro: '<p>Having a data value available in both inverted and non-inverted forms can be convenient for following logic.  For example, your solution to this puzzle probably used both D and ~D.</p>',
+   truth: [[{clk:0, d:0,   q:x, '~q':x},
+            {clk:1, d:0,   q:0, '~q':1},
+            {clk:1, d:1,   q:1, '~q':0},
+            {clk:0, d:1,   q:1, '~q':0},
+            {clk:0, d:0,   q:1, '~q':0}],
+           [{clk:0, d:1,   q:x, '~q':x},
+            {clk:1, d:1,   q:1, '~q':0},
+            {clk:1, d:0,   q:0, '~q':1},
+            {clk:0, d:0,   q:0, '~q':1},
+            {clk:0, d:1,   q:0, '~q':1}]],
    cells: {
      clk: {type: 'input',
          x: 100,
          y: 100
         }
      ,
-     a: {type: 'input',
+     d: {type: 'input',
          x: 100,
          y: 200
         }
      ,
-     z: {type: 'output',
+     q: {type: 'output',
          x: 600,
          y: 100
         }
      ,
-     '~z': {type: 'output',
+     '~q': {type: 'output',
          x: 600,
          y: 200
         }
@@ -745,7 +745,7 @@ Level.prototype.puzzle = [
        type: 'nand',
        x: 480,
        y: 100,
-       io: [['o', 'z', 'i'],
+       io: [['o', 'q', 'i'],
             ['o', 'nand2', 'i0']]
      }
      ,
@@ -753,7 +753,7 @@ Level.prototype.puzzle = [
        type: 'nand',
        x: 480,
        y: 200,
-       io: [['o', '~z', 'i'],
+       io: [['o', '~q', 'i'],
             ['o', 'nand1', 'i1']]
      }
    }
