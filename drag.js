@@ -120,6 +120,14 @@ Drag.prototype.enable_drag = function(io) {
                      $.proxy(this.hover_end, this, io));
 }
 
+Drag.prototype.disable_drag = function(io) {
+  io.el_handle.undblclick();
+  io.el_handle.undrag();
+  io.el_handle.unhover();
+  io.el_handle.hover($.proxy(this.locked_hover_start, this, io),
+                     $.proxy(this.locked_hover_end, this, io));
+}
+
 Drag.prototype.disable_hover = function() {
   // We could disable hover by removing the hover event triggers,
   // but we'd have to do that for every IO.  So instead we just make
@@ -163,6 +171,14 @@ Drag.prototype.hover_end = function(io, event) {
     // don't blow up the new info.
     if (io == this.new_io) this.update_new_io(this.be.null_io, event);
   }
+};
+
+Drag.prototype.locked_hover_start = function(io, event) {
+  io.display_fail(true);
+};
+
+Drag.prototype.locked_hover_end = function(io, event) {
+  io.display_fail(false);
 };
 
 Drag.prototype.connect_o_to_i = function(o, i) {

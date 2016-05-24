@@ -320,3 +320,7 @@ Io.prototype.restore_old = function() {
     this.w[i].restore_old();
   }
 };
+
+Io.prototype.lock = function() {
+  this.be.drag.disable_drag(this);
+};

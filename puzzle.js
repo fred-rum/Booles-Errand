@@ -116,7 +116,7 @@ Level.prototype.puzzle = [
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    truth: [{a: 0,   z: 0},
            {a: 1,   z: 1}],
-   avail: ['inv'],
+   avail: [],
    cells: {
      a: {type: 'input',
          x: 100,

@@ -2,7 +2,7 @@
 
 "use strict";
 
-function Wire(be, io1, io2, pending_new) {
+function Wire(be, io1, io2, pending_new, locked) {
   this.be = be;
 
   // When the user drags out new wires, he could be dragging in either
@@ -42,6 +42,12 @@ function Wire(be, io1, io2, pending_new) {
 
   this.o.connect(this);
   this.i.connect(this);
+
+  this.locked = locked;
+  if (locked){
+    this.o.lock();
+    this.i.lock();
+  }
 
   this.pending_new = pending_new;
   if (pending_new){

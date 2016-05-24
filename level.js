@@ -78,28 +78,28 @@ Level.prototype.begin = function(level_num) {
     this.add_cell(cell);
   }
 
-  // Either connect IOs according to the puzzle data, or restore
-  // additional cells and all wire connections from the save data.
-  if (save_str === undefined){
-    // Connect IOs according to the cell data.
-    for (var cell_name in level.cells){
-      var conn_list = level.cells[cell_name].io;
-      if (conn_list){
-        for (var i = 0; i < conn_list.length; i++){
-          var io_name = conn_list[i][0];
-          var cell_name2 = conn_list[i][1];
-          var io_name2 = conn_list[i][2];
-          new Wire(this.be,
-                   this.named_cells[cell_name].io[io_name],
-                   this.named_cells[cell_name2].io[io_name2],
-                   false);
-        }
+  // Connect the cell IOs as required by the level.
+  for (var cell_name in level.cells){
+    var conn_list = level.cells[cell_name].io;
+    if (conn_list){
+      for (var i = 0; i < conn_list.length; i++){
+        var io_name = conn_list[i][0];
+        var cell_name2 = conn_list[i][1];
+        var io_name2 = conn_list[i][2];
+        new Wire(this.be,
+                 this.named_cells[cell_name].io[io_name],
+                 this.named_cells[cell_name2].io[io_name2],
+                 false, // pending_del
+                 true); // locked
       }
     }
+  }
 
-    window.location.hash = encodeURI(level.name);
-  } else {
+  // Restore additional cells and wire connections from the save data.
+  if (save_str){
     this.decode_save(save_str);
+  } else {
+    window.location.hash = encodeURI(level.name);
   }
 
   // Initialize the level to the first row of the table, and
@@ -368,14 +368,16 @@ Level.prototype.update_url = function() {
       if (io.type == 'output'){
         for (var j = 0; j < io.w.length; j++) {
           var wire = io.w[j];
-          if (emitted_cell) {
-            save.push('+');
-          } else {
-            save.push('-', i, ',');
+          if (!wire.locked) {
+            if (emitted_cell) {
+              save.push('+');
+            } else {
+              save.push('-', i, ',');
+            }
+            save.push(port_name,
+                      ',', this.all_cells.indexOf(wire.i.cell),
+                      ',', wire.i.name);
           }
-          save.push(port_name,
-                    ',', this.all_cells.indexOf(wire.i.cell),
-                    ',', wire.i.name);
         }
       }
     }
@@ -456,8 +458,15 @@ Level.prototype.decode_save = function(save_str) {
       var io_i = i_cell.io[w.i_port];
       if (!io_o) throw "bad o port: " + w.o_port;
       if (!io_i) throw "bad i port: " + w.i_port;
-      if (io_i.w.length > 0) throw "input port busy: " + w.i_port;
-      new Wire(this.be, io_o, io_i);
+      if (io_i.w.length > 0){
+        if (io_i.w[0].o == io_o){
+          console.log("duplicate wire");
+        } else {
+          throw "input port busy: " + w.i_port;
+        }
+      } else {
+        new Wire(this.be, io_o, io_i);
+      }
     }
   }
   catch (ex) {
