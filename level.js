@@ -5,6 +5,16 @@
 function Level(be) {
   this.be = be;
 
+  try {
+    for (var i = 0; i < this.puzzle.length; i++){
+      var key_completed = 'booles.' + this.puzzle[i].name + '.completed';
+      this.puzzle[i].completed = localStorage.getItem(key_completed);
+    }
+  }
+  catch(e) {
+    // continue
+  }
+
   var html = [];
   html.push('<table class="levels"><tr class="levels" id="uilevels"><td>&#9733;</td><td><b>Interface lessons only (&#9733;).</b></td></tr>');
   for (var i = 0; i < this.puzzle.length; i++){
@@ -573,10 +583,19 @@ Level.prototype.done = function(fresh_play) {
   // There are no failed rows/sequences.
   this.be.sim.click_pause();
 
+  this.level.completed = true;
+  try {
+    var key_completed = 'booles.' + this.level.name + '.completed';
+    localStorage.setItem(key_completed, "true");
+  }
+  catch(e) {
+    // continue
+  }
+
   var outro = this.level.outro || "";
   if (this.uilevels){
     for (var next = this.level_num + 1; next < this.puzzle.length; next++){
-      if (this.puzzle[next].ui) break;
+      if (this.puzzle[next].ui && !this.puzzle[next].completed) break;
     }
     if (next < this.puzzle.length){
       var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
@@ -634,7 +653,14 @@ Level.prototype.record_result = function(row, result) {
 Level.prototype.click_main = function() {
   this.be.sim.click_pause();
   $("#main_container").css({display: "block"});
+
   this.uilevels = false;
+  for (var next = 0; next < this.puzzle.length; next++){
+    if (this.puzzle[next].ui && !this.puzzle[next].completed) break;
+  }
+  if (next >= this.puzzle.length){
+    $("#uilevels").remove();
+  }
 };
 
 Level.prototype.click_level = function(level_num, event) {
@@ -650,6 +676,8 @@ Level.prototype.click_level = function(level_num, event) {
 };
 
 Level.prototype.click_uilevels = function(event) {
-  this.uilevels = true;
-  this.click_level(0, event);
+  for (var next = 0; next < this.puzzle.length; next++){
+    if (this.puzzle[next].ui && !this.puzzle[next].completed) break;
+  }
+  this.click_level(next, event);
 };
