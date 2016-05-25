@@ -16,13 +16,16 @@ function Level(be) {
   }
 
   var html = [];
-  html.push('<table class="levels"><tr class="levels" id="uilevels"><td>&#9733;</td><td><b>Interface lessons only (&#9733;).</b></td></tr>');
+  html.push('<table class="levels"><tr class="levels" id="uilevels"><td></td><td>&#9733;</td><td><b>Interface lessons only (&#9733;).</b></td></tr>');
   for (var i = 0; i < this.puzzle.length; i++){
     if (this.puzzle[i].section){
-      html.push('<tr><td colspan="2"><b>', this.puzzle[i].section, '</b></td></tr>');
+      html.push('<tr><td colspan="3"><b>', this.puzzle[i].section, '</b></td></tr>');
     }
-    html.push('<tr class="levels" id="level', i, '"><td>');
-    if (this.puzzle[i].ui) html.push('&#9733;');
+    html.push('<tr class="levels" id="level', i, '">');
+    html.push('<td><svg id="complete', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td><td>');
+    if (this.puzzle[i].ui) {
+      html.push('&#9733;');
+    }
     html.push('</td><td>', this.puzzle[i].name, '</td></tr>');
   }
   html.push('</table>');
@@ -30,11 +33,17 @@ function Level(be) {
 
   $('#uilevels').click($.proxy(this.click_uilevels, this));
   for (var i = 0; i < this.puzzle.length; i++){
+    if (this.puzzle[i].completed) this.mark_complete(i);
     $('#level' + i).click($.proxy(this.click_level, this, i));
   }
 
   $("#button-main").click($.proxy(this.click_main, this));
 }
+
+Level.prototype.mark_complete = function(level_num) {
+  var id = '#complete' + level_num;
+  $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>')
+};
 
 Level.prototype.begin = function(level_num) {
   var save_str = undefined;
@@ -595,6 +604,7 @@ Level.prototype.done = function(fresh_play) {
   catch(e) {
     // continue
   }
+  this.mark_complete(this.level_num);
 
   var outro = this.level.outro || "";
   var next = this.next_level(this.level_num + 1);
