@@ -767,4 +767,75 @@ Level.prototype.puzzle = [
      }
    }
   }
+,
+  {name: 'metastability',
+   intro: '<p>If a latch becomes opaque at the same moment that its data input changes value, it is caught between accepting and rejecting the new data value.  To prevent this uncertainty, the preceding logic will typically <i>set up</i> a new data value at least a minimum amount of time before the latch becomes opaque, and it will also <i>hold</i> the data value for a minimum amount of time after the latch becomes opaque.</p><p>The circuit below does not meet the minimum set-up and hold times.  As a result, when D changes at the same time as CLK, the output of the latch depends on the speed of the wires. <b>Adjust the simulation speed using the speed slider in order to ensure that the latch becomes opaque without capturing the new D value.</b></p><p>Tip: You may need to click in the truth table to restart a test sequence with a new speed.</p>',
+   outro: '<p>You may have noticed that at the default speed (the middle tick mark on the speed slider), the latch becomes opaque with two different values inside it.  When this occurs, the latch isn\'t stable at a particular value, but instead is <i>metastable</i> while the different values chase each other through the latch\'s recirculating gates.</p>',
+   truth: [[{clk:1, d:0,   q:0, '~q':1},
+            {clk:0, d:1,   q:0, '~q':1}],
+           [{clk:1, d:1,   q:1, '~q':0},
+            {clk:0, d:0,   q:1, '~q':0}]],
+   cells: {
+     clk: {type: 'input',
+         x: -210,
+         y: 130,
+         io: [['o', 'nand3', 'i0'],
+              ['o', 'nand4', 'i0']]
+        }
+     ,
+     d: {type: 'input',
+         x: 200,
+         y: 145,
+         io: [['o', 'nand3', 'i1'],
+              ['o', 'inv', 'i']]
+        }
+     ,
+     q: {type: 'output',
+         x: 600,
+         y: 100
+        }
+     ,
+     '~q': {type: 'output',
+         x: 600,
+         y: 190
+        }
+     ,
+     nand1:{
+       type: 'nand',
+       x: 480,
+       y: 100,
+       io: [['o', 'q', 'i'],
+            ['o', 'nand2', 'i0']]
+     }
+     ,
+     nand2: {
+       type: 'nand',
+       x: 480,
+       y: 190,
+       io: [['o', '~q', 'i'],
+            ['o', 'nand1', 'i1']]
+     }
+     ,
+     nand3: {
+       type: 'nand',
+       x: 360,
+       y: 90,
+       io: [['o', 'nand1', 'i0']]
+     }
+     ,
+     nand4: {
+       type: 'nand',
+       x: 360,
+       y: 200,
+       io: [['o', 'nand2', 'i1']]
+     }
+     ,
+     inv: {
+       type: 'inv',
+       x: 285,
+       y: 210,
+       io: [['o', 'nand4', 'i1']]
+     }
+   }
+  }
 ];
