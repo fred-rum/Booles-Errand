@@ -29,6 +29,11 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee"
   };
 
+  this.cell_label_attr = {
+    "stroke-width": 0,
+    fill: "#000"
+  };
+
   // For the case that the foreground lines & fill are drawn separately.
   this.cell_fg_line_attr = {
     "stroke-width": this.be.stroke_cell_fg,
@@ -260,6 +265,24 @@ Cell.prototype.calc_output = function() {
 
   return undefined; // This cell has no output port.
 }
+
+Cell.prototype.calc_latch = function() {
+  var d = this.io.d.value;
+  var e = this.io.e.value;
+  var value;
+  if (e === 1){
+    if (d === undefined){
+      this.io['q'].propagate_output(undefined);
+      this.io['~q'].propagate_output(undefined);
+    } else {
+      this.io['q'].propagate_output(d);
+      this.io['~q'].propagate_output(1-d);
+    }
+  } else {
+    // Don't propagate a value (leave the output unchanged)
+    // if E is 0 or undefined.
+  }
+};
 
 Cell.prototype.check_pending = function() {
   this.el_question.setAttr("visibility", "visible");
@@ -513,7 +536,7 @@ Cell.prototype.draw_stubs = function() {
   }
 };
 
-Cell.prototype.draw_inv = function(inv, right, bg) {
+Cell.prototype.draw_inv = function(inv, right, bg, y) {
   if (inv){
     var inv_r = this.be.inv_bubble_size/2;
     var inv_cx = right+inv_r;
@@ -522,9 +545,9 @@ Cell.prototype.draw_inv = function(inv, right, bg) {
     var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
     var el = bg ? this.el_ns : this.el_s;
     if (bg){
-      this.push_ns(this.canvas.circle(inv_cx, 0, inv_r).attr(attr));
+      this.push_ns(this.canvas.circle(inv_cx, y||0, inv_r).attr(attr));
     } else {
-      this.push_s(this.canvas.circle(inv_cx, 0, inv_r).attr(attr));
+      this.push_s(this.canvas.circle(inv_cx, y||0, inv_r).attr(attr));
     }
   }
 };
@@ -536,7 +559,7 @@ Cell.prototype.init_buf = function(inv) {
   var left = -width/2;
   var right = width/2;
 
-  var stub_path = this.init_io(inv, 1, 1, left, right);
+  this.init_io(inv, 1, 1, left, right);
 
   var cell_path = ["M", left, -height/2,
                    "v", height,
@@ -560,7 +583,7 @@ Cell.prototype.init_and = function(inv) {
   var right = cell_width/2;
   var top = -height/2;
 
-  var stub_path = this.init_io(inv, 1, ni, left, right);
+  this.init_io(inv, 1, ni, left, right);
 
   var cell_path = ["M", left, top,
                    "v", height,
@@ -586,7 +609,7 @@ Cell.prototype.init_or = function(inv) {
   var right = cell_width/2;
   var top = -height/2;
 
-  var stub_path = this.init_io(inv, 1, ni, left, right);
+  this.init_io(inv, 1, ni, left, right);
 
   // The arcs that meet at the front (output) end of the gate have
   // ary=height and arx chosen such that the back of the arc is
@@ -620,7 +643,7 @@ Cell.prototype.init_xor = function(inv) {
   var bar_space = cell_width/6;
   var far_left = left - bar_space;
 
-  var stub_path = this.init_io(inv, 1, ni, far_left, right);
+  this.init_io(inv, 1, ni, far_left, right);
 
   var ary = height;
   var arx = cell_width * 2/Math.sqrt(3);
@@ -812,6 +835,45 @@ Cell.prototype.init_const = function() {
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
   this.draw_stubs();
   this.push_s(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr));
+};
+
+Cell.prototype.init_latch = function() {
+  var height = 3*this.be.io_spacing;
+  var width = 2*this.be.io_spacing;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.io['d'] = new Io(this.be, this.canvas, this, 'd', 'input',
+                        left - this.be.stub_len, -this.be.io_spacing);
+  this.io['e'] = new Io(this.be, this.canvas, this, 'e', 'input',
+                        left - this.be.stub_len, 0);
+
+  this.io['q'] = new Io(this.be, this.canvas, this, 'q', 'input',
+                        right + this.be.stub_len, -this.be.io_spacing);
+  this.io['~q'] = new Io(this.be, this.canvas, this, '~q', 'input',
+                         right + this.be.inv_bubble_size + this.be.stub_len,
+                         this.be.io_spacing);
+
+  this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
+  this.draw_inv(true, right, true, this.be.io_spacing);
+  this.draw_stubs();
+  this.push_s(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr));
+  this.draw_inv(true, right, false, this.be.io_spacing);
+
+  var attr = {
+    "stroke-width": 0,
+    fill: "#000",
+    'text-anchor': 'start'
+  };
+  left += this.be.stroke_cell_fg;
+  this.push_s(this.canvas.text(left, -this.be.io_spacing, "D").attr(attr));
+  this.push_s(this.canvas.text(left, 0, "E").attr(attr));
+
+  attr['text-anchor'] = 'end';
+  right -= this.be.stroke_cell_fg;
+  this.push_s(this.canvas.text(right, -this.be.io_spacing, "Q").attr(attr));
+  this.push_s(this.canvas.text(right, this.be.io_spacing, "~Q").attr(attr));
 };
 
 Cell.prototype.init_null = function() {
