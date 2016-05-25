@@ -190,6 +190,7 @@ Drag.prototype.locked_hover_end = function(io, event) {
 };
 
 Drag.prototype.touchstart = function(io, event) {
+  $('#info').append("<p>touch start</p>");
   this.drag_start(io, undefined, undefined, event);
 };
 
@@ -198,14 +199,17 @@ Drag.prototype.touchmove = function(io, event) {
 };
 
 Drag.prototype.touchend = function(io, event) {
+  $('#info').append("<p>touch end</p>");
   this.drag_end(io, event);
 };
 
 Drag.prototype.touchenter = function(io, event) {
+  $('#info').append("<p>touch enter</p>");
   this.hover_start(io, event);
 };
 
 Drag.prototype.touchleave = function(io, event) {
+  $('#info').append("<p>touch leave</p>");
   this.hover_end(io, event);
 };
 
