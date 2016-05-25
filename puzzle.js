@@ -97,7 +97,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Create a gate',
    ui: true,
-   intro: '<p><b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
+   intro: '<p><b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: Simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
    truth: [{a: 0, z: 1},
            {a: 1, z: 0}],
@@ -427,7 +427,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Build a mux',
    section: 'Easy combinational circuits',
-   intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: if one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
+   intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: If one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
    outro: '<p>Now you\'re building real circuits!</p>',
    truth: [{s:0, a:0,        z:0},
            {s:0, a:1,        z:1},
@@ -673,7 +673,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'OR-AND latch',
    section: 'Introduction to sequential circuits',
-   intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.  Whether a latch is transparent or opaque is typically determined by a clock signal connected to it.</p><p>The core recirculating elements of a latch are shown below. <b>Use appropriate gates to connect CLK (the clock signal) and&nbsp;D (the data input) such that D passes through to Z only when CLK is 1; otherwise Z is held constant.</b></p><p>Tip: the OR gate and AND gate recirculate the Z value only when their other inputs are certain values.  Otherwise, a new value replaces the recirculating value.</p>',
+   intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.  Whether a latch is transparent or opaque is typically determined by a clock signal connected to it.</p><p>The core recirculating elements of a latch are shown below. <b>Use appropriate gates to connect CLK (the clock signal) and&nbsp;D (the data input) such that D passes through to Z only when CLK is 1; otherwise Z is held constant.</b></p><p>Tip: The OR gate and AND gate recirculate the Z value only when their other inputs are certain values.  Otherwise, a new value replaces the recirculating value.</p>',
    outro: '<p>Congratulations, <b>you have built a transparent-high SR latch.</b>  This means that the latch is transparent when the clock signal is <i>high</i>&nbsp;(1), and the recirculating value can be altered by <i>S</i>etting the value in the OR gate or <i>R</i>esetting the value in the AND gate.</p>',
    truth: [[{clk:0, d:0,   q:x},
             {clk:1, d:0,   q:0},
@@ -838,4 +838,67 @@ Level.prototype.puzzle = [
      }
    }
   }
+,
+  {name: 'Meeting hold requirement',
+   intro: '<p>This circuit uses a pre-built transparent-high latch cell. <b>Connect the CLK and D pins in such a way that the new D value is not captured if it changes at the same time as CLK changes to 0.</b></p><p>Tip: Make sure that the D value meets the hold time requirement.</p>',
+   outro: '<p>Does your solution work for all simulation speeds?</p>',
+   truth: [[{clk:1, d:0,   q:0, '~q':1},
+            {clk:1, d:1,   q:1, '~q':0},
+            {clk:0, d:0,   q:1, '~q':0},
+            {clk:0, d:1,   q:1, '~q':0}],
+           [{clk:1, d:1,   q:1, '~q':0},
+            {clk:1, d:0,   q:0, '~q':1},
+            {clk:0, d:1,   q:0, '~q':1},
+            {clk:0, d:0,   q:0, '~q':1}]],
+   cells: {
+     clk: {
+       type: 'input',
+       x: 100,
+       y: 100,
+       io: [['o', 'inv1', 'i']]
+     }
+     ,
+     d: {
+       type: 'input',
+       x: 100,
+       y: 200
+     }
+     ,
+     inv1: {
+       type: 'inv',
+       x: 225,
+       y: 0,
+       io: [['o', 'inv2', 'i']]
+     }
+     ,
+     inv2: {
+       type: 'inv',
+       x: 325,
+       y: 0,
+       io: [['o', 'latch', 'e']]
+     }
+     ,
+     latch: {
+       type: 'latch',
+       x: 450,
+       y: 120,
+       io: [['q', 'q', 'i'],
+            ['~q', '~q', 'i']]
+     }
+     ,
+     q: {
+       type: 'output',
+       x: 600,
+       y: 100
+     }
+     ,
+     '~q': {
+       type: 'output',
+       x: 600,
+       y: 140
+     }
+   }
+  }
+//  {name: 'Meeting set-up requirement',
+//   intro: '<p>This circuit uses a pre-built transparent-high latch cell. <b>Connect the CLK and D pins in such a way that the new D value is captured if it changes at the same time as CLK changes to 0.</b></p>',
 ];
