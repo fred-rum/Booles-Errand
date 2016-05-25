@@ -16,7 +16,11 @@ Drag.prototype.remove_null_wire = function() {
 };
 
 Drag.prototype.drag_start = function(io, x, y, event) {
-  if (event.touches && (event.touches.length > 1)) return;
+  if (event.originalEvent) event = event.originalEvent;
+  if (event.touches){
+    $('#info').append('start ' + event.touches.length + '<br>');
+    if (event.touches.length > 1) return;
+  }
   io.set_vis("drag", true);
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
@@ -89,7 +93,7 @@ Drag.prototype.update_free_drag = function(event) {
   }
 };
 
-Drag.prototype.drag_move = function(io, dx, dy, x, y, event) {
+Drag.prototype.drag_move = function(ignore, dx, dy, x, y, event) {
   if (event.touches && !this.no_hover) {
     var closest_d = Infinity;
     for (var i = 0; i < event.touches.length; i++){
@@ -120,7 +124,11 @@ Drag.prototype.drag_move = function(io, dx, dy, x, y, event) {
 };
 
 Drag.prototype.drag_end = function(io, event) {
-  if (event.touches && (event.touches.length > 0)) return;
+  if (event.originalEvent) event = event.originalEvent;
+  if (event.touches) {
+    $('#info').append('end ' + event.touches.length + '<br>');
+      if (event.touches.length > 0) return;
+  }
   if (this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
