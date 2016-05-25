@@ -624,7 +624,7 @@ Level.prototype.done = function(fresh_play) {
       this.be.div_info.html(html);
       $("#next-puzzle").click($.proxy(this.change_level, this, next));
     } else {
-      var html = outro + '<p>Congratulations!  You\'ve complete all of the puzzles! <button type="button" id="next-main">Main menu</button></p>';
+      var html = outro + '<p>Congratulations!  You\'ve completed the last puzzle! <button type="button" id="next-main">Main menu</button></p>';
       this.be.div_info.html(html);
       $("#next-main").click($.proxy(this.click_main, this));
     }
