@@ -156,7 +156,6 @@ Cell.prototype.propagate_value = function() {
   var calc_func_name = "calc_" + this.type;
   if (!this[calc_func_name]) return;
   var value = this[calc_func_name]();
-  if (this.io.o) this.io.o.propagate_output(value);
 };
 
 Cell.prototype.reset = function() {
@@ -168,16 +167,16 @@ Cell.prototype.reset = function() {
 
 // Private functions & members
 
-Cell.prototype.calc_inv = function() { return this.calc_buf(true); };
+Cell.prototype.calc_inv = function() { this.calc_buf(true); };
 Cell.prototype.calc_buf = function(inv) {
   var i = this.io.i.value;
   if (i === undefined) return undefined;
   var value = i;
   if (inv) value = 1-value;
-  return value;
+  this.io.o.propagate_output(value);
 };
 
-Cell.prototype.calc_nand = function() { return this.calc_and(true); };
+Cell.prototype.calc_nand = function() { this.calc_and(true); };
 Cell.prototype.calc_and = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
@@ -190,10 +189,10 @@ Cell.prototype.calc_and = function(inv) {
     value = 1;
   }
   if (inv) value = 1-value;
-  return value;
+  this.io.o.propagate_output(value);
 };
 
-Cell.prototype.calc_nor = function() { return this.calc_or(true); };
+Cell.prototype.calc_nor = function() { this.calc_or(true); };
 Cell.prototype.calc_or = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
@@ -206,10 +205,10 @@ Cell.prototype.calc_or = function(inv) {
     value = 0;
   }
   if (inv) value = 1-value;
-  return value;
+  this.io.o.propagate_output(value);
 };
 
-Cell.prototype.calc_xnor = function() { return this.calc_xor(true); };
+Cell.prototype.calc_xnor = function() { this.calc_xor(true); };
 Cell.prototype.calc_xor = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
@@ -219,15 +218,15 @@ Cell.prototype.calc_xor = function(inv) {
   }
   value = i0 ^ i1;
   if (inv) value = 1-value;
-  return value;
+  this.io.o.propagate_output(value);
 };
 
 Cell.prototype.calc_const = function() {
-  return 0;
+  this.io.o.propagate_output(0);
 };
 
 Cell.prototype.calc_input = function() {
-  return this.be.level.value(this.name);
+  this.io.o.propagate_output(this.be.level.value(this.name));
 }
 
 Cell.prototype.calc_output = function() {
@@ -258,8 +257,6 @@ Cell.prototype.calc_output = function() {
     this.el_check.attr(attr);
     this.el_check.setAttr("visibility", "visible");
   }
-
-  return undefined; // This cell has no output port.
 }
 
 Cell.prototype.calc_latch = function() {
