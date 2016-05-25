@@ -203,6 +203,7 @@ Level.prototype.init_table = function() {
               $.proxy(this.row_leave, this, i));
     row.click($.proxy(this.row_click, this, i));
     row.dblclick($.proxy(this.row_dblclick, this, i));
+    row.on('touchstart', $.proxy(this.touchstart, this));
   }
 
   if (level.hide.has("speed")){
@@ -218,6 +219,10 @@ Level.prototype.init_table = function() {
       $('#pause-at-seq').removeClass('pause-at-hidden');
     }
   }
+};
+
+Level.prototype.touchstart = function(event) {
+  $('#info').append("<p>touchstart</p>");
 };
 
 Level.prototype.table_header = function(html, port_names) {

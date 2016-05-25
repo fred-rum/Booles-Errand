@@ -121,6 +121,7 @@ Drag.prototype.enable_drag = function(io) {
   io.el_handle.hover($.proxy(this.hover_start, this, io),
                      $.proxy(this.hover_end, this, io));
   var node = $(io.el_handle.node);
+  console.log(node);
   node.on('touchstart', $.proxy(this.touchstart, this, io));
   node.on('touchmove', $.proxy(this.touchmove, this, io));
   node.on('touchend', $.proxy(this.touchend, this, io));
