@@ -19,7 +19,7 @@ Drag.prototype.drag_start = function(io, x, y, event) {
   if (event.originalEvent) event = event.originalEvent;
   if (event.touches){
     $('#info').append('start ' + event.touches.length + '<br>');
-    if (event.touches.length > 1) return;
+    //if (event.touches.length > 1) return;
   }
   io.set_vis("drag", true);
   this.orig_io = io;
@@ -127,7 +127,6 @@ Drag.prototype.drag_end = function(io, event) {
   if (event.originalEvent) event = event.originalEvent;
   if (event.touches) {
     $('#info').append('end ' + event.touches.length + '<br>');
-      if (event.touches.length > 0) return;
   }
   if (this.fail_io){
     this.fail_io.display_fail(false);
