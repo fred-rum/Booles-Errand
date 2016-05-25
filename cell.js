@@ -232,10 +232,7 @@ Cell.prototype.calc_input = function() {
 }
 
 Cell.prototype.calc_output = function() {
-  var value = this.io.i.value;
-  if (value === this.value) return;
-  this.value = value;
-
+  var value = this.value = this.io.i.value;
   var exp_value = this.be.level.value(this.name);
   if ((exp_value === undefined) || (value === undefined)){
     this.el_check.setAttr("visibility", "hidden");
