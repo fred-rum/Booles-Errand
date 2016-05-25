@@ -7,7 +7,7 @@ function Level(be) {
 
   try {
     for (var i = 0; i < this.puzzle.length; i++){
-      var key_completed = 'booles.' + this.puzzle[i].name + '.completed';
+      var key_completed = 'boole.' + this.puzzle[i].name + '.completed';
       this.puzzle[i].completed = localStorage.getItem(key_completed);
     }
   }
@@ -40,19 +40,23 @@ Level.prototype.begin = function(level_num) {
   var save_str = undefined;
 
   if (level_num === undefined){
-    level_num = 0;
     var anchor = decodeURI(window.location.hash.substring(1));
-    var a = anchor.split('?', 2);
-    var level_name = a[0];
-    if (a.length == 2) save_str = a[1];
-    for (var i = 0; i < this.puzzle.length; i++){
-      if (this.puzzle[i].name == level_name){
-        level_num = i;
-        break;
+    if (anchor != ''){
+      var a = anchor.split('?', 2);
+      var level_name = a[0];
+      if (a.length == 2) save_str = a[1];
+      for (var i = 0; i < this.puzzle.length; i++){
+        if (this.puzzle[i].name == level_name){
+          level_num = i;
+          break;
+        }
       }
+    } else {
+      level_num = this.next_level(0);
     }
   }
 
+  if (!level_num) level_num = 0;
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
 
@@ -585,7 +589,7 @@ Level.prototype.done = function(fresh_play) {
 
   this.level.completed = true;
   try {
-    var key_completed = 'booles.' + this.level.name + '.completed';
+    var key_completed = 'boole.' + this.level.name + '.completed';
     localStorage.setItem(key_completed, "true");
   }
   catch(e) {
@@ -593,11 +597,9 @@ Level.prototype.done = function(fresh_play) {
   }
 
   var outro = this.level.outro || "";
-  if (this.uilevels){
-    for (var next = this.level_num + 1; next < this.puzzle.length; next++){
-      if (this.puzzle[next].ui && !this.puzzle[next].completed) break;
-    }
-    if (next < this.puzzle.length){
+  var next = this.next_level(this.level_num + 1);
+  if (this.ui_only){
+    if (next){
       var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
       this.be.div_info.html(html);
       $("#next-puzzle").click($.proxy(this.change_level, this, next));
@@ -606,9 +608,8 @@ Level.prototype.done = function(fresh_play) {
       this.be.div_info.html(html);
       $("#next-main").click($.proxy(this.click_main, this));
     }
-  } else { // !this.uilevels
-    var next = this.level_num + 1;
-    if (next < this.puzzle.length){
+  } else { // !this.ui_only
+    if (next){
       var html = outro + '<p><button type="button" id="next-puzzle">Next puzzle</button></p>';
       this.be.div_info.html(html);
       $("#next-puzzle").click($.proxy(this.change_level, this, next));
@@ -654,13 +655,9 @@ Level.prototype.click_main = function() {
   this.be.sim.click_pause();
   $("#main_container").css({display: "block"});
 
-  this.uilevels = false;
-  for (var next = 0; next < this.puzzle.length; next++){
-    if (this.puzzle[next].ui && !this.puzzle[next].completed) break;
-  }
-  if (next >= this.puzzle.length){
-    $("#uilevels").remove();
-  }
+  this.ui_only = true;
+  if (this.next_level(0) === undefined) $("#uilevels").remove();
+  this.ui_only = false;
 };
 
 Level.prototype.click_level = function(level_num, event) {
@@ -676,8 +673,16 @@ Level.prototype.click_level = function(level_num, event) {
 };
 
 Level.prototype.click_uilevels = function(event) {
-  for (var next = 0; next < this.puzzle.length; next++){
-    if (this.puzzle[next].ui && !this.puzzle[next].completed) break;
+  // If the button for "click_uilevels" is present, then there must
+  // be UI levels available.
+  this.ui_only = true;
+  this.click_level(this.next_level(0), event);
+};
+
+Level.prototype.next_level = function(start) {
+  for (var i = start; i < this.puzzle.length; i++){
+    if ((this.puzzle[i].ui || !this.ui_only) &&
+        !this.puzzle[i].completed) return i;
   }
-  this.click_level(next, event);
+  return undefined;
 };
