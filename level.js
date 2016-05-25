@@ -258,7 +258,7 @@ Level.prototype.push_padding = function(html, i, num, last_line) {
 Level.prototype.row_enter = function(row, event) {
   this.hover_row = row;
   var old_row = this.cur_row();
-  if (row == this.row_allows_simple_click){
+  if (row === this.row_allows_simple_click){
     if (row != old_row){
       $("#row" + row).css({"background-color": "#ddd"});
     }
@@ -291,7 +291,7 @@ Level.prototype.update_hover = function() {
 
 Level.prototype.row_click = function(row, event) {
   var old_row = this.cur_row();
-  if (row == this.row_allows_simple_click){
+  if (row === this.row_allows_simple_click){
     if (row == old_row + 1){
       // The user is selecting the next line of a sequence, and the
       // current line is complete and passed.  Go ahead and advance to
