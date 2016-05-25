@@ -637,7 +637,7 @@ Level.prototype.done = function(fresh_play) {
 
 Level.prototype.change_level = function(level_num) {
   for (var i = 0; i < this.all_cells.length; i++){
-    this.all_cells[i].remove();
+    this.all_cells[i].clear();
   }
   this.be.sim.click_pause();
   this.be.sim.reset();

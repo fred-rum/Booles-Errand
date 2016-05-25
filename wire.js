@@ -94,9 +94,8 @@ Wire.prototype.measure_perf = function(name) {
 Wire.prototype.remove = function(removed_by_input_port) {
   this.o.disconnect(this);
   this.i.disconnect(this);
-  this.el_fg.remove();
-  this.el_bg.remove();
-  this.remove_subpaths();
+
+  this.clear();
 
   if (!this.pending_new && !removed_by_input_port){
     // Update the attached cell input with the fact that it's
@@ -108,8 +107,18 @@ Wire.prototype.remove = function(removed_by_input_port) {
   }
 
   // In case the wire is disconnected while a value change is pending,
-  // we mark the following (input) IO as no longer connected.
-  this.i = undefined;
+  // we mark it as dead, which causes any tick to be ignored.
+  this.dead = true;
+};
+
+Wire.prototype.clear = function() {
+  this.el_fg.remove();
+  this.el_bg.remove();
+  this.remove_subpaths();
+
+  // In case the wire is disconnected while a value change is pending,
+  // we mark it as dead, which causes any tick to be ignored.
+  this.dead = true;
 };
 
 Wire.prototype.mark_old = function(type) {
@@ -169,7 +178,7 @@ Wire.prototype.tick = function(speed) {
   // The wire could have been removed while we waited for the tick.
   // We still get the tick, but we don't do anything with it, and
   // we don't trigger any more ticks.
-  if (!this.i) return;
+  if (this.dead) return;
 
   if (this.in_flight.length) {
     // Don't propagate the newest value if it is the same as the most
