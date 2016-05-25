@@ -16,6 +16,7 @@ Drag.prototype.remove_null_wire = function() {
 };
 
 Drag.prototype.drag_start = function(io, x, y, event) {
+  if (event.touches && (event.touches.length > 1)) return;
   io.set_vis("drag", true);
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
@@ -119,6 +120,7 @@ Drag.prototype.drag_move = function(io, dx, dy, x, y, event) {
 };
 
 Drag.prototype.drag_end = function(io, event) {
+  if (event.touches && (event.touches.length > 0)) return;
   if (this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
@@ -138,6 +140,11 @@ Drag.prototype.drag_end = function(io, event) {
   this.orig_io = null;
   this.new_io = null;
   this.be.level.update_url();
+
+  if (this.hover_io) {
+    this.hover_end(this.hover_io, event);
+    this.hover_io = undefined;
+  }
 };
 
 Drag.prototype.double_click = function(io, event) {
