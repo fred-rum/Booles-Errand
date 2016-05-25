@@ -663,6 +663,7 @@ Level.prototype.record_result = function(row, result) {
 
 Level.prototype.click_main = function() {
   this.be.sim.click_pause();
+  $("#level" + this.level_num).css({"background-color": "#ff8"});
   $("#main_container").css({display: "block"});
 
   this.ui_only = true;
@@ -672,6 +673,7 @@ Level.prototype.click_main = function() {
 
 Level.prototype.click_level = function(level_num, event) {
   $("#main_container").css({display: "none"});
+  $("#level" + this.level_num).css({"background-color": ""});
 
   if (level_num === this.level_num){
     // The user selected the same level he was previously on.
