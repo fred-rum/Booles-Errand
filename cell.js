@@ -120,9 +120,8 @@ Cell.prototype.update_quantity = function(n) {
       //"font-family": "Courier New, Fixed, monospace",
       "font-size": text_height
     };
-    this.qty_x = this.io.o.x;
     this.qty_y = 0;
-    this.el_qty_text = this.canvas.text(this.qty_x, this.qty_y, "").attr(attr);
+    this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, "").attr(attr);
     this.el_qty_text.setAttr("pointer-events", "none");
     this.el_qty_text.transform("t" + this.x + "," + this.y);
     this.push_ns(this.el_qty_text);
@@ -134,7 +133,7 @@ Cell.prototype.update_quantity = function(n) {
   };
   this.el_qty_text.attr(attr);
   var bbox = this.el_qty_text.getBBox(true);
-  var desiredtop = this.io.o.y + 2;
+  var desiredtop = this.qty_top;
   var actualtop = bbox.y;
   var drift_y = actualtop - desiredtop;
   this.qty_y -= drift_y;
@@ -509,6 +508,12 @@ Cell.prototype.init_io = function(inv, no, ni, left, right) {
     this.io[io_obj.name] = io_obj;
   }
 
+  if (no > 0){
+    // Position the quantity text just below the last output stub.
+    this.qty_cx = io_obj.x;
+    this.qty_top = io_obj.y + this.be.stroke_wire_fg * 2;
+  }
+
   for (var i = 0; i < ni; i++) {
     var y = ((i+0.5)*cs)-(ni*cs/2);
     var io_obj = new Io(this.be, this.canvas, this,
@@ -858,6 +863,10 @@ Cell.prototype.init_latch = function() {
   this.io['~q'] = new Io(this.be, this.canvas, this, '~q', 'input',
                          right + this.be.inv_bubble_size + this.be.stub_len,
                          this.be.io_spacing);
+
+    this.qty_cx = this.io['~q'].x;
+    this.qty_top = this.io['~q'].y + this.be.stroke_wire_fg * 2;
+
 
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
   this.draw_inv(true, right, true, this.be.io_spacing);
