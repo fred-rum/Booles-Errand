@@ -540,6 +540,7 @@ Level.prototype.start = function() {
 
 Level.prototype.circuit_changed = function() {
   this.row_allows_simple_click = false;
+  this.select_seq(this.cur_seq);
   this.update_hover();
 
   for (var i = 0; i < this.row_result.length; i++){
