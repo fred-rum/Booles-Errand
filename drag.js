@@ -118,6 +118,9 @@ Drag.prototype.enable_drag = function(io) {
                     $.proxy(this.drag_end, this, io));
   io.el_handle.hover($.proxy(this.hover_start, this, io),
                      $.proxy(this.hover_end, this, io));
+  var node = $(io.el_handle.node);
+  node.on('touchenter', $.proxy(this.hover_start, this, io));
+  node.on('touchleave', $.proxy(this.hover_end, this, io));
 }
 
 Drag.prototype.disable_drag = function(io) {
