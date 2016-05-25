@@ -4,7 +4,7 @@
 
 var x = undefined;
 Level.prototype.puzzle = [
-  {name: 'press play',
+  {name: 'Press play',
    section: 'Introduction to circuits',
    ui: true,
    intro: '<p>&#9733; <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733;</p>',
@@ -26,7 +26,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'first wire',
+  {name: 'Draw a wire',
    ui: true,
    intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press "play" to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction.  The direction that data flows on the wire is determined by what it\'s connected to.</p>',
@@ -46,7 +46,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'truth table',
+  {name: 'The truth table',
    ui: true,
    intro: '<p>A circuit must typically pass multiple tests to prove that it is correct. <b>The truth table on the left shows what values are required</b> at the test pins for each set of values on the stimulus pins.</p><p>Clicking "play" causes each row of the truth table to be tested until every row has passed or until some row has failed.</p>',
    outro: '<p>Every row of the truth table must pass with a check mark in order to move on to the next puzzle.</p>',
@@ -95,7 +95,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'first gate',
+  {name: 'Create a gate',
    ui: true,
    intro: '<p><b>Drag the NOT gate from the box at the left into the drawing area.  Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: simply touching two wire stubs is not sufficient to transmit a value between them.  A wire must be drawn from one to the other.</p>',
    outro: '<p>Whatever is in the drawing area at the start of the puzzle is locked in place.  But you can always freely move or delete any gates that you draw.</p>',
@@ -116,7 +116,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'setting speed',
+  {name: 'The speed slider',
    ui: true,
    intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table row has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
@@ -197,7 +197,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'fanout',
+  {name: 'Wire fanout',
    ui: true,
    intro: '<p><b>Add a wire to connect A to Z and another wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input.  If you drag from Z to Y, it will move the existing wire (if any), or it will fail.',
    outro: '<p>As many wires as you want can "fan out" from any output port.</p>',
@@ -222,7 +222,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'gate+fanout',
+  {name: 'A simple circuit',
    intro: '<p><b>Check the truth table</b> to see how this circuit should be connected.</p><p>Tip: The table says that when A is 1, Z must get a 1 value, and Y must get 0.  It also says what values must go to the test pins when A is 0.</p>',
    outro: '<p>It looks like you\'re getting the hang of it!</p>',
    truth: [{a: 1,   z: 1, y: 0},
@@ -298,7 +298,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'NOT-AND',
+  {name: 'NAND is NOT-AND',
    intro: '<p><b>A NAND gate can be decomposed into an AND gate followed by an NOT gate.</b> The result is NOT 1 only if the AND gate\'s output is 1.  In other words, it performs a NOT-AND function, also known as NAND.</p>',
    outro: '<p>Because a NAND gate combines the functions of an AND gate and an NOT gate, it combines the shape of the AND gate with the bubble from the NOT gate.</p>',
    truth: [{a:0, b:0,   z:1},
@@ -324,7 +324,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'NOT as NAND',
+  {name: 'NOT with NAND',
    intro: '<p>By tying its inputs to the same source, <b>a NAND gate can perform the same function as a NOT gate.</b></p>',
    outro: '<p>NAND gates are particularly small and fast in modern silicon circuits, so it is convenient that they are also so versatile.</p>',
    truth: [{a:0,  z:1},
@@ -425,7 +425,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'build a mux',
+  {name: 'Build a mux',
    section: 'Easy combinational circuits',
    intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: if one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
    outro: '<p>Now you\'re building real circuits!</p>',
@@ -457,7 +457,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'detect odd',
+  {name: 'Detect odd',
    intro: '<p><b>Determine whether an odd number of stimulus pins have a 1 value.</b></p><p>Tip: Start with a circuit that works when&nbsp;C is 0, then add logic to handle the cases when C is 1.</p>',
    outro: '<p>Notice that it doesn\'t matter what order you put the XOR gates in.  The result is always the same.</p>',
    truth: [{a:0, b:0, c:0,   z:0},
@@ -492,7 +492,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'detect >= 2',
+  {name: 'Detect >= 2',
    intro: '<p><b>Determine whether at least two stimulus pins have a 1 value.</b></p>',
    outro: '<p>The solutions to this puzzle and the previous one together comprise a <i>full adder</i>.</p>',
    truth: [{a:0, b:0, c:0,   z:0},
@@ -526,7 +526,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'seven segment decode',
+  {name: 'Seven-segment decode',
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '',
@@ -599,7 +599,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'seven segment encode',
+  {name: 'Seven-segment encode',
    intro: '<p><b>Recognize the value on a seven-segment display and encode it as a decimal value&nbsp;(0-9).</b></p>',
    outro: '',
    truth:[{t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1,   z3:0, z2:0, z1:0, z0:0},
@@ -768,7 +768,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'metastability',
+  {name: 'Metastability',
    intro: '<p>If a latch becomes opaque at the same moment that its data input changes value, it is caught between accepting and rejecting the new data value.  To prevent this uncertainty, the preceding logic will typically <i>set up</i> a new data value at least a minimum amount of time before the latch becomes opaque, and it will also <i>hold</i> the data value for a minimum amount of time after the latch becomes opaque.</p><p>The circuit below does not meet the minimum set-up and hold times.  As a result, when D changes at the same time as CLK, the output of the latch depends on the speed of the wires. <b>Adjust the simulation speed using the speed slider in order to ensure that the latch becomes opaque without capturing the new D value.</b></p><p>Tip: You may need to click in the truth table to restart a test sequence with a new speed.</p>',
    outro: '<p>You may have noticed that at the default speed (the middle tick mark on the speed slider), the latch becomes opaque with two different values inside it.  When this occurs, the latch isn\'t stable at a particular value, but instead is <i>metastable</i> while the different values chase each other through the latch\'s recirculating gates.</p>',
    truth: [[{clk:1, d:0,   q:0, '~q':1},
