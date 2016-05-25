@@ -4,6 +4,7 @@
 
 function Drag(be) {
   this.be = be;
+  this.io_set = new Set();
 }
 
 Drag.prototype.remove_null_wire = function() {
@@ -15,7 +16,6 @@ Drag.prototype.remove_null_wire = function() {
 };
 
 Drag.prototype.drag_start = function(io, x, y, event) {
-  $('#info').append("<p>drag start</p>");
   io.set_vis("drag", true);
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
@@ -64,8 +64,15 @@ Drag.prototype.commit_new_wires = function() {
 
 Drag.prototype.update_free_drag = function(event) {
   if (this.new_io == this.be.null_io){
-    this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(event.pageX);
-    this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(event.pageY);
+    if (event.touches){
+      var pageX = event.touches[0].pageX;
+      var pageY = event.touches[0].pageY;
+    } else {
+      pageX = event.pageX;
+      pageY = event.pageY;
+    }
+    this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(pageX);
+    this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(pageY);
 
     if (this.null_wire){
       this.null_wire.redraw();
@@ -82,11 +89,36 @@ Drag.prototype.update_free_drag = function(event) {
 };
 
 Drag.prototype.drag_move = function(io, dx, dy, x, y, event) {
+  if (event.touches && !this.no_hover) {
+    var closest_d = Infinity;
+    for (var i = 0; i < event.touches.length; i++){
+      var mx = this.be.circuit.cdraw_to_canvas_x(event.touches[i].pageX);
+      var my = this.be.circuit.cdraw_to_canvas_y(event.touches[i].pageY);
+      for (var io of this.io_set.values()) {
+        var dx = io.x + io.cell.x - mx;
+        var dy = io.y + io.cell.y - my;
+        var d = (dx * dx) + (dy * dy);
+        if (d < closest_d){
+          closest_d = d;
+          var closest_io = io;
+        }
+      }
+    }
+    if (closest_d < this.be.io_handle_size * this.be.io_handle_size / 4){
+      if (closest_io != this.hover_io){
+        if (this.hover_io) this.hover_end(this.hover_io, event);
+        this.hover_start(this.hover_io = closest_io, event);
+      }
+    } else if (this.hover_io) {
+      this.hover_end(this.hover_io, event);
+      this.hover_io = undefined;
+    }
+  }
+
   this.update_free_drag(event);
 };
 
 Drag.prototype.drag_end = function(io, event) {
-  $('#info').append("<p>drag end</p>");
   if (this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
@@ -120,13 +152,7 @@ Drag.prototype.enable_drag = function(io) {
                     $.proxy(this.drag_end, this, io));
   io.el_handle.hover($.proxy(this.hover_start, this, io),
                      $.proxy(this.hover_end, this, io));
-  var node = $(io.el_handle.node);
-  console.log(node);
-  node.on('touchstart', $.proxy(this.touchstart, this, io));
-  node.on('touchmove', $.proxy(this.touchmove, this, io));
-  node.on('touchend', $.proxy(this.touchend, this, io));
-  node.on('touchenter', $.proxy(this.touchenter, this, io));
-  node.on('touchleave', $.proxy(this.touchleave, this, io));
+  this.io_set.add(io);
 }
 
 Drag.prototype.disable_drag = function(io) {
@@ -135,6 +161,7 @@ Drag.prototype.disable_drag = function(io) {
   io.el_handle.unhover();
   io.el_handle.hover($.proxy(this.locked_hover_start, this, io),
                      $.proxy(this.locked_hover_end, this, io));
+  this.io_set.delete(io);
 }
 
 Drag.prototype.disable_hover = function() {
@@ -153,12 +180,18 @@ Drag.prototype.enable_hover = function() {
   }
 }
 
-Drag.prototype.hover_start = function(io, event) {
+Drag.prototype.true_hover_start = function(io, event) {
+  console.log("true hover start");
+  this.hover_supported = true;
   if (this.no_hover){
     this.pending_hover_io = io;
     return;
   }
 
+  this.hover_start(io, event);
+}
+
+Drag.prototype.hover_start = function(io, event) {
   io.set_vis("hover", true);
 
   if (this.orig_io){
@@ -167,6 +200,7 @@ Drag.prototype.hover_start = function(io, event) {
 };
 
 Drag.prototype.hover_end = function(io, event) {
+  console.log("hover end");
   if (io == this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
@@ -188,30 +222,6 @@ Drag.prototype.locked_hover_start = function(io, event) {
 
 Drag.prototype.locked_hover_end = function(io, event) {
   io.display_fail(false);
-};
-
-Drag.prototype.touchstart = function(io, event) {
-  $('#info').append("<p>touch start</p>");
-  this.drag_start(io, undefined, undefined, event);
-};
-
-Drag.prototype.touchmove = function(io, event) {
-  this.drag_move(io, undefined, undefined, undefined, undefined, event);
-};
-
-Drag.prototype.touchend = function(io, event) {
-  $('#info').append("<p>touch end</p>");
-  this.drag_end(io, event);
-};
-
-Drag.prototype.touchenter = function(io, event) {
-  $('#info').append("<p>touch enter</p>");
-  this.hover_start(io, event);
-};
-
-Drag.prototype.touchleave = function(io, event) {
-  $('#info').append("<p>touch leave</p>");
-  this.hover_end(io, event);
 };
 
 Drag.prototype.connect_o_to_i = function(o, i) {
