@@ -141,6 +141,8 @@ Bdrag.prototype.touchmove = function (event) {
               deleteme = false;
               this.touchdata[type].touchid = this.touchdata[type].pinchid;
               this.touchdata[type].pinchid = undefined;
+              this.touchdata[type].fn_end.call(data.context,
+                                               data.extra);
               this.touchdata[type].fn_start.call(data.context,
                                                  e.touches[i].pageX,
                                                  e.touches[i].pageY,
