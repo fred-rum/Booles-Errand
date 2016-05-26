@@ -27,18 +27,6 @@ Bdrag.prototype.drag = function (jel, context, type, fn_start, fn_move, fn_end,
 Bdrag.prototype.undrag = function (jel) {
   jel.off('mousedown.booletouch');
   jel.off('touchstart.booletouch');
-
-  if ((this.dragging == 'mouse') && (this.mousedata.jel == jel)) {
-    var doc = $(document);
-    doc.off("mousemove.booledrag");
-    doc.off("mouseup.booledrag");
-  }
-
-  if ((this.dragging == 'touch') && (this.touchdata.jel == jel)) {
-    var doc = $(document);
-    doc.off("touchmove.booledrag");
-    doc.off("touchend.booledrag");
-  }
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
@@ -48,8 +36,8 @@ Bdrag.prototype.mousedown = function (data, event) {
   this.mousedata = data;
 
   var doc = $(document);
-  doc.on("mousemove.booledrag", $.proxy(this.mousemove, this));
-  doc.on("mouseup.booledrag", $.proxy(this.mouseup, this));
+  doc.on('mousemove.booledrag', $.proxy(this.mousemove, this));
+  doc.on('mouseup.booledrag', $.proxy(this.mouseup, this));
 
   data.fn_start.call(data.context, event.pageX, event.pageY, data.extra);
 };
@@ -63,8 +51,8 @@ Bdrag.prototype.mouseup = function (event) {
   this.dragging = false;
 
   var doc = $(document);
-  doc.off("mousemove.booledrag");
-  doc.off("mouseup.booledrag");
+  doc.off('mousemove.booledrag');
+  doc.off('mouseup.booledrag');
 
   this.mousedata.fn_end.call(this.mousedata.context,
                              this.mousedata.extra);
@@ -109,9 +97,9 @@ Bdrag.prototype.touchstart = function (data, event) {
 
   if (!this.dragging){
     var doc = $(document);
-    doc.on("touchmove.booledrag", $.proxy(this.touchmove, this));
-    doc.on("touchend.booledrag", $.proxy(this.touchend, this));
-    doc.on("touchcancel.booledrag", $.proxy(this.touchend, this));
+    doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
+    doc.on('touchend.booledrag', $.proxy(this.touchend, this));
+    doc.on('touchcancel.booledrag', $.proxy(this.touchend, this));
   }
   this.dragging = 'touch';
 
@@ -184,8 +172,8 @@ Bdrag.prototype.touchend = function (event) {
   if (!e.touches.length) {
     this.dragging = false;
     var doc = $(document);
-    doc.off("touchmove.booledrag");
-    doc.off("touchend.booledrag");
-    doc.off("touchcancel.booledrag");
+    doc.off('touchmove.booledrag');
+    doc.off('touchend.booledrag');
+    doc.off('touchcancel.booledrag');
   }
 };
