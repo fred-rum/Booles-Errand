@@ -16,6 +16,8 @@ Drag.prototype.remove_null_wire = function() {
 };
 
 Drag.prototype.drag_start = function(io, x, y, event) {
+  console.log(event);
+  if (this.orig_io) return; // ignore multi-touch
   if (event.originalEvent) event = event.originalEvent;
   if (event.touches){
     $('#info').append('start ' + event.touches.length + '<br>');
@@ -195,7 +197,6 @@ Drag.prototype.enable_hover = function() {
 }
 
 Drag.prototype.true_hover_start = function(io, event) {
-  console.log("true hover start");
   this.hover_supported = true;
   if (this.no_hover){
     this.pending_hover_io = io;
@@ -214,7 +215,6 @@ Drag.prototype.hover_start = function(io, event) {
 };
 
 Drag.prototype.hover_end = function(io, event) {
-  console.log("hover end");
   if (io == this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;

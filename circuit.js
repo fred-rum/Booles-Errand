@@ -11,6 +11,8 @@ function Circuit() {
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
 
+  this.be.bdrag = new Bdrag(this.be);
+
   // An inline SVG sits on the baseline, so if it is 100% of the div
   // height, then the space left for descenders will cause a vertical
   // scrollbar to appear.  Setting display: block instead of inline
@@ -25,9 +27,16 @@ function Circuit() {
     fill: "#eee"
   };
   this.canvas_rect = this.be.cdraw.rect(0, 0, 0, 0).attr(attr);
+/*
   this.canvas_rect.drag($.proxy(this.canvas_drag_move, this),
                         $.proxy(this.canvas_drag_start, this),
                         $.proxy(this.canvas_drag_end, this));
+*/
+  this.be.bdrag.drag($("#cdraw"), this, 'canvas',
+                     this.canvas_drag_start,
+                     this.canvas_drag_move,
+                     this.canvas_drag_end);
+
   $("#cdraw").mousewheel($.proxy(this.canvas_mousewheel, this));
 
   this.be.window = $(window);
@@ -360,14 +369,14 @@ Circuit.prototype.update_view = function() {
   this.canvas_rect.attr(attr);
 };
 
-Circuit.prototype.canvas_drag_start = function(x, y, event) {
+Circuit.prototype.canvas_drag_start = function(x, y) {
   this.old_drag_x = x;
   this.old_drag_y = y;
 
   this.canvas_rect.attr({"cursor": "all-scroll"});
 };
 
-Circuit.prototype.canvas_drag_move = function(dx, dy, x, y, event) {
+Circuit.prototype.canvas_drag_move = function(x, y) {
   var screen_dx = x - this.old_drag_x;
   var screen_dy = y - this.old_drag_y;
   var canvas_dx = screen_dx / this.be.scale;
