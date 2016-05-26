@@ -66,7 +66,9 @@ Bdrag.prototype.mouseup = function (event) {
 };
 
 Bdrag.prototype.touchstart = function (data, event) {
-  $('#info').append('<br>touchstart');
+  var e = event.originalEvent || event;
+  var t = e.changedTouches[0];
+  $('#info').append('<br>touchstart' + t.identifier);
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'touch';
@@ -76,8 +78,6 @@ Bdrag.prototype.touchstart = function (data, event) {
   doc.on("touchmove.booledrag", $.proxy(this.touchmove, this));
   doc.on("touchend.booledrag", $.proxy(this.touchend, this));
 
-  var e = event.originalEvent || event;
-  var t = e.changedTouches[0];
   this.mouseid = t.identifier;
 
   data.fn_start.call(data.context, t.pageX, t.pageY);
