@@ -350,7 +350,7 @@ Circuit.prototype.update_view = function() {
 };
 
 Circuit.prototype.canvas_drag_start = function(x, y) {
-  $('#info').append('drag_start ' + x ',' + y);
+  $('#info').append('<br>drag_start ' + x + ',' + y);
   this.old_drag_x = x;
   this.old_drag_y = y;
 
