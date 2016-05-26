@@ -7,7 +7,7 @@ function Bdrag() {
 
 Bdrag.prototype.drag = function (jel, context, type, fn_start, fn_move, fn_end,
                                 extra) {
-  $('#info').append('<br>drag ' + type);
+  $('#info').append('<br>drag ' + type + '  1  ');
   var data = {
     jel: jel,
     context: context,

@@ -37,6 +37,7 @@ function Circuit() {
                      this.canvas_drag_move,
                      this.canvas_drag_end);
 
+  $('#info').append('<br>cdraw drag done init');
   $("#cdraw").mousewheel($.proxy(this.canvas_mousewheel, this));
 
   this.be.window = $(window);
@@ -61,6 +62,7 @@ function Circuit() {
   this.cdraw_width = 0;
   this.cdraw_height = 0;
 
+  $('#info').append('<br>catch resize');
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
   // Sizes are based on the "em" size in the document.  Thus,
@@ -102,6 +104,7 @@ function Circuit() {
   this.be.z_handle = this.be.cdraw.path("M0,0");
 
   // null cell
+  $('#info').append('<br>new null cell');
   new Cell(this.be, "cdraw", "null", 0, 0);
 
   this.be.circuit = this;
