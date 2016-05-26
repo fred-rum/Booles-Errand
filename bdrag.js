@@ -82,6 +82,7 @@ Bdrag.prototype.touchstart = function (data, event) {
   if ((data.type == 'canvas') &&
       this.touchdata['canvas'] &&
       (this.touchdata['canvas'].pinchid === undefined)){
+    $('#info').append('<br>pinchstart' + t.identifier);
     this.touchdata['canvas'].pinchid = t.identifier;
     for (var i = 0; i < e.touches.length; i++) {
       if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
@@ -140,6 +141,7 @@ Bdrag.prototype.touchmove = function (event) {
         }
       }
       if (this.touchdata[type].pinchid !== undefined){
+        $('#info').append('<br>pinchmove?');
         for (var i = 0; i < e.touches.length; i++) {
           if (e.touches[i].identifier == this.touchdata[type].pinchid){
             this.be.circuit.canvas_pinch_move(x, y,
