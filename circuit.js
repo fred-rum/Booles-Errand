@@ -373,6 +373,20 @@ Circuit.prototype.canvas_drag_end = function() {
   $('#cdraw').css({"cursor": "default"});
 };
 
+Circuit.prototype.canvas_pinch_start = function(x1, y1, x2, y2) {
+  this.pinch_orig_distance = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+  this.pinch_orig_scale = this.be.scale;
+};
+
+Circuit.prototype.canvas_pinch_move = function(x1, y1, x2, y2) {
+  var pinch_distance = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+  var new_scale = (this.pinch_orig_scale *
+                   (pinch_distance / this.pinch_orig_distance));
+  if (new_scale > 2.0) new_scale = 2.0;
+
+  this.rescale(x1, y1, new_scale);
+};
+
 Circuit.prototype.canvas_mousewheel = function(event) {
   // Ignore events with bucky-key modifiers.  E.g. ctrl-scroll zooms the
   // whole window, so we don't want to also zoom the draw view.
@@ -381,10 +395,14 @@ Circuit.prototype.canvas_mousewheel = function(event) {
   var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
   if (new_scale > 2.0) new_scale = 2.0;
 
+  this.rescale(event.pageX, event.pageY, new_scale);
+}
+
+Circuit.prototype.rescale = function(x, y, new_scale) {
   var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
   var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
-  var cdraw_mouse_offset_x = event.pageX - cdraw_cx;
-  var cdraw_mouse_offset_y = event.pageY - cdraw_cy;
+  var cdraw_mouse_offset_x = x - cdraw_cx;
+  var cdraw_mouse_offset_y = y - cdraw_cy;
   var old_canvas_mouse_offset_x = cdraw_mouse_offset_x / this.be.scale;
   var old_canvas_mouse_offset_y = cdraw_mouse_offset_y / this.be.scale;
   var new_canvas_mouse_offset_x = cdraw_mouse_offset_x / new_scale;

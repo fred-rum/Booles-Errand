@@ -78,6 +78,21 @@ Bdrag.prototype.touchstart = function (data, event) {
   event.preventDefault();
   event.stopPropagation();
   if (this.dragging == 'mouse') return;
+
+  if ((data.type == 'canvas') &&
+      this.touchdata['canvas'] &&
+      (this.touchdata['canvas'].pinchid === undefined)){
+    this.touchdata['canvas'].pinchid = t.identifier;
+    for (var i = 0; i < e.touches.length; i++) {
+      if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
+        this.be.circuit.canvas_pinch_start(e.touches[i].pageX,
+                                           e.touches[i].pageY,
+                                           t.pageX, t.pageY);
+      }
+    }
+    return;
+  }
+
   if (this.touchdata[data.type]) return;
 
   if (e.timeStamp !== undefined){
@@ -102,7 +117,8 @@ Bdrag.prototype.touchstart = function (data, event) {
   }
   this.dragging = 'touch';
 
-  data.mouseid = t.identifier;
+  data.touchid = t.identifier;
+  data.pinchid = undefined;
   this.touchdata[data.type] = data;
 
   data.fn_start.call(data.context, t.pageX, t.pageY, data.extra);
@@ -113,13 +129,24 @@ Bdrag.prototype.touchmove = function (event) {
   var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
-    for (var i = 0; i < e.touches.length; i++) {
-      if (this.touchdata[type] &&
-          (e.touches[i].identifier == this.touchdata[type].mouseid)){
-        this.touchdata[type].fn_move.call(this.touchdata[type].context,
-                                          e.touches[i].pageX,
-                                          e.touches[i].pageY,
-                                          this.touchdata[type].extra);
+    if (this.touchdata[type]){
+      for (var i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier == this.touchdata[type].touchid){
+          var x = e.touches[i].pageX;
+          var y = e.touches[i].pageY;
+          this.touchdata[type].fn_move.call(this.touchdata[type].context,
+                                            x, y,
+                                            this.touchdata[type].extra);
+        }
+      }
+      if (this.touchdata[type].pinchid !== undefined){
+        for (var i = 0; i < e.touches.length; i++) {
+          if (e.touches[i].identifier == this.touchdata[type].pinchid){
+            this.be.circuit.canvas_pinch_move(x, y,
+                                              e.touches[i].pageX,
+                                              e.touches[i].pageY);
+          }
+        }
       }
     }
   }
@@ -132,16 +159,28 @@ Bdrag.prototype.touchend = function (event) {
     var type = types[j];
     if (this.touchdata[type]) {
       // Because the iPad sometimes sends the touchend event without all
-      // changedTouches, we instead search for missing touches.
+      // changedTouches, we instead search for missing touches.  This also
+      // works for canceltouch.
       for (var i = 0; i < e.touches.length; i++) {
         //$('#info').append('<br>touchend' + e.touches[i].identifier);
-        if (e.touches[i].identifier == this.touchdata[type].mouseid) break;
+        if (e.touches[i].identifier == this.touchdata[type].touchid) break;
       }
       if (i == e.touches.length){
         this.touchdata[type].fn_end.call(this.touchdata[type].context,
                                          this.touchdata[type].extra);
         this.touchdata[type] = undefined;
       }
+    }
+  }
+
+  if (this.touchdata['canvas'] &&
+      (this.touchdata['canvas'].pinchid !== undefined)){
+    // The first canvas touch remains, but does its pinch touch remain?
+    for (var i = 0; i < e.touches.length; i++) {
+      if (e.touches[i].identifier == this.touchdata[type].pinchid) break;
+    }
+    if (i == e.touches.length){
+      this.touchdata['canvas'].pinchid = undefined;
     }
   }
 
