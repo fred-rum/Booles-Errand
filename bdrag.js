@@ -178,9 +178,10 @@ Bdrag.prototype.touchend = function (event) {
 
   if (this.touchdata['canvas'] &&
       (this.touchdata['canvas'].pinchid !== undefined)){
+    $('#info').append('<br>check for pinchend');
     // The first canvas touch remains, but does its pinch touch remain?
     for (var i = 0; i < e.touches.length; i++) {
-      if (e.touches[i].identifier == this.touchdata[type].pinchid) break;
+      if (e.touches[i].identifier == this.touchdata['canvas'].pinchid) break;
     }
     if (i == e.touches.length){
       $('#info').append('<br>pinchend');
