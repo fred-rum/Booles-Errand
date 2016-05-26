@@ -182,6 +182,7 @@ Bdrag.prototype.touchend = function (event) {
       if (e.touches[i].identifier == this.touchdata[type].pinchid) break;
     }
     if (i == e.touches.length){
+      $('#info').append('<br>pinchend');
       this.touchdata['canvas'].pinchid = undefined;
     }
   }
