@@ -37,6 +37,7 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
+  $('#info').add('<br>mousedown');
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'mouse';
@@ -54,6 +55,7 @@ Bdrag.prototype.mousemove = function (event) {
 };
 
 Bdrag.prototype.mouseup = function (event) {
+  $('#info').add('<br>mouseup');
   this.dragging = false;
 
   var doc = $(document);
@@ -64,6 +66,7 @@ Bdrag.prototype.mouseup = function (event) {
 };
 
 Bdrag.prototype.touchstart = function (data, event) {
+  $('#info').add('<br>touchstart');
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'touch';
@@ -90,7 +93,8 @@ Bdrag.prototype.touchmove = function (event) {
   }
 };
 
-Bdrag.prototype.touchup = function (event) {
+Bdrag.prototype.touchend = function (event) {
+  $('#info').add('<br>touchend');
   this.dragging = false;
 
   var doc = $(document);
@@ -99,4 +103,3 @@ Bdrag.prototype.touchup = function (event) {
 
   this.touchdata.fn_end.call(this.touchdata.context);
 };
-
