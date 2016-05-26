@@ -17,12 +17,15 @@ Drag.prototype.remove_null_wire = function() {
 
 Drag.prototype.drag_start = function(x, y, io) {
   io.set_vis("drag", true);
+  io.set_vis("hover", false);
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
   this.new_io = io;
   this.new_wires = [];
   this.old_wires = [];
   this.null_wire = null;
+  this.disable_hover();
+  this.drag_move(x, y, io);
 };
 
 Drag.prototype.gen_old_wires = function(io) {
@@ -94,14 +97,17 @@ Drag.prototype.drag_move = function(x, y, io) {
       var closest_io = io;
     }
   }
-  if (closest_d < this.be.io_handle_size * this.be.io_handle_size / 4){
-    if (closest_io != this.hover_io){
-      if (this.hover_io) this.hover_end(x, y, this.hover_io);
-      this.hover_start(x, y, this.hover_io = closest_io);
+  // Check to see if the nearest IO is within *double* the IO handle radius.
+  if (closest_d < this.be.io_handle_size * this.be.io_handle_size){
+    if (closest_io != this.snap_io){
+      if (this.snap_io) this.snap_end(x, y, this.snap_io);
+      this.snap_io = closest_io;
+      this.snap_io.set_vis("snap", true);
+      this.update_new_io(x, y, this.snap_io);
     }
-  } else if (this.hover_io) {
-    this.hover_end(x, y, this.hover_io);
-    this.hover_io = undefined;
+  } else if (this.snap_io) {
+    this.snap_end(x, y, this.snap_io);
+    this.snap_io = undefined;
   }
 
   this.update_free_drag(x, y);
@@ -128,11 +134,12 @@ Drag.prototype.drag_end = function(io) {
   this.new_io = null;
   this.be.level.update_url();
 
-  if (this.hover_io) {
+  if (this.snap_io) {
     // Because this.orig_io is null, hover_end() doesn't need x, y.
-    this.hover_end(undefined, undefined, this.hover_io);
-    this.hover_io = undefined;
+    this.snap_end(undefined, undefined, this.snap_io);
+    this.snap_io = undefined;
   }
+  this.enable_hover();
 };
 
 Drag.prototype.double_click = function(io, event) {
@@ -185,28 +192,24 @@ Drag.prototype.true_hover_start = function(io) {
   io.set_vis("hover", true);
 }
 
-Drag.prototype.hover_start = function(x, y, io) {
-  io.set_vis("hover", true);
-  if (this.orig_io){
-    this.update_new_io(x, y, io);
-  }
-};
-
 Drag.prototype.true_hover_end = function(io, event) {
+  if (this.no_hover){
+    this.pending_hover_io = undefined;
+    return;
+  }
   io.set_vis("hover", false);
 };
 
-Drag.prototype.hover_end = function(x, y, io) {
-  io.set_vis("hover", false);
+Drag.prototype.snap_end = function(x, y, io) {
+  io.set_vis("snap", false);
   if (io == this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
   }
-  this.pending_hover_io = undefined;
 
   if (this.orig_io){
-    // hover_start could conceivably be called on a new target
-    // before hover_end is called on the old target.  In that case,
+    // new_io could conceivably be updated for a new target
+    // before snap_end is called on the old target.  In that case,
     // don't blow up the new info.
     if (io == this.new_io) this.update_new_io(x, y, this.be.null_io);
   }
