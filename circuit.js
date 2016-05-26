@@ -5,8 +5,6 @@
 function Circuit() {
   ExtendRaphael();
 
-  $('#info').append('<br>version ' + 9);
-
   // this.be is a data structure for "global" values for the whole circuit.
   this.be = {}
   this.be.cdrag = Raphael("cdrag", "100%", "100%");
