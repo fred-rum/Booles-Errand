@@ -2,14 +2,6 @@
 
 "use strict";
 
-    function init_drag(el, num) {
-      this.be.bdrag.drag($(el.node), this, 'cell',
-                         this.cell_drag_start,
-                         this.cell_drag_move,
-                         this.cell_drag_end);
-      return true;
-    }
-
 function Cell(be, canvas_type, type, x, y, name, locked) {
   $('#info').append('<br>new cell 1');
   this.be = be;
@@ -103,6 +95,13 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
       this.change_cursor("grab");
     }
 
+    init_drag = function (el, num) {
+      this.be.bdrag.drag($(el.node), this, 'cell',
+                         this.cell_drag_start,
+                         this.cell_drag_move,
+                         this.cell_drag_end);
+      return true;
+    }
     this.el_cell.forEach(init_drag, this);
   }
 }
