@@ -95,7 +95,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
       this.change_cursor("grab");
     }
 
-    init_drag = function (el, num) {
+    var init_drag = function (el, num) {
       this.be.bdrag.drag($(el.node), this, 'cell',
                          this.cell_drag_start,
                          this.cell_drag_move,
@@ -489,13 +489,12 @@ Cell.prototype.cell_drag_end = function() {
 };
 
 Cell.prototype.remove = function() {
-/*
-  function remove_drag(el, num) {
+  var remove_drag = function (el, num) {
     this.be.bdrag.undrag($(el.node));
     return true;
   }
   this.el_cell.forEach(remove_drag, this);
-*/
+
   for (var name in this.io) {
     this.io[name].remove();
   }
