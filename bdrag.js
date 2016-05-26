@@ -66,7 +66,6 @@ Bdrag.prototype.mouseup = function (event) {
   doc.off("mouseup.booledrag");
 
   this.mousedata.fn_end.call(this.mousedata.context,
-                             event.pageX, event.pageY,
                              this.mousedata.extra);
 };
 
@@ -114,13 +113,15 @@ Bdrag.prototype.touchend = function (event) {
   var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
-    for (var i = 0; i < e.changedTouches.length; i++) {
-      //$('#info').append('<br>touchend' + e.changedTouches[i].identifier);
-      if (this.touchdata[type] &&
-          (e.changedTouches[i].identifier == this.touchdata[type].mouseid)){
+    if (this.touchdata[type]) {
+      // Because the iPad sometimes sends the touchend event without all
+      // changedTouches, we instead search for missing touches.
+      for (var i = 0; i < e.touches.length; i++) {
+        //$('#info').append('<br>touchend' + e.touches[i].identifier);
+        if (e.touches[i].identifier == this.touchdata[type].mouseid) break;
+      }
+      if (i == e.touches.length){
         this.touchdata[type].fn_end.call(this.touchdata[type].context,
-                                         e.changedTouches[i].pageX,
-                                         e.changedTouches[i].pageY,
                                          this.touchdata[type].extra);
         this.touchdata[type] = undefined;
       }
@@ -132,13 +133,5 @@ Bdrag.prototype.touchend = function (event) {
     var doc = $(document);
     doc.off("touchmove.booledrag");
     doc.off("touchend.booledrag");
-
-    for (var j = 0; j < types.length; j++) {
-      var type = types[j];
-      if (this.touchdata[type]){
-        $('#info').append('<br>orphan ' + type);
-        this.touchdata[type] = undefined;
-      }
-    }
   }
 };

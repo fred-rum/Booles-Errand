@@ -107,7 +107,7 @@ Drag.prototype.drag_move = function(x, y, io) {
   this.update_free_drag(x, y);
 };
 
-Drag.prototype.drag_end = function(x, y, io) {
+Drag.prototype.drag_end = function(io) {
   if (this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
@@ -129,7 +129,8 @@ Drag.prototype.drag_end = function(x, y, io) {
   this.be.level.update_url();
 
   if (this.hover_io) {
-    this.hover_end(x, y, this.hover_io);
+    // Because this.orig_io is null, hover_end() doesn't need x, y.
+    this.hover_end(undefined, undefined, this.hover_io);
     this.hover_io = undefined;
   }
 };
