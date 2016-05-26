@@ -127,6 +127,10 @@ Io.prototype.disconnect = function(wire) {
 };
 
 Io.prototype.remove = function() {
+  if (this.canvas == this.be.cdraw) {
+    this.be.drag.disable_drag(this);
+  }
+
   while (this.w.length) {
     this.w[0].remove(this.type == 'input');
   }

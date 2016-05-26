@@ -11,7 +11,7 @@ function Circuit() {
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
 
-  this.be.bdrag = new Bdrag(this.be);
+  this.be.bdrag = new Bdrag();
 
   // An inline SVG sits on the baseline, so if it is 100% of the div
   // height, then the space left for descenders will cause a vertical

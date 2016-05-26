@@ -27,7 +27,10 @@ function Sim(be) {
   this.slider_text = $("#speed-text")[0];
   this.slider_min_color = Raphael.getRGB("#88d");
   this.slider_max_color = Raphael.getRGB("#6d6");
-  slider.mousedown($.proxy(this.speed_drag_start, this));
+  this.be.bdrag.drag(slider, this, 'speed',
+                     this.speed_drag_start,
+                     this.speed_drag_move,
+                     this.speed_drag_end);
 }
 
 Sim.prototype.resize_slider = function () {
@@ -162,16 +165,12 @@ Sim.prototype.keydown = function(event) {
   }
 };
 
-Sim.prototype.speed_drag_start = function(event) {
-  event.preventDefault();
-  var doc = $(document);
-  doc.on("mousemove.speed", $.proxy(this.speed_drag_move, this));
-  doc.on("mouseup.speed", $.proxy(this.speed_drag_end, this));
-  this.speed_drag_move(event);
+Sim.prototype.speed_drag_start = function(x, y) {
+  this.speed_drag_move(x, y);
 };
 
-Sim.prototype.speed_drag_move = function(event) {
-  var x = (event.pageX - this.slider_left) * 350/this.slider_width;
+Sim.prototype.speed_drag_move = function(x, y) {
+  x = (x - this.slider_left) * 350/this.slider_width;
   var slider_min = 30;
   var slider_default = 110;
   var slider_max = 260;
@@ -204,9 +203,8 @@ Sim.prototype.speed_drag_move = function(event) {
   this.slider_text.setAttribute('fill', Raphael.rgb(r, g, b));
 };
 
-Sim.prototype.speed_drag_end = function(event) {
-  var doc = $(document);
-  doc.off("mousemove.speed").off("mouseup.speed");
+Sim.prototype.speed_drag_end = function() {
+  // no action needed
 };
 
 Sim.prototype.click_pause_at = function(type) {

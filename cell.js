@@ -88,9 +88,14 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
       this.change_cursor("grab");
     }
 
-    this.el_cell.drag($.proxy(this.cell_drag_move, this),
-                      $.proxy(this.cell_drag_start, this),
-                      $.proxy(this.cell_drag_end, this));
+    function init_drag(el, num) {
+      this.be.bdrag.drag($(el.node), this, 'cell',
+                         this.cell_drag_start,
+                         this.cell_drag_move,
+                         this.cell_drag_end);
+      return true;
+    }
+    this.el_cell.forEach(init_drag, this);
   }
 }
 
@@ -303,7 +308,7 @@ Cell.prototype.bring_to_top = function() {
   }
 };
 
-Cell.prototype.cell_drag_start = function(x, y, event) {
+Cell.prototype.cell_drag_start = function(x, y) {
   if (this.quantity === 0) return;
 
   this.dragging = true;
@@ -422,7 +427,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
   }
 };
 
-Cell.prototype.cell_drag_move = function(dx, dy, x, y, event) {
+Cell.prototype.cell_drag_move = function(x, y) {
   if (!this.dragging) return;
 
   var screen_dx = x - this.old_drag_x;
@@ -477,6 +482,12 @@ Cell.prototype.cell_drag_end = function() {
 };
 
 Cell.prototype.remove = function() {
+  function remove_drag(el, num) {
+    this.be.bdrag.undrag($(el.node));
+    return true;
+  }
+  this.el_cell.forEach(remove_drag, this);
+
   for (var name in this.io) {
     this.io[name].remove();
   }

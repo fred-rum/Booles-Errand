@@ -15,14 +15,7 @@ Drag.prototype.remove_null_wire = function() {
   }
 };
 
-Drag.prototype.drag_start = function(io, x, y, event) {
-  console.log(event);
-  if (this.orig_io) return; // ignore multi-touch
-  if (event.originalEvent) event = event.originalEvent;
-  if (event.touches){
-    $('#info').append('start ' + event.touches.length + '<br>');
-    //if (event.touches.length > 1) return;
-  }
+Drag.prototype.drag_start = function(x, y, io) {
   io.set_vis("drag", true);
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
@@ -69,17 +62,10 @@ Drag.prototype.commit_new_wires = function() {
   }
 };
 
-Drag.prototype.update_free_drag = function(event) {
+Drag.prototype.update_free_drag = function(x, y) {
   if (this.new_io == this.be.null_io){
-    if (event.touches){
-      var pageX = event.touches[0].pageX;
-      var pageY = event.touches[0].pageY;
-    } else {
-      pageX = event.pageX;
-      pageY = event.pageY;
-    }
-    this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(pageX);
-    this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(pageY);
+    this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(x);
+    this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(y);
 
     if (this.null_wire){
       this.null_wire.redraw();
@@ -95,41 +81,33 @@ Drag.prototype.update_free_drag = function(event) {
   }
 };
 
-Drag.prototype.drag_move = function(ignore, dx, dy, x, y, event) {
-  if (event.touches && !this.no_hover) {
-    var closest_d = Infinity;
-    for (var i = 0; i < event.touches.length; i++){
-      var mx = this.be.circuit.cdraw_to_canvas_x(event.touches[i].pageX);
-      var my = this.be.circuit.cdraw_to_canvas_y(event.touches[i].pageY);
-      for (var io of this.io_set.values()) {
-        var dx = io.x + io.cell.x - mx;
-        var dy = io.y + io.cell.y - my;
-        var d = (dx * dx) + (dy * dy);
-        if (d < closest_d){
-          closest_d = d;
-          var closest_io = io;
-        }
-      }
-    }
-    if (closest_d < this.be.io_handle_size * this.be.io_handle_size / 4){
-      if (closest_io != this.hover_io){
-        if (this.hover_io) this.hover_end(this.hover_io, event);
-        this.hover_start(this.hover_io = closest_io, event);
-      }
-    } else if (this.hover_io) {
-      this.hover_end(this.hover_io, event);
-      this.hover_io = undefined;
+Drag.prototype.drag_move = function(x, y, io) {
+  var closest_d = Infinity;
+  var mx = this.be.circuit.cdraw_to_canvas_x(x);
+  var my = this.be.circuit.cdraw_to_canvas_y(y);
+  for (var io of this.io_set.values()) {
+    var dx = io.x + io.cell.x - mx;
+    var dy = io.y + io.cell.y - my;
+    var d = (dx * dx) + (dy * dy);
+    if (d < closest_d){
+      closest_d = d;
+      var closest_io = io;
     }
   }
+  if (closest_d < this.be.io_handle_size * this.be.io_handle_size / 4){
+    if (closest_io != this.hover_io){
+      if (this.hover_io) this.hover_end(x, y, this.hover_io);
+      this.hover_start(x, y, this.hover_io = closest_io);
+    }
+  } else if (this.hover_io) {
+    this.hover_end(x, y, this.hover_io);
+    this.hover_io = undefined;
+  }
 
-  this.update_free_drag(event);
+  this.update_free_drag(x, y);
 };
 
-Drag.prototype.drag_end = function(io, event) {
-  if (event.originalEvent) event = event.originalEvent;
-  if (event.touches) {
-    $('#info').append('end ' + event.touches.length + '<br>');
-  }
+Drag.prototype.drag_end = function(x, y, io) {
   if (this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
@@ -151,7 +129,7 @@ Drag.prototype.drag_end = function(io, event) {
   this.be.level.update_url();
 
   if (this.hover_io) {
-    this.hover_end(this.hover_io, event);
+    this.hover_end(x, y, this.hover_io);
     this.hover_io = undefined;
   }
 };
@@ -163,17 +141,19 @@ Drag.prototype.double_click = function(io, event) {
 
 Drag.prototype.enable_drag = function(io) {
   io.el_handle.dblclick($.proxy(this.double_click, this, io));
-  io.el_handle.drag($.proxy(this.drag_move, this, io),
-                    $.proxy(this.drag_start, this, io),
-                    $.proxy(this.drag_end, this, io));
-  io.el_handle.hover($.proxy(this.hover_start, this, io),
-                     $.proxy(this.hover_end, this, io));
+  this.be.bdrag.drag($(io.el_handle.node), this, 'io',
+                     this.drag_start,
+                     this.drag_move,
+                     this.drag_end,
+                     io);
+  io.el_handle.hover($.proxy(this.true_hover_start, this, io),
+                     $.proxy(this.true_hover_end, this, io));
   this.io_set.add(io);
 }
 
 Drag.prototype.disable_drag = function(io) {
   io.el_handle.undblclick();
-  io.el_handle.undrag();
+  this.be.bdrag.undrag($(io.el_handle.node));
   io.el_handle.unhover();
   io.el_handle.hover($.proxy(this.locked_hover_start, this, io),
                      $.proxy(this.locked_hover_end, this, io));
@@ -196,37 +176,38 @@ Drag.prototype.enable_hover = function() {
   }
 }
 
-Drag.prototype.true_hover_start = function(io, event) {
-  this.hover_supported = true;
+Drag.prototype.true_hover_start = function(io) {
   if (this.no_hover){
     this.pending_hover_io = io;
     return;
   }
-
-  this.hover_start(io, event);
+  io.set_vis("hover", true);
 }
 
-Drag.prototype.hover_start = function(io, event) {
+Drag.prototype.hover_start = function(x, y, io) {
   io.set_vis("hover", true);
-
   if (this.orig_io){
-    this.update_new_io(io, event);
+    this.update_new_io(x, y, io);
   }
 };
 
-Drag.prototype.hover_end = function(io, event) {
+Drag.prototype.true_hover_end = function(io, event) {
+  io.set_vis("hover", false);
+};
+
+Drag.prototype.hover_end = function(x, y, io) {
+  io.set_vis("hover", false);
   if (io == this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
   }
-  io.set_vis("hover", false);
   this.pending_hover_io = undefined;
 
   if (this.orig_io){
     // hover_start could conceivably be called on a new target
     // before hover_end is called on the old target.  In that case,
     // don't blow up the new info.
-    if (io == this.new_io) this.update_new_io(this.be.null_io, event);
+    if (io == this.new_io) this.update_new_io(x, y, this.be.null_io);
   }
 };
 
@@ -249,7 +230,7 @@ Drag.prototype.connect_o_to_i = function(o, i) {
   }
 };
 
-Drag.prototype.update_new_io = function(io, event) {
+Drag.prototype.update_new_io = function(x, y, io) {
   // Like cannot drag to like unless there are one or more wires
   // on the original IO that can be moved.  The exception is
   // when the new IO is the same as the original IO.
@@ -271,7 +252,7 @@ Drag.prototype.update_new_io = function(io, event) {
 
   if (io.type == "null") {
     if (this.orig_io.type == "input") this.gen_old_wires(this.orig_io);
-    this.update_free_drag(event);
+    this.update_free_drag(x, y);
   } else if ((this.orig_io.type == "output") && (io.type == "input")) {
     this.connect_o_to_i(this.orig_io, io);
   } else if ((this.orig_io.type == "output") && (io.type == "output")) {
@@ -295,6 +276,6 @@ Drag.prototype.update_new_io = function(io, event) {
     }
   } else {
     // This should never happen.
-    this.update_new_io(this.be.null_io, event);
+    this.update_new_io(x, y, this.be.null_io);
   }
 };
