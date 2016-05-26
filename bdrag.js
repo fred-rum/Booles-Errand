@@ -75,6 +75,7 @@ Bdrag.prototype.touchstart = function (data, event) {
   var t = e.changedTouches[0];
   //$('#info').append('<br>touchstart' + t.identifier);
   event.preventDefault();
+  event.stopPropagation();
   if (this.dragging == 'mouse') return;
   if (this.touchdata[data.type]) return;
 
