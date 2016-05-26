@@ -8,7 +8,7 @@ function Circuit() {
   // this.be is a data structure for "global" values for the whole circuit.
   this.be = {}
   this.be.circuit = this;
-  this.be.bdrag = new Bdrag();
+  this.be.bdrag = new Bdrag(this.be);
 
   this.be.cdrag = Raphael("cdrag", "100%", "100%");
   this.be.cbox = Raphael("cbox", "100%", "100%");

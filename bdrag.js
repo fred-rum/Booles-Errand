@@ -2,7 +2,8 @@
 
 "use strict";
 
-function Bdrag() {
+function Bdrag(be) {
+  this.be = be;
   this.touchdata = {};
   this.tapdata = {};
 }
