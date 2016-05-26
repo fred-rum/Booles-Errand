@@ -37,7 +37,7 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
-  $('#info').add('<br>mousedown');
+  $('#info').append('<br>mousedown');
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'mouse';
@@ -55,7 +55,7 @@ Bdrag.prototype.mousemove = function (event) {
 };
 
 Bdrag.prototype.mouseup = function (event) {
-  $('#info').add('<br>mouseup');
+  $('#info').append('<br>mouseup');
   this.dragging = false;
 
   var doc = $(document);
@@ -66,7 +66,7 @@ Bdrag.prototype.mouseup = function (event) {
 };
 
 Bdrag.prototype.touchstart = function (data, event) {
-  $('#info').add('<br>touchstart');
+  $('#info').append('<br>touchstart');
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'touch';
@@ -94,12 +94,12 @@ Bdrag.prototype.touchmove = function (event) {
 };
 
 Bdrag.prototype.touchend = function (event) {
-  $('#info').add('<br>touchend');
   this.dragging = false;
 
   var e = event.originalEvent || event;
-  for (var i = 0; i < e.touches.length; i++) {
-    if (e.touches[i].identifier == this.mouseid){
+  for (var i = 0; i < e.changedTouches.length; i++) {
+    $('#info').append('<br>touchend' + e.changedTouches[i].identifier);
+    if (e.changedTouches[i].identifier == this.mouseid){
       var doc = $(document);
       doc.off("touchmove.booledrag");
       doc.off("touchend.booledrag");
