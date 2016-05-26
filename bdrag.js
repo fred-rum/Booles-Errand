@@ -42,7 +42,6 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
-  //$('#info').append('<br>mousedown');
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'mouse';
@@ -61,7 +60,6 @@ Bdrag.prototype.mousemove = function (event) {
 };
 
 Bdrag.prototype.mouseup = function (event) {
-  //$('#info').append('<br>mouseup');
   this.dragging = false;
 
   var doc = $(document);
@@ -75,7 +73,6 @@ Bdrag.prototype.mouseup = function (event) {
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
   var t = e.changedTouches[0];
-  $('#info').append('<br>touchstart ' + e.touches.length);
   event.preventDefault();
   event.stopPropagation();
   if (this.dragging == 'mouse') return;
@@ -83,7 +80,6 @@ Bdrag.prototype.touchstart = function (data, event) {
   if ((data.type == 'canvas') &&
       this.touchdata['canvas'] &&
       (this.touchdata['canvas'].pinchid === undefined)){
-    $('#info').append('<br>pinchstart' + t.identifier);
     this.touchdata['canvas'].pinchid = t.identifier;
     for (var i = 0; i < e.touches.length; i++) {
       if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
@@ -156,7 +152,6 @@ Bdrag.prototype.touchmove = function (event) {
 
 Bdrag.prototype.touchend = function (event) {
   var e = event.originalEvent || event;
-  $('#info').append('<br>touchend ' + e.touches.length);
   var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
@@ -165,7 +160,6 @@ Bdrag.prototype.touchend = function (event) {
       // changedTouches, we instead search for missing touches.  This also
       // works for canceltouch.
       for (var i = 0; i < e.touches.length; i++) {
-        //$('#info').append('<br>touchend' + e.touches[i].identifier);
         if (e.touches[i].identifier == this.touchdata[type].touchid) break;
       }
       if (i == e.touches.length){
@@ -178,13 +172,11 @@ Bdrag.prototype.touchend = function (event) {
 
   if (this.touchdata['canvas'] &&
       (this.touchdata['canvas'].pinchid !== undefined)){
-    $('#info').append('<br>check for pinchend');
     // The first canvas touch remains, but does its pinch touch remain?
     for (var i = 0; i < e.touches.length; i++) {
       if (e.touches[i].identifier == this.touchdata['canvas'].pinchid) break;
     }
     if (i == e.touches.length){
-      $('#info').append('<br>pinchend');
       this.touchdata['canvas'].pinchid = undefined;
     }
   }
