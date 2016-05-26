@@ -141,7 +141,7 @@ Drag.prototype.double_click = function(io, event) {
 
 Drag.prototype.enable_drag = function(io) {
   io.el_handle.dblclick($.proxy(this.double_click, this, io));
-  this.be.bdrag.drag($(io.el_handle.node), this, 'io',
+  this.be.bdrag.drag($(io.el_handle.node), this, 'cell',
                      this.drag_start,
                      this.drag_move,
                      this.drag_end,

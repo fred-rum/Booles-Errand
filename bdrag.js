@@ -94,7 +94,7 @@ Bdrag.prototype.touchstart = function (data, event) {
 
 Bdrag.prototype.touchmove = function (event) {
   var e = event.originalEvent || event;
-  var types = ['canvas', 'speed', 'cell', 'io'];
+  var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
     for (var i = 0; i < e.touches.length; i++) {
@@ -111,7 +111,7 @@ Bdrag.prototype.touchmove = function (event) {
 
 Bdrag.prototype.touchend = function (event) {
   var e = event.originalEvent || event;
-  var types = ['canvas', 'speed', 'cell', 'io'];
+  var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
     for (var i = 0; i < e.changedTouches.length; i++) {
