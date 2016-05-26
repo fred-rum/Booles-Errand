@@ -39,7 +39,7 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
-  //$('#info').append('<br>mousedown');
+  $('#info').append('<br>mousedown');
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'mouse';
@@ -73,7 +73,7 @@ Bdrag.prototype.mouseup = function (event) {
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
   var t = e.changedTouches[0];
-  //$('#info').append('<br>touchstart' + t.identifier);
+  $('#info').append('<br>touchstart' + t.identifier);
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'touch';
