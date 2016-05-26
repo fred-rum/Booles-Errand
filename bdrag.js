@@ -98,6 +98,7 @@ Bdrag.prototype.touchstart = function (data, event) {
     var doc = $(document);
     doc.on("touchmove.booledrag", $.proxy(this.touchmove, this));
     doc.on("touchend.booledrag", $.proxy(this.touchend, this));
+    doc.on("touchcancel.booledrag", $.proxy(this.touchend, this));
   }
   this.dragging = 'touch';
 
@@ -149,5 +150,6 @@ Bdrag.prototype.touchend = function (event) {
     var doc = $(document);
     doc.off("touchmove.booledrag");
     doc.off("touchend.booledrag");
+    doc.off("touchcancel.booledrag");
   }
 };
