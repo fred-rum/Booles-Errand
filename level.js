@@ -95,7 +95,7 @@ Level.prototype.begin = function(level_num) {
 
   this.be.div_info.html(level.intro || "");
   smartquotes(this.be.div_info[0]);
-  this.be.div_info.append('<br>version ' + 22);
+  this.be.div_info.append('<br>version ' + 23);
 
   // Get a list of the input and output pins.
   this.input_names = [];
