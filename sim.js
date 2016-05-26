@@ -3,7 +3,6 @@
 "use strict";
 
 function Sim(be) {
-  $('#info').append('<br>new sim');
   this.be = be;
   this.old_output_events = [];
   this.old_other_events = [];

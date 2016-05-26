@@ -3,7 +3,6 @@
 "use strict";
 
 function Cell(be, canvas_type, type, x, y, name, locked) {
-  $('#info').append('<br>new cell 1');
   this.be = be;
   this.name = name;
   this.locked = locked;
@@ -11,7 +10,6 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   this.canvas = (canvas_type == "cdraw") ? this.be.cdraw :
                 (canvas_type == "cbox")  ? this.be.cbox :
                                            this.be.cdrag;
-  $('#info').append('<br>new cell 2');
 
   this.type = type;
   this.x = x;
@@ -30,7 +28,6 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     "stroke-linejoin": "round",
     stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee"
   };
-  $('#info').append('<br>new cell 3');
 
   this.cell_label_attr = {
     "stroke-width": 0,
@@ -58,15 +55,11 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     "stroke-linecap": "round"
   };
 
-  $('#info').append('<br>new cell 4');
   this.el_s = this.canvas.set();
   this.el_ns = this.canvas.set();
   this.el_cell = this.canvas.set();
-  $('#info').append('<br>new cell 5');
   if (typeof this["init_" + type] != "function") throw "bad cell type" + type;
-  $('#info').append('<br>new cell 6');
   this["init_" + type](); // Call cell-type initiator function by name
-  $('#info').append('<br>new cell 7');
   if (type == "null") return; // do nothing else for the null cell
 
   if (this.canvas_type != "cdrag"){
@@ -907,9 +900,7 @@ Cell.prototype.init_latch = function() {
 Cell.prototype.init_null = function() {
   // A "null" port is used as the connection point for wires
   // currently being dragged.
-  $('#info').append('<br>init_null');
   var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0);
-  $('#info').append('<br>new io done');
   this.io["null"] = io_obj;
   this.be.null_io = io_obj;
 };
