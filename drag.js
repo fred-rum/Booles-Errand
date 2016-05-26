@@ -153,6 +153,7 @@ Drag.prototype.enable_drag = function(io) {
                      this.drag_start,
                      this.drag_move,
                      this.drag_end,
+                     this.double_click,
                      io);
   io.el_handle.hover($.proxy(this.true_hover_start, this, io),
                      $.proxy(this.true_hover_end, this, io));
@@ -179,24 +180,19 @@ Drag.prototype.enable_hover = function() {
   this.no_hover = false;
   if (this.pending_hover_io) {
     this.pending_hover_io.set_vis("hover", true);
-    this.pending_hover_io = undefined;
     // We know that an IO drag hasn't begun, so nothing more is needed.
   }
 }
 
 Drag.prototype.true_hover_start = function(io) {
-  if (this.no_hover){
-    this.pending_hover_io = io;
-    return;
-  }
+  this.pending_hover_io = io;
+  if (this.no_hover) return;
   io.set_vis("hover", true);
 }
 
 Drag.prototype.true_hover_end = function(io, event) {
-  if (this.no_hover){
-    this.pending_hover_io = undefined;
-    return;
-  }
+  this.pending_hover_io = io;
+  if (this.no_hover) return;
   io.set_vis("hover", false);
 };
 

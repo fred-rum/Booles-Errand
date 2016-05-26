@@ -4,10 +4,11 @@
 
 function Bdrag() {
   this.touchdata = {};
+  this.tapdata = {};
 }
 
 Bdrag.prototype.drag = function (jel, context, type, fn_start, fn_move, fn_end,
-                                extra) {
+                                 fn_dbltap, extra) {
   var data = {
     jel: jel,
     context: context,
@@ -15,6 +16,7 @@ Bdrag.prototype.drag = function (jel, context, type, fn_start, fn_move, fn_end,
     fn_start: fn_start,
     fn_move: fn_move,
     fn_end: fn_end,
+    fn_dbltap: fn_dbltap,
     extra: extra
   };
   jel.on('mousedown.booletouch', $.proxy(this.mousedown, this, data));
@@ -77,6 +79,20 @@ Bdrag.prototype.touchstart = function (data, event) {
   event.stopPropagation();
   if (this.dragging == 'mouse') return;
   if (this.touchdata[data.type]) return;
+
+  if (e.timeStamp !== undefined){
+    var tapdata = this.tapdata[data.type];
+    if ((tapdata !== undefined) && (tapdata.jel == data.jel)){
+      var delay = e.timeStamp - tapdata.timeStamp;
+      if ((delay < 500) && (delay > 0) && data.fn_dbltap){
+        data.fn_dbltap.call(data.context, data.extra);
+      }
+    }
+    this.tapdata[data.type] = {
+      jel: data.jel,
+      timeStamp: e.timeStamp
+    };
+  }
 
   if (!this.dragging){
     var doc = $(document);
