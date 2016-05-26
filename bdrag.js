@@ -75,7 +75,7 @@ Bdrag.prototype.mouseup = function (event) {
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
   var t = e.changedTouches[0];
-  //$('#info').append('<br>touchstart' + t.identifier);
+  $('#info').append('<br>touchstart ' + e.touches.length);
   event.preventDefault();
   event.stopPropagation();
   if (this.dragging == 'mouse') return;
@@ -156,6 +156,7 @@ Bdrag.prototype.touchmove = function (event) {
 
 Bdrag.prototype.touchend = function (event) {
   var e = event.originalEvent || event;
+  $('#info').append('<br>touchend ' + e.touches.length);
   var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
