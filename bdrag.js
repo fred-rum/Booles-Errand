@@ -94,12 +94,11 @@ Bdrag.prototype.touchmove = function (event) {
 };
 
 Bdrag.prototype.touchend = function (event) {
-  this.dragging = false;
-
   var e = event.originalEvent || event;
   for (var i = 0; i < e.changedTouches.length; i++) {
     $('#info').append('<br>touchend' + e.changedTouches[i].identifier);
     if (e.changedTouches[i].identifier == this.mouseid){
+      this.dragging = false;
       var doc = $(document);
       doc.off("touchmove.booledrag");
       doc.off("touchend.booledrag");
