@@ -374,14 +374,11 @@ Circuit.prototype.canvas_drag_end = function() {
 };
 
 Circuit.prototype.canvas_pinch_start = function(x1, y1, x2, y2) {
-  $('#info').append('<br>in circuit');
-  $('#info').append('<br>pinch_start' + x1 + ',' + y1 + ';' + x2 + ',' + y2);
   this.pinch_orig_distance = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
   this.pinch_orig_scale = this.be.scale;
 };
 
 Circuit.prototype.canvas_pinch_move = function(x1, y1, x2, y2) {
-  $('#info').append('<br>pinch_move' + x1 + ',' + y1 + ';' + x2 + ',' + y2);
   var pinch_distance = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
   var new_scale = (this.pinch_orig_scale *
                    (pinch_distance / this.pinch_orig_distance));
