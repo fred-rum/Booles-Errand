@@ -132,5 +132,13 @@ Bdrag.prototype.touchend = function (event) {
     var doc = $(document);
     doc.off("touchmove.booledrag");
     doc.off("touchend.booledrag");
+
+    for (var j = 0; j < types.length; j++) {
+      var type = types[j];
+      if (this.touchdata[type]){
+        $('#info').append('<br>orphan ' + type);
+        this.touchdata[type] = undefined;
+      }
+    }
   }
 };
