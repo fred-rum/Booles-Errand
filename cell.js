@@ -900,7 +900,9 @@ Cell.prototype.init_latch = function() {
 Cell.prototype.init_null = function() {
   // A "null" port is used as the connection point for wires
   // currently being dragged.
+  $('#info').append('<br>init_null');
   var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0);
+  $('#info').append('<br>new io done');
   this.io["null"] = io_obj;
   this.be.null_io = io_obj;
 };

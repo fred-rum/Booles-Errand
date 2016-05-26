@@ -37,7 +37,6 @@ function Circuit() {
                      this.canvas_drag_move,
                      this.canvas_drag_end);
 
-  $('#info').append('<br>cdraw drag done init');
   $("#cdraw").mousewheel($.proxy(this.canvas_mousewheel, this));
 
   this.be.window = $(window);
