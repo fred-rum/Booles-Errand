@@ -97,9 +97,13 @@ Bdrag.prototype.touchend = function (event) {
   $('#info').add('<br>touchend');
   this.dragging = false;
 
-  var doc = $(document);
-  doc.off("touchmove.booledrag");
-  doc.off("touchend.booledrag");
-
-  this.touchdata.fn_end.call(this.touchdata.context);
+  var e = event.originalEvent || event;
+  for (var i = 0; i < e.touches.length; i++) {
+    if (e.touches[i].identifier == this.mouseid){
+      var doc = $(document);
+      doc.off("touchmove.booledrag");
+      doc.off("touchend.booledrag");
+      this.touchdata.fn_end.call(this.touchdata.context);
+    }
+  }
 };
