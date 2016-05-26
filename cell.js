@@ -313,9 +313,6 @@ Cell.prototype.cell_drag_start = function(x, y) {
 
   this.dragging = true;
 
-  this.old_drag_x = x;
-  this.old_drag_y = y;
-
   this.change_cursor("grabbing");
   this.be.drag.disable_hover();
 
@@ -345,6 +342,11 @@ Cell.prototype.cell_drag_start = function(x, y) {
   }
   this.cdrag_cell = new Cell(this.be, "cdrag", this.type, canvas_x, canvas_y,
                              this.name);
+
+  // Remember how far the cell's x,y coordinate is from the canvas
+  // coordinate of the mouse/touch.
+  this.canvas_drag_offset_x = canvas_x - this.be.circuit.cdraw_to_canvas_x(x);
+  this.canvas_drag_offset_y = canvas_y - this.be.circuit.cdraw_to_canvas_y(y);
 
   // Put the cdrag cell in a central location.
   // The resize/reflow code will fix its position as necessory.
@@ -430,18 +432,15 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
 Cell.prototype.cell_drag_move = function(x, y) {
   if (!this.dragging) return;
 
-  var screen_dx = x - this.old_drag_x;
-  var screen_dy = y - this.old_drag_y;
-  var canvas_dx = screen_dx / this.be.scale;
-  var canvas_dy = screen_dy / this.be.scale;
+  var mx = this.be.circuit.cdraw_to_canvas_x(x);
+  var my = this.be.circuit.cdraw_to_canvas_y(y);
+  var canvas_dx = mx + this.canvas_drag_offset_x - this.cdraw_cell.x;
+  var canvas_dy = my + this.canvas_drag_offset_y - this.cdraw_cell.y;
   this.cdrag_cell.move(canvas_dx, canvas_dy);
   this.cdraw_cell.move(canvas_dx, canvas_dy);
 
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
-
-  this.old_drag_x = x;
-  this.old_drag_y = y;
 };
 
 Cell.prototype.cell_drag_end = function() {

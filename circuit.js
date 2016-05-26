@@ -168,7 +168,9 @@ Circuit.prototype.resize = function(center) {
     // then cdrag will change position, which means that any cell
     // currently being dragged will incorrectly shift on the screen.
     // Fix that.
-    this.be.cdrag_cell.move(0, this.be.truth_height - new_truth_height);
+    var cdraw_shift = this.be.truth_height - new_truth_height;
+    var canvas_shift = cdraw_shift / this.be.scale;
+    this.be.cdrag_cell.move(0, canvas_shift);
   }
 
   // Make sure the truth table div is at least as tall as the info div.
