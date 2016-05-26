@@ -98,8 +98,8 @@ Bdrag.prototype.touchstart = function (data, event) {
   if (!this.dragging){
     var doc = $(document);
     doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
-    doc.on('touchend.booledrag', $.proxy(this.touchend, this));
-    doc.on('touchcancel.booledrag', $.proxy(this.touchend, this));
+    doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
+    doc.on('touchcancel.booledrag', $.proxy(this.touchmove, this));
   }
   this.dragging = 'touch';
 
@@ -110,6 +110,10 @@ Bdrag.prototype.touchstart = function (data, event) {
   data.fn_start.call(data.context, t.pageX, t.pageY, data.extra);
 };
 
+// touchmove also handles touchend and touchcancel by looking for
+// touches that are no longer present.  (Some form of this is
+// necessary since the iPad doesn't send proper changedTouches when
+// two touches end at once.)
 Bdrag.prototype.touchmove = function (event) {
   var e = event.originalEvent || event;
   var types = ['canvas', 'speed', 'cell'];
@@ -123,49 +127,42 @@ Bdrag.prototype.touchmove = function (event) {
           this.touchdata[type].fn_move.call(this.touchdata[type].context,
                                             x, y,
                                             this.touchdata[type].extra);
+          break;
         }
       }
+
+      var deleteme = (i == e.touches.length);
+      var deletepinch = false;
+
       if (this.touchdata[type].pinchid !== undefined){
         for (var i = 0; i < e.touches.length; i++) {
           if (e.touches[i].identifier == this.touchdata[type].pinchid){
-            this.be.circuit.canvas_pinch_move(x, y,
-                                              e.touches[i].pageX,
-                                              e.touches[i].pageY);
+            if (deleteme){
+              deleteme = false;
+              this.touchdata[type].touchid = this.touchdata[type].pinchid;
+              this.touchdata[type].pinchid = undefined;
+              this.touchdata[type].fn_start.call(data.context,
+                                                 e.touches[i].pageX,
+                                                 e.touches[i].pageY,
+                                                 data.extra);
+            } else {
+              this.be.circuit.canvas_pinch_move(x, y,
+                                                e.touches[i].pageX,
+                                                e.touches[i].pageY);
+            }
+            break;
           }
         }
+        deletepinch = (i == e.touches.length);
       }
-    }
-  }
-};
 
-Bdrag.prototype.touchend = function (event) {
-  var e = event.originalEvent || event;
-  var types = ['canvas', 'speed', 'cell'];
-  for (var j = 0; j < types.length; j++) {
-    var type = types[j];
-    if (this.touchdata[type]) {
-      // Because the iPad sometimes sends the touchend event without all
-      // changedTouches, we instead search for missing touches.  This also
-      // works for canceltouch.
-      for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier == this.touchdata[type].touchid) break;
-      }
-      if (i == e.touches.length){
+      if (deleteme) {
         this.touchdata[type].fn_end.call(this.touchdata[type].context,
                                          this.touchdata[type].extra);
         this.touchdata[type] = undefined;
+      } else if (deletepinch){
+        this.touchdata[type].pinchid = undefined;
       }
-    }
-  }
-
-  if (this.touchdata['canvas'] &&
-      (this.touchdata['canvas'].pinchid !== undefined)){
-    // The first canvas touch remains, but does its pinch touch remain?
-    for (var i = 0; i < e.touches.length; i++) {
-      if (e.touches[i].identifier == this.touchdata['canvas'].pinchid) break;
-    }
-    if (i == e.touches.length){
-      this.touchdata['canvas'].pinchid = undefined;
     }
   }
 
