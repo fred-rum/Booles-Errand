@@ -94,7 +94,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     } else {
       this.change_cursor("grab");
     }
-
+/*
     function init_drag(el, num) {
       this.be.bdrag.drag($(el.node), this, 'cell',
                          this.cell_drag_start,
@@ -103,6 +103,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
       return true;
     }
     this.el_cell.forEach(init_drag, this);
+*/
   }
 }
 
@@ -489,12 +490,13 @@ Cell.prototype.cell_drag_end = function() {
 };
 
 Cell.prototype.remove = function() {
+/*
   function remove_drag(el, num) {
     this.be.bdrag.undrag($(el.node));
     return true;
   }
   this.el_cell.forEach(remove_drag, this);
-
+*/
   for (var name in this.io) {
     this.io[name].remove();
   }
