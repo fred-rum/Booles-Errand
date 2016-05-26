@@ -7,11 +7,12 @@ function Circuit() {
 
   // this.be is a data structure for "global" values for the whole circuit.
   this.be = {}
+  this.be.circuit = this;
+  this.be.bdrag = new Bdrag();
+
   this.be.cdrag = Raphael("cdrag", "100%", "100%");
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
-
-  this.be.bdrag = new Bdrag();
 
   // An inline SVG sits on the baseline, so if it is 100% of the div
   // height, then the space left for descenders will cause a vertical
@@ -92,7 +93,6 @@ function Circuit() {
   // null cell
   new Cell(this.be, "cdraw", "null", 0, 0);
 
-  this.be.circuit = this;
   this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
 

@@ -85,7 +85,9 @@ Bdrag.prototype.touchstart = function (data, event) {
     $('#info').append('<br>pinchstart' + t.identifier);
     this.touchdata['canvas'].pinchid = t.identifier;
     for (var i = 0; i < e.touches.length; i++) {
+      $('#info').append('<br>checking touch ' + i);
       if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
+        $('#info').append('<br>yes');
         this.be.circuit.canvas_pinch_start(e.touches[i].pageX,
                                            e.touches[i].pageY,
                                            t.pageX, t.pageY);
