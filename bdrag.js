@@ -142,13 +142,13 @@ Bdrag.prototype.touchmove = function (event) {
               this.touchdata[type].touchid = this.touchdata[type].pinchid;
               this.touchdata[type].pinchid = undefined;
               $('#info').append('<br>call fn_end');
-              this.touchdata[type].fn_end.call(data.context,
-                                               data.extra);
+              this.touchdata[type].fn_end.call(this.touchdata[type].context,
+                                               this.touchdata[type].extra);
               $('#info').append('<br>call fn_start');
-              this.touchdata[type].fn_start.call(data.context,
+              this.touchdata[type].fn_start.call(this.touchdata[type].context,
                                                  e.touches[i].pageX,
                                                  e.touches[i].pageY,
-                                                 data.extra);
+                                                 this.touchdata[type].extra);
             } else {
               this.be.circuit.canvas_pinch_move(x, y,
                                                 e.touches[i].pageX,
