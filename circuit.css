@@ -104,7 +104,7 @@ body {
     background-color: #d0d0ff;
     text-align: left;
     overflow: auto;
-    max-height: 50vh;
+    max-height: 30vh;
 }
 #controls {
     display: inline-block;
