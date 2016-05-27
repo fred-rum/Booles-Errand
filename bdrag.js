@@ -30,6 +30,9 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
+  // Accept only button 1 (if a button is specified).
+  if ((event.which !== undefined) && (event.which != 1)) return;
+
   event.preventDefault();
   if (this.dragging) return;
   this.dragging = 'mouse';
