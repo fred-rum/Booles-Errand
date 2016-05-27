@@ -50,6 +50,7 @@ function Circuit() {
   this.cdraw_width = 0;
   this.cdraw_height = 0;
 
+  this.be.window.on('orientationchange', $.proxy(this.resize_event, this)); 
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
   // Sizes are based on the "em" size in the document.  Thus,
@@ -108,9 +109,14 @@ Circuit.prototype.begin_level = function(level_num) {
 };
 
 Circuit.prototype.resize_event = function() {
+  $('#info').append('<br>resize');
   this.resize(true);
   this.update_view();
 };
+
+Circuit.prototype.orient = function() {
+  $('#info').append('<br>orient');
+}
 
 Circuit.prototype.resize = function(center) {
   // Adjust the sizes and positions of the various divs to fit the
