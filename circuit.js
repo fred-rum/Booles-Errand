@@ -22,9 +22,11 @@ function Circuit() {
   $("#cdraw svg").attr({"display": "block"});
 
   this.be.bdrag.drag($("#cdraw"), this, 'canvas',
-                     this.canvas_drag_start,
-                     this.canvas_drag_move,
-                     this.canvas_drag_end);
+                     {start: this.canvas_drag_start,
+                      move: this.canvas_drag_move,
+                      end: this.canvas_drag_end,
+                      pinch_start: this.canvas_pinch_start,
+                      pinch_move: this.canvas_pinch_move});
 
   $("#cdraw").mousewheel($.proxy(this.canvas_mousewheel, this));
 

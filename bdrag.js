@@ -8,16 +8,12 @@ function Bdrag(be) {
   this.tapdata = {};
 }
 
-Bdrag.prototype.drag = function (jel, context, type, fn_start, fn_move, fn_end,
-                                 fn_dbltap, extra) {
+Bdrag.prototype.drag = function (jel, context, type, callbacks, extra) {
   var data = {
     jel: jel,
     context: context,
     type: type,
-    fn_start: fn_start,
-    fn_move: fn_move,
-    fn_end: fn_end,
-    fn_dbltap: fn_dbltap,
+    callbacks: callbacks,
     extra: extra
   };
   jel.on('mousedown.booletouch', $.proxy(this.mousedown, this, data));
@@ -42,12 +38,13 @@ Bdrag.prototype.mousedown = function (data, event) {
   doc.on('mousemove.booledrag', $.proxy(this.mousemove, this));
   doc.on('mouseup.booledrag', $.proxy(this.mouseup, this));
 
-  data.fn_start.call(data.context, event.pageX, event.pageY, data.extra);
+  data.callbacks.start.call(data.context, event.pageX, event.pageY, data.extra);
 };
 
 Bdrag.prototype.mousemove = function (event) {
-  this.mousedata.fn_move.call(this.mousedata.context, event.pageX, event.pageY,
-                              this.mousedata.extra);
+  this.mousedata.callbacks.move.call(this.mousedata.context,
+                                     event.pageX, event.pageY,
+                                     this.mousedata.extra);
 };
 
 Bdrag.prototype.mouseup = function (event) {
@@ -57,8 +54,8 @@ Bdrag.prototype.mouseup = function (event) {
   doc.off('mousemove.booledrag');
   doc.off('mouseup.booledrag');
 
-  this.mousedata.fn_end.call(this.mousedata.context,
-                             this.mousedata.extra);
+  this.mousedata.callbacks.end.call(this.mousedata.context,
+                                    this.mousedata.extra);
 };
 
 Bdrag.prototype.touchstart = function (data, event) {
@@ -71,8 +68,8 @@ Bdrag.prototype.touchstart = function (data, event) {
     var tapdata = this.tapdata[data.type];
     if ((tapdata !== undefined) && (tapdata.jel == data.jel)){
       var delay = e.timeStamp - tapdata.timeStamp;
-      if ((delay < 500) && (delay > 0) && data.fn_dbltap){
-        data.fn_dbltap.call(data.context, data.extra);
+      if ((delay < 500) && (delay > 0) && data.callbacks.dblclick){
+        data.callbacks.dblclick.call(data.context, data.extra);
         // We allow processing to continue for the touch in case the
         // user wants to drag out a new wire immediately from the
         // double tap.
@@ -92,15 +89,15 @@ Bdrag.prototype.touchstart = function (data, event) {
     var t = e.changedTouches[j];
 
     // Detect second touch for a pinch.
-    if ((data.type == 'canvas') &&
-        this.touchdata['canvas'] &&
-        (this.touchdata['canvas'].pinchid === undefined)){
-      this.touchdata['canvas'].pinchid = t.identifier;
+    if ((data.type == 'canvas') && this.touchdata['canvas'] &&
+        (data.pinchid === undefined)){
+      data.pinchid = t.identifier;
       for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
-          this.be.circuit.canvas_pinch_start(e.touches[i].pageX,
-                                             e.touches[i].pageY,
-                                             t.pageX, t.pageY);
+        if (e.touches[i].identifier == data.touchid){
+          data.callbacks.pinch_start.call(data.context,
+                                          e.touches[i].pageX,
+                                          e.touches[i].pageY,
+                                          t.pageX, t.pageY);
         }
       }
       break;
@@ -120,7 +117,7 @@ Bdrag.prototype.touchstart = function (data, event) {
     data.pinchid = undefined;
     this.touchdata[data.type] = data;
 
-    data.fn_start.call(data.context, t.pageX, t.pageY, data.extra);
+    data.callbacks.start.call(data.context, t.pageX, t.pageY, data.extra);
   }
 };
 
@@ -133,14 +130,15 @@ Bdrag.prototype.touchmove = function (event) {
   var types = ['canvas', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
-    if (this.touchdata[type]){
+    var data = this.touchdata[type];
+    if (data){
       for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier == this.touchdata[type].touchid){
+        if (e.touches[i].identifier == data.touchid){
           var x = e.touches[i].pageX;
           var y = e.touches[i].pageY;
-          this.touchdata[type].fn_move.call(this.touchdata[type].context,
-                                            x, y,
-                                            this.touchdata[type].extra);
+          data.callbacks.move.call(data.context,
+                                   x, y,
+                                   data.extra);
           break;
         }
       }
@@ -148,23 +146,24 @@ Bdrag.prototype.touchmove = function (event) {
       var deleteme = (i == e.touches.length);
       var deletepinch = false;
 
-      if (this.touchdata[type].pinchid !== undefined){
+      if (data.pinchid !== undefined){
         for (var i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier == this.touchdata[type].pinchid){
+          if (e.touches[i].identifier == data.pinchid){
             if (deleteme){
               deleteme = false;
-              this.touchdata[type].touchid = this.touchdata[type].pinchid;
-              this.touchdata[type].pinchid = undefined;
-              this.touchdata[type].fn_end.call(this.touchdata[type].context,
-                                               this.touchdata[type].extra);
-              this.touchdata[type].fn_start.call(this.touchdata[type].context,
-                                                 e.touches[i].pageX,
-                                                 e.touches[i].pageY,
-                                                 this.touchdata[type].extra);
+              data.touchid = data.pinchid;
+              data.pinchid = undefined;
+              data.callbacks.end.call(data.context,
+                                      data.extra);
+              data.callbacks.start.call(data.context,
+                                        e.touches[i].pageX,
+                                        e.touches[i].pageY,
+                                        data.extra);
             } else {
-              this.be.circuit.canvas_pinch_move(x, y,
-                                                e.touches[i].pageX,
-                                                e.touches[i].pageY);
+              data.callbacks.pinch_move.call(data.context,
+                                             x, y,
+                                             e.touches[i].pageX,
+                                             e.touches[i].pageY);
             }
             break;
           }
@@ -173,11 +172,10 @@ Bdrag.prototype.touchmove = function (event) {
       }
 
       if (deleteme) {
-        this.touchdata[type].fn_end.call(this.touchdata[type].context,
-                                         this.touchdata[type].extra);
+        data.callbacks.end.call(data.context, data.extra);
         this.touchdata[type] = undefined;
       } else if (deletepinch){
-        this.touchdata[type].pinchid = undefined;
+        data.pinchid = undefined;
       }
     }
   }

@@ -28,9 +28,9 @@ function Sim(be) {
   this.slider_min_color = Raphael.getRGB("#88d");
   this.slider_max_color = Raphael.getRGB("#6d6");
   this.be.bdrag.drag(slider, this, 'speed',
-                     this.speed_drag_start,
-                     this.speed_drag_move,
-                     this.speed_drag_end);
+                     {start: this.speed_drag_start,
+                      move: this.speed_drag_move,
+                      end: this.speed_drag_end});
 }
 
 Sim.prototype.resize_slider = function () {

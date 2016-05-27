@@ -150,10 +150,10 @@ Drag.prototype.double_click = function(io, event) {
 Drag.prototype.enable_drag = function(io) {
   io.el_handle.dblclick($.proxy(this.double_click, this, io));
   this.be.bdrag.drag($(io.el_handle.node), this, 'cell',
-                     this.drag_start,
-                     this.drag_move,
-                     this.drag_end,
-                     this.double_click,
+                     {start: this.drag_start,
+                      move: this.drag_move,
+                      end: this.drag_end,
+                      dblclick: this.double_click},
                      io);
   io.el_handle.hover($.proxy(this.true_hover_start, this, io),
                      $.proxy(this.true_hover_end, this, io));

@@ -90,9 +90,9 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
 
     var init_drag = function (el, num) {
       this.be.bdrag.drag($(el.node), this, 'cell',
-                         this.cell_drag_start,
-                         this.cell_drag_move,
-                         this.cell_drag_end);
+                         {start: this.cell_drag_start,
+                          move: this.cell_drag_move,
+                          end: this.cell_drag_end});
       return true;
     }
     this.el_cell.forEach(init_drag, this);
