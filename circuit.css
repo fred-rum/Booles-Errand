@@ -134,15 +134,10 @@ body {
     width: 8em;
     height: 100%;
     background-color: #eee;
-    z-index: 2;
-}
-#cbox_border {
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: auto;
+    background-clip: padding-box;
     border-right-style: dotted;
     border-width: thin;
+    z-index: 2;
 }
 #cbox_scroll {
     top: 0;
