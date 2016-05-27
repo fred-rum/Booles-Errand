@@ -61,6 +61,12 @@ body {
 .pause-at:hover {
     fill: #ddd;
 }
+.infobutton {
+    fill: #d0d0ff;
+}
+.infobutton:hover {
+    fill: #b0b0ff;
+}
 #truth {
     position: fixed;
     top: 0;

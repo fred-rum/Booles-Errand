@@ -31,6 +31,7 @@ function Circuit() {
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
   this.be.div_info = $("#info");
+  this.be.div_infotxt = $("#infotxt");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");

@@ -93,9 +93,9 @@ Level.prototype.begin = function(level_num) {
   this.named_cells = {};
   this.all_cells = [];
 
-  this.be.div_info.html(level.intro || "");
-  smartquotes(this.be.div_info[0]);
-  //this.be.div_info.append('<br>version ' + 33);
+  this.be.div_infotxt.html(level.intro || "");
+  smartquotes(this.be.div_infotxt[0]);
+  //this.be.div_infotxt.append('<br>version ' + 33);
 
   // Get a list of the input and output pins.
   this.input_names = [];
@@ -613,25 +613,25 @@ Level.prototype.done = function(fresh_play) {
   if (this.ui_only){
     if (next){
       var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
-      this.be.div_info.html(html);
+      this.be.div_infotxt.html(html);
       $("#next-puzzle").click($.proxy(this.change_level, this, next));
     } else {
       var html = outro + '<p>You\'ve completed all of the interface lessons.  Are you ready for some puzzles? <button type="button" id="next-main">Main menu</button></p>';
-      this.be.div_info.html(html);
+      this.be.div_infotxt.html(html);
       $("#next-main").click($.proxy(this.click_main, this));
     }
   } else { // !this.ui_only
     if (next){
       var html = outro + '<p><button type="button" id="next-puzzle">Next puzzle</button></p>';
-      this.be.div_info.html(html);
+      this.be.div_infotxt.html(html);
       $("#next-puzzle").click($.proxy(this.change_level, this, next));
     } else {
       var html = outro + '<p>Congratulations!  You\'ve completed the last puzzle! <button type="button" id="next-main">Main menu</button></p>';
-      this.be.div_info.html(html);
+      this.be.div_infotxt.html(html);
       $("#next-main").click($.proxy(this.click_main, this));
     }
   }
-  smartquotes(this.be.div_info[0]);
+  smartquotes(this.be.div_infotxt[0]);
   this.be.circuit.resize(false);
   this.be.circuit.update_view();
 };
