@@ -88,18 +88,29 @@ body {
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */      
 }
-#info {
+#top {
     position: fixed;
     top: 0;
     left: 8em;
     width: 100%;
     height: auto;
-    max-height: 50vh;
-    overflow: auto;
     z-index: 100;
+    text-align: center;
+}
+#info {
+    display: block;
     border-bottom-style: solid;
     border-width: thin;
     background-color: #d0d0ff;
+    text-align: left;
+    overflow: auto;
+    max-height: 50vh;
+}
+#controls {
+    display: inline-block;
+    border-style: none dotted dotted dotted;
+    border-width: thin;
+    background-color: #eee;
 }
 #error {
     width: 100%;

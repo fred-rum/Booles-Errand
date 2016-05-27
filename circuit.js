@@ -30,6 +30,7 @@ function Circuit() {
 
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
+  this.be.div_top = $("#top");
   this.be.div_info = $("#info");
   this.be.div_infotxt = $("#infotxt");
   this.be.div_cdrag = $("#cdrag");
@@ -148,7 +149,7 @@ Circuit.prototype.resize = function(center) {
   this.be.div_truth.outerHeight("auto");
   var new_truth_height = this.be.div_truth.outerHeight();
 
-  // Move the div_info to the right of div_truth and decrease its width
+  // Move the div_top to the right of div_truth and decrease its width
   // accordingly.  Note that this may reflow the text and thus change the
   // height of div_info.
   //
@@ -161,18 +162,8 @@ Circuit.prototype.resize = function(center) {
     top: 0,
     left: this.be.truth_width - 1
   };
-  this.be.div_info.offset(info_offset);
-  this.be.div_info.width(info_width);
-
-  if (this.be.cdrag_cell){
-    // If div_truth changes height (e.g. due to a reflow of div_info),
-    // then cdrag will change position, which means that any cell
-    // currently being dragged will incorrectly shift on the screen.
-    // Fix that.
-    var cdraw_shift = this.be.truth_height - new_truth_height;
-    var canvas_shift = cdraw_shift / this.be.scale;
-    this.be.cdrag_cell.move(0, canvas_shift);
-  }
+  this.be.div_top.offset(info_offset);
+  this.be.div_top.width(info_width);
 
   // Make sure the truth table div is at least as tall as the info div.
   var info_height = this.be.div_info.outerHeight();
