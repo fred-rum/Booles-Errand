@@ -1,5 +1,8 @@
 /* Copyright 2016 Christopher P. Nelson - All rights reserved. */
 
+@-ms-viewport{
+    width: device-width;
+}
 body {
     margin: 0;
     color: #000;
