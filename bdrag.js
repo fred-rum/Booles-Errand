@@ -63,26 +63,9 @@ Bdrag.prototype.mouseup = function (event) {
 
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
-  var t = e.changedTouches[0];
   event.preventDefault();
   event.stopPropagation();
   if (this.dragging == 'mouse') return;
-
-  if ((data.type == 'canvas') &&
-      this.touchdata['canvas'] &&
-      (this.touchdata['canvas'].pinchid === undefined)){
-    this.touchdata['canvas'].pinchid = t.identifier;
-    for (var i = 0; i < e.touches.length; i++) {
-      if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
-        this.be.circuit.canvas_pinch_start(e.touches[i].pageX,
-                                           e.touches[i].pageY,
-                                           t.pageX, t.pageY);
-      }
-    }
-    return;
-  }
-
-  if (this.touchdata[data.type]) return;
 
   if (e.timeStamp !== undefined){
     var tapdata = this.tapdata[data.type];
@@ -90,6 +73,9 @@ Bdrag.prototype.touchstart = function (data, event) {
       var delay = e.timeStamp - tapdata.timeStamp;
       if ((delay < 500) && (delay > 0) && data.fn_dbltap){
         data.fn_dbltap.call(data.context, data.extra);
+        // We allow processing to continue for the touch in case the
+        // user wants to drag out a new wire immediately from the
+        // double tap.
       }
     }
     this.tapdata[data.type] = {
@@ -98,19 +84,44 @@ Bdrag.prototype.touchstart = function (data, event) {
     };
   }
 
-  if (!this.dragging){
-    var doc = $(document);
-    doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
-    doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
-    doc.on('touchcancel.booledrag', $.proxy(this.touchmove, this));
+  // It is possible for touchstart to be called with multiple touches
+  // at once, as long as they are all on the same object.  Normally,
+  // we accept only the first, but we accept up to two for a canvas
+  // pinch.
+  for (var j = 0; j < e.changedTouches.length; j++) {
+    var t = e.changedTouches[j];
+
+    // Detect second touch for a pinch.
+    if ((data.type == 'canvas') &&
+        this.touchdata['canvas'] &&
+        (this.touchdata['canvas'].pinchid === undefined)){
+      this.touchdata['canvas'].pinchid = t.identifier;
+      for (var i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier == this.touchdata['canvas'].touchid){
+          this.be.circuit.canvas_pinch_start(e.touches[i].pageX,
+                                             e.touches[i].pageY,
+                                             t.pageX, t.pageY);
+        }
+      }
+      break;
+    }
+
+    if (this.touchdata[data.type]) break;
+
+    if (!this.dragging){
+      var doc = $(document);
+      doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
+      doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
+      doc.on('touchcancel.booledrag', $.proxy(this.touchmove, this));
+    }
+    this.dragging = 'touch';
+
+    data.touchid = t.identifier;
+    data.pinchid = undefined;
+    this.touchdata[data.type] = data;
+
+    data.fn_start.call(data.context, t.pageX, t.pageY, data.extra);
   }
-  this.dragging = 'touch';
-
-  data.touchid = t.identifier;
-  data.pinchid = undefined;
-  this.touchdata[data.type] = data;
-
-  data.fn_start.call(data.context, t.pageX, t.pageY, data.extra);
 };
 
 // touchmove also handles touchend and touchcancel by looking for
