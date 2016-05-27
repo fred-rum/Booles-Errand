@@ -265,14 +265,16 @@ Circuit.prototype.fit_view = function() {
 
     // Try to the right of the truth table.
     var cdraw_width1 = this.be.window_width - this.be.truth_width;
-    var cdraw_height1 = this.be.window_height - this.be.cdraw_top;
+    var cdraw_top1 = this.be.div_top.outerHeight();
+    var cdraw_height1 = this.be.window_height - cdraw_top1;
     var x_scale1 = cdraw_width1 / canvas_width;
     var y_scale1 = cdraw_height1 / canvas_height;
     var scale1 = Math.min(x_scale1, y_scale1);
 
     // Try below the truth table.
     var cdraw_width2 = this.be.window_width - this.be.cdraw_left;
-    var cdraw_height2 = this.be.window_height - this.be.truth_height;
+    var cdraw_top2 = Math.max(cdraw_top1, this.be.truth_height);
+    var cdraw_height2 = this.be.window_height - cdraw_top2;
     var x_scale2 = cdraw_width2 / canvas_width;
     var y_scale2 = cdraw_height2 / canvas_height;
     var scale2 = Math.min(x_scale2, y_scale2);
@@ -282,7 +284,7 @@ Circuit.prototype.fit_view = function() {
       this.be.canvas_cx -= (this.be.truth_width - this.be.cdraw_left)/2/scale;
     } else {
       var scale = this.be.scale = Math.min(scale2, 2.0);
-      this.be.canvas_cy -= (this.be.truth_height - this.be.cdraw_top)/2/scale;
+      this.be.canvas_cy -= (cdraw_top2 - this.be.cdraw_top)/2/scale;
     }
   }
 };
