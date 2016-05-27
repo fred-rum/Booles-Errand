@@ -7,7 +7,7 @@ Level.prototype.puzzle = [
   {name: 'Press play',
    section: 'Introduction to circuits',
    ui: true,
-   intro: '<p>&#9733; <b>Press the "play" button on the left</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733;</p>',
+   intro: '<p>&#9733; <b>Press the "play" button below</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733;</p>',
    outro: '<p>Congratulations!</p>',
    truth: [{a: 1,   z: 1}],
    hide: ['truth', 'speed'],
