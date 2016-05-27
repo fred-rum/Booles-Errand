@@ -191,7 +191,7 @@ Drag.prototype.true_hover_start = function(io) {
 }
 
 Drag.prototype.true_hover_end = function(io, event) {
-  this.pending_hover_io = io;
+  this.pending_hover_io = undefined;
   if (this.no_hover) return;
   io.set_vis("hover", false);
 };
