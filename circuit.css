@@ -137,16 +137,10 @@ body {
     background-clip: padding-box;
     border-right-style: dotted;
     border-width: thin;
-    z-index: 2;
-}
-#cbox_scroll {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     background-color: #d0ffd0;
+    z-index: 2;
 }
 #cbox {
     top: 0;
