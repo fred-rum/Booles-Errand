@@ -20,15 +20,6 @@ function Circuit() {
   // prevents that.
   $("#cbox svg").attr({"display": "block"});
 
-  this.be.bdrag.drag($("#cdraw"), this, 'canvas',
-                     {start: this.canvas_drag_start,
-                      move: this.canvas_drag_move,
-                      end: this.canvas_drag_end,
-                      pinch_start: this.canvas_pinch_start,
-                      pinch_move: this.canvas_pinch_move});
-
-  $("#cdraw").mousewheel($.proxy(this.canvas_mousewheel, this));
-
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
   this.be.div_top = $("#top");
@@ -39,8 +30,7 @@ function Circuit() {
   this.be.div_cbox_container = $("#cbox_container");
   this.be.div_cbox = $("#cbox");
 
-  this.be.div_truth.css({"min-width": ""});
-  this.be.div_cbox.width("6.4em");
+  //this.be.div_cbox.width("6.4em");
   //this.be.div_truth.css({"font-size": "80%"});
   //this.be.div_info.css({"font-size": "80%"});
 
@@ -62,7 +52,7 @@ function Circuit() {
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
   // appropriate.
-  var em_size = this.be.div_cbox_container.width() / 8;
+  var em_size = this.be.em_size = this.be.div_cbox_container.width() / 8;
   this.be.io_spacing = em_size * 10/8;
   this.be.io_handle_size = this.be.io_spacing * 3/4;
   this.be.stub_len = em_size * 5/8;
@@ -98,10 +88,25 @@ function Circuit() {
   this.be.z_handle = this.be.cdraw.path("M0,0");
 
   // null cell
-  new Cell(this.be, "cdraw", "null", 0, 0);
+  new Cell(this.be, "cdraw", "null", 0, 0, "null");
 
   this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
+
+  this.be.bdrag.drag(this.be.div_cdraw, this, 'canvas',
+                     {start: this.canvas_drag_start,
+                      move: this.canvas_drag_move,
+                      end: this.canvas_drag_end,
+                      pinch_start: this.canvas_pinch_start,
+                      pinch_move: this.canvas_pinch_move});
+
+  this.be.div_cdraw.mousewheel($.proxy(this.canvas_mousewheel, this));
+
+  this.be.bdrag.drag(this.be.div_cbox_container, this, 'cbox',
+                     {start: this.cbox_drag_start,
+                      move: this.cbox_drag_move,
+                      end: this.cbox_drag_end});
+
 
   this.be.level = new Level(this.be);
   this.begin_level();
@@ -193,10 +198,6 @@ Circuit.prototype.resize = function(center) {
   };
   this.be.div_cbox_container.offset(cbox_offset);
   this.be.div_cbox_container.height(cbox_height);
-
-  // cdrag has the same position and size as cbox.
-  this.be.div_cdrag.offset(cbox_offset);
-  this.be.div_cdrag.height(cbox_height);
 
   if (!center){
     // If we don't want the view to change, we adjust the recorded
@@ -341,10 +342,9 @@ Circuit.prototype.update_view = function() {
   // canvas_cdrag_left/top/width/height indicates the bounds of the
   // overall cdrag (larger than viewable) area in canvas coordinates.
   var canvas_cdrag_left = this.cdraw_to_canvas_x(0);
-  var canvas_cdrag_top = this.cdraw_to_canvas_y(this.be.truth_height);
-  var canvas_cdrag_width = this.be.cbox_width / this.be.scale;
-  var canvas_cdrag_height =
-    (this.be.window_height - this.be.truth_height) / this.be.scale;
+  var canvas_cdrag_top = this.cdraw_to_canvas_y(0);
+  var canvas_cdrag_width = this.be.div_cbox_container.outerWidth() / this.be.scale;
+  var canvas_cdrag_height = this.be.window_height / this.be.scale;
   this.be.cdrag.setViewBox(canvas_cdrag_left, canvas_cdrag_top,
                            canvas_cdrag_width, canvas_cdrag_height);
 };
@@ -353,7 +353,7 @@ Circuit.prototype.canvas_drag_start = function(x, y) {
   this.old_drag_x = x;
   this.old_drag_y = y;
 
-  $('#cdraw').css({"cursor": "all-scroll"});
+  this.be.div_cdraw.css({"cursor": "all-scroll"});
 };
 
 Circuit.prototype.canvas_drag_move = function(x, y) {
@@ -370,7 +370,7 @@ Circuit.prototype.canvas_drag_move = function(x, y) {
 };
 
 Circuit.prototype.canvas_drag_end = function() {
-  $('#cdraw').css({"cursor": "default"});
+  this.be.div_cdraw.css({"cursor": "default"});
 };
 
 Circuit.prototype.canvas_pinch_start = function(x1, y1, x2, y2) {
@@ -413,6 +413,28 @@ Circuit.prototype.rescale = function(x, y, new_scale) {
   this.be.scale = new_scale;
 
   this.update_view();
+};
+
+Circuit.prototype.cbox_drag_start = function(x, y) {
+  this.cbox_drag_x = x;
+  this.cbox_drag_width = this.be.div_cbox.width();
+  this.be.div_cbox_container.css({"cursor": "col-resize"});
+};
+
+Circuit.prototype.cbox_drag_move = function(x, y) {
+  var cbox_width = this.cbox_drag_width + x - this.cbox_drag_x;
+  cbox_width = Math.max(cbox_width, this.be.em_size*4);
+  var scale = cbox_width / (this.be.em_size*8);
+  this.be.div_cbox.width(cbox_width);
+  this.be.div_cbox.height(this.be.box_height * scale);
+  this.be.div_cdrag.width(this.be.div_cbox_container.outerWidth());
+  this.resize();
+  this.fit_view();
+  this.update_view();
+};
+
+Circuit.prototype.cbox_drag_end = function() {
+  this.be.div_cbox_container.css({"cursor": "default"});
 };
 
 // This is called as soon as the DOM is ready.
