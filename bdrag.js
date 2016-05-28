@@ -127,7 +127,7 @@ Bdrag.prototype.touchstart = function (data, event) {
 // two touches end at once.)
 Bdrag.prototype.touchmove = function (event) {
   var e = event.originalEvent || event;
-  var types = ['canvas', 'speed', 'cell'];
+  var types = ['canvas', 'cbox', 'speed', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
     var data = this.touchdata[type];
