@@ -178,7 +178,7 @@ Circuit.prototype.resize = function(maintain_center) {
 
   // Make sure the truth table div is at least as tall as the info div.
   if (this.info_hidden){
-    this.be.info_height = $('info-stub').outerHeight();
+    this.be.info_height = $('#info-stub').outerHeight();
   } else {
     this.be.info_height = this.be.div_info.outerHeight();
   }
@@ -425,12 +425,14 @@ Circuit.prototype.click_info_hide = function() {
   this.info_hidden = true;
   this.be.div_info.css({display: "none"});
   $('#info-stub').css({display: "inline-block"});
+  $('#main-stub').css({display: "inline-block"});
   this.resize();
 }
 
 Circuit.prototype.click_info_unhide = function() {
   this.info_hidden = false;
   $('#info-stub').css({display: "none"});
+  $('#main-stub').css({display: "none"});
   this.be.div_info.css({display: "block"});
   this.resize();
 }

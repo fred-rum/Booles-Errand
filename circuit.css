@@ -114,10 +114,8 @@ body {
     width: 2em;
     height: 2em;
 }
-#controls {
+.controls {
     display: inline-block;
-    border-style: none dotted dotted dotted;
-    border-width: thin;
     background-color: #eee;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */

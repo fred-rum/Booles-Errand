@@ -36,10 +36,6 @@
 	  <rect x="15" y="15" width="70" height="70" stroke="#888" stroke-width="3" fill="none"/>
 	  <path d="M45,70h25,v-25M70,70L30,30" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/>
 	</g>
-	<g id="button-main" class="infobutton">
-	  <rect x="105" y="5" width="90" height="90" stroke-width="0" rx="8" ry="8"/>
-	  <path d="M110,20h80M110,50h80M110,80h80" stroke="#888" stroke-width="16"/>
-	</g>
       </svg>
     </div>
     <div id="info">
@@ -56,7 +52,15 @@
       </svg>
       <span id="infotxt"><p>Boole's Errand</p><p>Copyright 2016 Christopher P. Nelson - All rights reserved.</p><p>Javascript is required to play.</p></span>
     </div>
-    <div id="controls">
+    <div id="main-stub" class="controls" style="float: right; display: none;">
+      <svg width="2em" height="2em" viewBox="0 0 100 100">
+	<g id="button-main2" class="pause-at">
+	  <rect x="5" y="5" width="90" height="90" stroke-width="0" rx="8" ry="8"/>
+	  <path d="M10,20h80M10,50h80M10,80h80" stroke="#888" stroke-width="16"/>
+	</g>
+      </svg>
+    </div>
+    <div class="controls">
       <svg id="pause-at" width="2.5714em" height="2em" viewBox="-4 -2 36 28" stroke="#888">
 	<g id="pause-at-gate" class="pause-at">
 	  <rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/>

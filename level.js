@@ -38,6 +38,7 @@ function Level(be) {
   }
 
   $("#button-main").click($.proxy(this.click_main, this));
+  $("#button-main2").click($.proxy(this.click_main, this));
 }
 
 Level.prototype.mark_complete = function(level_num) {
