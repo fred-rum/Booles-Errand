@@ -7,6 +7,10 @@ function Drag(be) {
   this.io_set = new Set();
 }
 
+Drag.prototype.reset = function() {
+  this.io_set.clear();
+};
+
 Drag.prototype.remove_null_wire = function() {
   if (this.null_wire){
     // remove_null_wire
@@ -51,18 +55,16 @@ Drag.prototype.remove_new_wires = function() {
 };
 
 Drag.prototype.commit_new_wires = function() {
-  if (this.new_wires.length){
-    var attr = {stroke: "#eee"}
-    for (var i = 0; i < this.new_wires.length; i++){
-      this.new_wires[i].el_bg.attr(attr);
-      this.new_wires[i].pending_new = false;
+  var attr = {stroke: "#eee"}
+  for (var i = 0; i < this.new_wires.length; i++){
+    this.new_wires[i].el_bg.attr(attr);
+    this.new_wires[i].pending_new = false;
 
-      // We want the newly connected output port to trigger on the
-      // next tick in order to propagate its value to the wire.
-      this.new_wires[i].o.register_output();
-    }
-    this.new_wires = [];
+    // We want the newly connected output port to trigger on the
+    // next tick in order to propagate its value to the wire.
+    this.new_wires[i].o.register_output();
   }
+  this.new_wires = [];
 };
 
 Drag.prototype.update_free_drag = function(x, y) {
@@ -135,7 +137,7 @@ Drag.prototype.drag_end = function(io) {
   this.be.level.update_url();
 
   if (this.snap_io) {
-    // Because this.orig_io is null, hover_end() doesn't need x, y.
+    // Because this.orig_io is null, snap_end() doesn't need x, y.
     this.snap_end(undefined, undefined, this.snap_io);
     this.snap_io = undefined;
   }

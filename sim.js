@@ -42,6 +42,9 @@ Sim.prototype.resize_slider = function () {
 
 Sim.prototype.click_play = function () {
   if (this.running) return;
+  console.log("click_play",
+              this.new_output_events.length,
+              this.new_other_events.length);
 
   $("#button-play").hide();
   $("#button-pause").show();
