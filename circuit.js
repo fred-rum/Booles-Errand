@@ -35,19 +35,15 @@ function Circuit() {
   //this.be.div_info.css({"font-size": "80%"});
 
   // We want cdrag to be wide enough to overlap the border between
-  // cbox and cdraw.  I have *hopefully* arranged for cbox_container
-  // to be an integer number of pixels wide so that we don't have to
-  // worry about sub-pixel issues here.
+  // cbox and cdraw.  jquery appears to round up for outerwidth(),
+  // which is what we want to avoid a sub-pixel gap.
   this.be.cbox_width = this.be.div_cbox_container.outerWidth();
-  this.be.cdraw_left = this.be.cbox_width;
-  this.be.div_cdrag.width(this.be.cdraw_left);
+  this.be.div_cdrag.width(this.be.cbox_width);
 
   // Other div dimensions are resized dynamically as appropriate.
   // The first puzzle level will reflow the text and call this.resize().
   this.cdraw_width = 0;
   this.cdraw_height = 0;
-
-  this.be.window.resize($.proxy(this.resize_event, this)); 
 
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
@@ -108,13 +104,15 @@ function Circuit() {
                       end: this.cbox_drag_end});
 
 
+  this.be.window.resize($.proxy(this.resize_event, this)); 
+
   this.be.level = new Level(this.be);
   this.begin_level();
 }
 
 Circuit.prototype.begin_level = function(level_num) {
   this.be.level.begin(level_num);
-  this.resize(true);
+  this.resize();
   this.fit_view();
   this.update_view();
 };
@@ -124,12 +122,12 @@ Circuit.prototype.resize_event = function() {
   this.update_view();
 };
 
-Circuit.prototype.resize = function(center) {
+Circuit.prototype.resize = function(maintain_center) {
   // Adjust the sizes and positions of the various divs to fit the
   // window size.
 
-  var old_cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2
-  var old_cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
+  var old_cdraw_cx = (this.be.window_width + this.be.cbox_width)/2
+  var old_cdraw_cy = (this.be.window_height + this.be.info_height)/2;
 
   this.be.window_width = this.be.window.width();
   this.be.window_height = this.be.window.height();
@@ -177,13 +175,12 @@ Circuit.prototype.resize = function(center) {
   this.be.div_top.width(info_width);
 
   // Make sure the truth table div is at least as tall as the info div.
-  var info_height = this.be.div_info.outerHeight();
-  if (new_truth_height < info_height) {
-    new_truth_height = info_height;
+  this.be.info_height = this.be.div_info.outerHeight();
+  if (new_truth_height < this.be.info_height) {
+    new_truth_height = this.be.info_height;
     this.be.div_truth.outerHeight(new_truth_height);
   }
   this.be.truth_height = new_truth_height;
-  this.be.cdraw_top = info_height;
 
   // Move the cbox below div_truth and decrease its height
   // accordingly.  div_truth may not be an exact integer height, but
@@ -199,17 +196,20 @@ Circuit.prototype.resize = function(center) {
   this.be.div_cbox_container.offset(cbox_offset);
   this.be.div_cbox_container.height(cbox_height);
 
-  if (!center){
-    // If we don't want the view to change, we adjust the recorded
-    // center coordinates to continue to point to the center of the view.
-    var new_cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2
-    var new_cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
+  if (maintain_center){
+    // If we want the canvas objects to stay centered in the viewable
+    // area, we adjust the canvas_left/top coordinates as needed.
+    // This takes into account not only the change in the window size,
+    // but also the possible new sizes of the panels that border the
+    // viewable area.
+    var new_cdraw_cx = (this.be.window_width + this.be.cbox_width)/2
+    var new_cdraw_cy = (this.be.window_height + this.be.info_height)/2;
     var cdraw_dx = new_cdraw_cx - old_cdraw_cx;
     var cdraw_dy = new_cdraw_cy - old_cdraw_cy;
     var canvas_dx = cdraw_dx / this.be.scale;
     var canvas_dy = cdraw_dy / this.be.scale;
-    this.be.canvas_cx += canvas_dx;
-    this.be.canvas_cy += canvas_dy;
+    this.be.canvas_left -= canvas_dx;
+    this.be.canvas_top -= canvas_dy;
   }
 
   if (this.be.window_width > this.cdraw_width){
@@ -253,99 +253,82 @@ Circuit.prototype.fit_view = function() {
     }
   }
 
-  // canvas_cx/cy indicates the center of the overall cell bbox
-  // in canvas coordinates.
   if (bbox.left === undefined){
     // Handle the case that no cells are in cdraw.
-    this.be.canvas_cx = 0;
-    this.be.canvas_cy = 0;
+    this.be.canvas_left = 0;
+    this.be.canvas_top = 0;
     this.be.scale = 1.0;
   } else {
-    this.be.canvas_cx = (bbox.left + bbox.right) / 2;
-    this.be.canvas_cy = (bbox.top + bbox.bottom) / 2;
-    var canvas_width = bbox.right - bbox.left + this.be.wire_arc_radius * 3;
-    var canvas_height = bbox.bottom - bbox.top + this.be.wire_arc_radius * 4;
+    var bbox_cx = (bbox.left + bbox.right) / 2;
+    var bbox_cy = (bbox.top + bbox.bottom) / 2;
+    var bbox_width = bbox.right - bbox.left + this.be.wire_arc_radius * 3;
+    var bbox_height = bbox.bottom - bbox.top + this.be.wire_arc_radius * 4;
 
     // The truth table cuts a corner out of the viewable screen
     // area, so we try two different aspect ratios to avoid it
     // and see which one is better.
 
     // Try to the right of the truth table.
-    var cdraw_width1 = this.be.window_width - this.be.truth_width;
+    var cdraw_left1 = this.be.truth_width;
+    var cdraw_width1 = this.be.window_width - cdraw_left1;
     var cdraw_top1 = this.be.div_top.outerHeight();
     var cdraw_height1 = this.be.window_height - cdraw_top1;
-    var x_scale1 = cdraw_width1 / canvas_width;
-    var y_scale1 = cdraw_height1 / canvas_height;
+    var x_scale1 = cdraw_width1 / bbox_width;
+    var y_scale1 = cdraw_height1 / bbox_height;
     var scale1 = Math.min(x_scale1, y_scale1);
 
     // Try below the truth table.
-    var cdraw_width2 = this.be.window_width - this.be.cdraw_left;
+    var cdraw_left2 = this.be.cbox_width;
+    var cdraw_width2 = this.be.window_width - cdraw_left2;
     var cdraw_top2 = Math.max(cdraw_top1, this.be.truth_height);
     var cdraw_height2 = this.be.window_height - cdraw_top2;
-    var x_scale2 = cdraw_width2 / canvas_width;
-    var y_scale2 = cdraw_height2 / canvas_height;
+    var x_scale2 = cdraw_width2 / bbox_width;
+    var y_scale2 = cdraw_height2 / bbox_height;
     var scale2 = Math.min(x_scale2, y_scale2);
 
     if (scale1 > scale2){
       var scale = this.be.scale = Math.min(scale1, 2.0);
-      this.be.canvas_cx -= (this.be.truth_width - this.be.cdraw_left)/2/scale;
+      var cdraw_cx = cdraw_left1 + cdraw_width1 / 2;
+      var cdraw_cy = cdraw_top1 + cdraw_height1 / 2;
     } else {
       var scale = this.be.scale = Math.min(scale2, 2.0);
-      this.be.canvas_cy -= (cdraw_top2 - this.be.cdraw_top)/2/scale;
+      var cdraw_cx = cdraw_left2 + cdraw_width2 / 2;
+      var cdraw_cy = cdraw_top2 + cdraw_height2 / 2;
     }
+    this.be.canvas_left = bbox_cx - cdraw_cx / scale;
+    this.be.canvas_top = bbox_cy - cdraw_cy / scale;
   }
 };
 
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
-  // cdraw_cx indicates the center of the viewable cdraw area in
-  // cdraw/screen coordinates.
-  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
-  return (cdraw_x - cdraw_cx) / this.be.scale + this.be.canvas_cx;
+  return cdraw_x / this.be.scale + this.be.canvas_left;
 };
 
 Circuit.prototype.cdraw_to_canvas_y = function(cdraw_y) {
-  // cdraw_cy indicates the center of the viewable cdraw area in
-  // cdraw/screen coordinates.
-  var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
-  return (cdraw_y - cdraw_cy) / this.be.scale + this.be.canvas_cy;
+  return cdraw_y / this.be.scale + this.be.canvas_top;
 };
 
 Circuit.prototype.canvas_to_cdraw_x = function(canvas_x) {
-  // cdraw_cx indicates the center of the viewable cdraw area in
-  // cdraw/screen coordinates.
-  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
-  return (canvas_x - this.be.canvas_cx) * this.be.scale + cdraw_cx;
+  return (canvas_x - this.be.canvas_left) * this.be.scale;
 };
 
 Circuit.prototype.canvas_to_cdraw_y = function(canvas_y) {
-  // cdraw_cy indicates the center of the viewable cdraw area in
-  // cdraw/screen coordinates.
-  var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
-  return (canvas_y - this.be.canvas_cy) * this.be.scale + cdraw_cy;
+  return (canvas_y - this.be.canvas_top) * this.be.scale;
 };
 
 Circuit.prototype.update_view = function() {
-  // cdraw_cx/cy indicates the center of the viewable cdraw area
-  // in cdraw/screen coordinates.
-  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
-  var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
-
-  // canvas_cdraw_left/top/width/height indicates the bounds of the
-  // overall cdraw (larger than viewable) area in canvas coordinates.
-  var canvas_cdraw_left = this.cdraw_to_canvas_x(0);
-  var canvas_cdraw_top = this.cdraw_to_canvas_y(0);
+  // canvas_cdraw_width/height indicates the size of the overall cdraw
+  // (larger than viewable) area in canvas coordinates.
   var canvas_cdraw_width = this.cdraw_width / this.be.scale;
   var canvas_cdraw_height = this.cdraw_height / this.be.scale;
-  this.be.cdraw.setViewBox(canvas_cdraw_left, canvas_cdraw_top,
+  this.be.cdraw.setViewBox(this.be.canvas_left, this.be.canvas_top,
                            canvas_cdraw_width, canvas_cdraw_height);
 
-  // canvas_cdrag_left/top/width/height indicates the bounds of the
-  // overall cdrag (larger than viewable) area in canvas coordinates.
-  var canvas_cdrag_left = this.cdraw_to_canvas_x(0);
-  var canvas_cdrag_top = this.cdraw_to_canvas_y(0);
-  var canvas_cdrag_width = this.be.div_cbox_container.outerWidth() / this.be.scale;
+  // canvas_cdrag_width/height indicates the size of the cdrag area in
+  // canvas coordinates.
+  var canvas_cdrag_width = this.be.cbox_width / this.be.scale;
   var canvas_cdrag_height = this.be.window_height / this.be.scale;
-  this.be.cdrag.setViewBox(canvas_cdrag_left, canvas_cdrag_top,
+  this.be.cdrag.setViewBox(this.be.canvas_left, this.be.canvas_top,
                            canvas_cdrag_width, canvas_cdrag_height);
 };
 
@@ -361,8 +344,8 @@ Circuit.prototype.canvas_drag_move = function(x, y) {
   var screen_dy = y - this.old_drag_y;
   var canvas_dx = screen_dx / this.be.scale;
   var canvas_dy = screen_dy / this.be.scale;
-  this.be.canvas_cx -= canvas_dx;
-  this.be.canvas_cy -= canvas_dy;
+  this.be.canvas_left -= canvas_dx;
+  this.be.canvas_top -= canvas_dy;
   this.update_view();
 
   this.old_drag_x = x;
@@ -399,17 +382,12 @@ Circuit.prototype.canvas_mousewheel = function(event) {
 }
 
 Circuit.prototype.rescale = function(x, y, new_scale) {
-  var cdraw_cx = (this.be.window_width + this.be.cdraw_left)/2;
-  var cdraw_cy = (this.be.window_height + this.be.cdraw_top)/2;
-  var cdraw_mouse_offset_x = x - cdraw_cx;
-  var cdraw_mouse_offset_y = y - cdraw_cy;
-  var old_canvas_mouse_offset_x = cdraw_mouse_offset_x / this.be.scale;
-  var old_canvas_mouse_offset_y = cdraw_mouse_offset_y / this.be.scale;
-  var new_canvas_mouse_offset_x = cdraw_mouse_offset_x / new_scale;
-  var new_canvas_mouse_offset_y = cdraw_mouse_offset_y / new_scale;
-  this.be.canvas_cx -= (new_canvas_mouse_offset_x - old_canvas_mouse_offset_x);
-  this.be.canvas_cy -= (new_canvas_mouse_offset_y - old_canvas_mouse_offset_y);
-
+  var old_canvas_mx = x / this.be.scale;
+  var old_canvas_my = y / this.be.scale;
+  var new_canvas_mx = x / new_scale;
+  var new_canvas_my = y / new_scale;
+  this.be.canvas_left -= (new_canvas_mx - old_canvas_mx);
+  this.be.canvas_top -= (new_canvas_my - old_canvas_my);
   this.be.scale = new_scale;
 
   this.update_view();
@@ -427,9 +405,9 @@ Circuit.prototype.cbox_drag_move = function(x, y) {
   var scale = cbox_width / (this.be.em_size*8);
   this.be.div_cbox.width(cbox_width);
   this.be.div_cbox.height(this.be.box_height * scale);
-  this.be.div_cdrag.width(this.be.div_cbox_container.outerWidth());
+  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+  this.be.div_cdrag.width(this.be.cbox_width);
   this.resize();
-  this.fit_view();
   this.update_view();
 };
 

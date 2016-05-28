@@ -367,7 +367,7 @@ Level.prototype.add_box_cell = function(name) {
   var c = new Cell(this.be, "cbox", name, 0, 0);
   this.box_cells.push(c);
   var bbox = c.bbox;
-  var cx = (this.be.cbox_width/2) - bbox.x - bbox.width/2; // align center
+  var cx = (this.be.em_size*4) - bbox.x - bbox.width/2; // align center
   var cy = this.be.box_height - bbox.y; // align top edge
   c.move(cx, cy);
   this.be.box_height += bbox.height + this.be.box_spacing;

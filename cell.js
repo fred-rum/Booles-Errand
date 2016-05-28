@@ -328,14 +328,11 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // mouse events from reaching the scrollbar.
   $(this.be.div_cdrag).css("z-index", "99")
 
-  var cbox_y_offset = this.be.truth_height - this.be.cdraw_top;
-  var view_left = this.be.canvas_cx - this.be.view_width/2/this.be.scale;
-  var view_top = this.be.canvas_cy - this.be.view_height/2/this.be.scale;
   if (this.canvas == this.be.cdraw){
     var canvas_x = this.x;
     var canvas_y = this.y;
     this.cdraw_cell = this;
-  } else {
+  } else { // canvas == cbox
     var canvas_x = this.be.circuit.cdraw_to_canvas_x(x);
     var canvas_y = this.be.circuit.cdraw_to_canvas_y(y);
     this.cdraw_cell = new Cell(this.be, "cdraw", this.type, canvas_x, canvas_y);
@@ -370,15 +367,14 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
   // not the center (0,0) coordinate of the cell.
   var del;
   if (is_new &&
-      (x >= 0) &&
-      (x < this.be.cdraw_left) &&
+      (x < this.be.cbox_width) &&
       (y >= this.be.truth_height) &&
       (y < this.be.window_height)){
     // A new cell is still within the cell box
     // (or has been returned to the cell box.)
     del = "new";
-  } else if ((x < this.be.cdraw_left) ||
-             (y < this.be.cdraw_top) ||
+  } else if ((x < this.be.cbox_width) ||
+             (y < this.be.info_height) ||
              (x >= this.be.window_width) ||
              (y >= this.be.window_height) ||
              ((x < this.be.truth_width) && (y < this.be.truth_height))){
