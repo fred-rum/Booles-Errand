@@ -146,6 +146,10 @@ Io.prototype.remove = function() {
 }
 
 Io.prototype.clear = function() {
+  if (this.canvas == this.be.cdraw) {
+    this.be.drag.disable_drag(this);
+  }
+
   if (this.type == 'input'){
     // We clear only wires attached to input ports to avoid clearing a
     // wire from both ends.
