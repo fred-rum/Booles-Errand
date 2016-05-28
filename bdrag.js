@@ -60,7 +60,7 @@ Bdrag.prototype.mouseup = function (event) {
 
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
-  event.preventDefault();
+  if (data.type != 'cbox') event.preventDefault();
   event.stopPropagation();
   if (this.dragging == 'mouse') return;
 
