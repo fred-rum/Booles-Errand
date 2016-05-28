@@ -105,6 +105,15 @@ body {
     overflow: auto;
     max-height: 30vh;
 }
+#info-stub {
+    display: none;
+    float: left;
+    border-style: none solid solid none;
+    border-width: thin;
+    background-color: #d0d0ff;
+    width: 2em;
+    height: 2em;
+}
 #controls {
     display: inline-block;
     border-style: none dotted dotted dotted;

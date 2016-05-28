@@ -103,6 +103,8 @@ function Circuit() {
                       move: this.cbox_drag_move,
                       end: this.cbox_drag_end});
 
+  $("#button-info-hide").click($.proxy(this.click_info_hide, this));
+  $("#button-info-unhide").click($.proxy(this.click_info_unhide, this));
 
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
@@ -175,7 +177,11 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.div_top.width(info_width);
 
   // Make sure the truth table div is at least as tall as the info div.
-  this.be.info_height = this.be.div_info.outerHeight();
+  if (this.info_hidden){
+    this.be.info_height = $('info-stub').outerHeight();
+  } else {
+    this.be.info_height = this.be.div_info.outerHeight();
+  }
   if (new_truth_height < this.be.info_height) {
     new_truth_height = this.be.info_height;
     this.be.div_truth.outerHeight(new_truth_height);
@@ -414,6 +420,20 @@ Circuit.prototype.cbox_drag_move = function(x, y) {
 Circuit.prototype.cbox_drag_end = function() {
   this.be.div_cbox_container.css({"cursor": "default"});
 };
+
+Circuit.prototype.click_info_hide = function() {
+  this.info_hidden = true;
+  this.be.div_info.css({display: "none"});
+  $('#info-stub').css({display: "inline-block"});
+  this.resize();
+}
+
+Circuit.prototype.click_info_unhide = function() {
+  this.info_hidden = false;
+  $('#info-stub').css({display: "none"});
+  this.be.div_info.css({display: "block"});
+  this.resize();
+}
 
 // This is called as soon as the DOM is ready.
 $(function() {
