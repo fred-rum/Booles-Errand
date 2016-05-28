@@ -19,7 +19,6 @@ function Circuit() {
   // scrollbar to appear.  Setting display: block instead of inline
   // prevents that.
   $("#cbox svg").attr({"display": "block"});
-  $("#cdraw svg").attr({"display": "block"});
 
   this.be.bdrag.drag($("#cdraw"), this, 'canvas',
                      {start: this.canvas_drag_start,
@@ -38,8 +37,12 @@ function Circuit() {
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
-  this.be.div_cbox_scroll = $("#cbox_scroll");
   this.be.div_cbox = $("#cbox");
+
+  this.be.div_truth.css({"min-width": ""});
+  this.be.div_cbox.width("6.4em");
+  //this.be.div_truth.css({"font-size": "80%"});
+  //this.be.div_info.css({"font-size": "80%"});
 
   // We want cdrag to be wide enough to overlap the border between
   // cbox and cdraw.  I have *hopefully* arranged for cbox_container
@@ -131,7 +134,7 @@ Circuit.prototype.resize = function(center) {
   // have to set them back to auto first.
 
   // Both Chrome and Firefox do a *terrible* job with overflow-auto.
-  // When the browser decides that vertical scrollbar is needed, it
+  // When the browser decides that a vertical scrollbar is needed, it
   // refuses to expand the div width to accommodate it.  I've tried
   // everything, and the only solution that looks somewhat decent is
   // to artificially widen the div by 20 pixels over its natural width
@@ -141,7 +144,8 @@ Circuit.prototype.resize = function(center) {
   // browser is that both scrollbars appear.
   this.be.div_truth.outerWidth("auto");
   this.be.truth_width = this.be.div_truth.outerWidth();
-  this.be.div_truth.outerWidth(this.be.truth_width + 20);
+  this.be.div_truth.outerWidth(Math.max(this.be.truth_width + 20,
+                                        this.be.div_cbox.outerWidth()));
 
   // The actual div_truth may be smaller than what we just set due to
   // the max-width property, so we measure it again to get the final
