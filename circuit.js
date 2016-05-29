@@ -26,6 +26,7 @@ function Circuit() {
   this.be.div_infotxt = $("#infotxt");
   this.be.div_info_stub = $("#info-stub");
   this.be.div_controls = $("#sim-controls");
+  this.be.div_main_stub = $("#main-stub");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
@@ -40,6 +41,12 @@ function Circuit() {
   // which is what we want to avoid a sub-pixel gap.
   this.be.cbox_width = this.be.div_cbox_container.outerWidth();
   this.be.div_cdrag.width(this.be.cbox_width);
+
+  this.be.controls_width = this.be.div_controls.outerWidth();
+  this.be.controls_height = this.be.div_controls.outerHeight();
+
+  this.be.main_stub_width = this.be.div_main_stub.outerWidth();
+  this.be.main_stub_height = this.be.div_main_stub.outerHeight();
 
   // Other div dimensions are resized dynamically as appropriate.
   // The first puzzle level will reflow the text and call this.resize().
@@ -174,9 +181,8 @@ Circuit.prototype.resize = function(maintain_center) {
     left: this.be.truth_width - 1
   };
 
-  var controls_width = this.be.div_controls.outerWidth();
-  var controls_offset = {
-    left: (info_offset.left + this.be.window_width)/2 - controls_width/2
+  this.be.controls_offset = {
+    left: (info_offset.left + this.be.window_width)/2 - this.be.controls_width/2
   };
 
   // Position either info panel or the info stub, and then position the
@@ -184,16 +190,16 @@ Circuit.prototype.resize = function(maintain_center) {
   if (this.info_hidden){
     this.be.div_info_stub.offset(info_offset);
     this.be.info_width = info_offset.left + this.be.div_info_stub.outerWidth();
-    this.be.info_height = this.be.div_controls.outerHeight();
-    controls_offset.top = 0;
+    this.be.info_height = this.be.div_info_stub.outerHeight();
+    this.be.controls_offset.top = -1;
   } else {
     this.be.div_info.offset(info_offset);
     this.be.div_info.width(this.be.window_width - info_offset.left);
     this.be.info_width = Infinity;
     this.be.info_height = this.be.div_info.outerHeight();
-    controls_offset.top = this.be.info_height;
+    this.be.controls_offset.top = this.be.info_height - 1;
   }
-  this.be.div_controls.offset(controls_offset);
+  this.be.div_controls.offset(this.be.controls_offset);
 
   // Make sure that div_truth is at least as tall as div_info.
   if (new_truth_height < this.be.info_height) {
@@ -438,15 +444,15 @@ Circuit.prototype.cbox_drag_end = function() {
 Circuit.prototype.click_info_hide = function() {
   this.info_hidden = true;
   this.be.div_info.css({display: "none"});
-  $('#info-stub').css({display: "block"});
-  $('#main-stub').css({display: "block"});
+  this.be.div_info_stub.css({display: "block"});
+  this.be.div_main_stub.css({display: "block"});
   this.resize();
 }
 
 Circuit.prototype.click_info_unhide = function() {
   this.info_hidden = false;
-  $('#info-stub').css({display: "none"});
-  $('#main-stub').css({display: "none"});
+  this.be.div_info_stub.css({display: "none"});
+  this.be.div_main_stub.css({display: "none"});
   this.be.div_info.css({display: "block"});
   this.resize();
 }

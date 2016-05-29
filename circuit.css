@@ -73,7 +73,7 @@ body {
     border-width: thin;
     text-align: center;
     display: block;
-    z-index: 101;
+    z-index: 150;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
@@ -88,7 +88,7 @@ body {
     background-color: #d0d0ff;
     overflow: auto;
     max-height: 30vh;
-    z-index: 100;
+    z-index: 101;
 }
 #info-stub {
     position: fixed;
@@ -98,7 +98,7 @@ body {
     width: 2em;
     height: 2em;
     background-color: #d0d0ff;
-    z-index: 100;
+    z-index: 101;
 }
 .controls {
     display: inline-block;
