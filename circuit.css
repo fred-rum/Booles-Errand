@@ -8,14 +8,6 @@ body {
     color: #000;
     z-index: 0;
 }
-.nowrap {
-    white-space: nowrap;
-}
-.vcenter {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-}
 .playcenter {
     stroke: #0c0;
     fill: #fff;
@@ -87,32 +79,26 @@ body {
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */      
 }
-#top {
+#info {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: auto;
-    z-index: 100;
-    text-align: center;
-}
-#info {
-    display: block;
     border-bottom-style: solid;
     border-width: thin;
     background-color: #d0d0ff;
-    text-align: left;
     overflow: auto;
     max-height: 30vh;
+    z-index: 100;
 }
 #info-stub {
+    position: fixed;
     display: none;
-    float: left;
     border-style: none solid solid none;
     border-width: thin;
-    background-color: #d0d0ff;
     width: 2em;
     height: 2em;
+    background-color: #d0d0ff;
+    z-index: 100;
 }
 .controls {
     display: inline-block;
@@ -121,13 +107,7 @@ body {
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */
     user-select: none;          /* Likely future */      
-}
-#error {
-    width: 100%;
-    height: auto;
-    border-style: solid none solid none;
-    border-width: thin;
-    background-color: #ffb0b0;
+    z-index: 100;
 }
 #cdrag {
     position: fixed;

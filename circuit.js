@@ -22,9 +22,10 @@ function Circuit() {
 
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
-  this.be.div_top = $("#top");
   this.be.div_info = $("#info");
   this.be.div_infotxt = $("#infotxt");
+  this.be.div_info_stub = $("#info-stub");
+  this.be.div_controls = $("#sim-controls");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
   this.be.div_cbox_container = $("#cbox_container");
@@ -160,32 +161,41 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.div_truth.outerHeight("auto");
   var new_truth_height = this.be.div_truth.outerHeight();
 
-  // Move the div_top to the right of div_truth and decrease its width
-  // accordingly.  Note that this may reflow the text and thus change the
-  // height of div_info.
+  // Move div_info to the right of div_truth and decrease its width
+  // accordingly.  Note that this may reflow the text and thus change
+  // the height of div_info.
   //
   // The truth div may be a non-integer width.  To avoid a gap,
   // shoot for a 1 pixel overlap.  Since info is below truth in the
   // z-index, this won't be visible, and the minor difference in text
   // position won't be noticeable, either.
-  var info_width = this.be.window_width - this.be.truth_width + 1;
   var info_offset = {
     top: 0,
     left: this.be.truth_width - 1
   };
-  this.be.div_top.offset(info_offset);
-  this.be.div_top.width(info_width);
 
-  // Make sure the truth table div is at least as tall as the info
-  // div.  info_height & info_width are also used to detect when a
-  // cell is dragged over the info panel and thus should be deleted.
+  var controls_width = this.be.div_controls.outerWidth();
+  var controls_offset = {
+    left: (info_offset.left + this.be.window_width)/2 - controls_width/2
+  };
+
+  // Position either info panel or the info stub, and then position the
+  // sim controls accordingly.
   if (this.info_hidden){
-    this.be.info_height = $('#info-stub').outerHeight();
-    this.be.info_width = info_offset.left + $('#info-stub').outerWidth();
+    this.be.div_info_stub.offset(info_offset);
+    this.be.info_width = info_offset.left + this.be.div_info_stub.outerWidth();
+    this.be.info_height = this.be.div_controls.outerHeight();
+    controls_offset.top = 0;
   } else {
-    this.be.info_height = this.be.div_info.outerHeight();
+    this.be.div_info.offset(info_offset);
+    this.be.div_info.width(this.be.window_width - info_offset.left);
     this.be.info_width = Infinity;
+    this.be.info_height = this.be.div_info.outerHeight();
+    controls_offset.top = this.be.info_height;
   }
+  this.be.div_controls.offset(controls_offset);
+
+  // Make sure that div_truth is at least as tall as div_info.
   if (new_truth_height < this.be.info_height) {
     new_truth_height = this.be.info_height;
     this.be.div_truth.outerHeight(new_truth_height);
@@ -281,7 +291,7 @@ Circuit.prototype.fit_view = function() {
     // Try to the right of the truth table.
     var cdraw_left1 = this.be.truth_width;
     var cdraw_width1 = this.be.window_width - cdraw_left1;
-    var cdraw_top1 = this.be.div_top.outerHeight();
+    var cdraw_top1 = this.be.info_height + this.be.div_controls.outerHeight();
     var cdraw_height1 = this.be.window_height - cdraw_top1;
     var x_scale1 = cdraw_width1 / bbox_width;
     var y_scale1 = cdraw_height1 / bbox_height;
@@ -428,8 +438,8 @@ Circuit.prototype.cbox_drag_end = function() {
 Circuit.prototype.click_info_hide = function() {
   this.info_hidden = true;
   this.be.div_info.css({display: "none"});
-  $('#info-stub').css({display: "inline-block"});
-  $('#main-stub').css({display: "inline-block"});
+  $('#info-stub').css({display: "block"});
+  $('#main-stub').css({display: "block"});
   this.resize();
 }
 
