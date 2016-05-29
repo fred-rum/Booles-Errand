@@ -374,9 +374,9 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     // (or has been returned to the cell box.)
     del = "new";
   } else if ((x < this.be.cbox_width) ||
-             (y < this.be.info_height) ||
              (x >= this.be.window_width) ||
              (y >= this.be.window_height) ||
+             ((x < this.be.info_width) && (y < this.be.info_height)) ||
              ((x < this.be.truth_width) && (y < this.be.truth_height))){
     del = "del";
   } else {

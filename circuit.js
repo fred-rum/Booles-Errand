@@ -176,11 +176,15 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.div_top.offset(info_offset);
   this.be.div_top.width(info_width);
 
-  // Make sure the truth table div is at least as tall as the info div.
+  // Make sure the truth table div is at least as tall as the info
+  // div.  info_height & info_width are also used to detect when a
+  // cell is dragged over the info panel and thus should be deleted.
   if (this.info_hidden){
     this.be.info_height = $('#info-stub').outerHeight();
+    this.be.info_width = info_offset.left + $('#info-stub').outerWidth();
   } else {
     this.be.info_height = this.be.div_info.outerHeight();
+    this.be.info_width = Infinity;
   }
   if (new_truth_height < this.be.info_height) {
     new_truth_height = this.be.info_height;
