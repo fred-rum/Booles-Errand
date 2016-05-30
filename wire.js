@@ -40,14 +40,10 @@ function Wire(be, io1, io2, pending_new, locked) {
   this.el_bg.insertBefore(this.be.z_wire);
   this.el_fg.insertBefore(this.be.z_wire);
 
+  this.locked = locked;
+
   this.o.connect(this);
   this.i.connect(this);
-
-  this.locked = locked;
-  if (locked){
-    this.o.lock();
-    this.i.lock();
-  }
 
   this.pending_new = pending_new;
   if (pending_new){

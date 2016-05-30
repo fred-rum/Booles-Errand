@@ -98,7 +98,9 @@ Io.prototype.draw_stub_fg = function() {
 };
 
 Io.prototype.connect = function(wire) {
-  if (!this.w.length && this.el_stub_end){
+  if (wire.locked){
+    this.be.drag.disable_drag(this);
+  } else if (!this.w.length && this.el_stub_end){
     this.el_stub_end.setAttr("visibility", "visible");
   }
 
@@ -344,8 +346,4 @@ Io.prototype.restore_old = function() {
   for (var i = 0; i < this.w.length; i++){
     this.w[i].restore_old();
   }
-};
-
-Io.prototype.lock = function() {
-  this.be.drag.disable_drag(this);
 };
