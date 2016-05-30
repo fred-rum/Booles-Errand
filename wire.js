@@ -347,41 +347,43 @@ Wire.prototype.arcwire = function (x1, y1, xc, yc) {
     lb = 0;
 
     if ((dx > 0) && (dy == 4)) {
-      //   -.
-      //     \
-      //      `-
       /* Slope with straight (angled) line, special case.
          The normal equation divides 0 by 0 at exactly dy=4,
          so here we take a short-cut to the correct value. */
+      //   -.
+      //     \
+      //      `-
       slope = 2/dx;
       angle = 2*Math.atan(slope);
     } else if ((dx <= 0) && (dy == 4)) {
+      /* Arcs connected with straight (horizontal) line to the left.
+         The normal equation gets the wrong sign from atan,
+         so here we take a short-cut to the correct value. */
       //      -.
       //        )
       //   .---'
       //  (
       //   `-
-      /* Arcs connected with straight (horizontal) line to the left.
-         The normal equation gets the wrong sign from atan,
-         so here we take a short-cut to the correct value. */
       angle = Math.PI;
-    } else if ((dx > 2) || (dy > 4) ||
-               ((dx > 0) && (dy < 2 - Math.sqrt(4 - dx*dx)))) {
+    } else if ((dx > 2) || (dx*dx+(dy-4)*dy > 0)) {
+      /* Normal case: straight line connects arcs with +/-slope. */
+      // This meets the constraint if:
+      //   x is large
+      //   y is small relative to x, so there is room for a positive slope
+      //   y is large relative to (2-x), so there is room for a negative slope
       //   -.   -.   -._  ---
       //     )    |
       //    /     |
       //   (      `-
       //    `-
-      /* Normal case: straight line connects arcs with +/-slope. */
-      slope = (Math.sqrt(dx*dx+(dy-4)*dy)-dx)/(dy-4)
+      slope = (Math.sqrt(dx*dx+(dy-4)*dy)-dx)/(dy-4);
       angle = 2*Math.atan(slope);
-    } else {
-      /* 0 < dx <= 2, sqrt < dy < 4 */
+    } else { // 0 < dx <= 2, sqrt < dy < sqrt
+      /* Reduced radius, no straight line */
       //   -.
       //    `-
-      /* Reduced radius, no straight line */
       slope = dy/dx;
-      angle = 2*Math.atan(slope)
+      angle = 2*Math.atan(slope);
       r = r * dx * (slope*slope + 1) / (4 * slope);
     }
 
