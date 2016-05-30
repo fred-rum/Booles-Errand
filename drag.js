@@ -19,18 +19,22 @@ Drag.prototype.remove_null_wire = function() {
   }
 };
 
-Drag.prototype.drag_start = function(x, y, io) {
+Drag.prototype.drag_start = function(x, y) {
+  var io = this.closest_io(x, y);
+
   io.set_vis("drag", true);
   io.set_vis("hover", false);
   $(document.body).addClass('cursor-force-default');
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
-  this.new_io = io;
+  this.new_io = this.be.null_io;
   this.new_wires = [];
   this.old_wires = [];
   this.null_wire = null;
   this.disable_hover();
-  this.drag_move(x, y, io);
+
+  this.snap_io = io;
+  this.update_free_drag(x, y);
 };
 
 Drag.prototype.gen_old_wires = function(io) {
@@ -87,7 +91,7 @@ Drag.prototype.update_free_drag = function(x, y) {
   }
 };
 
-Drag.prototype.drag_move = function(x, y, io) {
+Drag.prototype.closest_io = function(x, y, limit) {
   var closest_d = Infinity;
   var mx = this.be.circuit.cdraw_to_canvas_x(x);
   var my = this.be.circuit.cdraw_to_canvas_y(y);
@@ -101,8 +105,18 @@ Drag.prototype.drag_move = function(x, y, io) {
     }
   }
   // Check to see if the nearest IO is within *double* the IO handle radius.
-  if (closest_d < this.be.io_handle_size * this.be.io_handle_size){
-    if (closest_io != this.snap_io){
+  if (limit && (closest_d >= this.be.io_handle_size * this.be.io_handle_size)){
+    return null;
+  } else {
+    return closest_io;
+  }
+};
+
+Drag.prototype.drag_move = function(x, y) {
+  var closest_io = this.closest_io(x, y, true);
+
+  if (closest_io) {
+    if (closest_io != this.snap_io) {
       if (this.snap_io) this.snap_end(x, y, this.snap_io);
       this.snap_io = closest_io;
       this.snap_io.set_vis("snap", true);
@@ -116,7 +130,7 @@ Drag.prototype.drag_move = function(x, y, io) {
   this.update_free_drag(x, y);
 };
 
-Drag.prototype.drag_end = function(io) {
+Drag.prototype.drag_end = function() {
   if (this.fail_io){
     this.fail_io.display_fail(false);
     this.fail_io = undefined;
@@ -146,29 +160,35 @@ Drag.prototype.drag_end = function(io) {
   $(document.body).removeClass('cursor-force-default');
 };
 
-Drag.prototype.double_click = function(io, event) {
-  while (io.w.length > 0) io.w[0].remove();
-  this.be.level.update_url();
+Drag.prototype.mouse_double_click = function(event) {
+  this.dblclick(event.pageX, event.pageY);
+};
+
+Drag.prototype.dblclick = function(x, y) {
+  var io = this.closest_io(x, y);
+  while (io.w.length > 0){
+    io.w[0].remove();
+    this.be.level.update_url();
+  }
 };
 
 Drag.prototype.enable_drag = function(io) {
-  io.el_handle.dblclick($.proxy(this.double_click, this, io));
-  this.be.bdrag.drag($(io.el_handle.node), this, 'cell',
+  io.el_target.dblclick($.proxy(this.mouse_double_click, this));
+  this.be.bdrag.drag($(io.el_target.node), this, 'cell',
                      {start: this.drag_start,
                       move: this.drag_move,
                       end: this.drag_end,
-                      dblclick: this.double_click},
-                     io);
-  io.el_handle.hover($.proxy(this.true_hover_start, this, io),
-                     $.proxy(this.true_hover_end, this, io));
+                      dblclick: this.dblclick});
+  io.el_target.hover($.proxy(this.true_hover_start, this),
+                     $.proxy(this.true_hover_end, this));
   this.io_set.add(io);
 }
 
 Drag.prototype.disable_drag = function(io) {
-  io.el_handle.undblclick();
-  this.be.bdrag.undrag($(io.el_handle.node));
-  io.el_handle.unhover();
-  io.el_handle.hover($.proxy(this.locked_hover_start, this, io),
+  io.el_target.undblclick();
+  this.be.bdrag.undrag($(io.el_target.node));
+  io.el_target.unhover();
+  io.el_target.hover($.proxy(this.locked_hover_start, this, io),
                      $.proxy(this.locked_hover_end, this, io));
   this.io_set.delete(io);
 }
@@ -188,16 +208,30 @@ Drag.prototype.enable_hover = function() {
   }
 }
 
-Drag.prototype.true_hover_start = function(io) {
+Drag.prototype.true_hover_start = function(event) {
+  var x = event.pageX;
+  var y = event.pageY;
+  var io = this.closest_io(x, y);
   this.pending_hover_io = io;
-  if (this.no_hover) return;
-  io.set_vis("hover", true);
+  if (!this.no_hover) io.set_vis("hover", true);
+  $(document).on('mousemove.boolehover', $.proxy(this.hover_move, this));
 }
 
-Drag.prototype.true_hover_end = function(io, event) {
+Drag.prototype.hover_move = function(event) {
+  var x = event.pageX;
+  var y = event.pageY;
+  var io = this.closest_io(x, y);
+  if ((io != this.pending_hover_io) && !this.no_hover){
+    this.pending_hover_io.set_vis("hover", false);
+    io.set_vis("hover", true);
+  }
+  this.pending_hover_io = io;
+}
+
+Drag.prototype.true_hover_end = function() {
+  this.pending_hover_io.set_vis("hover", false);
   this.pending_hover_io = undefined;
-  if (this.no_hover) return;
-  io.set_vis("hover", false);
+  $(document).off('mousemove.boolehover');
 };
 
 Drag.prototype.snap_end = function(x, y, io) {
@@ -238,8 +272,9 @@ Drag.prototype.update_new_io = function(x, y, io) {
   // Like cannot drag to like unless there are one or more wires
   // on the original IO that can be moved.  The exception is
   // when the new IO is the same as the original IO.
-  if (this.orig_empty && (this.orig_io.type == io.type) &&
-      (io != this.orig_io)){
+  if (io == this.orig_io){
+    io = this.be.null_io;
+  } else if (this.orig_empty && (this.orig_io.type == io.type)){
     io.display_fail(true);
     this.fail_io = io;
     io = this.be.null_io;
@@ -251,8 +286,6 @@ Drag.prototype.update_new_io = function(x, y, io) {
   this.remove_new_wires();
   this.remove_null_wire();
   this.new_io = io;
-
-  if (io == this.orig_io) return; // no new wires
 
   if (io.type == "null") {
     if (this.orig_io.type == "input") this.gen_old_wires(this.orig_io);

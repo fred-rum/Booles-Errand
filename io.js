@@ -45,7 +45,23 @@ function Io(be, canvas, cell, name, type, x, y) {
   var tw = this.be.io_handle_size;
   this.el_handle = this.canvas.circle(x, y, tw/2, tw/2).attr(attr);
   this.el_handle.setAttr("visibility", "hidden");
-  this.el_handle.setAttr("pointer-events", "all");
+  this.el_handle.setAttr("pointer-events", "none");
+
+  if (cell.locked) {
+    this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
+  } else if (type == 'input') {
+    var intersect_y = Math.sqrt(tw*tw - tw*tw/4);
+    this.el_target = this.canvas.path(['M',x+tw/2, y-intersect_y,
+                                       'a', tw, tw, 0, 1, 0,
+                                       0, intersect_y*2]).attr(attr);
+  } else {
+    var intersect_y = Math.sqrt(tw*tw - tw*tw/4);
+    this.el_target = this.canvas.path(['M',x-tw/2, y-intersect_y,
+                                       'a', tw, tw, 0, 1, 1,
+                                       0, intersect_y*2]).attr(attr);
+  }
+  this.el_target.setAttr("visibility", "hidden");
+  this.el_target.setAttr("pointer-events", "all");
 
   this.be.drag.enable_drag(this);
 
@@ -73,7 +89,8 @@ function Io(be, canvas, cell, name, type, x, y) {
   this.el_value_text_bg.attr(attr_bg);
   this.el_value_text_bg.setAttr("pointer-events", "none");
 
-  this.set_io = this.canvas.set(this.el_handle,
+  this.set_io = this.canvas.set(this.el_target,
+                                this.el_handle,
                                 this.el_value_text_bg,
                                 this.el_value_text);
 }
@@ -140,6 +157,7 @@ Io.prototype.remove = function() {
   // The Raphael source code appears to automatically remove event handlers
   // when the element is removed, so we don't have to do that here.
   if (this.canvas == this.be.cdraw){
+    this.el_target.remove();
     this.el_handle.remove();
     this.el_stub_end.remove();
     this.el_value_text.remove();
@@ -162,6 +180,7 @@ Io.prototype.clear = function() {
 
   // The Raphael source code appears to automatically remove event handlers
   // when the element is removed, so we don't have to do that here.
+  this.el_target.remove();
   this.el_handle.remove();
   this.el_stub_end.remove();
   this.el_value_text.remove();
@@ -331,6 +350,7 @@ Io.prototype.bring_to_top = function() {
   this.el_stub_end.insertBefore(this.be.z_io);
 
   this.el_handle.insertBefore(this.be.z_handle);
+  this.el_target.insertBefore(this.be.z_handle);
 };
 
 Io.prototype.mark_old = function(type) {

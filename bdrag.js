@@ -69,7 +69,10 @@ Bdrag.prototype.touchstart = function (data, event) {
     if ((tapdata !== undefined) && (tapdata.jel == data.jel)){
       var delay = e.timeStamp - tapdata.timeStamp;
       if ((delay < 500) && (delay > 0) && data.callbacks.dblclick){
-        data.callbacks.dblclick.call(data.context, data.extra);
+        data.callbacks.dblclick.call(data.context,
+                                     e.changedTouches[0].pageX,
+                                     e.changedTouches[0].pageY,
+                                     data.extra);
         // We allow processing to continue for the touch in case the
         // user wants to drag out a new wire immediately from the
         // double tap.
