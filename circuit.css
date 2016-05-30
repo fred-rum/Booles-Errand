@@ -83,7 +83,7 @@ body {
 #info {
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     border-bottom-style: solid;
     border-width: thin;
     background-color: #d0d0ff;

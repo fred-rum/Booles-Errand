@@ -168,33 +168,31 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.div_truth.outerHeight("auto");
   var new_truth_height = this.be.div_truth.outerHeight();
 
-  // Move div_info to the right of div_truth and decrease its width
-  // accordingly.  Note that this may reflow the text and thus change
-  // the height of div_info.
+  // Move div_info or its stub to the right of div_truth and decrease
+  // its width accordingly.  Note that this may reflow the text and
+  // thus change the height of div_info.
   //
   // The truth div may be a non-integer width.  To avoid a gap,
   // shoot for a 1 pixel overlap.  Since info is below truth in the
   // z-index, this won't be visible, and the minor difference in text
   // position won't be noticeable, either.
-  var info_offset = {
-    top: 0,
-    left: this.be.truth_width - 1
-  };
-
-  this.be.controls_offset = {
-    left: (info_offset.left + this.be.window_width)/2 - this.be.controls_width/2
-  };
 
   // Position either info panel or the info stub, and then position the
   // sim controls accordingly.
+  this.be.controls_offset = {
+    top: -1,
+    left: (this.be.truth_width + this.be.window_width - this.be.controls_width) / 2
+  };
   if (this.info_hidden){
-    this.be.div_info_stub.offset(info_offset);
-    this.be.info_width = info_offset.left + this.be.div_info_stub.outerWidth();
+    var info_stub_offset = {
+      top: 0,
+      left: this.be.truth_width - 1
+    };
+    this.be.div_info_stub.offset(info_stub_offset);
+    this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
     this.be.info_height = this.be.div_info_stub.outerHeight();
-    this.be.controls_offset.top = -1;
   } else {
-    this.be.div_info.offset(info_offset);
-    this.be.div_info.width(this.be.window_width - info_offset.left);
+    this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
     this.be.info_width = Infinity;
     this.be.info_height = this.be.div_info.outerHeight();
     this.be.controls_offset.top = this.be.info_height - 1;
