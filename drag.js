@@ -4,11 +4,11 @@
 
 function Drag(be) {
   this.be = be;
-  this.io_set = new Set();
+  this.io_set = [];
 }
 
 Drag.prototype.reset = function() {
-  this.io_set.clear();
+  this.io_set = [];
 };
 
 Drag.prototype.remove_null_wire = function() {
@@ -95,7 +95,8 @@ Drag.prototype.closest_io = function(x, y, limit) {
   var closest_d = Infinity;
   var mx = this.be.circuit.cdraw_to_canvas_x(x);
   var my = this.be.circuit.cdraw_to_canvas_y(y);
-  for (var io of this.io_set.values()) {
+  for (var i = 0; i < this.io_set.length; i++){
+    var io = this.io_set[i];
     var dx = io.x + io.cell.x - mx;
     var dy = io.y + io.cell.y - my;
     var d = (dx * dx) + (dy * dy);
@@ -181,7 +182,7 @@ Drag.prototype.enable_drag = function(io) {
                       dblclick: this.dblclick});
   io.el_target.hover($.proxy(this.true_hover_start, this),
                      $.proxy(this.true_hover_end, this));
-  this.io_set.add(io);
+  this.io_set.push(io);
 }
 
 Drag.prototype.disable_drag = function(io) {
@@ -190,7 +191,12 @@ Drag.prototype.disable_drag = function(io) {
   io.el_target.unhover();
   io.el_target.hover($.proxy(this.locked_hover_start, this, io),
                      $.proxy(this.locked_hover_end, this, io));
-  this.io_set.delete(io);
+  for (var i = 0; i < this.io_set.length; i++){
+    if (this.io_set[i] == io) {
+      this.io_set.splice(i, 1);
+      break;
+    }
+  }
 }
 
 Drag.prototype.disable_hover = function() {
