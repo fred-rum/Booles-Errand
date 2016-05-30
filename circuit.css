@@ -259,3 +259,15 @@ table.levels {
 tr.levels:hover {
     background-color: #ddd;
 }
+body.cursor-force-default, body.cursor-force-default * {
+    cursor: default !important;
+}
+body.cursor-force-grabbing, body.cursor-force-grabbing * {
+    cursor: default !important;
+    cursor: -webkit-grabbing !important;
+    cursor: -moz-grabbing !important;
+    cursor: grabbing !important;
+}
+body.cursor-force-all-scroll, body.cursor-force-all-scroll * {
+    cursor: all-scroll !important;
+}

@@ -362,7 +362,7 @@ Circuit.prototype.canvas_drag_start = function(x, y) {
   this.old_drag_x = x;
   this.old_drag_y = y;
 
-  this.be.div_cdraw.css({"cursor": "all-scroll"});
+  $(document.body).addClass('cursor-force-all-scroll');
 };
 
 Circuit.prototype.canvas_drag_move = function(x, y) {
@@ -379,7 +379,7 @@ Circuit.prototype.canvas_drag_move = function(x, y) {
 };
 
 Circuit.prototype.canvas_drag_end = function() {
-  this.be.div_cdraw.css({"cursor": "default"});
+  $(document.body).removeClass('cursor-force-all-scroll');
 };
 
 Circuit.prototype.canvas_pinch_start = function(x1, y1, x2, y2) {

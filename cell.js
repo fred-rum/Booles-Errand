@@ -82,11 +82,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   if (this.locked){
     this.change_cursor("not-allowed");
   } else {
-    if (this.canvas == this.be.cdrag){
-      this.change_cursor("grabbing");
-    } else {
-      this.change_cursor("grab");
-    }
+    this.change_cursor("grab");
 
     var init_drag = function (el, num) {
       this.be.bdrag.drag($(el.node), this, 'cell',
@@ -313,7 +309,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
 
   this.dragging = true;
 
-  this.change_cursor("grabbing");
+  $(document.body).addClass('cursor-force-grabbing');
   this.be.drag.disable_hover();
 
   // Pop cell to top for more natural dragging.
@@ -351,9 +347,6 @@ Cell.prototype.cell_drag_start = function(x, y) {
 
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
-
-  this.cdraw_cell.change_cursor("grabbing");
-  this.cdrag_cell.change_cursor("grabbing");
 };
 
 Cell.prototype.move = function(dx, dy) {
@@ -447,10 +440,7 @@ Cell.prototype.cell_drag_move = function(x, y) {
 Cell.prototype.cell_drag_end = function() {
   if (!this.dragging) return;
 
-  if (this.quantity !== 0){
-    this.change_cursor("grab");
-  }
-  this.cdraw_cell.change_cursor("grab");
+  $(document.body).removeClass('cursor-force-grabbing');
 
   this.be.drag.enable_hover();
 

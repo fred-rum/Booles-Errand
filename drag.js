@@ -22,6 +22,7 @@ Drag.prototype.remove_null_wire = function() {
 Drag.prototype.drag_start = function(x, y, io) {
   io.set_vis("drag", true);
   io.set_vis("hover", false);
+  $(document.body).addClass('cursor-force-default');
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
   this.new_io = io;
@@ -142,6 +143,7 @@ Drag.prototype.drag_end = function(io) {
     this.snap_io = undefined;
   }
   this.enable_hover();
+  $(document.body).removeClass('cursor-force-default');
 };
 
 Drag.prototype.double_click = function(io, event) {
