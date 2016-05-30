@@ -25,6 +25,7 @@ Drag.prototype.drag_start = function(x, y) {
   io.set_vis("drag", true);
   io.set_vis("hover", false);
   $(document.body).addClass('cursor-force-default');
+  this.snap_io = io;
   this.orig_io = io;
   this.orig_empty = (io.w.length == 0);
   this.new_io = this.be.null_io;
@@ -32,9 +33,6 @@ Drag.prototype.drag_start = function(x, y) {
   this.old_wires = [];
   this.null_wire = null;
   this.disable_hover();
-
-  this.snap_io = io;
-  this.update_free_drag(x, y);
 };
 
 Drag.prototype.gen_old_wires = function(io) {
