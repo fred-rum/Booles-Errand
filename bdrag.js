@@ -68,15 +68,19 @@ Bdrag.prototype.mouseup = function (event) {
 
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
-  if (data.type != 'cbox') event.preventDefault();
-  event.stopPropagation();
+  if (data.type != 'cbox') {
+    event.preventDefault();
+  }
+  if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
+    event.stopPropagation();
+  }
   if (this.dragging == 'mouse') return;
 
-  if (e.timeStamp !== undefined){
+  if (data.callbacks.dblclick && (e.timeStamp !== undefined)) {
     var tapdata = this.tapdata[data.type];
     if ((tapdata !== undefined) && (tapdata.jel == data.jel)){
       var delay = e.timeStamp - tapdata.timeStamp;
-      if ((delay < 500) && (delay > 0) && data.callbacks.dblclick){
+      if ((delay < 500) && (delay > 0)) {
         data.callbacks.dblclick.call(data.context,
                                      e.changedTouches[0].pageX,
                                      e.changedTouches[0].pageY,
@@ -92,44 +96,46 @@ Bdrag.prototype.touchstart = function (data, event) {
     };
   }
 
-  // It is possible for touchstart to be called with multiple touches
-  // at once, as long as they are all on the same object.  Normally,
-  // we accept only the first, but we accept up to two for a pinch.
-  for (var j = 0; j < e.changedTouches.length; j++) {
-    var t = e.changedTouches[j];
+  if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
+    // It is possible for touchstart to be called with multiple touches
+    // at once, as long as they are all on the same object.  Normally,
+    // we accept only the first, but we accept up to two for a pinch.
+    for (var j = 0; j < e.changedTouches.length; j++) {
+      var t = e.changedTouches[j];
 
-    // Detect second touch for a pinch.
-    if (data.callbacks.pinch_start && this.touchdata[data.type] &&
-        (data.pinchid === undefined)){
-      data.pinchid = t.identifier;
-      for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier == data.touchid){
-          data.callbacks.pinch_start.call(data.context,
-                                          e.touches[i].pageX,
-                                          e.touches[i].pageY,
-                                          t.pageX, t.pageY,
-                                          data.extra);
+      // Detect second touch for a pinch.
+      if (data.callbacks.pinch_start && this.touchdata[data.type] &&
+          (data.pinchid === undefined)){
+        data.pinchid = t.identifier;
+        for (var i = 0; i < e.touches.length; i++) {
+          if (e.touches[i].identifier == data.touchid){
+            data.callbacks.pinch_start.call(data.context,
+                                            e.touches[i].pageX,
+                                            e.touches[i].pageY,
+                                            t.pageX, t.pageY,
+                                            data.extra);
+          }
         }
+        break;
       }
-      break;
-    }
 
-    if (this.touchdata[data.type]) break;
+      if (this.touchdata[data.type]) break;
 
-    if (!this.dragging){
-      var doc = $(document);
-      doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
-      doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
-      doc.on('touchcancel.booledrag', $.proxy(this.touchmove, this));
-    }
-    this.dragging = 'touch';
+      if (!this.dragging){
+        var doc = $(document);
+        doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
+        doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
+        doc.on('touchcancel.booledrag', $.proxy(this.touchmove, this));
+      }
+      this.dragging = 'touch';
 
-    data.touchid = t.identifier;
-    data.pinchid = undefined;
-    this.touchdata[data.type] = data;
+      data.touchid = t.identifier;
+      data.pinchid = undefined;
+      this.touchdata[data.type] = data;
 
-    if (data.callbacks.start) {
-      data.callbacks.start.call(data.context, t.pageX, t.pageY, data.extra);
+      if (data.callbacks.start) {
+        data.callbacks.start.call(data.context, t.pageX, t.pageY, data.extra);
+      }
     }
   }
 };
@@ -140,7 +146,9 @@ Bdrag.prototype.touchstart = function (data, event) {
 // two touches end at once.)
 Bdrag.prototype.touchmove = function (event) {
   var e = event.originalEvent || event;
-  var types = ['canvas', 'cbox', 'speed', 'cell'];
+  // The touch types are processed in a certain order so that changes
+  // to the canvas are made before cell dragging is updated.
+  var types = ['canvas', 'cbox', 'speed', 'truth', 'cell'];
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
     var data = this.touchdata[type];
