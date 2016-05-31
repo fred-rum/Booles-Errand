@@ -91,7 +91,9 @@ Wire.prototype.remove = function(removed_by_input_port) {
   this.o.disconnect(this);
   this.i.disconnect(this);
 
-  this.clear();
+  this.el_fg.remove();
+  this.el_bg.remove();
+  this.remove_subpaths();
 
   if (!this.pending_new && !removed_by_input_port){
     // Update the attached cell input with the fact that it's
@@ -101,16 +103,6 @@ Wire.prototype.remove = function(removed_by_input_port) {
     this.i.propagate_input(undefined);
     this.be.level.circuit_changed();
   }
-
-  // In case the wire is disconnected while a value change is pending,
-  // we mark it as dead, which causes any tick to be ignored.
-  this.dead = true;
-};
-
-Wire.prototype.clear = function() {
-  this.el_fg.remove();
-  this.el_bg.remove();
-  this.remove_subpaths();
 
   // In case the wire is disconnected while a value change is pending,
   // we mark it as dead, which causes any tick to be ignored.

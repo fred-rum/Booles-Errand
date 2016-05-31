@@ -165,27 +165,6 @@ Io.prototype.remove = function() {
   }
 }
 
-Io.prototype.clear = function() {
-  if (this.type == 'input'){
-    // We clear only wires attached to input ports to avoid clearing a
-    // wire from both ends.
-    for (var i = 0; i < this.w.length; i++){
-      this.w[i].clear();
-    }
-  }
-
-  // The Raphael source code appears to automatically remove event handlers
-  // when the element is removed, so we don't have to do that here.
-  if (this.canvas == this.be.cdraw) {
-    this.be.drag.remove_io(this);
-    this.el_target.remove();
-    this.el_handle.remove();
-    this.el_stub_end.remove();
-    this.el_value_text.remove();
-    this.el_value_text_bg.remove();
-  }
-}
-
 Io.prototype.redraw = function() {
   for (var i = 0; i < this.w.length; i++){
     this.w[i].redraw();

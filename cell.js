@@ -485,13 +485,6 @@ Cell.prototype.remove = function() {
   this.el_cell.remove();
 };
 
-Cell.prototype.clear = function() {
-  for (var name in this.io) {
-    this.io[name].clear();
-  }
-  this.el_cell.remove();
-};
-
 Cell.prototype.init_io = function(inv, no, ni, left, right) {
   var cw = this.be.stub_len;
   var cs = this.be.io_spacing;

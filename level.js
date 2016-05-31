@@ -542,6 +542,8 @@ Level.prototype.start = function() {
 };
 
 Level.prototype.circuit_changed = function() {
+  if (this.cleaning_up) return; // Ignore circuit changes while cleaning up.
+
   this.row_allows_simple_click = false;
   this.select_seq(this.cur_seq);
   this.update_hover();
@@ -639,15 +641,20 @@ Level.prototype.done = function(fresh_play) {
 };
 
 Level.prototype.change_level = function(level_num) {
+  this.cleaning_up = true;
+
   for (var i = 0; i < this.all_cells.length; i++){
-    this.all_cells[i].clear();
+    this.all_cells[i].remove();
   }
+
   this.be.sim.click_pause();
   this.be.sim.reset();
 
   for (var i = 0; i < this.box_cells.length; i++){
     this.box_cells[i].remove();
   }
+
+  this.cleaning_up = false;
 
   this.be.circuit.begin_level(level_num);
 };
