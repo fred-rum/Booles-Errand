@@ -13,6 +13,12 @@ function Drag(be) {
     fill: "#fff"
   };
 
+  this.el_handle1 = this.el_handle();
+  this.el_handle2 = this.el_handle();
+
+  // el_fail is generated after the el_handles so that it shows up on
+  // top in case of overlap.
+
   // Rather than doing trigonometry to draw the diagonal slash,
   // we just draw it horizontally and then rotate the whole thing
   // when we position the fail symbol over an IO.
@@ -24,6 +30,20 @@ function Drag(be) {
   this.el_fail.setAttr("visibility", "hidden");
   this.el_fail.setAttr("pointer-events", "none");
 }
+
+Drag.prototype.el_handle = function () {
+  var attr = {
+    "stroke-width": this.be.stroke_io_handle,
+    stroke: "#f80",
+    fill: "#ff0",
+    opacity: "0.80"
+  };
+  var tw = this.be.io_handle_size;
+  var el_handle = this.be.cdraw.circle(0, 0, tw/2, tw/2).attr(attr);
+  el_handle.setAttr("visibility", "hidden");
+  el_handle.setAttr("pointer-events", "none");
+  return el_handle;
+};
 
 Drag.prototype.reset = function() {
   this.io_set = [];
@@ -74,8 +94,7 @@ Drag.prototype.commit_new_wires = function() {
 
 Drag.prototype.drag_start = function(x, y) {
   var io = this.closest_io(x, y);
-  io.set_vis("drag", true);
-  io.set_vis("hover", false);
+  this.show_handle(this.el_handle1, io);
   $(document.body).addClass('cursor-force-default');
   this.snap_io = io;
   this.orig_io = io;
@@ -88,14 +107,13 @@ Drag.prototype.drag_start = function(x, y) {
 };
 
 Drag.prototype.drag_move = function(x, y) {
-  var closest_io = this.closest_io(x, y, true);
+  var io = this.closest_io(x, y, true);
 
-  if (closest_io != this.snap_io) {
+  if (io != this.snap_io) {
     if (this.snap_io) this.snap_end(x, y, this.snap_io);
-    if (closest_io) {
-      this.snap_io = closest_io;
-      closest_io.set_vis("snap", true);
-      this.update_new_io(x, y, closest_io);
+    if (io) {
+      this.snap_io = io;
+      this.update_new_io(x, y, io);
     } else {
       this.snap_io = undefined;
       this.update_new_io(x, y, this.be.null_io);
@@ -106,11 +124,11 @@ Drag.prototype.drag_move = function(x, y) {
 };
 
 Drag.prototype.drag_end = function() {
-  if (this.fail_io){
-    this.hide_fail();
-    this.fail_io = undefined;
+  this.hide_handle(this.el_handle1);
+  if (this.snap_io) {
+    this.snap_end();
   }
-  this.orig_io.set_vis("drag", false);
+
   if (this.new_io == this.be.null_io){
     this.restore_old_wires();
   } else {
@@ -126,11 +144,6 @@ Drag.prototype.drag_end = function() {
   this.new_io = null;
   this.be.level.update_url();
 
-  if (this.snap_io) {
-    // Because this.orig_io is null, snap_end() doesn't need x, y.
-    this.snap_end(undefined, undefined, this.snap_io);
-    this.snap_io = undefined;
-  }
   $(document.body).removeClass('cursor-force-default');
   this.enable_hover();
 };
@@ -155,7 +168,7 @@ Drag.prototype.hover_start = function(event) {
   if (io.locked) return;
 
   this.pending_hover_io = io;
-  if (!this.no_hover) io.set_vis("hover", true);
+  if (!this.no_hover) this.show_handle(this.el_handle1, io);
   $(document).on('mousemove.boolehover', $.proxy(this.hover_move, this));
 };
 
@@ -167,14 +180,17 @@ Drag.prototype.hover_move = function(event) {
   if (io.locked) return;
 
   if ((io != this.pending_hover_io) && !this.no_hover){
-    this.pending_hover_io.set_vis("hover", false);
-    io.set_vis("hover", true);
+    this.show_handle(this.el_handle1, io);
   }
   this.pending_hover_io = io;
 };
 
 Drag.prototype.hover_end = function() {
-  this.pending_hover_io.set_vis("hover", false);
+  if (!this.no_hover) {
+    // If no_hover is true, then the el_handles may be being used for
+    // dragging and shouldn't be disrupted.
+    this.hide_handle(this.el_handle1, this.pending_hover_io);
+  }
   this.pending_hover_io = undefined;
   $(document).off('mousemove.boolehover');
 };
@@ -256,17 +272,24 @@ Drag.prototype.disable_hover = function() {
 Drag.prototype.enable_hover = function() {
   this.no_hover = false;
   if (this.pending_hover_io) {
-    this.pending_hover_io.set_vis("hover", true);
-    // We know that an IO drag hasn't begun, so nothing more is needed.
+    this.show_handle(this.el_handle1, this.pending_hover_io);
   }
 };
 
 Drag.prototype.snap_end = function() {
-  this.snap_io.set_vis("snap", false);
-  if (this.fail_io){
-    this.hide_fail();
-    this.fail_io = undefined;
-  }
+  this.hide_handle(this.el_handle2);
+  this.hide_fail();
+  this.snap_io = undefined;
+  this.fail_io = undefined;
+};
+
+Drag.prototype.show_handle = function(el, io) {
+  el.transform('t' + (io.cell.x + io.x) + ',' + (io.cell.y + io.y));
+  el.setAttr("visibility", "visible");
+};
+
+Drag.prototype.hide_handle = function(el) {
+  el.setAttr("visibility", "hidden");
 };
 
 Drag.prototype.display_fail = function(io) {
@@ -300,6 +323,8 @@ Drag.prototype.update_new_io = function(x, y, io) {
     this.display_fail(io);
     this.fail_io = true;
     io = this.be.null_io;
+  } else if ((io != this.orig_io) && (io != this.be.null_io)) {
+    this.show_handle(this.el_handle2, io);
   }
 
   if (io == this.new_io) return; // no change
