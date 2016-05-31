@@ -99,7 +99,7 @@ Bdrag.prototype.touchstart = function (data, event) {
     var t = e.changedTouches[j];
 
     // Detect second touch for a pinch.
-    if ((data.callbacks.pinch_start && this.touchdata[data.type] &&
+    if (data.callbacks.pinch_start && this.touchdata[data.type] &&
         (data.pinchid === undefined)){
       data.pinchid = t.identifier;
       for (var i = 0; i < e.touches.length; i++) {
