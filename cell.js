@@ -862,9 +862,8 @@ Cell.prototype.init_latch = function() {
                          right + this.be.inv_bubble_size + this.be.stub_len,
                          this.be.io_spacing);
 
-    this.qty_cx = this.io['~q'].x;
-    this.qty_top = this.io['~q'].y + this.be.stroke_wire_fg * 2;
-
+  this.qty_cx = this.io['~q'].x;
+  this.qty_top = this.io['~q'].y + this.be.stroke_wire_fg * 2;
 
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
   this.draw_inv(true, right, true, this.be.io_spacing);
