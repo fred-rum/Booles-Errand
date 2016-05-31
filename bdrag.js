@@ -145,14 +145,14 @@ Bdrag.prototype.touchmove = function (event) {
     var type = types[j];
     var data = this.touchdata[type];
     if (data){
-      if (data.callbacks.move) {
-        for (var i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier == data.touchid){
+      for (var i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier == data.touchid){
+          if (data.callbacks.move) {
             var x = e.touches[i].pageX;
             var y = e.touches[i].pageY;
             data.callbacks.move.call(data.context, x, y, data.extra);
-            break;
           }
+          break;
         }
       }
 
