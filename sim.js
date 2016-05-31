@@ -21,7 +21,7 @@ function Sim(be) {
   $("#pause-at-seq").click($.proxy(this.click_pause_at, this, 'seq'));
   $("#pause-at-done").click($.proxy(this.click_pause_at, this, 'done'));
 
-  this.speed = 1.0;
+  this.preferred_speed = 1.0;
   var slider = $("#speed-slider");
   this.slider_knob = $("#speed-knob")[0];
   this.slider_text = $("#speed-text")[0];
@@ -205,6 +205,8 @@ Sim.prototype.speed_drag_move = function(x, y) {
   var g = min_color.g + (max_color.g - min_color.g) * f;
   var b = min_color.b + (max_color.b - min_color.b) * f;
   this.slider_text.setAttribute('fill', Raphael.rgb(r, g, b));
+
+  this.preferred_speed = this.speed;
 };
 
 Sim.prototype.speed_drag_end = function() {
@@ -215,4 +217,29 @@ Sim.prototype.click_pause_at = function(type) {
   $("#pause-at-" + this.pause_at).removeClass('pause-at-selected');
   this.pause_at = type;
   $("#pause-at-" + this.pause_at).addClass('pause-at-selected');
+};
+
+Sim.prototype.begin_level = function(hidden_speed) {
+  if (hidden_speed){
+    $('#pause-at')[0].setAttribute('display', 'none');
+    $('#speed-slider')[0].setAttribute('display', 'none');
+
+    // We set the speed for this level to the default value, but we
+    // retain the preferred speed for when the user returns to a level
+    // that allows speed selection.
+    this.speed = 1.0;
+  } else {
+    $('#pause-at')[0].setAttribute('display', '');
+    $('#speed-slider')[0].setAttribute('display', '');
+    this.speed = this.preferred_speed;
+
+    if (!this.sequenced){
+      $('#pause-at-seq').addClass('pause-at-hidden');
+    } else {
+      $('#pause-at-seq').removeClass('pause-at-hidden');
+    }
+  }
+
+  // A new level always resets the pause-at setting.
+  this.click_pause_at('done');
 };

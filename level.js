@@ -154,6 +154,8 @@ Level.prototype.begin = function(level_num) {
   this.cur_seq = 0;
   this.cur_line = 0;
   this.select_seq(0);
+
+  this.be.sim.begin_level(level.hide.has("speed"));
 };
 
 Level.prototype.init_table = function() {
@@ -208,20 +210,6 @@ Level.prototype.init_table = function() {
     row.dblclick($.proxy(this.row_dblclick, this, i));
     this.be.bdrag.drag(row, this, 'truth',
                        {dblclick: this.row_dblclick});
-  }
-
-  if (level.hide.has("speed")){
-    $('#pause-at')[0].setAttribute('display', 'none');
-    $('#speed-slider')[0].setAttribute('display', 'none');
-  } else {
-    $('#pause-at')[0].setAttribute('display', '');
-    $('#speed-slider')[0].setAttribute('display', '');
-
-    if (!this.sequenced){
-      $('#pause-at-seq').addClass('pause-at-hidden');
-    } else {
-      $('#pause-at-seq').removeClass('pause-at-hidden');
-    }
   }
 };
 
