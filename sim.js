@@ -83,6 +83,10 @@ Sim.prototype.pause = function() {
     clearInterval(this.timer);
     this.timer = undefined;
   }
+  if (this.delay_timer){
+    clearTimeout(this.delay_timer);
+    this.delay_timer = undefined;
+  }
 };
 
 Sim.prototype.paused = function() {
