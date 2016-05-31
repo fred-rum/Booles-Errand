@@ -94,13 +94,12 @@ Bdrag.prototype.touchstart = function (data, event) {
 
   // It is possible for touchstart to be called with multiple touches
   // at once, as long as they are all on the same object.  Normally,
-  // we accept only the first, but we accept up to two for a canvas
-  // pinch.
+  // we accept only the first, but we accept up to two for a pinch.
   for (var j = 0; j < e.changedTouches.length; j++) {
     var t = e.changedTouches[j];
 
     // Detect second touch for a pinch.
-    if ((data.type == 'canvas') && this.touchdata['canvas'] &&
+    if ((data.callbacks.pinch_start && this.touchdata[data.type] &&
         (data.pinchid === undefined)){
       data.pinchid = t.identifier;
       for (var i = 0; i < e.touches.length; i++) {
@@ -108,7 +107,8 @@ Bdrag.prototype.touchstart = function (data, event) {
           data.callbacks.pinch_start.call(data.context,
                                           e.touches[i].pageX,
                                           e.touches[i].pageY,
-                                          t.pageX, t.pageY);
+                                          t.pageX, t.pageY,
+                                          data.extra);
         }
       }
       break;
