@@ -27,26 +27,17 @@ function Io(be, canvas, cell, name, type, x, y) {
                "H", 0]; // draw horizontally to the cell's center
 
   // An IO for a cell in the cell box has graphics for the stub, but
-  // it doesn't have a drag handle or event handling.
+  // it doesn't have a drag target or event handling.
   if (this.canvas != this.be.cdraw){
     this.set_io = this.canvas.set();
     return;
   }
 
-  // If any properties of vis_state are true, then the IO handle is visible.
-  this.vis_state = {};
 
+  var tw = this.be.io_handle_size;
   var attr = {
     "stroke-width": this.be.stroke_io_handle,
-    stroke: "#f80",
-    fill: "#ff0",
-    opacity: "0.80"
   };
-  var tw = this.be.io_handle_size;
-  this.el_handle = this.canvas.circle(x, y, tw/2, tw/2).attr(attr);
-  this.el_handle.setAttr("visibility", "hidden");
-  this.el_handle.setAttr("pointer-events", "none");
-
   if (cell.locked) {
     this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
   } else if (type == 'input') {
@@ -90,7 +81,6 @@ function Io(be, canvas, cell, name, type, x, y) {
   this.el_value_text_bg.setAttr("pointer-events", "none");
 
   this.set_io = this.canvas.set(this.el_target,
-                                this.el_handle,
                                 this.el_value_text_bg,
                                 this.el_value_text);
 }
@@ -159,7 +149,6 @@ Io.prototype.remove = function() {
   if (this.canvas == this.be.cdraw){
     this.be.drag.remove_io(this);
     this.el_target.remove();
-    this.el_handle.remove();
     this.el_stub_end.remove();
     this.el_value_text.remove();
     this.el_value_text_bg.remove();
@@ -170,17 +159,6 @@ Io.prototype.redraw = function() {
   for (var i = 0; i < this.w.length; i++){
     this.w[i].redraw();
   }
-};
-
-Io.prototype.set_vis = function(type, vis) {
-  this.vis_state[type] = vis;
-  for (var name in this.vis_state){
-    if (this.vis_state[name]){
-      this.el_handle.setAttr("visibility", "visible");
-      return;
-    }
-  }
-  this.el_handle.setAttr("visibility", "hidden");
 };
 
 Io.prototype.color_stub = function(value) {
@@ -299,7 +277,6 @@ Io.prototype.bring_to_top = function() {
   this.el_value_text_bg.insertBefore(this.be.z_io);
   this.el_value_text.insertBefore(this.be.z_io);
   this.el_stub_end.insertBefore(this.be.z_io);
-  this.el_handle.insertBefore(this.be.z_io);
   this.el_target.insertBefore(this.be.z_io);
 };
 

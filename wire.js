@@ -34,9 +34,6 @@ function Wire(be, io1, io2, pending_new, locked) {
   this.el_bg.setAttr("pointer-events", "none");
   this.el_fg.setAttr("pointer-events", "none");
 
-  // Insert the new wire just above the null gate so that it is below
-  // IO handles.  This is its default position, but its Z order may be
-  // changed by o.connect().
   this.el_bg.insertBefore(this.be.z_wire);
   this.el_fg.insertBefore(this.be.z_wire);
 
