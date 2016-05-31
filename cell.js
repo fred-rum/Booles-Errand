@@ -83,16 +83,16 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     this.change_cursor("not-allowed");
   } else {
     this.change_cursor("grab");
-
-    var init_drag = function (el, num) {
-      this.be.bdrag.drag($(el.node), this, 'cell',
-                         {start: this.cell_drag_start,
-                          move: this.cell_drag_move,
-                          end: this.cell_drag_end});
-      return true;
-    }
-    this.el_cell.forEach(init_drag, this);
   }
+
+  var init_drag = function (el, num) {
+    this.be.bdrag.drag($(el.node), this, 'cell',
+                       {start: this.cell_drag_start,
+                        move: this.cell_drag_move,
+                        end: this.cell_drag_end});
+    return true;
+  }
+  this.el_cell.forEach(init_drag, this);
 }
 
 
@@ -303,9 +303,18 @@ Cell.prototype.bring_to_top = function() {
 };
 
 Cell.prototype.cell_drag_start = function(x, y) {
-  if (this.quantity === 0) return;
+  this.dragging = !this.locked && (this.quantity !== 0);
 
-  this.dragging = true;
+  if (!this.dragging) {
+    if (this.locked){
+      // Show the fail icon only on cdraw, not on cbox.
+      this.be.drag.show_fail_xy(this.x, this.y);
+    }
+    $(document.body).addClass('cursor-force-not-allowed');
+    this.be.drag.disable_hover();
+    return;
+  }
+
 
   $(document.body).addClass('cursor-force-grabbing');
   this.be.drag.disable_hover();
@@ -436,7 +445,12 @@ Cell.prototype.cell_drag_move = function(x, y) {
 };
 
 Cell.prototype.cell_drag_end = function() {
-  if (!this.dragging) return;
+  if (!this.dragging) {
+    this.be.drag.hide_fail();
+    $(document.body).removeClass('cursor-force-not-allowed');
+    this.be.drag.enable_hover();
+    return;
+  }
 
   $(document.body).removeClass('cursor-force-grabbing');
 
