@@ -293,7 +293,11 @@ Drag.prototype.hide_handle = function(el) {
 };
 
 Drag.prototype.show_fail = function(io) {
-  this.el_fail.transform('t' + (io.cell.x + io.x) + ',' + (io.cell.y + io.y) + 'r45');
+  this.show_fail_xy(io.cell.x + io.x, io.cell.y + io.y);
+};
+
+Drag.prototype.show_fail_xy = function(x, y) {
+  this.el_fail.transform('t' + x + ',' + y + 'r45');
   this.el_fail.setAttr("visibility", "visible");
 };
 
