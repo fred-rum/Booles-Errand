@@ -770,6 +770,7 @@ Level.prototype.puzzle = [
             {e:0, d:1,   q:0, '~q':1}],
            [{e:1, d:1,   q:1, '~q':0},
             {e:0, d:0,   q:1, '~q':0}]],
+   avail: [],
    cells: {
      e: {type: 'input',
          x: -210,
