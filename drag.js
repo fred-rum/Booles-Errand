@@ -292,7 +292,7 @@ Drag.prototype.hide_handle = function(el) {
   el.setAttr("visibility", "hidden");
 };
 
-Drag.prototype.display_fail = function(io) {
+Drag.prototype.show_fail = function(io) {
   this.el_fail.transform('t' + (io.cell.x + io.x) + ',' + (io.cell.y + io.y) + 'r45');
   this.el_fail.setAttr("visibility", "visible");
 };
@@ -320,7 +320,7 @@ Drag.prototype.update_new_io = function(x, y, io) {
     io = this.be.null_io;
   } else if ((this.orig_empty && (this.orig_io.type == io.type)) ||
              io.locked){
-    this.display_fail(io);
+    this.show_fail(io);
     this.fail_io = true;
     io = this.be.null_io;
   } else if ((io != this.orig_io) && (io != this.be.null_io)) {
@@ -390,7 +390,7 @@ Drag.prototype.update_free_drag = function(x, y) {
 // may be two with overlapping targets).
 Drag.prototype.drag_locked_start = function(x, y) {
   var io = this.closest_locked_io(x, y);
-  this.display_fail(io);
+  this.show_fail(io);
   $(document.body).addClass('cursor-force-not-allowed');
   this.disable_hover();
 };
