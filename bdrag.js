@@ -38,13 +38,19 @@ Bdrag.prototype.mousedown = function (data, event) {
   doc.on('mousemove.booledrag', $.proxy(this.mousemove, this));
   doc.on('mouseup.booledrag', $.proxy(this.mouseup, this));
 
-  data.callbacks.start.call(data.context, event.pageX, event.pageY, data.extra);
+  if (data.callbacks.start) {
+    data.callbacks.start.call(data.context,
+                              event.pageX, event.pageY,
+                              data.extra);
+  }
 };
 
 Bdrag.prototype.mousemove = function (event) {
-  this.mousedata.callbacks.move.call(this.mousedata.context,
-                                     event.pageX, event.pageY,
-                                     this.mousedata.extra);
+  if (this.mousedata.callbacks.move) {
+    this.mousedata.callbacks.move.call(this.mousedata.context,
+                                       event.pageX, event.pageY,
+                                       this.mousedata.extra);
+  }
 };
 
 Bdrag.prototype.mouseup = function (event) {
@@ -54,8 +60,10 @@ Bdrag.prototype.mouseup = function (event) {
   doc.off('mousemove.booledrag');
   doc.off('mouseup.booledrag');
 
-  this.mousedata.callbacks.end.call(this.mousedata.context,
-                                    this.mousedata.extra);
+  if (this.mousedata.callbacks.end) {
+    this.mousedata.callbacks.end.call(this.mousedata.context,
+                                      this.mousedata.extra);
+  }
 };
 
 Bdrag.prototype.touchstart = function (data, event) {
@@ -120,7 +128,9 @@ Bdrag.prototype.touchstart = function (data, event) {
     data.pinchid = undefined;
     this.touchdata[data.type] = data;
 
-    data.callbacks.start.call(data.context, t.pageX, t.pageY, data.extra);
+    if (data.callbacks.start) {
+      data.callbacks.start.call(data.context, t.pageX, t.pageY, data.extra);
+    }
   }
 };
 
@@ -135,14 +145,14 @@ Bdrag.prototype.touchmove = function (event) {
     var type = types[j];
     var data = this.touchdata[type];
     if (data){
-      for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier == data.touchid){
-          var x = e.touches[i].pageX;
-          var y = e.touches[i].pageY;
-          data.callbacks.move.call(data.context,
-                                   x, y,
-                                   data.extra);
-          break;
+      if (data.callbacks.move) {
+        for (var i = 0; i < e.touches.length; i++) {
+          if (e.touches[i].identifier == data.touchid){
+            var x = e.touches[i].pageX;
+            var y = e.touches[i].pageY;
+            data.callbacks.move.call(data.context, x, y, data.extra);
+            break;
+          }
         }
       }
 
@@ -156,12 +166,16 @@ Bdrag.prototype.touchmove = function (event) {
               deleteme = false;
               data.touchid = data.pinchid;
               data.pinchid = undefined;
-              data.callbacks.end.call(data.context,
-                                      data.extra);
-              data.callbacks.start.call(data.context,
-                                        e.touches[i].pageX,
-                                        e.touches[i].pageY,
+              if (data.callbacks.end) {
+                data.callbacks.end.call(data.context,
                                         data.extra);
+              }
+              if (data.callbacks.start) {
+                data.callbacks.start.call(data.context,
+                                          e.touches[i].pageX,
+                                          e.touches[i].pageY,
+                                          data.extra);
+              }
             } else {
               data.callbacks.pinch_move.call(data.context,
                                              x, y,
@@ -175,7 +189,9 @@ Bdrag.prototype.touchmove = function (event) {
       }
 
       if (deleteme) {
-        data.callbacks.end.call(data.context, data.extra);
+        if (data.callbacks.end) {
+          data.callbacks.end.call(data.context, data.extra);
+        }
         this.touchdata[type] = undefined;
       } else if (deletepinch){
         data.pinchid = undefined;

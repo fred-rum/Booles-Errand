@@ -245,7 +245,7 @@ Drag.prototype.disable_drag = function(io) {
   io.el_target.attr({cursor: 'not-allowed'});
   this.be.bdrag.drag(el, this, 'cell',
                      {start: this.drag_locked_start,
-                      move: this.drag_locked_move,
+                      // no drag_move action
                       end: this.drag_locked_end});
 };
 
@@ -397,10 +397,6 @@ Drag.prototype.drag_locked_start = function(x, y) {
   this.show_fail(io);
   $(document.body).addClass('cursor-force-not-allowed');
   this.disable_hover();
-};
-
-Drag.prototype.drag_locked_move = function(x, y) {
-  // Do nothing.
 };
 
 Drag.prototype.drag_locked_end = function() {
