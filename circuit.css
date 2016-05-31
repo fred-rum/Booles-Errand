@@ -271,3 +271,6 @@ body.cursor-force-grabbing, body.cursor-force-grabbing * {
 body.cursor-force-all-scroll, body.cursor-force-all-scroll * {
     cursor: all-scroll !important;
 }
+body.cursor-force-not-allowed, body.cursor-force-not-allowed * {
+    cursor: not-allowed !important;
+}

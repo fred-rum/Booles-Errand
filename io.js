@@ -116,7 +116,12 @@ Io.prototype.draw_stub_fg = function() {
 
 Io.prototype.connect = function(wire) {
   if (wire.locked){
+    this.locked = true;
     this.be.drag.disable_drag(this);
+
+    // Drop the IO target below all others so that the 'not-allowed'
+    // cursor doesn't show up when another target is nearby.
+    this.el_target.insertAfter(this.be.wire);
   } else if (!this.w.length && this.el_stub_end){
     this.el_stub_end.setAttr("visibility", "visible");
   }
@@ -202,34 +207,6 @@ Io.prototype.set_vis = function(type, vis) {
     }
   }
   this.el_handle.setAttr("visibility", "hidden");
-};
-
-Io.prototype.display_fail = function(fail) {
-  if (fail){
-    var tw = this.be.io_handle_size;
-    var attr = {
-      "stroke-width": tw/5,
-      stroke: "#f00",
-      fill: "#fff"
-    };
-    var cx = this.cell.x + this.x;
-    var cy = this.cell.y + this.y;
-
-    this.el_fail_circle = this.canvas.circle(cx, cy, tw/2, tw/2);
-    this.el_fail_circle.attr(attr);
-    this.el_fail_circle.setAttr("pointer-events", "none");
-
-    // Rather than doing trigonometry to draw the diagonal slash,
-    // we just draw it straight and then rotate it.
-    this.el_fail_slash = this.canvas.path(["M", cx, cy-tw/2,
-                                           "v", tw]);
-    this.el_fail_slash.attr(attr);
-    this.el_fail_slash.rotate(-45, cx, cy);
-    this.el_fail_slash.setAttr("pointer-events", "none");
-  } else if (this.el_fail_circle){
-    this.el_fail_circle.remove();
-    this.el_fail_slash.remove();
-  }
 };
 
 Io.prototype.color_stub = function(value) {

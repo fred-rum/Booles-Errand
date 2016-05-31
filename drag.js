@@ -5,6 +5,24 @@
 function Drag(be) {
   this.be = be;
   this.io_set = [];
+
+  var tw = this.be.io_handle_size;
+  var attr = {
+    "stroke-width": tw/5,
+    stroke: "#f00",
+    fill: "#fff"
+  };
+
+  // Rather than doing trigonometry to draw the diagonal slash,
+  // we just draw it horizontally and then rotate the whole thing
+  // when we position the fail symbol over an IO.
+  var el_fail_circle = this.be.cdraw.circle(0, 0, tw/2, tw/2).attr(attr);
+  var el_fail_slash = this.be.cdraw.path(["M", -tw/2, 0,
+                                          "h", tw]).attr(attr);
+
+  this.el_fail = this.be.cdraw.set(el_fail_circle, el_fail_slash);
+  this.el_fail.setAttr("visibility", "hidden");
+  this.el_fail.setAttr("pointer-events", "none");
 }
 
 Drag.prototype.reset = function() {
@@ -17,22 +35,6 @@ Drag.prototype.remove_null_wire = function() {
     this.null_wire.remove();
     this.null_wire = null;
   }
-};
-
-Drag.prototype.drag_start = function(x, y) {
-  var io = this.closest_io(x, y);
-
-  io.set_vis("drag", true);
-  io.set_vis("hover", false);
-  $(document.body).addClass('cursor-force-default');
-  this.snap_io = io;
-  this.orig_io = io;
-  this.orig_empty = (io.w.length == 0);
-  this.new_io = this.be.null_io;
-  this.new_wires = [];
-  this.old_wires = [];
-  this.null_wire = null;
-  this.disable_hover();
 };
 
 Drag.prototype.gen_old_wires = function(io) {
@@ -70,45 +72,19 @@ Drag.prototype.commit_new_wires = function() {
   this.new_wires = [];
 };
 
-Drag.prototype.update_free_drag = function(x, y) {
-  if (this.new_io == this.be.null_io){
-    this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(x);
-    this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(y);
-
-    if (this.null_wire){
-      this.null_wire.redraw();
-    } else {
-      // create_null_wire
-      if ((this.orig_io.type == "input") && (!this.orig_empty)){
-        var from_io = this.orig_io.w[0].o;
-      } else {
-        var from_io = this.orig_io;
-      }
-      this.null_wire = new Wire(this.be, from_io, this.be.null_io, true);
-    }
-  }
-};
-
-Drag.prototype.closest_io = function(x, y, limit) {
-  var closest_d = Infinity;
-  var mx = this.be.circuit.cdraw_to_canvas_x(x);
-  var my = this.be.circuit.cdraw_to_canvas_y(y);
-  for (var i = 0; i < this.io_set.length; i++){
-    var io = this.io_set[i];
-    var dx = io.x + io.cell.x - mx;
-    var dy = io.y + io.cell.y - my;
-    var d = (dx * dx) + (dy * dy);
-    if (d < closest_d){
-      closest_d = d;
-      var closest_io = io;
-    }
-  }
-  // Check to see if the nearest IO is within *double* the IO handle radius.
-  if (limit && (closest_d >= this.be.io_handle_size * this.be.io_handle_size)){
-    return null;
-  } else {
-    return closest_io;
-  }
+Drag.prototype.drag_start = function(x, y) {
+  var io = this.closest_io(x, y);
+  io.set_vis("drag", true);
+  io.set_vis("hover", false);
+  $(document.body).addClass('cursor-force-default');
+  this.snap_io = io;
+  this.orig_io = io;
+  this.orig_empty = (io.w.length == 0);
+  this.new_io = this.be.null_io;
+  this.new_wires = [];
+  this.old_wires = [];
+  this.null_wire = null;
+  this.disable_hover();
 };
 
 Drag.prototype.drag_move = function(x, y) {
@@ -131,7 +107,7 @@ Drag.prototype.drag_move = function(x, y) {
 
 Drag.prototype.drag_end = function() {
   if (this.fail_io){
-    this.fail_io.display_fail(false);
+    this.hide_fail();
     this.fail_io = undefined;
   }
   this.orig_io.set_vis("drag", false);
@@ -155,8 +131,8 @@ Drag.prototype.drag_end = function() {
     this.snap_end(undefined, undefined, this.snap_io);
     this.snap_io = undefined;
   }
-  this.enable_hover();
   $(document.body).removeClass('cursor-force-default');
+  this.enable_hover();
 };
 
 Drag.prototype.mouse_double_click = function(event) {
@@ -171,6 +147,66 @@ Drag.prototype.dblclick = function(x, y) {
   }
 };
 
+Drag.prototype.hover_start = function(event) {
+  var x = event.pageX;
+  var y = event.pageY;
+  var io = this.closest_io(x, y);
+
+  if (io.locked) return;
+
+  this.pending_hover_io = io;
+  if (!this.no_hover) io.set_vis("hover", true);
+  $(document).on('mousemove.boolehover', $.proxy(this.hover_move, this));
+};
+
+Drag.prototype.hover_move = function(event) {
+  var x = event.pageX;
+  var y = event.pageY;
+  var io = this.closest_io(x, y);
+
+  if (io.locked) return;
+
+  if ((io != this.pending_hover_io) && !this.no_hover){
+    this.pending_hover_io.set_vis("hover", false);
+    io.set_vis("hover", true);
+  }
+  this.pending_hover_io = io;
+};
+
+Drag.prototype.hover_end = function() {
+  this.pending_hover_io.set_vis("hover", false);
+  this.pending_hover_io = undefined;
+  $(document).off('mousemove.boolehover');
+};
+
+Drag.prototype.closest_io = function(x, y, limit) {
+  var closest_io = null;
+  var closest_d = Infinity;
+
+  // Check to see if the nearest IO is within *double* the IO handle
+  // radius.  This limit is applied only when dragging the mouse
+  // freely.  When an event triggers the 'closest' check, then the
+  // mouse may be near the edge of the limit, and we don't want to
+  // confuse matters by not finding an IO to act on.
+  var limit2 = limit ? this.be.io_handle_size*this.be.io_handle_size : Infinity;
+
+  var mx = this.be.circuit.cdraw_to_canvas_x(x);
+  var my = this.be.circuit.cdraw_to_canvas_y(y);
+  for (var i = 0; i < this.io_set.length; i++){
+    var io = this.io_set[i];
+    var dx = io.x + io.cell.x - mx;
+    var dy = io.y + io.cell.y - my;
+    var d = (dx * dx) + (dy * dy);
+    if ((d < limit2) &&
+        ((d < closest_d) || (!io.locked && closest_io.locked))){
+      closest_d = d;
+      var closest_io = io;
+    }
+  }
+
+  return closest_io;
+};
+
 Drag.prototype.enable_drag = function(io) {
   io.el_target.dblclick($.proxy(this.mouse_double_click, this));
   this.be.bdrag.drag($(io.el_target.node), this, 'cell',
@@ -178,31 +214,31 @@ Drag.prototype.enable_drag = function(io) {
                       move: this.drag_move,
                       end: this.drag_end,
                       dblclick: this.dblclick});
-  io.el_target.hover($.proxy(this.true_hover_start, this),
-                     $.proxy(this.true_hover_end, this));
+  io.el_target.hover($.proxy(this.hover_start, this),
+                     $.proxy(this.hover_end, this));
   this.io_set.push(io);
-}
+};
 
 Drag.prototype.disable_drag = function(io) {
+  var el = $(io.el_target.node)
+
+  this.be.bdrag.undrag(el);
   io.el_target.undblclick();
-  this.be.bdrag.undrag($(io.el_target.node));
   io.el_target.unhover();
-  io.el_target.hover($.proxy(this.locked_hover_start, this, io),
-                     $.proxy(this.locked_hover_end, this, io));
-  for (var i = 0; i < this.io_set.length; i++){
-    if (this.io_set[i] == io) {
-      this.io_set.splice(i, 1);
-      break;
-    }
-  }
-}
+
+  io.el_target.attr({cursor: 'not-allowed'});
+  this.be.bdrag.drag(el, this, 'cell',
+                     {start: this.drag_locked_start,
+                      move: this.drag_locked_move,
+                      end: this.drag_locked_end});
+};
 
 Drag.prototype.disable_hover = function() {
   // We could disable hover by removing the hover event triggers,
   // but we'd have to do that for every IO.  So instead we just make
   // a note to ignore hover events until they're re-enabled.
   this.no_hover = true;
-}
+};
 
 Drag.prototype.enable_hover = function() {
   this.no_hover = false;
@@ -210,55 +246,23 @@ Drag.prototype.enable_hover = function() {
     this.pending_hover_io.set_vis("hover", true);
     // We know that an IO drag hasn't begun, so nothing more is needed.
   }
-}
-
-Drag.prototype.true_hover_start = function(event) {
-  var x = event.pageX;
-  var y = event.pageY;
-  var io = this.closest_io(x, y);
-  this.pending_hover_io = io;
-  if (!this.no_hover) io.set_vis("hover", true);
-  $(document).on('mousemove.boolehover', $.proxy(this.hover_move, this));
-}
-
-Drag.prototype.hover_move = function(event) {
-  var x = event.pageX;
-  var y = event.pageY;
-  var io = this.closest_io(x, y);
-  if ((io != this.pending_hover_io) && !this.no_hover){
-    this.pending_hover_io.set_vis("hover", false);
-    io.set_vis("hover", true);
-  }
-  this.pending_hover_io = io;
-}
-
-Drag.prototype.true_hover_end = function() {
-  this.pending_hover_io.set_vis("hover", false);
-  this.pending_hover_io = undefined;
-  $(document).off('mousemove.boolehover');
 };
 
-Drag.prototype.snap_end = function(x, y, io) {
-  io.set_vis("snap", false);
-  if (io == this.fail_io){
-    this.fail_io.display_fail(false);
+Drag.prototype.snap_end = function() {
+  this.snap_io.set_vis("snap", false);
+  if (this.fail_io){
+    this.hide_fail();
     this.fail_io = undefined;
   }
-
-  if (this.orig_io){
-    // new_io could conceivably be updated for a new target
-    // before snap_end is called on the old target.  In that case,
-    // don't blow up the new info.
-    if (io == this.new_io) this.update_new_io(x, y, this.be.null_io);
-  }
 };
 
-Drag.prototype.locked_hover_start = function(io, event) {
-  io.display_fail(true);
+Drag.prototype.display_fail = function(io) {
+  this.el_fail.transform('t' + (io.cell.x + io.x) + ',' + (io.cell.y + io.y) + 'r45');
+  this.el_fail.setAttr("visibility", "visible");
 };
 
-Drag.prototype.locked_hover_end = function(io, event) {
-  io.display_fail(false);
+Drag.prototype.hide_fail = function() {
+  this.el_fail.setAttr("visibility", "hidden");
 };
 
 Drag.prototype.connect_o_to_i = function(o, i) {
@@ -278,9 +282,10 @@ Drag.prototype.update_new_io = function(x, y, io) {
   // when the new IO is the same as the original IO.
   if (io == this.orig_io){
     io = this.be.null_io;
-  } else if (this.orig_empty && (this.orig_io.type == io.type)){
-    io.display_fail(true);
-    this.fail_io = io;
+  } else if ((this.orig_empty && (this.orig_io.type == io.type)) ||
+             io.locked){
+    this.display_fail(io);
+    this.fail_io = true;
     io = this.be.null_io;
   }
 
@@ -319,4 +324,65 @@ Drag.prototype.update_new_io = function(x, y, io) {
     // This should never happen.
     this.update_new_io(x, y, this.be.null_io);
   }
+};
+
+Drag.prototype.update_free_drag = function(x, y) {
+  if (this.new_io == this.be.null_io){
+    this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(x);
+    this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(y);
+
+    if (this.null_wire){
+      this.null_wire.redraw();
+    } else {
+      // create_null_wire
+      if ((this.orig_io.type == "input") && (!this.orig_empty)){
+        var from_io = this.orig_io.w[0].o;
+      } else {
+        var from_io = this.orig_io;
+      }
+      this.null_wire = new Wire(this.be, from_io, this.be.null_io, true);
+    }
+  }
+};
+
+// If the user clicks on a locked IO target, then we know that the
+// not-allowed cursor was displayed, so for consistency we don't allow
+// an unlocked IO to be selected, even if it might be marginally
+// closer.  However, we do look for the closest locked IO (since there
+// may be two with overlapping targets).
+Drag.prototype.drag_locked_start = function(x, y) {
+  var io = this.closest_locked_io(x, y);
+  this.display_fail(io);
+  $(document.body).addClass('cursor-force-not-allowed');
+  this.disable_hover();
+};
+
+Drag.prototype.drag_locked_move = function(x, y) {
+  // Do nothing.
+};
+
+Drag.prototype.drag_locked_end = function() {
+  this.hide_fail();
+  $(document.body).removeClass('cursor-force-not-allowed');
+  this.enable_hover();
+};
+
+Drag.prototype.closest_locked_io = function(x, y) {
+  var closest_d = Infinity;
+  var mx = this.be.circuit.cdraw_to_canvas_x(x);
+  var my = this.be.circuit.cdraw_to_canvas_y(y);
+  for (var i = 0; i < this.io_set.length; i++){
+    var io = this.io_set[i];
+    if (io.locked) {
+      var dx = io.x + io.cell.x - mx;
+      var dy = io.y + io.cell.y - my;
+      var d = (dx * dx) + (dy * dy);
+      if (d < closest_d){
+        closest_d = d;
+        var closest_io = io;
+      }
+    }
+  }
+
+  return closest_io;
 };
