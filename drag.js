@@ -233,6 +233,19 @@ Drag.prototype.disable_drag = function(io) {
                       end: this.drag_locked_end});
 };
 
+Drag.prototype.remove_io = function(io) {
+  this.be.bdrag.undrag($(io.el_target.node));
+  io.el_target.undblclick();
+  io.el_target.unhover();
+
+  for (var i = 0; i < this.io_set.length; i++){
+    if (this.io_set[i] == io) {
+      this.io_set.splice(i, 1);
+      break;
+    }
+  }
+};
+
 Drag.prototype.disable_hover = function() {
   // We could disable hover by removing the hover event triggers,
   // but we'd have to do that for every IO.  So instead we just make

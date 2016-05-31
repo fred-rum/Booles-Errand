@@ -151,17 +151,12 @@ Io.prototype.disconnect = function(wire) {
 };
 
 Io.prototype.remove = function() {
-  if (this.canvas == this.be.cdraw) {
-    this.be.drag.disable_drag(this);
-  }
-
   while (this.w.length) {
     this.w[0].remove(this.type == 'input');
   }
 
-  // The Raphael source code appears to automatically remove event handlers
-  // when the element is removed, so we don't have to do that here.
   if (this.canvas == this.be.cdraw){
+    this.be.drag.remove_io(this);
     this.el_target.remove();
     this.el_handle.remove();
     this.el_stub_end.remove();
@@ -171,10 +166,6 @@ Io.prototype.remove = function() {
 }
 
 Io.prototype.clear = function() {
-  if (this.canvas == this.be.cdraw) {
-    this.be.drag.disable_drag(this);
-  }
-
   if (this.type == 'input'){
     // We clear only wires attached to input ports to avoid clearing a
     // wire from both ends.
@@ -185,11 +176,14 @@ Io.prototype.clear = function() {
 
   // The Raphael source code appears to automatically remove event handlers
   // when the element is removed, so we don't have to do that here.
-  this.el_target.remove();
-  this.el_handle.remove();
-  this.el_stub_end.remove();
-  this.el_value_text.remove();
-  this.el_value_text_bg.remove();
+  if (this.canvas == this.be.cdraw) {
+    this.be.drag.remove_io(this);
+    this.el_target.remove();
+    this.el_handle.remove();
+    this.el_stub_end.remove();
+    this.el_value_text.remove();
+    this.el_value_text_bg.remove();
+  }
 }
 
 Io.prototype.redraw = function() {
