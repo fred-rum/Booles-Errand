@@ -156,7 +156,7 @@ Cell.prototype.update_quantity = function(n) {
 Cell.prototype.propagate_value = function() {
   var calc_func_name = "calc_" + this.type;
   if (!this[calc_func_name]) return;
-  var value = this[calc_func_name]();
+  this[calc_func_name]();
 };
 
 Cell.prototype.reset = function() {
@@ -242,7 +242,6 @@ Cell.prototype.calc_output = function() {
     var width = height;
     var right = width/2;
     var left = right + height*1/3;
-    var cx = left + (height*2/3/2);
     if (value === exp_value) {
       attr.stroke = "#0c0";
       attr.path = ["M", left, 0,
@@ -263,7 +262,6 @@ Cell.prototype.calc_output = function() {
 Cell.prototype.calc_latch = function() {
   var d = this.io.d.value;
   var e = this.io.e.value;
-  var value;
   if (e === 1){
     if (d === undefined){
       this.io['q'].propagate_output(undefined);
@@ -540,10 +538,7 @@ Cell.prototype.draw_inv = function(inv, right, bg, y) {
   if (inv){
     var inv_r = this.be.inv_bubble_size/2;
     var inv_cx = right+inv_r;
-    var sw = bg ? 9 : 3;
-    var sc = bg ? "#eee" : "#000";
     var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
-    var el = bg ? this.el_ns : this.el_s;
     if (bg){
       this.push_ns(this.canvas.circle(inv_cx, y||0, inv_r).attr(attr));
     } else {
@@ -635,7 +630,6 @@ Cell.prototype.init_xor = function(inv) {
   var ni = 2;
   var height = ni*this.be.io_spacing;
   var r = height/2;
-  var box_width = height-r;
   var cell_width = height;
   var left = -cell_width/2;
   var right = cell_width/2;

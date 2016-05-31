@@ -237,12 +237,11 @@ Wire.prototype.get_subpath = function(z1, z2) {
 
   var aw = this.aw;
   var len_aa = aw.angle_a * aw.r;
-  var len_ab = aw.angle_b * aw.r;
   var len_b = len_aa + aw.seg_len;
   var path_length = this.path_length;
 
   function get_point(z) {
-    var point, xd, yd;
+    var xd, yd;
     if (z < len_aa){
       var angle = z / aw.r;
       var sign_ya = aw.cwa ? 1 : -1;
