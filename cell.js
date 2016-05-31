@@ -303,9 +303,9 @@ Cell.prototype.bring_to_top = function() {
 };
 
 Cell.prototype.cell_drag_start = function(x, y) {
-  this.dragging = !this.locked && (this.quantity !== 0);
+  this.dragging_disallowed = this.locked || (this.quantity === 0);
 
-  if (!this.dragging) {
+  if (this.dragging_disallowed) {
     if (this.locked){
       // Show the fail icon only on cdraw, not on cbox.
       this.be.drag.show_fail_xy(this.x, this.y);
@@ -431,7 +431,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
 };
 
 Cell.prototype.cell_drag_move = function(x, y) {
-  if (!this.dragging) return;
+  if (this.dragging_disallowed) return;
 
   var mx = this.be.circuit.cdraw_to_canvas_x(x);
   var my = this.be.circuit.cdraw_to_canvas_y(y);
@@ -445,7 +445,7 @@ Cell.prototype.cell_drag_move = function(x, y) {
 };
 
 Cell.prototype.cell_drag_end = function() {
-  if (!this.dragging) {
+  if (this.dragging_disallowed) {
     this.be.drag.hide_fail();
     $(document.body).removeClass('cursor-force-not-allowed');
     this.be.drag.enable_hover();
@@ -480,7 +480,6 @@ Cell.prototype.cell_drag_end = function() {
   }
 
   this.be.level.update_url();
-  this.dragging = false;
 };
 
 Cell.prototype.remove = function() {
