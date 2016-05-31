@@ -734,6 +734,7 @@ Cell.prototype.init_output = function() {
   };
   this.el_check = this.canvas.path("M0,0").attr(attr);
   this.el_check.setAttr("visibility", "hidden");
+  this.el_check.setAttr("pointer-events", "none");
   this.push_ns(this.el_check);
 
   // Draw a "question mark" when the output check is pending.  If a
@@ -763,6 +764,7 @@ Cell.prototype.init_output = function() {
               "l", 0, 0];
   this.el_question = this.canvas.path(path).attr(attr);
   this.el_question.setAttr("visibility", "hidden");
+  this.el_question.setAttr("pointer-events", "none");
   this.push_ns(this.el_question);
 };
 
