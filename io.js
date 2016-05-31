@@ -107,6 +107,7 @@ Io.prototype.draw_stub_fg = function() {
   var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
                        "v", this.be.stub_end_len];
   this.el_stub_end = this.canvas.path(stub_end_path).attr(stub_end_attr);
+  this.el_stub_end.setAttr("pointer-events", "none");
   this.el_stub_end.setAttr("visibility", "hidden");
   this.set_io.push(this.el_stub_end);
 
@@ -298,9 +299,8 @@ Io.prototype.bring_to_top = function() {
   this.el_value_text_bg.insertBefore(this.be.z_io);
   this.el_value_text.insertBefore(this.be.z_io);
   this.el_stub_end.insertBefore(this.be.z_io);
-
-  this.el_handle.insertBefore(this.be.z_handle);
-  this.el_target.insertBefore(this.be.z_handle);
+  this.el_handle.insertBefore(this.be.z_io);
+  this.el_target.insertBefore(this.be.z_io);
 };
 
 Io.prototype.mark_old = function(type) {
