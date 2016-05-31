@@ -68,10 +68,10 @@ Bdrag.prototype.mouseup = function (event) {
 
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
-  if (data.type != 'cbox') {
-    event.preventDefault();
-  }
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
+    if (data.type != 'cbox') {
+      event.preventDefault();
+    }
     event.stopPropagation();
   }
   if (this.dragging == 'mouse') return;
