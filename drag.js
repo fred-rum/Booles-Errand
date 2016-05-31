@@ -90,16 +90,16 @@ Drag.prototype.drag_start = function(x, y) {
 Drag.prototype.drag_move = function(x, y) {
   var closest_io = this.closest_io(x, y, true);
 
-  if (closest_io) {
-    if (closest_io != this.snap_io) {
-      if (this.snap_io) this.snap_end(x, y, this.snap_io);
+  if (closest_io != this.snap_io) {
+    if (this.snap_io) this.snap_end(x, y, this.snap_io);
+    if (closest_io) {
       this.snap_io = closest_io;
-      this.snap_io.set_vis("snap", true);
-      this.update_new_io(x, y, this.snap_io);
+      closest_io.set_vis("snap", true);
+      this.update_new_io(x, y, closest_io);
+    } else {
+      this.snap_io = undefined;
+      this.update_new_io(x, y, this.be.null_io);
     }
-  } else if (this.snap_io) {
-    this.snap_end(x, y, this.snap_io);
-    this.snap_io = undefined;
   }
 
   this.update_free_drag(x, y);
