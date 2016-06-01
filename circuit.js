@@ -110,11 +110,6 @@ function Circuit() {
 
   this.be.div_cdraw.mousewheel($.proxy(this.canvas_mousewheel, this));
 
-  this.be.bdrag.drag(this.be.div_cbox_container, this, 'cbox',
-                     {start: this.cbox_drag_start,
-                      move: this.cbox_drag_move,
-                      end: this.cbox_drag_end});
-
   $("#button-info-hide").click($.proxy(this.click_info_hide, this));
   $("#button-info-unhide").click($.proxy(this.click_info_unhide, this));
 
@@ -227,6 +222,13 @@ Circuit.prototype.resize = function(maintain_center) {
   };
   this.be.div_cbox_container.offset(cbox_offset);
   this.be.div_cbox_container.height(cbox_height);
+
+  var cbox_scale = Math.min(1.0,
+                            Math.max(0.5, cbox_height / this.be.box_height));
+  this.be.div_cbox.width(this.be.em_size * 8 * cbox_scale);
+  this.be.div_cbox.height(this.be.box_height * cbox_scale);
+  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+  this.be.div_cdrag.width(this.be.cbox_width);
 
   if (maintain_center){
     // If we want the canvas objects to stay centered in the viewable
@@ -424,44 +426,6 @@ Circuit.prototype.rescale = function(x, y, new_scale) {
   this.update_view();
 };
 
-Circuit.prototype.cbox_drag_start = function(x, y) {
-  this.cbox_drag_x = x;
-  this.cbox_drag_width = this.be.div_cbox.width();
-  this.be.div_cbox_container.css({"cursor": "col-resize"});
-};
-
-Circuit.prototype.cbox_drag_move = function(x, y) {
-  var cbox_width = this.cbox_drag_width + x - this.cbox_drag_x;
-  cbox_width = Math.max(cbox_width, this.be.em_size*4);
-  var scale = cbox_width / (this.be.em_size*8);
-  this.be.div_cbox.width(cbox_width);
-  this.be.div_cbox.height(this.be.box_height * scale);
-  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
-  this.be.div_cdrag.width(this.be.cbox_width);
-  this.resize();
-  this.update_view();
-};
-
-Circuit.prototype.cbox_drag_end = function() {
-  this.be.div_cbox_container.css({"cursor": "default"});
-};
-
-Circuit.prototype.click_info_hide = function() {
-  this.info_hidden = true;
-  this.be.div_info.css({display: "none"});
-  this.be.div_info_stub.css({display: "block"});
-  this.be.div_main_stub.css({display: "block"});
-  this.resize();
-}
-
-Circuit.prototype.click_info_unhide = function() {
-  this.info_hidden = false;
-  this.be.div_info_stub.css({display: "none"});
-  this.be.div_main_stub.css({display: "none"});
-  this.be.div_info.css({display: "block"});
-  this.resize();
-}
-
 Circuit.prototype.click_zoom_in = function() {
   this.zoom(1/0.85);
 };
@@ -480,6 +444,24 @@ Circuit.prototype.click_zoom_fit = function() {
   this.be.circuit.fit_view();
   this.be.circuit.update_view();
 };
+
+Circuit.prototype.click_info_hide = function() {
+  this.info_hidden = true;
+  this.be.div_info.css({display: "none"});
+  this.be.div_info_stub.css({display: "block"});
+  this.be.div_main_stub.css({display: "block"});
+  this.resize();
+  this.update_view();
+}
+
+Circuit.prototype.click_info_unhide = function() {
+  this.info_hidden = false;
+  this.be.div_info_stub.css({display: "none"});
+  this.be.div_main_stub.css({display: "none"});
+  this.be.div_info.css({display: "block"});
+  this.resize();
+  this.update_view();
+}
 
 // This is called as soon as the DOM is ready.
 $(function() {
