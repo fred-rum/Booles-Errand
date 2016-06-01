@@ -672,7 +672,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'SR latch',
-   section: 'Introduction to sequential circuits',
+   section: 'Introduction to latches',
    intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.</p><p>The below circuit is an </i>SR latch</i>.  It can be <i>set</i> to 1 or <i>reset</i> to 0 by its inputs.  If it is currently neither set nor reset, then it holds its last value.</p><p><b>Connect the S pin so that it sets the latch to 1 and the R pin so that it resets the latch to 0.</b></p>',
    outro: '<p>What happens if S and R are both 1?</p>',
    truth: [[{s:0, r:0,   q:x},
@@ -836,7 +836,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Meeting hold requirement',
-   intro: '<p>This circuit uses a pre-built transparent-high latch cell. <b>Connect the E and D pins in such a way that the new D value is not captured if it changes at the same time as E changes to 0.</b></p><p>Tip: Make sure that the D value meets the hold time requirement.</p>',
+   intro: '<p>This circuit uses a pre-built D latch cell. <b>Connect the E and D pins in such a way that the new D value is not captured if it changes at the same time as E changes to 0.</b></p><p>Tip: Make sure that the D value meets the hold time requirement.</p>',
    outro: '<p>Does your solution work for all simulation speeds?</p>',
    truth: [[{e:1, d:0,   q:0, '~q':1},
             {e:1, d:1,   q:1, '~q':0},
@@ -895,6 +895,65 @@ Level.prototype.puzzle = [
      }
    }
   }
-//  {name: 'Meeting set-up requirement',
-//   intro: '<p>This circuit uses a pre-built transparent-high latch cell. <b>Connect the E and D pins in such a way that the new D value is captured if it changes at the same time as E changes to 0.</b></p>',
+,
+  {name: 'Meeting set-up requirement',
+   intro: '<p>This circuit uses a pre-built D latch cell. <b>Connect the E and D pins in such a way that the new D value is captured if it changes at the same time as E changes to 0.</b></p><p>Tip: Make sure that the D value meets the set-up time requirement.</p>',
+   outro: '<p>Does your solution work for all simulation speeds?</p>',
+   truth: [[{e:1, d:0,   q:0, '~q':1},
+            {e:1, d:1,   q:1, '~q':0},
+            {e:0, d:0,   q:0, '~q':1},
+            {e:0, d:1,   q:0, '~q':1}],
+           [{e:1, d:1,   q:1, '~q':0},
+            {e:1, d:0,   q:0, '~q':1},
+            {e:0, d:1,   q:1, '~q':0},
+            {e:0, d:0,   q:1, '~q':0}]],
+   cells: {
+     e: {
+       type: 'input',
+       x: 100,
+       y: 100
+     }
+     ,
+     d: {
+       type: 'input',
+       x: 100,
+       y: 200,
+       io: [['o', 'inv1', 'i']]
+     }
+     ,
+     inv1: {
+       type: 'inv',
+       x: 225,
+       y: 300,
+       io: [['o', 'inv2', 'i']]
+     }
+     ,
+     inv2: {
+       type: 'inv',
+       x: 325,
+       y: 300,
+       io: [['o', 'latch', 'd']]
+     }
+     ,
+     latch: {
+       type: 'latch',
+       x: 450,
+       y: 120,
+       io: [['q', 'q', 'i'],
+            ['~q', '~q', 'i']]
+     }
+     ,
+     q: {
+       type: 'output',
+       x: 600,
+       y: 100
+     }
+     ,
+     '~q': {
+       type: 'output',
+       x: 600,
+       y: 140
+     }
+   }
+  }
 ];
