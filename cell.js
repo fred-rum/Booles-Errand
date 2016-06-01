@@ -367,6 +367,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
   // not the center (0,0) coordinate of the cell.
   var del;
   if (is_new &&
+      (x >= 0) &&
       (x < this.be.cbox_width) &&
       (y >= this.be.truth_height) &&
       (y < this.be.window_height)){
