@@ -154,7 +154,7 @@ Level.prototype.begin = function(level_num) {
   this.cur_line = 0;
   this.select_seq(0);
 
-  this.be.sim.begin_level(level.hide.has("speed"));
+  this.be.sim.begin_level(level.hide.has("speed"), this.sequenced);
 };
 
 Level.prototype.init_table = function() {

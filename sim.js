@@ -222,7 +222,7 @@ Sim.prototype.click_pause_at = function(type) {
   $("#pause-at-" + this.pause_at).addClass('pause-at-selected');
 };
 
-Sim.prototype.begin_level = function(hidden_speed) {
+Sim.prototype.begin_level = function(hidden_speed, sequenced) {
   if (hidden_speed){
     $('#pause-at')[0].setAttribute('display', 'none');
     $('#speed-slider')[0].setAttribute('display', 'none');
@@ -236,10 +236,10 @@ Sim.prototype.begin_level = function(hidden_speed) {
     $('#speed-slider')[0].setAttribute('display', '');
     this.speed = this.preferred_speed;
 
-    if (!this.sequenced){
-      $('#pause-at-seq').addClass('pause-at-hidden');
-    } else {
+    if (sequenced){
       $('#pause-at-seq').removeClass('pause-at-hidden');
+    } else {
+      $('#pause-at-seq').addClass('pause-at-hidden');
     }
   }
 
