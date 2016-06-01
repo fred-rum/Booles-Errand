@@ -158,14 +158,19 @@ Circuit.prototype.resize = function(maintain_center) {
   // appear without triggering a horizontal scrollbar.  And worst that
   // can happen if the hack is not completely successful for some
   // browser is that both scrollbars appear.
-  this.be.div_truth.outerWidth("auto");
-  this.be.truth_width = this.be.div_truth.outerWidth();
-  this.be.div_truth.outerWidth(Math.max(this.be.truth_width + 20,
-                                        this.be.div_cbox.outerWidth()));
+  //
+  // We measure and set the interior width here so that the minimum
+  // width of the truth table exactly matches the maximum width of
+  // cbox (which is also based on its interior width.)
+  this.be.div_truth.width("auto");
+  var truth_width = this.be.div_truth.width();
+  this.be.div_truth.width(Math.max(truth_width + 20,
+                                   this.be.em_size * 8));
 
   // The actual div_truth may be smaller than what we just set due to
   // the max-width property, so we measure it again to get the final
-  // width.
+  // width.  Here, we measure the outer width since that's what useful
+  // for positioning adjacent elements.
   this.be.truth_width = this.be.div_truth.outerWidth();
 
   this.be.div_truth.outerHeight("auto");
