@@ -118,7 +118,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'The speed slider',
    ui: true,
-   intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table row has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
+   intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table line has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    truth: [{a: 0,   z: 0},
            {a: 1,   z: 1}],
@@ -671,12 +671,49 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'SR latch',
+  {name: 'D latch',
    section: 'Introduction to latches',
-   intro: '<p>A <i>latch</i> allows an input data value to pass through to the output in certain conditions, but it holds its output constant by recirculating the last output value in other conditions.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.</p><p>The below circuit is an </i>SR latch</i>.  It can be <i>set</i> to 1 or <i>reset</i> to 0 by its inputs.  If it is currently neither set nor reset, then it holds its last value.</p><p><b>Connect the S pin so that it sets the latch to 1 and the R pin so that it resets the latch to 0.</b></p>',
+   intro: '<p>A <i>D latch</i> is our first storage element.  It passes its D (data) input to its Q output when its E (enable) input is 1, but it holds its Q output constant when E is 0.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.</p><p>In order to test a circuit with storage elements, each boxed section of the truth table contains multiple lines.  Each line represents one step of a test sequence.  Clicking in the truth table starts a fresh test sequence for the selected row.</p>',
+   outro: '<p>Simulation can be automatically paused when one line of a test sequence has passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>)</span> or when all lines of a test sequence have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M3,2.5l1.25,2.5l2.5,-5M3,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>).</span></p>',
+   truth: [[{e:1, d:0,   q:0},
+            {e:1, d:1,   q:1},
+            {e:0, d:1,   q:1},
+            {e:0, d:0,   q:1}],
+           [{e:1, d:1,   q:1},
+            {e:1, d:0,   q:0},
+            {e:0, d:0,   q:0},
+            {e:0, d:1,   q:0}]],
+   cells: {
+     e: {type: 'input',
+         x: 100,
+         y: 100,
+         io: [['o', 'latch', 'e']]
+        }
+     ,
+     d: {type: 'input',
+         x: 100,
+         y: 200,
+         io: [['o', 'latch', 'd']]
+        }
+     ,
+     latch: {
+       type: 'latch',
+       x: 380,
+       y: 120,
+       io: [['q', 'q', 'i']]
+     }
+     ,
+     q: {type: 'output',
+         x: 500,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'SR latch',
+   intro: '<p>A D latch is typically built with an <i>SR latch</i> inside, as shown in the circuit below.  It can be <i>set</i> to 1 or <i>reset</i> to 0 by its inputs.  If it is currently neither set nor reset, then it holds its last value by recirculating that value infinitely.</p><p><b>Connect the S pin so that it sets the latch to 1 and the R pin so that it resets the latch to 0.</b></p>',
    outro: '<p>What happens if S and R are both 1?</p>',
-   truth: [[{s:0, r:0,   q:x},
-            {s:1, r:0,   q:1},
+   truth: [[{s:1, r:0,   q:1},
             {s:0, r:0,   q:1},
             {s:0, r:1,   q:0},
             {s:0, r:0,   q:0}]],
@@ -711,8 +748,8 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'D latch',
-   intro: '<p>Because NAND gates are generally easier to implement using silicon transistors, a more common SR latch design uses a pair of NAND gates to recirculate the data. This latch design has the convenient property that the latch output is available in both regular and inverted forms.</p><p><b>Connect the latch so that it is transparent and propagates the D value only when E is 1.</b> In other words, when E is 1, the latch is <i>enabled</i> to propagate the the <i>data</i> value D to the output Q.  Once the latch output is initialized, ~Q must be the inverted value of Q.</p>',
+  {name: 'Build a D latch',
+   intro: '<p>The logic that feeds the SR latch can be built up to implement the D latch.  Because NAND gates are generally easier to implement using silicon transistors, a more common SR latch design uses a pair of NAND gates to recirculate the data. This latch design has the convenient property that the latch output is available in both regular and inverted forms.</p><p><b>Connect the latch so that it is transparent and propagates the D value only when E is 1.</b> Once the latch output is initialized, ~Q must be the inverted value of Q.</p>',
    outro: '<p>The circuit you designed is called a D latch.</p>',
    truth: [[{e:0, d:0,   q:x, '~q':x},
             {e:1, d:0,   q:0, '~q':1},
