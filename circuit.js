@@ -26,6 +26,7 @@ function Circuit() {
   this.be.div_infotxt = $("#infotxt");
   this.be.div_info_stub = $("#info-stub");
   this.be.div_controls = $("#sim-controls");
+  this.be.div_zoom = $("#zoom-controls");
   this.be.div_main_stub = $("#main-stub");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
@@ -44,6 +45,9 @@ function Circuit() {
 
   this.be.controls_width = this.be.div_controls.outerWidth();
   this.be.controls_height = this.be.div_controls.outerHeight();
+
+  this.be.zoom_width = this.be.div_zoom.outerWidth();
+  this.be.zoom_height = this.be.div_zoom.outerHeight();
 
   this.be.main_stub_width = this.be.div_main_stub.outerWidth();
   this.be.main_stub_height = this.be.div_main_stub.outerHeight();
@@ -114,6 +118,8 @@ function Circuit() {
   $("#button-info-hide").click($.proxy(this.click_info_hide, this));
   $("#button-info-unhide").click($.proxy(this.click_info_unhide, this));
 
+  $("#zoom-fit").click($.proxy(this.click_zoom_fit, this));
+
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
   this.be.level = new Level(this.be);
@@ -178,10 +184,14 @@ Circuit.prototype.resize = function(maintain_center) {
   // position won't be noticeable, either.
 
   // Position either info panel or the info stub, and then position the
-  // sim controls accordingly.
+  // sim & zoom controls accordingly.
   this.be.controls_offset = {
     top: -1,
     left: (this.be.truth_width + this.be.window_width - this.be.controls_width) / 2
+  };
+  this.be.zoom_offset = {
+    top: -1,
+    left: this.be.window_width - this.be.zoom_width
   };
   if (this.info_hidden){
     var info_stub_offset = {
@@ -191,13 +201,15 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_info_stub.offset(info_stub_offset);
     this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
     this.be.info_height = this.be.div_info_stub.outerHeight();
+    this.be.zoom_offset.left -= this.be.main_stub_width;
   } else {
     this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
     this.be.info_width = Infinity;
     this.be.info_height = this.be.div_info.outerHeight();
-    this.be.controls_offset.top = this.be.info_height - 1;
+    this.be.zoom_offset.top = this.be.controls_offset.top = this.be.info_height - 1;
   }
   this.be.div_controls.offset(this.be.controls_offset);
+  this.be.div_zoom.offset(this.be.zoom_offset);
 
   // Make sure that div_truth is at least as tall as div_info.
   if (new_truth_height < this.be.info_height) {
@@ -454,6 +466,11 @@ Circuit.prototype.click_info_unhide = function() {
   this.be.div_info.css({display: "block"});
   this.resize();
 }
+
+Circuit.prototype.click_zoom_fit = function() {
+  this.be.circuit.fit_view();
+  this.be.circuit.update_view();
+};
 
 // This is called as soon as the DOM is ready.
 $(function() {

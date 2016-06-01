@@ -164,8 +164,7 @@ Sim.prototype.keydown = function(event) {
   var bucky = event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
     
   if ((key == 'F') && !bucky){
-    this.be.circuit.fit_view();
-    this.be.circuit.update_view();
+    this.be.circuit.click_zoom_fit();
   }
 };
 
