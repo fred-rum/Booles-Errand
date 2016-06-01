@@ -382,7 +382,9 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
               (x < this.be.controls_offset.left + this.be.controls_width) &&
               (y < this.be.controls_offset.top + this.be.controls_height)) ||
              ((x >= this.be.window_width - this.be.main_stub_width) &&
-              (y < this.be.main_stub_height))){
+              (y < this.be.main_stub_height)) ||
+             ((x >= this.be.window_width - this.be.zoom_width) &&
+              (y >= this.be.window_height - this.be.zoom_height))){
     del = "del";
   } else {
     del = false;

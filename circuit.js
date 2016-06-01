@@ -191,10 +191,6 @@ Circuit.prototype.resize = function(maintain_center) {
     top: -1,
     left: (this.be.truth_width + this.be.window_width - this.be.controls_width) / 2
   };
-  this.be.zoom_offset = {
-    top: -1,
-    left: this.be.window_width - this.be.zoom_width
-  };
   if (this.info_hidden){
     var info_stub_offset = {
       top: 0,
@@ -203,15 +199,13 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_info_stub.offset(info_stub_offset);
     this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
     this.be.info_height = this.be.div_info_stub.outerHeight();
-    this.be.zoom_offset.left -= this.be.main_stub_width;
   } else {
     this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
     this.be.info_width = Infinity;
     this.be.info_height = this.be.div_info.outerHeight();
-    this.be.zoom_offset.top = this.be.controls_offset.top = this.be.info_height - 1;
+    this.be.controls_offset.top = this.be.info_height - 1;
   }
   this.be.div_controls.offset(this.be.controls_offset);
-  this.be.div_zoom.offset(this.be.zoom_offset);
 
   // Make sure that div_truth is at least as tall as div_info.
   if (new_truth_height < this.be.info_height) {
@@ -310,7 +304,7 @@ Circuit.prototype.fit_view = function() {
     var cdraw_left1 = this.be.truth_width;
     var cdraw_width1 = this.be.window_width - cdraw_left1;
     var cdraw_top1 = this.be.info_height + this.be.div_controls.outerHeight();
-    var cdraw_height1 = this.be.window_height - cdraw_top1;
+    var cdraw_height1 = this.be.window_height - this.be.zoom_height - cdraw_top1;
     var x_scale1 = cdraw_width1 / bbox_width;
     var y_scale1 = cdraw_height1 / bbox_height;
     var scale1 = Math.min(x_scale1, y_scale1);
@@ -319,7 +313,7 @@ Circuit.prototype.fit_view = function() {
     var cdraw_left2 = this.be.cbox_width;
     var cdraw_width2 = this.be.window_width - cdraw_left2;
     var cdraw_top2 = Math.max(cdraw_top1, this.be.truth_height);
-    var cdraw_height2 = this.be.window_height - cdraw_top2;
+    var cdraw_height2 = this.be.window_height - this.be.zoom_height - cdraw_top2;
     var x_scale2 = cdraw_width2 / bbox_width;
     var y_scale2 = cdraw_height2 / bbox_height;
     var scale2 = Math.min(x_scale2, y_scale2);
