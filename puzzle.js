@@ -68,7 +68,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'NOT gate',
+  {name: 'The NOT gate',
    intro: '<p><b>A NOT gate changes a 0 to 1, or changes a 1 to a 0.</b>  In other words, the output of a NOT gate is 1 only if the input is <i>not</i> 1.</p>',
    outro: '<p>A NOT gate is also often called an inverter.</p>',
    truth: [{a: 0,   z: 1},
@@ -246,7 +246,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'AND gate',
+  {name: 'The AND gate',
    intro: '<p><b>An AND gate outputs a 1 only if its first input is 1 <i>and</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
    outro: '<p>When one of an AND gate\'s inputs is 1, then the value of the other input is propagated to the output of the gate.  Otherwise, the gate output is 0.</p><p><b>Make sure you clearly understand the relationship of the AND gate\'s output with its inputs</b>, as displayed in the truth table.  You will soon learn five other simple logic gates, each of which perform a different logic function.</p>',
    truth: [{a:0, b:0,   z:0},
@@ -272,7 +272,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'NAND gate',
+  {name: 'The NAND gate',
    intro: '<p><b>A NAND gate outputs an inverted value as compared to an AND gate.</b></p><p>Be careful when speaking aloud: "a NAND gate" is not "an AND gate".</p>',
    outro: '<p>As you\'ll soon see, NAND gates can be combined to implement every possible Boolean logic expression.</p>',
    truth: [{a:0, b:0,   z:1},
@@ -343,7 +343,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'OR gate',
+  {name: 'The OR gate',
    intro: '<p><b>An OR gate outputs a 1 if its first input is 1 <i>or</i> its second input is 1</b> (or both are 1). Otherwise the output of the OR gate is 0.</p>',
    outro: '<p>When one of an OR gate\'s inputs is 0, then the value of the other input is propagated to the output of the gate.  Otherwise, the gate output is 1.</p><p>An OR gate is more precisely described with the legal term "and/or" because its output is 1 if its first input is 1 <i>and/or</i> its second input is 1.</p>',
    truth: [{a:0, b:0,   z:0},
@@ -369,7 +369,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'NOR gate',
+  {name: 'The NOR gate',
    intro: '<p><b>A NOR gate outputs an inverted value as compared to an OR gate.</b></p><p>In this puzzle we introduce the concept of a "don\'t care" value.  If A is 1, we know that the output of the NOR gate must always be 0, so we <i>don\'t care</i> what B is.  Likewise, we <i>don\'t care</i> what A is when B is 1.</p>',
    outro: '<p>This circuit simulator uses a black color to represent a value that is unknown, which includes "don\'t care" values.  If a logic gate has an unknown input, a logic gate may output a known or unknown value depending on its input(s) and its logic function.</p>',
    truth: [{a:0, b:0,   z:1},
@@ -394,7 +394,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'XOR and XNOR gates',
+  {name: 'The XOR and XNOR gates',
    intro: '<p>An XOR gate performs an "exclusive or" function. <b>An XOR gate outputs a 1 if its first input is <i>exclusively</i>&nbsp;1 <i>or</i> its second input is <i>exclusively</i>&nbsp;1.</b> Unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p><p><b>An XNOR gate outputs an inverted value as compared to an XOR gate.</b></p>',
    outro: '<p>When one of an XOR gate\'s inputs is 0, then the value of the other input is propagated to the output of the gate.  Otherwise, the value of the other input is inverted at the output.</p><p>There are no "don\'t care" cases for the XOR and XNOR gates.</p>',
    truth: [{a:0, b:0,   z:0, y:1},
@@ -671,7 +671,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'D latch',
+  {name: 'The D latch',
    section: 'Introduction to latches',
    intro: '<p>A <i>D latch</i> is our first storage element.  It passes its D (data) input to its Q output when its E (enable) input is 1, but it holds its Q output constant when E is 0.  The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.</p><p>In order to test a circuit with storage elements, each boxed section of the truth table contains multiple lines.  Each line represents one step of a test sequence.  Clicking in the truth table starts a fresh test sequence for the selected row.</p>',
    outro: '<p>Simulation can be automatically paused when one line of a test sequence has passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>)</span> or when all lines of a test sequence have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M3,2.5l1.25,2.5l2.5,-5M3,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>).</span></p>',
@@ -710,7 +710,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'SR latch',
+  {name: 'An SR latch',
    intro: '<p>A D latch is typically built with an <i>SR latch</i> inside, as shown in the circuit below.  It can be <i>set</i> to 1 or <i>reset</i> to 0 by its inputs.  If it is currently neither set nor reset, then it holds its last value by recirculating that value infinitely.</p><p><b>Connect the S pin so that it sets the latch to 1 and the R pin so that it resets the latch to 0.</b></p>',
    outro: '<p>What happens if S and R are both 1?</p>',
    truth: [[{s:1, r:0,   q:1},
