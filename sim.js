@@ -10,7 +10,7 @@ function Sim(be) {
   this.new_other_events = [];
   this.running = false;
 
-  $(document).keydown($.proxy(this.keydown, this));
+  $(document).keypress($.proxy(this.keypress, this));
 
   $("#button-play").click($.proxy(this.click_play, this));
   $("#button-pause").click($.proxy(this.click_pause, this));
@@ -159,13 +159,17 @@ Sim.prototype.pass_delay_complete = function(next_row) {
   this.be.level.select_row(next_row);
 }
 
-Sim.prototype.keydown = function(event) {
+Sim.prototype.keypress = function(event) {
   var key = String.fromCharCode(event.which);
-  var bucky = event.ctrlKey || event.shiftKey || event.altKey || event.metaKey;
-    
-  if ((key == 'F') && !bucky){
+  var bucky = event.ctrlKey || event.altKey || event.metaKey;
+
+  if ((key == '-') && !bucky){
+    this.be.circuit.click_zoom_out();
+  } else if (((key == '=') || (key == '+')) && !bucky){
+    this.be.circuit.click_zoom_in();
+  } else if (((key == 'f') || (key == 'F')) && !bucky){
     this.be.circuit.click_zoom_fit();
-  }
+  } // else console.log(event.which + ' = "' + key + '"');
 };
 
 Sim.prototype.speed_drag_start = function(x, y) {

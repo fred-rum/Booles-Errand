@@ -118,6 +118,8 @@ function Circuit() {
   $("#button-info-hide").click($.proxy(this.click_info_hide, this));
   $("#button-info-unhide").click($.proxy(this.click_info_unhide, this));
 
+  $("#zoom-in").click($.proxy(this.click_zoom_in, this));
+  $("#zoom-out").click($.proxy(this.click_zoom_out, this));
   $("#zoom-fit").click($.proxy(this.click_zoom_fit, this));
 
   this.be.window.resize($.proxy(this.resize_event, this)); 
@@ -412,12 +414,11 @@ Circuit.prototype.canvas_mousewheel = function(event) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
 
   var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
-  if (new_scale > 2.0) new_scale = 2.0;
-
   this.rescale(event.pageX, event.pageY, new_scale);
 }
 
 Circuit.prototype.rescale = function(x, y, new_scale) {
+  if (new_scale > 2.0) new_scale = 2.0;
   var old_canvas_mx = x / this.be.scale;
   var old_canvas_my = y / this.be.scale;
   var new_canvas_mx = x / new_scale;
@@ -466,6 +467,20 @@ Circuit.prototype.click_info_unhide = function() {
   this.be.div_info.css({display: "block"});
   this.resize();
 }
+
+Circuit.prototype.click_zoom_in = function() {
+  this.zoom(1/0.85);
+};
+
+Circuit.prototype.click_zoom_out = function() {
+  this.zoom(0.85);
+};
+
+Circuit.prototype.zoom = function(ratio) {
+  this.rescale((this.be.window_width + this.be.cbox_width) / 2,
+               (this.be.window_height + this.be.info_height) / 2,
+               this.be.scale * ratio);
+};
 
 Circuit.prototype.click_zoom_fit = function() {
   this.be.circuit.fit_view();
