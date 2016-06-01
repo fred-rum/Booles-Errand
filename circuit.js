@@ -291,10 +291,10 @@ Circuit.prototype.fit_view = function() {
     this.be.canvas_top = 0;
     this.be.scale = 1.0;
   } else {
-    var bbox_cx = (bbox.left + bbox.right) / 2;
-    var bbox_cy = (bbox.top + bbox.bottom) / 2;
     var bbox_width = bbox.right - bbox.left + this.be.wire_arc_radius * 3;
-    var bbox_height = bbox.bottom - bbox.top + this.be.wire_arc_radius * 4;
+    var bbox_height = bbox.bottom - bbox.top + this.be.wire_arc_radius * 3;
+    var bbox_cx = bbox.left - this.be.wire_arc_radius * 1.5 + bbox_width / 2;
+    var bbox_cy = bbox.top - this.be.wire_arc_radius * 2 + bbox_height / 2;
 
     // The truth table cuts a corner out of the viewable screen
     // area, so we try two different aspect ratios to avoid it
