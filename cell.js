@@ -265,10 +265,8 @@ Cell.prototype.calc_latch = function() {
   if (e === 1){
     if (d === undefined){
       this.io['q'].propagate_output(undefined);
-      this.io['~q'].propagate_output(undefined);
     } else {
       this.io['q'].propagate_output(d);
-      this.io['~q'].propagate_output(1-d);
     }
   } else {
     // Don't propagate a value (leave the output unchanged)
@@ -863,18 +861,13 @@ Cell.prototype.init_latch = function() {
 
   this.io['q'] = new Io(this.be, this.canvas, this, 'q', 'output',
                         right + this.be.stub_len, -this.be.io_spacing);
-  this.io['~q'] = new Io(this.be, this.canvas, this, '~q', 'output',
-                         right + this.be.inv_bubble_size + this.be.stub_len,
-                         this.be.io_spacing);
 
-  this.qty_cx = this.io['~q'].x;
-  this.qty_top = this.io['~q'].y + this.be.stroke_wire_fg * 2;
+  this.qty_cx = this.io['q'].x;
+  this.qty_top = this.io['q'].y + this.be.io_spacing * 2 + this.be.stroke_wire_fg * 2;
 
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
-  this.draw_inv(true, right, true, this.be.io_spacing);
   this.draw_stubs();
   this.push_s(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr));
-  this.draw_inv(true, right, false, this.be.io_spacing);
 
   var attr = {
     "stroke-width": 0,
@@ -888,7 +881,6 @@ Cell.prototype.init_latch = function() {
   attr['text-anchor'] = 'end';
   right -= this.be.stroke_cell_fg;
   this.push_s(this.canvas.text(right, -this.be.io_spacing, "Q").attr(attr));
-  this.push_s(this.canvas.text(right, this.be.io_spacing, "~Q").attr(attr));
 };
 
 Cell.prototype.init_null = function() {

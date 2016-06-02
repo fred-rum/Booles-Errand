@@ -803,10 +803,10 @@ Level.prototype.puzzle = [
   {name: 'Metastability',
    intro: '<p>If a latch becomes opaque at the same moment that its data input changes value, the latch may be caught between accepting and rejecting the new data value. To prevent this uncertainty, the logic preceding the latch will typically <i>set up</i> a new data value for at least a minimum amount of time before the latch becomes opaque, and it will also <i>hold</i> the data value for a minimum amount of time after the latch becomes opaque.</p><p>The circuit below does not meet the minimum set-up and hold times. As a result, when D changes value at the same time as E becomes 0, the output of the latch depends on the speed of the wires. <b>Adjust the simulation speed using the speed slider in order to ensure that the latch becomes opaque without capturing the new D value.</b></p><p>Tip: You may need to click in the truth table to restart a test sequence with a new speed.</p>',
    outro: '<p>You may have noticed that at the default speed (the middle tick mark on the speed slider), the latch becomes opaque with two different values inside it. When this occurs, the latch isn\'t stable at a particular value, but instead is <i>metastable</i> while the different values chase each other through the latch\'s recirculating gates.</p>',
-   truth: [[{e:1, d:0,   q:0, '~q':1},
-            {e:0, d:1,   q:0, '~q':1}],
-           [{e:1, d:1,   q:1, '~q':0},
-            {e:0, d:0,   q:1, '~q':0}]],
+   truth: [[{e:1, d:0,   q:0},
+            {e:0, d:1,   q:0}],
+           [{e:1, d:1,   q:1},
+            {e:0, d:0,   q:1}]],
    avail: [],
    cells: {
      e: {type: 'input',
@@ -828,11 +828,6 @@ Level.prototype.puzzle = [
          y: 100
         }
      ,
-     '~q': {type: 'output',
-         x: 600,
-         y: 190
-        }
-     ,
      nand1:{
        type: 'nand',
        x: 480,
@@ -845,8 +840,7 @@ Level.prototype.puzzle = [
        type: 'nand',
        x: 480,
        y: 190,
-       io: [['o', '~q', 'i'],
-            ['o', 'nand1', 'i1']]
+       io: [['o', 'nand1', 'i1']]
      }
      ,
      nand3: {
@@ -875,14 +869,14 @@ Level.prototype.puzzle = [
   {name: 'Meeting hold requirement',
    intro: '<p>This circuit uses a pre-built D latch cell. <b>Connect the E and D pins in such a way that the new D value is not captured if it changes at the same time as E changes to 0.</b></p><p>Tip: Make sure that the D value meets the hold time requirement.</p>',
    outro: '<p>Does your solution work for all simulation speeds?</p>',
-   truth: [[{e:1, d:0,   q:0, '~q':1},
-            {e:1, d:1,   q:1, '~q':0},
-            {e:0, d:0,   q:1, '~q':0},
-            {e:0, d:1,   q:1, '~q':0}],
-           [{e:1, d:1,   q:1, '~q':0},
-            {e:1, d:0,   q:0, '~q':1},
-            {e:0, d:1,   q:0, '~q':1},
-            {e:0, d:0,   q:0, '~q':1}]],
+   truth: [[{e:1, d:0,   q:0},
+            {e:1, d:1,   q:1},
+            {e:0, d:0,   q:1},
+            {e:0, d:1,   q:1}],
+           [{e:1, d:1,   q:1},
+            {e:1, d:0,   q:0},
+            {e:0, d:1,   q:0},
+            {e:0, d:0,   q:0}]],
    cells: {
      e: {
        type: 'input',
@@ -915,8 +909,7 @@ Level.prototype.puzzle = [
        type: 'latch',
        x: 450,
        y: 120,
-       io: [['q', 'q', 'i'],
-            ['~q', '~q', 'i']]
+       io: [['q', 'q', 'i']]
      }
      ,
      q: {
@@ -924,26 +917,20 @@ Level.prototype.puzzle = [
        x: 600,
        y: 100
      }
-     ,
-     '~q': {
-       type: 'output',
-       x: 600,
-       y: 140
-     }
    }
   }
 ,
   {name: 'Meeting set-up requirement',
    intro: '<p>This circuit uses a pre-built D latch cell. <b>Connect the E and D pins in such a way that the new D value is captured if it changes at the same time as E changes to 0.</b></p><p>Tip: Make sure that the D value meets the set-up time requirement.</p>',
    outro: '<p>Does your solution work for all simulation speeds?</p>',
-   truth: [[{e:1, d:0,   q:0, '~q':1},
-            {e:1, d:1,   q:1, '~q':0},
-            {e:0, d:0,   q:0, '~q':1},
-            {e:0, d:1,   q:0, '~q':1}],
-           [{e:1, d:1,   q:1, '~q':0},
-            {e:1, d:0,   q:0, '~q':1},
-            {e:0, d:1,   q:1, '~q':0},
-            {e:0, d:0,   q:1, '~q':0}]],
+   truth: [[{e:1, d:0,   q:0},
+            {e:1, d:1,   q:1},
+            {e:0, d:0,   q:0},
+            {e:0, d:1,   q:0}],
+           [{e:1, d:1,   q:1},
+            {e:1, d:0,   q:0},
+            {e:0, d:1,   q:1},
+            {e:0, d:0,   q:1}]],
    cells: {
      e: {
        type: 'input',
@@ -976,20 +963,13 @@ Level.prototype.puzzle = [
        type: 'latch',
        x: 450,
        y: 120,
-       io: [['q', 'q', 'i'],
-            ['~q', '~q', 'i']]
+       io: [['q', 'q', 'i']]
      }
      ,
      q: {
        type: 'output',
        x: 600,
        y: 100
-     }
-     ,
-     '~q': {
-       type: 'output',
-       x: 600,
-       y: 140
      }
    }
   }
