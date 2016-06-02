@@ -88,6 +88,7 @@ body {
     border-width: thin;
     background-color: #d0d0ff;
     overflow: auto;
+    width: 100%;
     max-height: 30vh;
     z-index: 101;
 }
