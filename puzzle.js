@@ -326,7 +326,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'NOT with NAND',
    intro: '<p>By tying its inputs to the same source, <b>a NAND gate can perform the same function as a NOT gate.</b></p>',
-   outro: '<p>NAND gates are particularly small and fast in modern silicon circuits, so it is convenient that they are also so versatile.</p>',
+   outro: '<p>NAND gates are particularly small and fast in most types of circuits, so it is convenient that they are also so versatile.</p>',
    truth: [{a:0,  z:1},
            {a:1,  z:0}],
    avail: ['nand', 1],
