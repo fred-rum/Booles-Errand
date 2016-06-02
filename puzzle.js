@@ -116,7 +116,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'The speed slider',
+  {name: 'Simulation controls',
    ui: true,
    intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table line has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
    outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row.  Double clicking a row selects it and immediately starts simulation (as if you clicked "play").  If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
@@ -990,6 +990,86 @@ Level.prototype.puzzle = [
        type: 'output',
        x: 600,
        y: 140
+     }
+   }
+  }
+,
+  {name: 'Entrance bell',
+   section: 'Latch-based circuits',
+   intro: '<p>A store owner has a pair of electric eyes at the front of her store that each output a 1 when the light path is uninterrupted and a 0 when the beam is broken.  The eyes are arranged so that a person entering the store blocks only the first eye\'s beam, then both beams, then only the second eye\'s beam.  <b>Design a circuit that rings a bell when both beams are broken as a person enters, but not as a person leaves.</b></p>',
+   outro: '<p>Ding!</p>',
+   hint: ['<p>Knowing that both beams are broken is not enough information to determine the direction of travel.  A storage element is needed to remember which beam was previously broken.</p>',
+          '<p>A D latch holds its previous input value when its enable goes to 0.</p>'],
+   soln: '1s3-0,o,3,d-0,o,5,i0-1,o,3,e-1,o,4,i1;250,latch,150+q,4,i0;380,or,190+o,5,i1;480,nor,100+o,2,i',
+   truth: [[{b1:1, b2:1,   z:0},
+            {b1:0, b2:1,   z:0},
+            {b1:0, b2:0,   z:1},
+            {b1:1, b2:0,   z:0},
+            {b1:1, b2:1,   z:0}],
+           [{b1:1, b2:1,   z:0},
+            {b1:1, b2:0,   z:0},
+            {b1:0, b2:0,   z:0},
+            {b1:0, b2:1,   z:0},
+            {b1:1, b2:1,   z:0}]],
+   avail: ['latch', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     b1: {
+       type: 'input',
+       x: 100,
+       y: 100
+     }
+     ,
+     b2: {
+       type: 'input',
+       x: 100,
+       y: 200
+     }
+     ,
+     z: {
+       type: 'output',
+       x: 600,
+       y: 100
+     }
+   }
+  }
+,
+  {name: 'Build a D flip-flop',
+   intro: '<p>Sequential circuits are typically built around an oscillating clock signal.  The clock cannot simply be used as the enable to a D latch because doing so would allow values to propagate all the way through the circuit while the clock is high.</p><p><b>Design a circuit that transmits the D input to the Q output only as the CLK signal transitions from 0 to 1.</b></p>',
+   outro: '<p>This circuit is called a D flip-flop.  If you used a chained pair of latches, it is a master-slave D flip-flop.</p>',
+   hint: ['<p>If you use a latch as the storage element, the input to the latch needs to be held constant while the latch is transparent.</p>',
+         '<p>Use two latches in series with opposite polarity enables.</p>',
+         '<p>Make sure that the first latch meets the hold time requirement of the second.</p>'],
+   soln: '1s3-0,o,4,d-1,o,5,i-1,o,3,e;540,latch,200+q,2,i;380,latch,20+q,3,d;240,inv,140+o,4,e',
+   truth: [[{d:0, clk:0,   q:x},
+            {d:0, clk:1,   q:0},
+            {d:1, clk:1,   q:0},
+            {d:1, clk:0,   q:0},
+            {d:0, clk:0,   q:0},
+            {d:1, clk:0,   q:0},
+            {d:1, clk:1,   q:1},
+            {d:0, clk:1,   q:1},
+            {d:0, clk:0,   q:1},
+            {d:1, clk:0,   q:1},
+            {d:0, clk:0,   q:1},
+            {d:0, clk:1,   q:0}]],
+   avail: ['latch', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     d: {
+       type: 'input',
+       x: 100,
+       y: 100
+     }
+     ,
+     clk: {
+       type: 'input',
+       x: 100,
+       y: 200
+     }
+     ,
+     q: {
+       type: 'output',
+       x: 700,
+       y: 100
      }
    }
   }

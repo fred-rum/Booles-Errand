@@ -861,9 +861,9 @@ Cell.prototype.init_latch = function() {
   this.io['e'] = new Io(this.be, this.canvas, this, 'e', 'input',
                         left - this.be.stub_len, 0);
 
-  this.io['q'] = new Io(this.be, this.canvas, this, 'q', 'input',
+  this.io['q'] = new Io(this.be, this.canvas, this, 'q', 'output',
                         right + this.be.stub_len, -this.be.io_spacing);
-  this.io['~q'] = new Io(this.be, this.canvas, this, '~q', 'input',
+  this.io['~q'] = new Io(this.be, this.canvas, this, '~q', 'output',
                          right + this.be.inv_bubble_size + this.be.stub_len,
                          this.be.io_spacing);
 
