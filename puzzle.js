@@ -395,7 +395,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'The XOR and XNOR gates',
-   intro: '<p>An XOR gate performs an "exclusive or" function. <b>An XOR gate outputs a 1 if its first input is <i>exclusively</i>&nbsp;1 <i>or</i> its second input is <i>exclusively</i>&nbsp;1.</b> Unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p><p><b>An XNOR gate outputs an inverted value as compared to an XOR gate.</b></p>',
+   intro: '<p>An XOR gate performs an "exclusive or" function. <b>An XOR gate outputs a 1 if its first input is &nbsp;1 <i>or</i> its second input is &nbsp;1 <i>excluding</i> the case that both inputs are 1.</b> I.e. unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p><p><b>An XNOR gate outputs an inverted value as compared to an XOR gate.</b></p>',
    outro: '<p>When one of an XOR gate\'s inputs is 0, then the value of the other input is propagated to the output of the gate. Otherwise, the value of the other input is inverted at the output.</p><p>There are no "don\'t care" cases for the XOR and XNOR gates.</p>',
    truth: [{a:0, b:0,   z:0, y:1},
            {a:0, b:1,   z:1, y:0},
@@ -457,6 +457,88 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'De Morgan&rsquo;s law (1)',
+   intro: '<p>Augustus De Morgan proved that "not (A and B)" is the same as "(not A) or (not B)".  <b>Use De Morgan\'s law to output the desired values for the truth table</b> using only inverters and NAND gates.</p>',
+   outro: '<p>Both the OR gate and the NAND gate output a 1 for three out of four combinations of input values.  They differ only in which combination outputs 0.</p>',
+   truth: [{a:0, b:0,   z:1, y:1, x:1, w:0},
+           {a:0, b:1,   z:1, y:1, x:0, w:1},
+           {a:1, b:0,   z:1, y:0, x:1, w:1},
+           {a:1, b:1,   z:0, y:1, x:1, w:1}],
+   avail: ['inv', 'nand'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 190
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 310
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 100
+        }
+     ,
+     y: {type: 'output',
+         x: 600,
+         y: 200
+        }
+     ,
+     x: {type: 'output',
+         x: 600,
+         y: 300
+        }
+     ,
+     w: {type: 'output',
+         x: 600,
+         y: 400
+        }
+   }
+  }
+,
+  {name: 'De Morgan&rsquo;s law (2)',
+   intro: '<p>De Morgan also proved that "not (A or B)" is the same as "(not A) and (not B)".  <b>Output the desired values for the truth table</b> using only inverters and NOR gates.</p>',
+   outro: '<p>Both the AND gate and the NOR gate output a 1 for one out of four combinations of input values.  They differ only in which combination outputs the 1.</p>',
+   truth: [{a:0, b:0,   z:0, y:0, x:0, w:1},
+           {a:0, b:1,   z:0, y:0, x:1, w:0},
+           {a:1, b:0,   z:0, y:1, x:0, w:0},
+           {a:1, b:1,   z:1, y:0, x:0, w:0}],
+   avail: ['inv', 'nor'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 190
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 310
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 100
+        }
+     ,
+     y: {type: 'output',
+         x: 600,
+         y: 200
+        }
+     ,
+     x: {type: 'output',
+         x: 600,
+         y: 300
+        }
+     ,
+     w: {type: 'output',
+         x: 600,
+         y: 400
+        }
+   }
+  }
+,
   {name: 'Detect odd',
    intro: '<p><b>Determine whether an odd number of stimulus pins have a 1 value.</b></p><p>Tip: Start with a circuit that works when&nbsp;C is 0, then add logic to handle the cases when C is 1.</p>',
    outro: '<p>Notice that it doesn\'t matter what order you put the XOR gates in. The result is always the same.</p>',
@@ -494,7 +576,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Detect >= 2',
    intro: '<p><b>Determine whether at least two stimulus pins have a 1 value.</b></p>',
-   outro: '<p>The solutions to this puzzle and the previous one together comprise a <i>full adder</i>.</p>',
+   outro: '<p>The solutions to this puzzle and the previous one together comprise a <i>full adder</i>, which will be explained later.</p>',
    truth: [{a:0, b:0, c:0,   z:0},
            {a:1, b:0, c:0,   z:0},
            {a:0, b:1, c:0,   z:0},
