@@ -539,6 +539,37 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Build another mux',
+   intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b>  You\'ve done this before, but this time you\'ll need to use De Morgan\'s laws to build the circuit using only NAND gates and NOT gates.</p>',
+   outro: '<p>Augustus De Morgan would be proud.</p>',
+   truth: [{s:0, a:0,        z:0},
+           {s:0, a:1,        z:1},
+           {s:1,      b:0,   z:0},
+           {s:1,      b:1,   z:1}],
+   avail: ['inv', 'nand'],
+   cells: {
+     s: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     a: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 300
+        }
+     ,
+     z: {type: 'output',
+         x: 600,
+         y: 200
+        }
+   }
+  }
+,
   {name: 'Detect odd',
    intro: '<p><b>Determine whether an odd number of stimulus pins have a 1 value.</b></p><p>Tip: Start with a circuit that works when&nbsp;C is 0, then add logic to handle the cases when C is 1.</p>',
    outro: '<p>Notice that it doesn\'t matter what order you put the XOR gates in. The result is always the same.</p>',
