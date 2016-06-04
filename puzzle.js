@@ -605,7 +605,7 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'Detect >= 2',
+  {name: 'Detect &gt;= 2',
    intro: '<p><b>Determine whether at least two stimulus pins have a 1 value.</b></p>',
    outro: '<p>The solutions to this puzzle and the previous one together comprise a <i>full adder</i>, which will be explained later.</p>',
    truth: [{a:0, b:0, c:0,   z:0},
