@@ -103,7 +103,8 @@ body {
     z-index: 101;
 }
 .controls {
-    display: inline-block;
+    position: fixed;
+    display: block;
     background-color: #eee;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
