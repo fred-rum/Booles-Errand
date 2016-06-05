@@ -478,6 +478,8 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
         this.be.level.add_cell(this);
       }
     }
+
+    this.be.level.update_widths(true);
   } else {
     for (var port_name in this.io) {
       this.io[port_name].redraw();
@@ -533,6 +535,7 @@ Cell.prototype.cell_drag_end = function() {
       }
     }
   }
+  this.be.level.commit_widths();
 
   this.be.level.update_url();
 };
