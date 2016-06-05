@@ -121,6 +121,10 @@ Level.prototype.begin = function(level_num) {
                         true);
     this.named_cells[cell_name] = cell;
     this.add_cell(cell);
+
+    if (cell_obj.width) {
+      cell.update_width(cell_obj.width);
+    }
   }
 
   // Connect the cell IOs as required by the level.

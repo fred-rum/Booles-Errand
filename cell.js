@@ -12,6 +12,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
                                            this.be.cdrag;
 
   this.type = type;
+  this.width = 1;
   this.x = x;
   this.y = y;
   this.io = {};
@@ -66,6 +67,19 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     this.bbox = this.el_ns.getBBox(true);
   }
 
+  var text_height = 11;
+  var attr = {
+    "text-anchor": "middle",
+    "font-family": "Verdana, Helvetica, Arial, sans-serif",
+    //"font-family": "Courier New, Fixed, monospace",
+    "font-size": text_height
+  };
+  this.qty_y = 0;
+  this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, "").attr(attr);
+  this.el_qty_text.setAttr("visibility", "hidden");
+  this.el_qty_text.setAttr("pointer-events", "none");
+  this.push_ns(this.el_qty_text);
+
   // Make a separate xform set that includes the IO elements so that they
   // get moved with the cell.
   this.set_xform = this.canvas.set(this.el_cell);
@@ -112,25 +126,10 @@ Cell.prototype.change_cursor = function(cursor) {
   this.el_cell.attr({cursor: cursor});
 };
 
-Cell.prototype.update_quantity = function(n) {
-  if (this.quantity === undefined){
-    var text_height = 11;
-    var attr = {
-      "text-anchor": "middle",
-      "font-family": "Verdana, Helvetica, Arial, sans-serif",
-      //"font-family": "Courier New, Fixed, monospace",
-      "font-size": text_height
-    };
-    this.qty_y = 0;
-    this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, "").attr(attr);
-    this.el_qty_text.setAttr("pointer-events", "none");
-    this.el_qty_text.transform("t" + this.x + "," + this.y);
-    this.push_ns(this.el_qty_text);
-  }
-
+Cell.prototype.update_qty_text = function(n) {
   var attr = {
     text: "x" + n,
-    fill: n ? "#000" : "#aaa"
+    fill: n ? "#000" : "#aaa" // n can be 0 only for cells in the cbox
   };
   this.el_qty_text.attr(attr);
   var bbox = this.el_qty_text.getBBox(true);
@@ -139,9 +138,11 @@ Cell.prototype.update_quantity = function(n) {
   var drift_y = actualtop - desiredtop;
   this.qty_y -= drift_y;
   this.el_qty_text.attr({y: this.qty_y});
+};
 
-  // Since the quantity is only show with cbox, we don't have to worry
-  // about interactions with pending_del.
+Cell.prototype.update_quantity = function(n) {
+  this.update_qty_text(n);
+
   if (n && !this.quantity){
     this.el_s.attr({stroke: "#000"});
     this.change_cursor("grab");
@@ -151,6 +152,49 @@ Cell.prototype.update_quantity = function(n) {
   }
 
   this.quantity = n;
+};
+
+Cell.prototype.update_width = function(n) {
+  if (this.width === n) return;
+
+  if (n == 1) {
+    this.el_qty_text.setAttr('visibility', 'hidden');
+  } else {
+    this.update_qty_text(n);
+    this.el_qty_text.setAttr('visibility', 'visible');
+  }
+
+  this.width = n;
+
+  this.propagate_width();
+};
+
+Cell.prototype.propagate_width = function() {
+  var n = this.width;
+  for (var port_name in this.io) {
+    var io = this.io[port_name];
+    if (io.type == 'output') {
+      for (var i = 0; i < io.w.length; i++) {
+        var cell = io.w[i].i.cell;
+        cell.determine_width(n);
+      }
+    }
+  }
+};
+
+Cell.prototype.determine_width = function() {
+  // The output pin cannot change width.
+  if (this.type == 'output') return;
+
+  var n = 1;
+  for (var port_name in this.io) {
+    var io = this.io[port_name];
+    if ((io.type == 'input') && (io.w.length > 0) && (!io.w[0].pending_new)) {
+      var oqty = io.w[0].o.cell.width;
+      if (oqty > n) n = oqty
+    }
+  }
+  this.update_width(n);
 };
 
 Cell.prototype.propagate_value = function() {
@@ -173,7 +217,8 @@ Cell.prototype.calc_buf = function(inv) {
   var i = this.io.i.value;
   if (i === undefined) return undefined;
   var value = i;
-  if (inv) value = 1-value;
+  var max = (1 << this.width) - 1;
+  if (inv) value ^= max;
   this.io.o.propagate_output(value);
 };
 
@@ -182,14 +227,15 @@ Cell.prototype.calc_and = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
   var value;
+  var max = (1 << this.width) - 1;
   if ((i0 === 0) || (i1 === 0)){
     value = 0;
   } else if ((i0 === undefined) || (i1 === undefined)){
     return undefined;
   } else {
-    value = 1;
+    value = i0 & i1;
   }
-  if (inv) value = 1-value;
+  if (inv) value ^= max;
   this.io.o.propagate_output(value);
 };
 
@@ -198,14 +244,15 @@ Cell.prototype.calc_or = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
   var value;
-  if ((i0 === 1) || (i1 === 1)){
-    value = 1;
+  var max = (1 << this.width) - 1;
+  if ((i0 === max) || (i1 === max)){
+    value = max;
   } else if ((i0 === undefined) || (i1 === undefined)){
     return undefined;
   } else {
-    value = 0;
+    value = i0 | i1;
   }
-  if (inv) value = 1-value;
+  if (inv) value ^= max;
   this.io.o.propagate_output(value);
 };
 
@@ -214,11 +261,12 @@ Cell.prototype.calc_xor = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
   var value;
+  var max = (1 << this.width) - 1;
   if ((i0 === undefined) || (i1 === undefined)){
     return undefined;
   }
   value = i0 ^ i1;
-  if (inv) value = 1-value;
+  if (inv) value ^= max;
   this.io.o.propagate_output(value);
 };
 
@@ -711,6 +759,9 @@ Cell.prototype.init_output = function() {
   var top = -height/2;
 
   this.init_io(false, 0, 1, left, right);
+
+  this.qty_cx = this.io.i.x;
+  this.qty_top = this.io.i.y + this.be.stroke_wire_fg * 2;
 
   var path = ["M", right, top,
               "v", height,

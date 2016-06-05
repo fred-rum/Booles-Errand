@@ -65,6 +65,7 @@ Drag.prototype.gen_old_wires = function(io) {
   }
 };
 
+// Revert the pending change for old and new wires.
 Drag.prototype.restore_old_wires = function() {
   for (var i = 0; i < this.old_wires.length; i++){
     this.old_wires[i].restore_old();
@@ -79,6 +80,17 @@ Drag.prototype.remove_new_wires = function() {
   this.new_wires = [];
 };
 
+// Commit the pending change for old and new wires.
+Drag.prototype.remove_old_wires = function() {
+  // Delete the old wires.
+  for (var i = 0; i < this.old_wires.length; i++){
+    var icell = this.old_wires[i].i.cell;
+    this.old_wires[i].remove();
+    icell.determine_width();
+  }
+  this.old_wires = [];
+};
+
 Drag.prototype.commit_new_wires = function() {
   var attr = {stroke: "#eee"}
   for (var i = 0; i < this.new_wires.length; i++){
@@ -88,6 +100,8 @@ Drag.prototype.commit_new_wires = function() {
     // We want the newly connected output port to trigger on the
     // next tick in order to propagate its value to the wire.
     this.new_wires[i].o.register_output();
+
+    this.new_wires[i].o.cell.propagate_width();
   }
   this.new_wires = [];
 };
@@ -129,17 +143,13 @@ Drag.prototype.drag_end = function() {
     this.snap_end();
   }
 
+  this.remove_null_wire();
   if (this.new_io == this.be.null_io){
     this.restore_old_wires();
   } else {
-    // Delete the old wires.
-    for (var i = 0; i < this.old_wires.length; i++){
-      this.old_wires[i].remove();
-    }
-    this.old_wires = [];
+    this.remove_old_wires();
   }
   this.commit_new_wires();
-  this.remove_null_wire();
   this.orig_io = null;
   this.new_io = null;
   this.be.level.update_url();
@@ -155,7 +165,9 @@ Drag.prototype.mouse_double_click = function(event) {
 Drag.prototype.dblclick = function(x, y) {
   var io = this.closest_io(x, y);
   while (io.w.length > 0){
+    var icell = io.w[0].i.cell;
     io.w[0].remove();
+    icell.determine_width();
     this.be.level.update_url();
   }
 };
@@ -333,9 +345,9 @@ Drag.prototype.update_new_io = function(x, y, io) {
 
   if (io == this.new_io) return; // no change
 
+  this.remove_null_wire();
   this.restore_old_wires();
   this.remove_new_wires();
-  this.remove_null_wire();
   this.new_io = io;
 
   if (io.type == "null") {

@@ -21,6 +21,9 @@ function Io(be, canvas, cell, name, type, x, y) {
   // event handling.
   if (type == "null") return;
 
+  this.min_color = Raphael.getRGB("#aaf");
+  this.max_color = Raphael.getRGB("#8d8");
+
   this.has_new_value = false;
 
   this.path = ["M", x, y,
@@ -163,7 +166,7 @@ Io.prototype.redraw = function() {
 
 Io.prototype.color_stub = function(value) {
   var attr = {
-    stroke: Wire.color(value),
+    stroke: Wire.color(value, this.cell.width),
   };
   if (!this.pending_del) this.stub.attr(attr);
 
@@ -206,11 +209,13 @@ Io.prototype.update_value = function(value) {
     height: bbox.height,
     opacity: bg_opacity
   };
-  if (value) {
-    attr_bg.fill = "#8d8";
-  } else {
-    attr_bg.fill = "#aaf";
-  }
+
+  var f = value / ((1 << this.cell.width) - 1);
+  var r = this.min_color.r + (this.max_color.r - this.min_color.r) * f;
+  var g = this.min_color.g + (this.max_color.g - this.min_color.g) * f;
+  var b = this.min_color.b + (this.max_color.b - this.min_color.b) * f;
+  attr_bg.fill = Raphael.rgb(r, g, b)
+
   this.el_value_text_bg.attr(attr_bg);
 };
 

@@ -639,6 +639,40 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Create many gates',
+   section: 'Multi-bit values',
+   ui: true,
+   intro: '<p>Multiple gates feed multi-bit wires.</p>',
+   outro: '',
+   truth: [{a:0, b:0, c:0,   z:7},
+           {a:1, b:3, c:7,   z:0}],
+   cells: {
+     a: {type: 'input',
+         width: 1,
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         width: 2,
+         x: 100,
+         y: 200
+        }
+     ,
+     c: {type: 'input',
+         width: 3,
+         x: 100,
+         y: 300
+        }
+     ,
+     z: {type: 'output',
+         width: 3,
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'Seven-segment decode',
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',

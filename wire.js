@@ -58,13 +58,15 @@ function Wire(be, io1, io2, pending_new, locked) {
 
 // Functions not associated with an object
 
-Wire.color = function(value) {
+Wire.color = function(value, width) {
   if (value === undefined) {
     return "#888";
-  } else if (value === 0){
-    return "#00f";
-  } else if (value === 1) {
-    return "#0c0";
+  } else {
+    var max = (1 << width) - 1;
+    var r = 0;
+    var g = value / max * 204;
+    var b = (max - value) / max * 255;
+    return Raphael.rgb(r, g, b);
   }
 };
 
@@ -181,7 +183,11 @@ Wire.prototype.tick = function(speed) {
     fl_obj.age += this.be.wire_speed * speed / this.path_length;
     if (fl_obj.age >= 1.0){
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
-      this.i.propagate_input(fl_obj.value);
+      var value = fl_obj.value;
+      if ((this.o.cell.width == 1) && (value == 1)) {
+        value *= ((1 << this.i.cell.width) - 1);
+      }
+      this.i.propagate_input(value);
       this.in_flight.splice(0, 1); // remove the first (oldest)
       i--;
     }
@@ -479,6 +485,11 @@ Wire.prototype.redraw_fg = function() {
   }
 
   var older_value = this.i.value;
+
+  // If the value was multiplied up from 1 bit to the input port's
+  // width, then we need to compress it back down to 1 bit here.
+  if ((this.o.cell.width == 1) && (older_value > 1)) older_value = 1;
+
   var older_el_subpath = this.el_fg;
   var older_age_len = this.path_length;
 
@@ -487,7 +498,7 @@ Wire.prototype.redraw_fg = function() {
     var age_len = fl_obj.age * this.path_length;
     var path = this.get_subpath(age_len, older_age_len);
     older_el_subpath.attr({path: path,
-                           stroke: Wire.color(older_value)});
+                           stroke: Wire.color(older_value, this.o.cell.width)});
 
     if (!fl_obj.el_subpath){
       // Draw a path placeholder of the appropriate color.
@@ -520,7 +531,7 @@ Wire.prototype.redraw_fg = function() {
   }
   var attr = {
     path: path,
-    stroke: Wire.color(older_value),
+    stroke: Wire.color(older_value, this.o.cell.width),
     "stroke-dasharray": "",
     opacity: (this.pending_del == "null") ? "0.4" : "1.0"
   };
