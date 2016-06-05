@@ -86,7 +86,9 @@ Level.prototype.begin = function(level_num) {
     if (typeof name == 'string'){
       this.add_box_cell(name);
     } else {
-      this.box_cells[this.box_cells.length-1].update_quantity(name);
+      var cell = this.box_cells[this.box_cells.length-1];
+      cell.update_quantity(name);
+      cell.el_qty_text.setAttr('visibility', 'visible');
     }
   }
   this.be.cbox.setViewBox(0, 0, this.be.em_size*8, this.be.box_height);
