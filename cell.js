@@ -165,36 +165,40 @@ Cell.prototype.update_width = function(n) {
   }
 
   this.width = n;
-
-  this.propagate_width();
 };
 
-Cell.prototype.propagate_width = function() {
-  var n = this.width;
+Cell.prototype.propagate_width = function(n) {
   for (var port_name in this.io) {
     var io = this.io[port_name];
     if (io.type == 'output') {
       for (var i = 0; i < io.w.length; i++) {
-        var cell = io.w[i].i.cell;
-        cell.determine_width(n);
+        if (io.w[i].pending_del != 'del') {
+          var cell = io.w[i].i.cell;
+          var failure = cell.update_pending_width(n);
+          if (failure) return failure;
+        }
       }
     }
   }
+  // implicit return undefined for success
 };
 
-Cell.prototype.determine_width = function() {
-  // The output pin cannot change width.
-  if (this.type == 'output') return;
+Cell.prototype.update_pending_width = function(n) {
+  var pending_width = this.pending_width;
 
-  var n = 1;
-  for (var port_name in this.io) {
-    var io = this.io[port_name];
-    if ((io.type == 'input') && (io.w.length > 0) && (!io.w[0].pending_new)) {
-      var oqty = io.w[0].o.cell.width;
-      if (oqty > n) n = oqty
-    }
+  if (this.type == 'output') {
+    // The output pin has an inflexible width;
+    pending_width = this.width;
   }
-  this.update_width(n);
+
+  if (pending_width === undefined) {
+    this.pending_width = n;
+    return this.propagate_width(n);
+  } else if (n != pending_width) {
+    return "width mismatch";
+  } else {
+    return undefined; // No need to propagate further, and may be a loop.
+  }
 };
 
 Cell.prototype.propagate_value = function() {
@@ -952,6 +956,7 @@ Cell.prototype.push_s = function(el) {
   this.el_s.push(el);
   this.el_cell.push(el);
 };
+
 Cell.prototype.push_ns = function(el) {
   this.el_ns.push(el);
   this.el_cell.push(el);

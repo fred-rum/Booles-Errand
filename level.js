@@ -702,3 +702,29 @@ Level.prototype.next_level = function(start) {
   }
   return undefined;
 };
+
+Level.prototype.update_widths = function() {
+  for (var i = 0; i < this.all_cells.length; i++){
+    var cell = this.all_cells[i];
+    if ((cell.type == 'input') && (cell.width > 1)){
+      var failure = cell.propagate_width(cell.width);
+      if (failure) break;
+    }
+  }
+
+  // Even if there's a failure, we still perform this step in order to
+  // clear the pending_width values.
+  for (var i = 0; i < this.all_cells.length; i++){
+    var cell = this.all_cells[i];
+    if ((cell.type != 'output') && (cell.type != 'input')) {
+      if (cell.pending_width) {
+        cell.update_width(cell.pending_width);
+        cell.pending_width = undefined;
+      } else {
+        cell.update_width(1);
+      }
+    }
+  }
+
+  return failure;
+};

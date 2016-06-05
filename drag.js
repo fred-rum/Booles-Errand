@@ -86,7 +86,6 @@ Drag.prototype.remove_old_wires = function() {
   for (var i = 0; i < this.old_wires.length; i++){
     var icell = this.old_wires[i].i.cell;
     this.old_wires[i].remove();
-    icell.determine_width();
   }
   this.old_wires = [];
 };
@@ -100,8 +99,6 @@ Drag.prototype.commit_new_wires = function() {
     // We want the newly connected output port to trigger on the
     // next tick in order to propagate its value to the wire.
     this.new_wires[i].o.register_output();
-
-    this.new_wires[i].o.cell.propagate_width();
   }
   this.new_wires = [];
 };
@@ -128,9 +125,15 @@ Drag.prototype.drag_move = function(x, y) {
     if (io) {
       this.snap_io = io;
       this.update_new_io(x, y, io);
+      var failure = this.be.level.update_widths();
+      if (failure) {
+        this.update_new_io(x, y, io, failure);
+        this.be.level.update_widths();
+      }
     } else {
       this.snap_io = undefined;
       this.update_new_io(x, y, this.be.null_io);
+      this.be.level.update_widths();
     }
   }
 
@@ -167,9 +170,10 @@ Drag.prototype.dblclick = function(x, y) {
   while (io.w.length > 0){
     var icell = io.w[0].i.cell;
     io.w[0].remove();
-    icell.determine_width();
     this.be.level.update_url();
   }
+
+  this.be.level.update_widths();
 };
 
 Drag.prototype.hover_start = function(event) {
@@ -328,14 +332,14 @@ Drag.prototype.connect_o_to_i = function(o, i) {
   }
 };
 
-Drag.prototype.update_new_io = function(x, y, io) {
+Drag.prototype.update_new_io = function(x, y, io, failure) {
   // Like cannot drag to like unless there are one or more wires
   // on the original IO that can be moved.  The exception is
   // when the new IO is the same as the original IO.
   if (io == this.orig_io){
     io = this.be.null_io;
   } else if ((this.orig_empty && (this.orig_io.type == io.type)) ||
-             io.locked){
+             io.locked || failure){
     this.show_fail(io);
     this.fail_io = true;
     io = this.be.null_io;
