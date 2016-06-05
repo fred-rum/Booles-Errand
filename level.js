@@ -150,6 +150,7 @@ Level.prototype.begin = function(level_num) {
   } else {
     window.location.hash = encodeURI(level.name);
   }
+  this.update_widths();
 
   // Initialize the level to the first row of the table, and
   // correspondingly set up the initial input values and output
@@ -507,7 +508,12 @@ Level.prototype.decode_save = function(save_str) {
           throw "input port busy: " + w.i_port;
         }
       } else {
-        new Wire(this.be, io_o, io_i);
+        var w = new Wire(this.be, io_o, io_i);
+        var failure = this.update_widths();
+        if (failure) {
+          w.remove();
+          throw failure;
+        }
       }
     }
   }
