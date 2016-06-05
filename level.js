@@ -709,7 +709,7 @@ Level.prototype.next_level = function(start) {
   return undefined;
 };
 
-Level.prototype.update_widths = function() {
+Level.prototype.update_widths = function(pending) {
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
     if ((cell.type == 'input') && (cell.width > 1)){
@@ -719,18 +719,28 @@ Level.prototype.update_widths = function() {
   }
 
   // Even if there's a failure, we still perform this step in order to
-  // clear the pending_width values.
+  // clear the prospective_width values.
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
     if ((cell.type != 'output') && (cell.type != 'input')) {
-      if (cell.pending_width) {
-        cell.update_width(cell.pending_width);
-        cell.pending_width = undefined;
+      if (cell.prospective_width) {
+        cell.update_width(cell.prospective_width, pending);
+        cell.prospective_width = undefined;
       } else {
-        cell.update_width(1);
+        cell.update_width(1, pending);
       }
     }
   }
 
   return failure;
+};
+
+Level.prototype.commit_widths = function() {
+  for (var i = 0; i < this.all_cells.length; i++){
+    var cell = this.all_cells[i];
+    if ((cell.type != 'output') && (cell.type != 'input') &&
+        (cell.pending_width != cell.width)) {
+      cell.update_width(cell.pending_width);
+    }
+  }
 };

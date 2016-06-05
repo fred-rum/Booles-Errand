@@ -125,15 +125,15 @@ Drag.prototype.drag_move = function(x, y) {
     if (io) {
       this.snap_io = io;
       this.update_new_io(x, y, io);
-      var failure = this.be.level.update_widths();
+      var failure = this.be.level.update_widths(true);
       if (failure) {
         this.update_new_io(x, y, io, failure);
-        this.be.level.update_widths();
+        this.be.level.update_widths(true);
       }
     } else {
       this.snap_io = undefined;
       this.update_new_io(x, y, this.be.null_io);
-      this.be.level.update_widths();
+      this.be.level.update_widths(true);
     }
   }
 
@@ -153,6 +153,7 @@ Drag.prototype.drag_end = function() {
     this.remove_old_wires();
   }
   this.commit_new_wires();
+  this.be.level.commit_widths();
   this.orig_io = null;
   this.new_io = null;
   this.be.level.update_url();

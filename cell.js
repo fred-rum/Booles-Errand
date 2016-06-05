@@ -126,10 +126,10 @@ Cell.prototype.change_cursor = function(cursor) {
   this.el_cell.attr({cursor: cursor});
 };
 
-Cell.prototype.update_qty_text = function(n) {
+Cell.prototype.update_qty_text = function(n, pending) {
   var attr = {
     text: "x" + n,
-    fill: n ? "#000" : "#aaa" // n can be 0 only for cells in the cbox
+    fill: (pending || !n) ? "#aaa" : "#000"
   };
   this.el_qty_text.attr(attr);
   var bbox = this.el_qty_text.getBBox(true);
@@ -154,17 +154,19 @@ Cell.prototype.update_quantity = function(n) {
   this.quantity = n;
 };
 
-Cell.prototype.update_width = function(n) {
-  if (this.width === n) return;
+Cell.prototype.update_width = function(n, pending) {
+  var name = pending ? 'pending_width' : 'width';
 
-  if (n == 1) {
+  if (this[name] === n) return;
+
+  if ((n == 1) && (!pending || (this.width == 1))) {
     this.el_qty_text.setAttr('visibility', 'hidden');
   } else {
-    this.update_qty_text(n);
+    this.update_qty_text(n, pending && (n != this.width));
     this.el_qty_text.setAttr('visibility', 'visible');
   }
 
-  this.width = n;
+  this[name] = n;
 };
 
 Cell.prototype.propagate_width = function(n) {
@@ -174,7 +176,7 @@ Cell.prototype.propagate_width = function(n) {
       for (var i = 0; i < io.w.length; i++) {
         if (io.w[i].pending_del != 'del') {
           var cell = io.w[i].i.cell;
-          var failure = cell.update_pending_width(n);
+          var failure = cell.update_prospective_width(n);
           if (failure) return failure;
         }
       }
@@ -183,20 +185,20 @@ Cell.prototype.propagate_width = function(n) {
   // implicit return undefined for success
 };
 
-Cell.prototype.update_pending_width = function(n) {
-  var pending_width = this.pending_width;
+Cell.prototype.update_prospective_width = function(n) {
+  var prospective_width = this.prospective_width;
 
   if (this.type == 'output') {
     // The output pin has an inflexible width;
-    pending_width = this.width;
+    prospective_width = this.width;
   }
 
-  if (pending_width === undefined) {
-    this.pending_width = n;
+  if (prospective_width === undefined) {
+    this.prospective_width = n;
     return this.propagate_width(n);
-  } else if (n != pending_width) {
+  } else if (n != prospective_width) {
     return "width mismatch";
-  } else {
+  } else { // n == prospective_width
     return undefined; // No need to propagate further, and may be a loop.
   }
 };
