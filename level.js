@@ -76,7 +76,7 @@ Level.prototype.begin = function(level_num) {
     level.hide = new Set(level.hide);
   }
 
-  this.box_cells = [];
+  this.box_cells = {};
   this.be.box_height = this.be.box_spacing;
   if (level.avail === undefined){
     level.avail = ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'];
@@ -84,9 +84,8 @@ Level.prototype.begin = function(level_num) {
   for (var i = 0; i < level.avail.length; i++){
     var name = level.avail[i];
     if (typeof name == 'string'){
-      this.add_box_cell(name);
+      var cell = this.add_box_cell(name);
     } else {
-      var cell = this.box_cells[this.box_cells.length-1];
       cell.update_quantity(name);
       cell.el_qty_text.setAttr('visibility', 'visible');
     }
@@ -361,13 +360,14 @@ Level.prototype.reset_sim = function() {
 };
 
 Level.prototype.add_box_cell = function(name) {
-  var c = new Cell(this.be, "cbox", name, 0, 0);
-  this.box_cells.push(c);
-  var bbox = c.bbox;
+  var cell = new Cell(this.be, "cbox", name, 0, 0);
+  this.box_cells[name] = cell;
+  var bbox = cell.bbox;
   var cx = (this.be.em_size*4) - bbox.x - bbox.width/2; // align center
   var cy = this.be.box_height - bbox.y; // align top edge
-  c.move(cx, cy);
+  cell.move(cx, cy);
   this.be.box_height += bbox.height + this.be.box_spacing;
+  return cell;
 };
 
 Level.prototype.value = function(name) {
@@ -452,18 +452,12 @@ Level.prototype.decode_save = function(save_str) {
         var x = Number(m[1]);
         var type = m[2];
         var y = Number(m[3]);
-        if ((type == "io") || (type == "null")) throw "bad cell type: " + type;
-        for (var i = 0; i < this.box_cells.length; i++){
-          var bcell = this.box_cells[i];
-          if (bcell.type == type){
-            if (bcell.quantity !== undefined){
-              if (bcell.quantity == 0) throw "exhausted cell type: " + type
-              bcell.update_quantity(bcell.quantity - 1);
-            }
-            break;
-          }
+        var bcell = this.box_cells[type];
+        if (bcell === undefined) throw "disallowed cell type: " + type;
+        if (bcell.quantity !== undefined){
+          if (bcell.quantity == 0) throw "exhausted cell type: " + type
+          bcell.update_quantity(bcell.quantity - 1);
         }
-        if (i == this.box_cells.length) throw "disallowed cell type: " + type;
         this.add_cell(new Cell(this.be, "cdraw", type,
                                x / 20 * this.be.io_spacing,
                                y / 20 * this.be.io_spacing));
@@ -651,8 +645,8 @@ Level.prototype.change_level = function(level_num) {
   this.be.sim.click_pause();
   this.be.sim.reset();
 
-  for (var i = 0; i < this.box_cells.length; i++){
-    this.box_cells[i].remove();
+  for (var type in this.box_cells) {
+    this.box_cells[type].remove();
   }
 
   this.cleaning_up = false;

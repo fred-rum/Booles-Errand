@@ -524,15 +524,9 @@ Cell.prototype.cell_drag_end = function() {
     // If this cell was dragged from the box, it'd be simple to
     // increase its quantity.  But in case it was dragged from cdraw,
     // we have to search through cbox to find it.
-    var box_cells = this.be.level.box_cells;
-    for (var i = 0; i < box_cells.length; i++){
-      var cell = box_cells[i];
-      if (cell.type == this.type){
-        if (cell.quantity !== undefined){
-          cell.update_quantity(cell.quantity + 1);
-        }
-        break;
-      }
+    var bcell = this.be.level.box_cells[this.type];
+    if (bcell.quantity !== undefined){
+      bcell.update_quantity(bcell.quantity + 1);
     }
   }
   this.be.level.commit_widths();
