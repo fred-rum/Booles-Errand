@@ -468,6 +468,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
 
     if (this.canvas_type == "cdraw"){
       this.be.level.remove_cell(this);
+      this.be.level.update_box_quantity(this.type, +1);
     }
 
     this.be.level.update_widths(true);
@@ -485,6 +486,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
 
     if (this.canvas_type == "cdraw"){
       this.be.level.add_cell(this);
+      this.be.level.update_box_quantity(this.type, -1);
     }
 
     this.be.level.update_widths(true);
@@ -530,7 +532,6 @@ Cell.prototype.cell_drag_end = function() {
 
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
-    this.be.level.update_box_quantity(this.type, +1);
   }
   this.be.level.commit_widths();
 
