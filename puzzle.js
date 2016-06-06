@@ -116,10 +116,31 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Zoom controls',
+   ui: true,
+   intro: '<p>For larger puzzles, you can zoom in <svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><circle cx="37" cy="37" r="20" stroke="#888" stroke-width="7" fill="none"/><path d="M37,30v14M30,37h14M52,52L83,83" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>, zoom out <svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><circle cx="37" cy="37" r="20" stroke="#888" stroke-width="7" fill="none"/><path d="M30,37h14M52,52L83,83" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>, and zoom to fit <svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" stroke="#888" stroke-width="3" fill="none"/><path d="M50,42V20M40,30L50,20L60,30M58,50H80M70,40L80,50L70,60M50,58V80M40,70L50,80L60,70M42,50H20M30,40L20,50L30,60" stroke="#888" stroke-width="5" stroke-linecap="round" fill="none"/></svg> using the controls in the lower right.  You can also zoom in and out using the scroll wheel on your mouse or by pinching in the drawing area on a touchscreen.</p><p>You can also pan the drawing area by dragging the background.</p><p>Tip: on a touch screen, you can drag a gate or wire and simultaneously pan or zoom the drawing area to where you want to put it.</p>',
+   outro: '<p>You can play this game on a small screen such as a smartphone, but you\'ll have to do a lot of zooming and panning.  You may find the later puzzles easier on a larger screen.</p><p>If you need more drawing room, you can hide this info panel by clicking the arrow in the corner<svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><path d="M30,45H15V15H45V30" stroke="#888" stroke-width="3" fill="none"/><path d="M30,55v-25h25M30,30L80,80" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>.</p>',
+   truth: [{a: 0,   z: 1},
+           {a: 1,   z: 0}],
+   hide: ['speed'],
+   avail: ['inv'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 1100,
+         y: 1100
+        }
+   }
+  }
+,
   {name: 'Simulation controls',
    ui: true,
-   intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <span class="nowrap">(<svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>)</span>, when one truth table line has passed testing <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>),</span> or when all truth table rows have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>).</span></p><p>You can switch to testing a different truth table row by clicking on that row. Double clicking a row selects it and immediately starts simulation (as if you clicked "play"). If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
-   outro: '<p>The small buttons next to the "play" button tell the simulation to pause when the values have reached a gate, when one truth table row has passed testing, or when all truth table rows have passed.</p><p>You can switch to testing a different truth table row by clicking on that row. Double clicking a row selects it and immediately starts simulation (as if you clicked "play"). If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
+   intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the "play" button tell the simulation to pause when the propagating values have reached a gate <svg style="vertical-align:middle" width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>, when one truth table line has passed testing <svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>, or when all truth table rows have passed <svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><rect x="-4" y="-2" width="18" height="14" stroke-width="0" rx="3" ry="3"/><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>.</p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
+   outro: '<p>You can switch to testing a different truth table row by clicking on that row. Double clicking a row selects it and immediately starts simulation (as if you clicked "play"). If simulation is paused immediately after one truth table row has passed, clicking "play" automatically advances to the next row.</p>',
    truth: [{a: 0,   z: 0},
            {a: 1,   z: 1}],
    avail: [],
@@ -932,7 +953,7 @@ Level.prototype.puzzle = [
   {name: 'The D latch',
    section: 'Introduction to latches',
    intro: '<p>A <i>D latch</i> is our first storage element. It passes its D (data) input to its Q output when its E (enable) input is 1, but it holds its Q output constant when E is 0. The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.</p><p>In order to test a circuit with storage elements, each boxed section of the truth table contains multiple lines. Each line represents one step of a test sequence. Clicking in the truth table starts a fresh test sequence for the selected row.</p>',
-   outro: '<p>Simulation can be automatically paused when one line of a test sequence has passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>)</span> or when all lines of a test sequence have passed <span class="nowrap">(<svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M3,2.5l1.25,2.5l2.5,-5M3,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>).</span></p>',
+   outro: '<p>Simulation can be automatically paused when one line of a test sequence has passed <svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg> or when all lines of a test sequence have passed <svg style="vertical-align:middle" width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M3,2.5l1.25,2.5l2.5,-5M3,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>.</p>',
    truth: [[{e:1, d:0,   q:0},
             {e:1, d:1,   q:1},
             {e:0, d:1,   q:1},
