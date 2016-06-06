@@ -375,6 +375,10 @@ Cell.prototype.cell_drag_start = function(x, y) {
   this.bring_to_top();
 
   if (this.canvas_type == "cbox"){
+    // Typically when a cell is grabbed from the box, this line
+    // decreases its quantity, but check_for_del() immediately
+    // increases its (pending) quantity right back again since the
+    // cell is positioned to be deleted.
     this.be.level.update_box_quantity(this.type, -1);
   }
 
@@ -442,45 +446,52 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
   } else {
     del = false;
   }
-  if (del != this.pending_del){
+  if (del && !this.pending_del){
     var attr;
     if (del == "new"){
       attr = {
         stroke: "#aaa", // grey
         "stroke-dasharray": ""
       };
-    } else if (del == "del"){
+    } else {
       attr = {
         stroke: "#e88", // red
         "stroke-dasharray": "-"
-      };
-    } else {
-      attr = {
-        stroke: "#000", // black
-        "stroke-dasharray": ""
       };
     }
     this.el_s.attr(attr);
 
     for (var name in this.io) {
-      if (del){
-        this.io[name].mark_old("del");
-      } else {
-        this.io[name].restore_old();
-      }
+      this.io[name].mark_old("del");
     }
     this.pending_del = del;
 
     if (this.canvas_type == "cdraw"){
-      if (del){
-        this.be.level.remove_cell(this);
-      } else {
-        this.be.level.add_cell(this);
-      }
+      this.be.level.remove_cell(this);
+    }
+
+    this.be.level.update_widths(true);
+  } else if (!del && this.pending_del){
+    var attr = {
+      stroke: "#000", // black
+      "stroke-dasharray": ""
+    };
+    this.el_s.attr(attr);
+
+    for (var name in this.io) {
+      this.io[name].restore_old();
+    }
+    this.pending_del = del;
+
+    if (this.canvas_type == "cdraw"){
+      this.be.level.add_cell(this);
     }
 
     this.be.level.update_widths(true);
   } else {
+    // If the wires weren't already redrawn above (in a different
+    // color due to a change in deletion status), then they're redrawn
+    // here solely to update their position.
     for (var port_name in this.io) {
       this.io[port_name].redraw();
     }
