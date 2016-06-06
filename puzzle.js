@@ -734,8 +734,7 @@ Level.prototype.puzzle = [
            {a:0, s:1,   z:0},
            {a:1, s:1,   z:1},
            {a:2, s:1,   z:2},
-           {a:3, s:1,   z:3},
-           ],
+           {a:3, s:1,   z:3}],
    avail: ['and', 2],
    cells: {
      a: {type: 'input',
@@ -758,10 +757,37 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Single-row mystery',
+   intro: '<p><b>What multi-bit function is expressed in the truth table?</b></p><p>Tip: The same function is applied to all bits.</p>',
+   outro: '<p>Converting between decimal and binary in your head sure is annoying, isn\'t it?</p>',
+   hint: ['<p>You can\'t think logically about this puzzle unless you first convert the decimal values to binary.</p>',
+          '<p>This puzzle with four bits being tested by one truth table row is the equivalent of a puzzle with one bit being tested by four truth table rows.</p>'],
+   truth: [{a:12, b:10,   z:9}],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         width: 4,
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         width: 4,
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'Seven-segment decode',
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
-   outro: '',
+   outro: '<p>Were you able to design your circuit using 25 gates or fewer?</p>',
    truth:[{a3:0, a2:0, a1:0, a0:0,   t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1},
           {a3:0, a2:0, a1:0, a0:1,   t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0},
           {a3:0, a2:0, a1:1, a0:0,   t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1},
@@ -833,7 +859,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Seven-segment encode',
    intro: '<p><b>Recognize the value on a seven-segment display and encode it as a decimal value&nbsp;(0-9).</b></p>',
-   outro: '',
+   outro: '<p>Were you able to design your circuit using 25 gates or fewer?</p>',
    truth:[{t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1,   z3:0, z2:0, z1:0, z0:0},
           {t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z3:0, z2:0, z1:0, z0:1},
           {t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1,   z3:0, z2:0, z1:1, z0:0},
