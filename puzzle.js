@@ -759,7 +759,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Single-row mystery',
    intro: '<p><b>What multi-bit function is expressed in the truth table?</b></p><p>Tip: The same function is applied to all bits.</p>',
-   outro: '<p>Converting between decimal and binary in your head sure is annoying, isn\'t it?</p>',
+   outro: '<p>Converting between decimal and binary in your head sure is annoying, isn\'t it?  I hope you\'ve memorized your powers of 2.</p>',
    hint: ['<p>You can\'t think logically about this puzzle unless you first convert the decimal values to binary.</p>',
           '<p>This puzzle with four bits being tested by one truth table row is the equivalent of a puzzle with one bit being tested by four truth table rows.</p>'],
    truth: [{a:12, b:10,   z:9}],
