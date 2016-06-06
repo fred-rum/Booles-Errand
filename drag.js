@@ -84,7 +84,6 @@ Drag.prototype.remove_new_wires = function() {
 Drag.prototype.remove_old_wires = function() {
   // Delete the old wires.
   for (var i = 0; i < this.old_wires.length; i++){
-    var icell = this.old_wires[i].i.cell;
     this.old_wires[i].remove();
   }
   this.old_wires = [];
@@ -174,7 +173,6 @@ Drag.prototype.mouse_double_click = function(event) {
 Drag.prototype.dblclick = function(x, y) {
   var io = this.closest_io(x, y);
   while (io.w.length > 0){
-    var icell = io.w[0].i.cell;
     io.w[0].remove();
     this.be.level.update_url();
   }
