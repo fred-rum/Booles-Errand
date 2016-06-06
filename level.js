@@ -136,11 +136,12 @@ Level.prototype.begin = function(level_num) {
         var io_name = conn_list[i][0];
         var cell_name2 = conn_list[i][1];
         var io_name2 = conn_list[i][2];
+        var unlocked = conn_list[i][3];
         new Wire(this.be,
                  this.named_cells[cell_name].io[io_name],
                  this.named_cells[cell_name2].io[io_name2],
                  false, // pending_del
-                 true); // locked
+                 !unlocked); // locked
       }
     }
   }

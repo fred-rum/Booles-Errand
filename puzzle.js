@@ -84,8 +84,34 @@ Level.prototype.puzzle = [
      ,
      inv: {type: 'inv',
            x: 250,
-           y: 100,
-         io: [['o', 'z', 'i']]
+           y: 150,
+           io: [['o', 'z', 'i']]
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'Delete a wire',
+   ui: true,
+   intro: '<p>This circuit is wired incorrectly. <b>Delete the incorrect wire and connect the NOT gate into the circuit.</b></p><p>A wire can be deleted by dragging from one end of the wire to the other end.  Alternatively, double click on one end of the wire.</p>',
+   outro: '<p>A wire leading to the input of a gate can also be deleted by connecting another wire to that same input.  Only one wire at a time can be connected to any gate\'s input port.</p>',
+   truth: [{a: 0, z: 1},
+           {a: 1, z: 0}],
+   hide: ['speed'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100,
+         io: [['o', 'z', 'i', 1]] // this wire is unlocked
+        }
+     ,
+     inv: {type: 'inv',
+           x: 250,
+           y: 150
         }
      ,
      z: {type: 'output',
