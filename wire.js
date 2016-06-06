@@ -186,7 +186,7 @@ Wire.prototype.tick = function(speed) {
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
       var value = fl_obj.value;
       if ((this.o.cell.width == 1) && (value == 1)) {
-        value *= ((1 << this.i.cell.width) - 1);
+        value *= ((1 << this.i.cell.input_width) - 1);
       }
       this.i.propagate_input(value);
       this.in_flight.splice(0, 1); // remove the first (oldest)

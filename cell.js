@@ -13,6 +13,8 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
 
   this.type = type;
   this.width = 1;
+  this.input_width = 1;
+  this.output_width = 1;
   this.x = x;
   this.y = y;
   this.io = {};
@@ -54,6 +56,10 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     "stroke-width": this.be.stroke_wire_bg,
     stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee",
     "stroke-linecap": "round"
+  };
+  this.stub_fg_attr = {
+    "stroke-width": this.be.stroke_wire_fg,
+    stroke: Wire.color(undefined)
   };
 
   this.el_s = this.canvas.set();
@@ -107,6 +113,10 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
     return true;
   }
   this.el_cell.forEach(init_drag, this);
+
+  if ((this.canvas_type == 'cdraw') && (this.type == 'condenser')) {
+    this.update_width(2);
+  }
 }
 
 
@@ -167,6 +177,10 @@ Cell.prototype.update_width = function(n, pending) {
   }
 
   this[name] = n;
+  if (!pending) {
+    if (this.type != 'condenser') this.input_width = n;
+    if (this.type != 'expander') this.output_width = n;
+  }
 };
 
 Cell.prototype.propagate_width = function(n) {
@@ -188,7 +202,9 @@ Cell.prototype.propagate_width = function(n) {
 Cell.prototype.update_prospective_width = function(n) {
   var prospective_width = this.prospective_width;
 
-  if (this.locked) {
+  if (this.type == 'condenser') {
+    prospective_width = 1;
+  } else if (this.locked) {
     prospective_width = this.width;
   }
 
@@ -317,14 +333,28 @@ Cell.prototype.calc_latch = function() {
   var e = this.io.e.value;
   if (e === 1){
     if (d === undefined){
-      this.io['q'].propagate_output(undefined);
+      this.io.q.propagate_output(undefined);
     } else {
-      this.io['q'].propagate_output(d);
+      this.io.q.propagate_output(d);
     }
   } else {
     // Don't propagate a value (leave the output unchanged)
     // if E is 0 or undefined.
   }
+};
+
+Cell.prototype.calc_condenser = function() {
+  var z = 0;
+
+  for (var i = 0; i < this.width; i++) {
+    var value = this.io['i' + i].value;
+    if (value === undefined) {
+      this.io.o.propagate_output(undefined);
+      return;
+    }
+    z |= value << i;
+  }
+  this.io.o.propagate_output(z);
 };
 
 Cell.prototype.check_pending = function() {
@@ -557,7 +587,7 @@ Cell.prototype.remove = function() {
   this.el_cell.remove();
 };
 
-Cell.prototype.init_io = function(inv, no, ni, left, right) {
+Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
   var cw = this.be.stub_len;
   var cs = this.be.io_spacing;
 
@@ -565,6 +595,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right) {
 
   for (var i = 0; i < no; i++) {
     var y = ((i+0.5)*cs)-(no*cs/2);
+    if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
                         (no > 1) ? "o" + i : "o", "output",
                         right+cw, y);
@@ -579,6 +610,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right) {
 
   for (var i = 0; i < ni; i++) {
     var y = ((i+0.5)*cs)-(ni*cs/2);
+    if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
                         (ni > 1) ? "i" + i : "i", "input",
                         left-cw, y);
@@ -944,6 +976,35 @@ Cell.prototype.init_latch = function() {
   attr['text-anchor'] = 'end';
   right -= this.be.stroke_cell_fg;
   this.push_s(this.canvas.text(right, -this.be.io_spacing, "Q").attr(attr));
+};
+
+Cell.prototype.init_condenser = function(ni) {
+  ni = ni || 2;
+  var height = ni*this.be.io_spacing;
+  var width = this.be.io_spacing * 2;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.init_io(false, 1, ni, left, right, true);
+
+  var cell_path = ["M", left, top,
+                   "v", height,
+                   "L", right, this.be.io_spacing/2,
+                   "v", -this.be.io_spacing,
+                   "z"];
+
+  var trace_path = [];
+  for (var i = 0; i < ni; i++) {
+    var y = top + (i+0.5)*this.be.io_spacing;
+    trace_path.push('M', left, y, 'L', right, 0);
+  }
+
+  this.push_ns(this.canvas.path(cell_path).attr(this.cell_bg_attr));
+  this.draw_stubs();
+  this.push_s(this.canvas.path(cell_path).attr(this.cell_fg_fill_attr));
+  this.push_s(this.canvas.path(trace_path).attr(this.stub_fg_attr));
+  this.push_s(this.canvas.path(cell_path).attr(this.cell_fg_line_attr));
 };
 
 Cell.prototype.init_null = function() {

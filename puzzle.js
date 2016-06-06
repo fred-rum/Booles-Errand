@@ -791,7 +791,6 @@ Level.prototype.puzzle = [
         }
      ,
      s: {type: 'input',
-         width: 1,
          x: 100,
          y: 200
         }
@@ -825,6 +824,33 @@ Level.prototype.puzzle = [
      ,
      z: {type: 'output',
          width: 4,
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'The condenser',
+   intro: '<p></p>',
+   outro: '<p></p>',
+   truth: [{a1:0, a0:0,   z:0},
+           {a1:0, a0:1,   z:1},
+           {a1:1, a0:0,   z:2},
+           {a1:1, a0:1,   z:3}],
+   avail: ['condenser'],
+   cells: {
+     a1: {type: 'input',
+         x: 100,
+         y: 100
+         }
+     ,
+     a0: {type: 'input',
+         x: 100,
+         y: 200
+         }
+     ,
+     z: {type: 'output',
+         width: 2,
          x: 400,
          y: 100
         }

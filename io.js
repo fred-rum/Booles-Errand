@@ -165,8 +165,9 @@ Io.prototype.redraw = function() {
 };
 
 Io.prototype.color_stub = function(value) {
+  var width = (this.type == 'input') ? this.cell.input_width : this.cell.output_width;
   var attr = {
-    stroke: Wire.color(value, this.cell.width),
+    stroke: Wire.color(value, width),
   };
   if (!this.pending_del) this.stub.attr(attr);
 
@@ -210,7 +211,8 @@ Io.prototype.update_value = function(value) {
     opacity: bg_opacity
   };
 
-  var f = value / ((1 << this.cell.width) - 1);
+  var width = (this.type == 'input') ? this.cell.input_width : this.cell.output_width;
+  var f = value / ((1 << width) - 1);
   var r = this.min_color.r + (this.max_color.r - this.min_color.r) * f;
   var g = this.min_color.g + (this.max_color.g - this.min_color.g) * f;
   var b = this.min_color.b + (this.max_color.b - this.min_color.b) * f;
