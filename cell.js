@@ -360,6 +360,9 @@ Cell.prototype.cell_drag_start = function(x, y) {
     if (this.locked){
       // Show the fail icon only on cdraw, not on cbox.
       this.be.drag.show_fail_xy(this.x, this.y);
+      $('#error').html('<p>This logic element is locked by the puzzle and cannot be moved or deleted.</p>');
+    } else {
+      $('#error').html('<p>You have already used all available gates of this type.</p>');
     }
     $(document.body).addClass('cursor-force-not-allowed');
     this.be.drag.disable_hover();
@@ -518,6 +521,7 @@ Cell.prototype.cell_drag_move = function(x, y) {
 Cell.prototype.cell_drag_end = function() {
   if (this.dragging_disallowed) {
     this.be.drag.hide_fail();
+    $('#error').html('');
     $(document.body).removeClass('cursor-force-not-allowed');
     this.be.drag.enable_hover();
     return;

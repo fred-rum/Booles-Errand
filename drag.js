@@ -300,9 +300,12 @@ Drag.prototype.enable_hover = function() {
 
 Drag.prototype.snap_end = function() {
   this.hide_handle(this.el_handle2);
-  this.hide_fail();
   this.snap_io = undefined;
-  this.fail_io = undefined;
+  if (this.fail_io) {
+    this.fail_io = undefined;
+    this.hide_fail();
+    $('#error').html('');
+  }
 };
 
 Drag.prototype.show_handle = function(el, io) {
@@ -346,6 +349,17 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
     io = this.be.null_io;
   } else if ((this.orig_empty && (this.orig_io.type == io.type)) ||
              io.locked || failure){
+    if (failure == 'exhausted cells') {
+      $('#error').html('<p>Connecting a multi-bit wire here would replicate more gates downstream than are available.</p>');
+    } else if (failure == 'width mismatch') {
+      $('#error').html('<p>Connecting a multi-bit wire here would conflict with a different logic width downstream.</p>');
+    } else if (io.locked) {
+      $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
+    } else if (io.type == 'output'){
+      $('#error').html('<p>A wire cannot be created from an output port to another output port.</p>');
+    } else {
+      $('#error').html('<p>A wire cannot be created from an input port to another input port.</p>');
+    }
     this.show_fail(io);
     this.fail_io = true;
     io = this.be.null_io;
@@ -417,12 +431,14 @@ Drag.prototype.update_free_drag = function(x, y) {
 Drag.prototype.drag_locked_start = function(x, y) {
   var io = this.closest_locked_io(x, y);
   this.show_fail(io);
+  $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
   $(document.body).addClass('cursor-force-not-allowed');
   this.disable_hover();
 };
 
 Drag.prototype.drag_locked_end = function() {
   this.hide_fail();
+  $('#error').html('');
   $(document.body).removeClass('cursor-force-not-allowed');
   this.enable_hover();
 };

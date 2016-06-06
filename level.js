@@ -731,7 +731,7 @@ Level.prototype.update_widths = function(pending) {
       if (this.update_box_quantity(cell.type, old_width - new_width)){
         cell.update_width(new_width, pending);
       } else {
-        failure = 'exhausted cells';
+        if (!failure) failure = 'exhausted cells';
       }
       cell.prospective_width = undefined;
     }
