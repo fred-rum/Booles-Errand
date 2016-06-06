@@ -118,6 +118,7 @@ Wire.prototype.mark_old = function(type) {
 
 Wire.prototype.restore_old = function() {
   this.pending_del = false;
+  this.el_fg.attr({"stroke-dasharray": ""});
   this.redraw_fg();
 }
 
