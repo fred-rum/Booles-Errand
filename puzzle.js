@@ -646,6 +646,7 @@ Level.prototype.puzzle = [
    outro: '',
    truth: [{a:0, b:0, c:0,   z:7},
            {a:1, b:3, c:7,   z:0}],
+   avail: ['inv', 6, 'and', 5],
    cells: {
      a: {type: 'input',
          width: 1,

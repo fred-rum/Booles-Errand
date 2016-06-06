@@ -408,6 +408,8 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // The resize/reflow code will fix its position as necessory.
   this.be.cdrag_cell = this.cdrag_cell;
 
+  this.be.level.update_widths(true);
+
   this.cdraw_cell.check_for_del(x, y, this.canvas == this.be.cbox);
   this.cdrag_cell.check_for_del(x, y, this.canvas == this.be.cbox);
 };

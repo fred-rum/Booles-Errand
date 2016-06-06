@@ -115,6 +115,11 @@ Drag.prototype.drag_start = function(x, y) {
   this.old_wires = [];
   this.null_wire = null;
   this.disable_hover();
+
+  // No widths are actually updated here, but this step initializes
+  // the pending_width values so that a later commit_widths() won't
+  // fail.
+  this.be.level.update_widths(true);
 };
 
 Drag.prototype.drag_move = function(x, y) {

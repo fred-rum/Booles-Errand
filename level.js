@@ -726,12 +726,14 @@ Level.prototype.update_widths = function(pending) {
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
     if ((cell.type != 'output') && (cell.type != 'input')) {
-      if (cell.prospective_width) {
-        cell.update_width(cell.prospective_width, pending);
-        cell.prospective_width = undefined;
+      var new_width = cell.prospective_width || 1;
+      var old_width = (pending && cell.pending_width) || cell.width;
+      if (this.update_box_quantity(cell.type, old_width - new_width)){
+        cell.update_width(new_width, pending);
       } else {
-        cell.update_width(1, pending);
+        failure = 'exhausted cells';
       }
+      cell.prospective_width = undefined;
     }
   }
 
@@ -745,5 +747,6 @@ Level.prototype.commit_widths = function() {
         (cell.pending_width != cell.width)) {
       cell.update_width(cell.pending_width);
     }
+    cell.pending_width = undefined;
   }
 };
