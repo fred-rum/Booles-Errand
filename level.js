@@ -725,7 +725,7 @@ Level.prototype.update_widths = function(pending) {
   // clear the prospective_width values.
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
-    if ((cell.type != 'output') && (cell.type != 'input')) {
+    if (!cell.locked) {
       var new_width = cell.prospective_width || 1;
       var old_width = (pending && cell.pending_width) || cell.width;
       if (this.update_box_quantity(cell.type, old_width - new_width)){
@@ -743,8 +743,7 @@ Level.prototype.update_widths = function(pending) {
 Level.prototype.commit_widths = function() {
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
-    if ((cell.type != 'output') && (cell.type != 'input') &&
-        (cell.pending_width != cell.width)) {
+    if (!cell.locked) {
       cell.update_width(cell.pending_width);
     }
     cell.pending_width = undefined;

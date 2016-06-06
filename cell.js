@@ -157,7 +157,7 @@ Cell.prototype.update_quantity = function(n) {
 Cell.prototype.update_width = function(n, pending) {
   var name = pending ? 'pending_width' : 'width';
 
-  if (this[name] === n) return;
+  if (n == this[name]) return;
 
   if ((n == 1) && (!pending || (this.width == 1))) {
     this.el_qty_text.setAttr('visibility', 'hidden');
@@ -188,8 +188,7 @@ Cell.prototype.propagate_width = function(n) {
 Cell.prototype.update_prospective_width = function(n) {
   var prospective_width = this.prospective_width;
 
-  if (this.type == 'output') {
-    // The output pin has an inflexible width;
+  if (this.locked) {
     prospective_width = this.width;
   }
 
