@@ -95,7 +95,7 @@ Level.prototype.begin = function(level_num) {
   this.named_cells = {};
   this.all_cells = [];
 
-  this.be.div_infotxt.html(level.intro || "");
+  this.be.div_infotxt.html(this.text(level.intro));
   smartquotes(this.be.div_infotxt[0]);
   //this.be.div_infotxt.append('<br>version ' + 33);
 
@@ -614,7 +614,7 @@ Level.prototype.done = function(fresh_play) {
   }
   this.mark_complete(this.level_num);
 
-  var outro = this.level.outro || "";
+  var outro = this.text(this.level.outro);
   var next = this.next_level(this.level_num + 1);
   if (this.ui_only){
     if (next){
@@ -748,4 +748,8 @@ Level.prototype.commit_widths = function() {
     }
     cell.pending_width = undefined;
   }
+};
+
+Level.prototype.text = function(str) {
+  return (str || '').replace(/&play;/g,'<svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder"/><path d="M37,25v50l30,-25z" class="playcenter"/></svg>');
 };
