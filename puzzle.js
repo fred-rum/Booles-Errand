@@ -665,35 +665,93 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'Create many gates',
+  {name: 'Multi-bit values',
    section: 'Introduction to multi-bit values',
    ui: true,
-   intro: '<p>Multiple gates feed multi-bit wires.</p>',
-   outro: '',
-   truth: [{a:0, b:0, c:0,   z:7},
-           {a:1, b:3, c:7,   z:0}],
-   avail: ['inv', 6, 'and', 5],
+   intro: '<p>A single wire can only carry one <i>bit</i> of information, either a 0 or 1.  <b>Multiple wires can be grouped together as a multi-bit <i>bus</i></b>, which can carry a wider range of values.  In the same way that three decimal (base 10) digits such as 123 represents 3&times;1+2&times;10+1&times;100, three <a href="https://en.wikipedia.org/wiki/Binary_number">binary (base 2)</a> bits such as 101 represents 1&times;1+0&times;2+1&times;4.</p><p>This game displays multi-bit values in their decimal form, but keep in mind the underlying binary representations.</p>',
+   outro: '<p>A cluster of identical logic cells is displayed as a single cell with a multiplier printed next to it.</p>',
+   truth: [{a:0,   z:0},
+           {a:1,   z:1},
+           {a:2,   z:2},
+           {a:3,   z:3},
+           {a:4,   z:4},
+           {a:5,   z:5},
+           {a:6,   z:6},
+           {a:7,   z:7}],
+   avail: [],
    cells: {
      a: {type: 'input',
-         width: 1,
-         x: 100,
-         y: 100
-        }
-     ,
-     b: {type: 'input',
-         width: 2,
-         x: 100,
-         y: 200
-        }
-     ,
-     c: {type: 'input',
          width: 3,
          x: 100,
-         y: 300
+         y: 100,
+         io: [['o', 'z', 'i']]
         }
      ,
      z: {type: 'output',
          width: 3,
+         x: 300,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'Create a gate cluster',
+   ui: true,
+   intro: '<p>Hooking a wire to the output port of a cluster of logic cells automatically converts the wire to a multi-bit bus that can carry all of the cell outputs.  Hooking a multi-bit bus to the input port of a logic cell converts the cell into a cell cluster that can make use of all of the input bits.  In this way, the multi-bit width propagates downstream.</p><p><b>Hook up a cluster of NOT gates in order to invert the multi-bit values.</b></p>',
+   outro: '<p>Decimal value 0 is binary value 000.  When 000 passes through the NOT cluster, it becomes 111, which is 1&times;1+1&times;2+1&times;4 = 7.  You might want to carefully consider the remaining rows in the truth table to understand the conversion of decimal to binary and binary to decimal.</p>',
+   truth: [{a:0,   z:7},
+           {a:1,   z:6},
+           {a:2,   z:5},
+           {a:3,   z:4},
+           {a:4,   z:3},
+           {a:5,   z:2},
+           {a:6,   z:1},
+           {a:7,   z:0}],
+   avail: ['inv'],
+   cells: {
+     a: {type: 'input',
+         width: 3,
+         x: 100,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         width: 3,
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'Mix single-bit and multi-bit values',
+   ui: true,
+   intro: '<p>A single-bit wire can also be connected to the input of a gate cluster, in which case the wire is implicitly fanned out to supply all of the gates in the cluster.</p><p><b>Selectively propagate the multi-bit value from A to Z only when S is 1.  Otherwise, clear the Z value to 0.</b></p>',
+   outro: '<p>Did you notice that the x2 cluster of AND gates used both AND gates from the gate inventory?</p>',
+   truth: [{a:0, s:0,   z:0},
+           {a:1, s:0,   z:0},
+           {a:2, s:0,   z:0},
+           {a:3, s:0,   z:0},
+           {a:0, s:1,   z:0},
+           {a:1, s:1,   z:1},
+           {a:2, s:1,   z:2},
+           {a:3, s:1,   z:3},
+           ],
+   avail: ['and', 2],
+   cells: {
+     a: {type: 'input',
+         width: 2,
+         x: 100,
+         y: 100
+        }
+     ,
+     s: {type: 'input',
+         width: 1,
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         width: 2,
          x: 400,
          y: 100
         }
