@@ -1003,13 +1003,13 @@ Level.prototype.puzzle = [
      ,
      latch: {
        type: 'latch',
-       x: 380,
+       x: 280,
        y: 120,
        io: [['q', 'q', 'i']]
      }
      ,
      q: {type: 'output',
-         x: 500,
+         x: 400,
          y: 100
         }
    }
