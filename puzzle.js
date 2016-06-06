@@ -28,7 +28,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Draw a wire',
    ui: true,
-   intro: '<p>Now, you do it! <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press play &play; to verify that your circuit is correct.</p>',
+   intro: '<p>If you\'re going to be a circuit designer, you\'ll have to get your hands dirty. <b>Draw a wire to connect A to Z.</b></p><p>Tip to draw a wire: While the mouse is over the stub at the right side of A, press and hold the mouse button, then move the mouse to the stub at the left side of Z before releasing the mouse button.</p><p>Tip: Press play &play; to verify that your circuit is correct.</p>',
    outro: '<p>You can also draw a wire in the other direction. The direction that data flows on the wire is determined by what it\'s connected to.</p>',
    truth: [{a: 1,   z: 1}],
    hide: ['truth', 'speed'],
