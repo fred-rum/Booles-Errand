@@ -5,7 +5,7 @@
 var x = undefined;
 Level.prototype.puzzle = [
   {name: 'Press play',
-   section: 'Introduction to circuits',
+   section: 'Introduction to combinational circuits',
    ui: true,
    intro: '<p>&#9733; <b>Press the "play" button below</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733;</p>',
    outro: '<p>Congratulations!</p>',
@@ -570,6 +570,32 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Build an XOR gate',
+   intro: '<p><b>Implement the XOR function using only NAND gates.</b></p>',
+   outro: '<p>Six NAND gates is good.  Five NAND gates is excellent.</p>',
+   truth: [{a:0, b:0,   z:0},
+           {a:0, b:1,   z:1},
+           {a:1, b:0,   z:1},
+           {a:1, b:1,   z:0}],
+   avail: ['nand'],
+   cells: {
+     a: {type: 'input',
+         x: 100,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 100,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 700,
+         y: 150
+        }
+   }
+  }
+,
   {name: 'Detect odd',
    intro: '<p><b>Determine whether an odd number of stimulus pins have a 1 value.</b></p><p>Tip: Start with a circuit that works when&nbsp;C is 0, then add logic to handle the cases when C is 1.</p>',
    outro: '<p>Notice that it doesn\'t matter what order you put the XOR gates in. The result is always the same.</p>',
@@ -640,7 +666,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Create many gates',
-   section: 'Multi-bit values',
+   section: 'Introduction to multi-bit values',
    ui: true,
    intro: '<p>Multiple gates feed multi-bit wires.</p>',
    outro: '',
