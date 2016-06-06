@@ -359,15 +359,25 @@ Level.prototype.reset_sim = function() {
   }
 };
 
-Level.prototype.add_box_cell = function(name) {
-  var cell = new Cell(this.be, "cbox", name, 0, 0);
-  this.box_cells[name] = cell;
+Level.prototype.add_box_cell = function(type) {
+  var cell = new Cell(this.be, "cbox", type, 0, 0);
+  this.box_cells[type] = cell;
   var bbox = cell.bbox;
   var cx = (this.be.em_size*4) - bbox.x - bbox.width/2; // align center
   var cy = this.be.box_height - bbox.y; // align top edge
   cell.move(cx, cy);
   this.be.box_height += bbox.height + this.be.box_spacing;
   return cell;
+};
+
+Level.prototype.update_box_quantity = function(type, change) {
+  var cell = this.be.level.box_cells[type];
+  if (cell === undefined) return false;
+  if (cell.quantity !== undefined){
+    if (cell.quantity + change < 0) return false;
+    cell.update_quantity(cell.quantity + change);
+  }
+  return true;
 };
 
 Level.prototype.value = function(name) {
@@ -452,11 +462,8 @@ Level.prototype.decode_save = function(save_str) {
         var x = Number(m[1]);
         var type = m[2];
         var y = Number(m[3]);
-        var bcell = this.box_cells[type];
-        if (bcell === undefined) throw "disallowed cell type: " + type;
-        if (bcell.quantity !== undefined){
-          if (bcell.quantity == 0) throw "exhausted cell type: " + type
-          bcell.update_quantity(bcell.quantity - 1);
+        if (!this.update_box_quantity(type, -1)) {
+          throw "exhausted cell type: " + type
         }
         this.add_cell(new Cell(this.be, "cdraw", type,
                                x / 20 * this.be.io_spacing,

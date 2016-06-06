@@ -374,8 +374,8 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // Pop cell to top for more natural dragging.
   this.bring_to_top();
 
-  if ((this.canvas_type == "cbox") && (this.quantity !== undefined)){
-    this.update_quantity(this.quantity - 1);
+  if (this.canvas_type == "cbox"){
+    this.be.level.update_box_quantity(this.type, -1);
   }
 
   // Bring the drag div (and its associated canvas) to the top of the Z order.
@@ -519,15 +519,7 @@ Cell.prototype.cell_drag_end = function() {
 
   if (this.cdraw_cell.pending_del){
     this.cdraw_cell.remove();
-
-    // Increment the number of available cells of the deleted type.
-    // If this cell was dragged from the box, it'd be simple to
-    // increase its quantity.  But in case it was dragged from cdraw,
-    // we have to search through cbox to find it.
-    var bcell = this.be.level.box_cells[this.type];
-    if (bcell.quantity !== undefined){
-      bcell.update_quantity(bcell.quantity + 1);
-    }
+    this.be.level.update_box_quantity(this.type, +1);
   }
   this.be.level.commit_widths();
 
