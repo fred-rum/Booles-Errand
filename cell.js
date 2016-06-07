@@ -113,7 +113,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
                         end: this.cell_drag_end});
     return true;
   }
-  this.el_cell.forEach(init_drag, this);
+  this.el_no_target.forEach(init_drag, this);
 
   if ((this.canvas_type == 'cdraw') && (this.type == 'condenser')) {
     this.update_width(harness_width || 2);
@@ -1042,9 +1042,9 @@ Cell.prototype.init_condenser = function(ni) {
     this.el_top_target.setAttr("pointer-events", "all");
     this.push_ns(this.el_top_target, true);
     this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
-                       {start: this.drag_harness_start,
-                        move: this.drag_harness_move,
-                        end: this.drag_harness_end},
+                       {start: this.harness_drag_start,
+                        move: this.harness_drag_move,
+                        end: this.harness_drag_end},
                        'top');
 
     var target_path = ['M', left, -top + this.be.io_spacing/2,
@@ -1057,9 +1057,9 @@ Cell.prototype.init_condenser = function(ni) {
     this.el_bottom_target.setAttr("pointer-events", "all");
     this.push_ns(this.el_bottom_target, true);
     this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
-                       {start: this.drag_harness_start,
-                        move: this.drag_harness_move,
-                        end: this.drag_harness_end},
+                       {start: this.harness_drag_start,
+                        move: this.harness_drag_move,
+                        end: this.harness_drag_end},
                        'bottom');
   }
 };
@@ -1090,7 +1090,7 @@ Cell.prototype.push_ns = function(el, no_tgt) {
   this.el_cell.push(el);
 };
 
-Cell.prototype.drag_harness_start = function(x, y, dir) {
+Cell.prototype.harness_drag_start = function(x, y, dir) {
   this.canvas_drag_offset_y = this.be.circuit.cdraw_to_canvas_y(y);
   this.pending_width = this.width;
 
@@ -1098,7 +1098,7 @@ Cell.prototype.drag_harness_start = function(x, y, dir) {
   this.bring_to_top();
 };
 
-Cell.prototype.drag_harness_move = function(x, y, dir) {
+Cell.prototype.harness_drag_move = function(x, y, dir) {
   var bigdir = (dir == 'top') ? -1 : 1;
   var my = this.be.circuit.cdraw_to_canvas_y(y);
   var canvas_dy = my - this.canvas_drag_offset_y;
@@ -1144,7 +1144,7 @@ Cell.prototype.drag_harness_move = function(x, y, dir) {
   this.el_qty_text.transform(xform);
 };
 
-Cell.prototype.drag_harness_end = function(dir) {
+Cell.prototype.harness_drag_end = function(dir) {
   var width = this.pending_width;
   this.pending_width = undefined;
   var change = width - this.width;
