@@ -1090,6 +1090,22 @@ Cell.prototype.push_ns = function(el, no_tgt) {
 };
 
 Cell.prototype.harness_drag_start = function(x, y, dir) {
+  // Test to see if the condenser's multi-bit output is currently
+  // hooked to a multi-bit input with a locked width.  Do this by
+  // temporarily forcing a different width and seeing if it fails.
+  this.update_width(this.width + 1);
+  this.dragging_disallowed = this.be.level.update_widths();
+  this.update_width(this.width - 1);
+  this.be.level.update_widths();
+
+  if (this.dragging_disallowed) {
+    this.be.drag.show_fail_xy(this.x, this.y);
+    $('#error').html('<p>This condenser cannot be resized because its output is connected to downstream logic with fixed width.</p>');
+    $(document.body).addClass('cursor-force-not-allowed');
+    this.be.drag.disable_hover();
+    return;
+  }
+
   this.canvas_drag_offset_y = this.be.circuit.cdraw_to_canvas_y(y);
   this.pending_width = this.width;
 
@@ -1101,6 +1117,8 @@ Cell.prototype.harness_drag_start = function(x, y, dir) {
 };
 
 Cell.prototype.harness_drag_move = function(x, y, dir) {
+  if (this.dragging_disallowed) return;
+
   var bigdir = (dir == 'top') ? -1 : 1;
   var my = this.be.circuit.cdraw_to_canvas_y(y);
   var canvas_dy = my - this.canvas_drag_offset_y;
@@ -1147,6 +1165,14 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
 };
 
 Cell.prototype.harness_drag_end = function(dir) {
+  if (this.dragging_disallowed) {
+    this.be.drag.hide_fail();
+    $('#error').html('');
+    $(document.body).removeClass('cursor-force-not-allowed');
+    this.be.drag.enable_hover();
+    return;
+  }
+
   $(document.body).removeClass('cursor-force-row-resize');
   this.be.drag.enable_hover();
 
