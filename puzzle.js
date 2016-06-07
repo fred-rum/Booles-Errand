@@ -831,13 +831,13 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'The condenser',
-   intro: '<p></p>',
-   outro: '<p></p>',
+   intro: '<p>A condenser bundles single-bit wires into a multi-bit bus.  <b>Use the condenser to convert two 1-bit signals into one 2-bit signal.</b></p>',
+   outro: '<p>The multi-bit output gets its 2<sup>0</sup> bit (the <i>little end</i>) from the bottom input of the condenser and its 2<sup>n-1</sup> bit (the <i>big end</i>) from the top.</p>',
    truth: [{a1:0, a0:0,   z:0},
            {a1:0, a0:1,   z:1},
            {a1:1, a0:0,   z:2},
            {a1:1, a0:1,   z:3}],
-   avail: ['condenser'],
+   avail: [],
    cells: {
      a1: {type: 'input',
          x: 100,
@@ -849,8 +849,49 @@ Level.prototype.puzzle = [
          y: 200
          }
      ,
+     c: {type: 'condenser',
+         x: 250,
+         y: 150
+         }
+     ,
      z: {type: 'output',
          width: 2,
+         x: 400,
+         y: 150
+        }
+   }
+  }
+,
+  {name: 'Resize a condenser',
+   intro: '<p><b>Resize a condenser to three bits</b> by dragging its top edge upward or its bottom edge downward.  A condenser can resized to any width from 2 to 8 bits.</p>',
+   outro: '<p>Individual wires allow for more flexible logic, while a multi-bit bus allows easier interpretation of a larger value.  A condenser allows both forms in the same circuit.</p>',
+   truth: [{a2:0, a1:0, a0:0,   z:0},
+           {a2:0, a1:0, a0:1,   z:1},
+           {a2:0, a1:1, a0:0,   z:2},
+           {a2:0, a1:1, a0:1,   z:3},
+           {a2:1, a1:0, a0:0,   z:4},
+           {a2:1, a1:0, a0:1,   z:5},
+           {a2:1, a1:1, a0:0,   z:6},
+           {a2:1, a1:1, a0:1,   z:7}],
+   avail: ['condenser'],
+   cells: {
+     a2: {type: 'input',
+         x: 100,
+         y: 0
+         }
+     ,
+     a1: {type: 'input',
+         x: 100,
+         y: 100
+         }
+     ,
+     a0: {type: 'input',
+         x: 100,
+         y: 200
+         }
+     ,
+     z: {type: 'output',
+         width: 3,
          x: 400,
          y: 100
         }
