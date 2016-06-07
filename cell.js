@@ -145,7 +145,7 @@ Cell.prototype.update_qty_text = function(n, pending) {
   };
   this.el_qty_text.attr(attr);
   var bbox = this.el_qty_text.getBBox(true);
-  var desiredtop = this.qty_top;
+  var desiredtop = this.qty_top + this.be.stroke_wire_fg * 2;
   var actualtop = bbox.y;
   var drift_y = actualtop - desiredtop;
   this.qty_y -= drift_y;
@@ -619,7 +619,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
   if (no > 0){
     // Position the quantity text just below the last output stub.
     this.qty_cx = io_obj.x;
-    this.qty_top = io_obj.y + this.be.stroke_wire_fg * 2;
+    this.qty_top = io_obj.y;
   }
 
   for (var i = 0; i < ni; i++) {
@@ -834,7 +834,7 @@ Cell.prototype.init_output = function() {
   this.init_io(false, 0, 1, left, right);
 
   this.qty_cx = this.io.i.x;
-  this.qty_top = this.io.i.y + this.be.stroke_wire_fg * 2;
+  this.qty_top = this.io.i.y;
 
   var path = ["M", right, top,
               "v", height,
@@ -987,7 +987,7 @@ Cell.prototype.init_latch = function() {
                         right + this.be.stub_len, -this.be.io_spacing, right);
 
   this.qty_cx = this.io['q'].x;
-  this.qty_top = this.io['q'].y + this.be.io_spacing * 2 + this.be.stroke_wire_fg * 2;
+  this.qty_top = this.io['q'].y + this.be.io_spacing * 2;
 
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
   this.draw_stubs();
@@ -1089,7 +1089,7 @@ Cell.prototype.init_expander = function(no) {
   this.init_io(false, no, 1, left, right, true);
 
   this.qty_cx = this.io.i.x;
-  this.qty_top = this.io.i.y + this.be.stroke_wire_fg * 2;
+  this.qty_top = this.io.i.y;
 
   var cell_path = ["M", right, top,
                    "v", height,
