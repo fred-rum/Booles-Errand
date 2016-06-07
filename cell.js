@@ -561,7 +561,6 @@ Cell.prototype.cell_drag_end = function() {
   }
 
   $(document.body).removeClass('cursor-force-grabbing');
-
   this.be.drag.enable_hover();
 
   $(this.be.div_cdrag).css("z-index", "-1")
@@ -1094,8 +1093,11 @@ Cell.prototype.harness_drag_start = function(x, y, dir) {
   this.canvas_drag_offset_y = this.be.circuit.cdraw_to_canvas_y(y);
   this.pending_width = this.width;
 
-  // Pop cell to top for more natural dragging.
+  // Pop cell to top for more natural resizing.
   this.bring_to_top();
+
+  $(document.body).addClass('cursor-force-row-resize');
+  this.be.drag.disable_hover();
 };
 
 Cell.prototype.harness_drag_move = function(x, y, dir) {
@@ -1145,6 +1147,9 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
 };
 
 Cell.prototype.harness_drag_end = function(dir) {
+  $(document.body).removeClass('cursor-force-row-resize');
+  this.be.drag.enable_hover();
+
   var width = this.pending_width;
   this.pending_width = undefined;
   var change = width - this.width;

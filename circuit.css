@@ -287,3 +287,6 @@ body.cursor-force-all-scroll, body.cursor-force-all-scroll * {
 body.cursor-force-not-allowed, body.cursor-force-not-allowed * {
     cursor: not-allowed !important;
 }
+body.cursor-force-row-resize, body.cursor-force-row-resize * {
+    cursor: row-resize !important;
+}
