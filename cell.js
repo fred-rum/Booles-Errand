@@ -115,7 +115,8 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   }
   this.el_no_target.forEach(init_drag, this);
 
-  if ((this.canvas_type == 'cdraw') && (this.type == 'condenser')) {
+  if ((this.canvas_type == 'cdraw') &&
+      ((this.type == 'condenser') || (this.type == 'expander'))) {
     this.update_width(harness_width || 2);
   }
 }
@@ -205,7 +206,7 @@ Cell.prototype.update_prospective_width = function(n) {
 
   if (this.type == 'condenser') {
     prospective_width = 1;
-  } else if (this.locked) {
+  } else if (this.locked || (this.type == 'expander')) {
     prospective_width = this.width;
   }
 
@@ -356,6 +357,17 @@ Cell.prototype.calc_condenser = function() {
     z |= value << i;
   }
   this.io.o.propagate_output(z);
+};
+
+Cell.prototype.calc_expander = function() {
+  var value = this.io.i.value;
+  for (var i = 0; i < this.width; i++) {
+    if (value === undefined) {
+      this.io['o' + i].propagate_output(undefined);
+    } else {
+      this.io['o' + i].propagate_output((value >> i) & 1);
+    }
+  }
 };
 
 Cell.prototype.check_pending = function() {
@@ -647,9 +659,11 @@ Cell.prototype.draw_stubs = function() {
     }
   }
 
-  if (this.type == 'condenser') {
-    var el_stub_bg = this.canvas.path(this.io.o.path).attr(this.stub_bg_attr);
-    var el_stub_fg = this.io.o.draw_stub_fg();
+  if ((this.type == 'condenser') || (this.type == 'expander')) {
+    var port_name = (this.type == 'condenser') ? 'o' : 'i';
+    var port = this.io[port_name];
+    var el_stub_bg = this.canvas.path(port.path).attr(this.stub_bg_attr);
+    var el_stub_fg = port.draw_stub_fg();
     this.push_ns(this.el_harness_stub_bg = el_stub_bg);
     this.push_s(this.el_harness_stub_fg = el_stub_fg);
   }
@@ -1025,42 +1039,117 @@ Cell.prototype.init_condenser = function(ni) {
   this.con_fg = this.canvas.path(cell_path).attr(this.cell_fg_line_attr);
   this.push_s(this.con_fg);
 
-  if (!this.locked && this.canvas_type == 'cdraw') {
-    var attr = {
-      "stroke-width": 0,
-      cursor: 'row-resize'
-    };
+  if (this.locked || (this.canvas_type != 'cdraw')) return;
 
-    var target_path = ['M', left, top - this.be.io_spacing/2,
-                       'v', this.be.io_spacing,
-                       'L', right, -this.be.io_spacing/2,
-                       'v', -this.be.io_spacing/2,
-                       'z'];
-    this.el_top_target = this.canvas.path(target_path).attr(attr);
-    this.el_top_target.setAttr("visibility", "hidden");
-    this.el_top_target.setAttr("pointer-events", "all");
-    this.push_ns(this.el_top_target, true);
-    this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
-                       {start: this.harness_drag_start,
-                        move: this.harness_drag_move,
-                        end: this.harness_drag_end},
-                       'top');
+  // Create drag targets to use for resizing the condenser.
+  var attr = {
+    "stroke-width": 0,
+    cursor: 'row-resize'
+  };
 
-    var target_path = ['M', left, -top + this.be.io_spacing/2,
-                       'v', -this.be.io_spacing,
-                       'L', right, this.be.io_spacing/2,
-                       'v', this.be.io_spacing/2,
-                       'z'];
-    this.el_bottom_target = this.canvas.path(target_path).attr(attr);
-    this.el_bottom_target.setAttr("visibility", "hidden");
-    this.el_bottom_target.setAttr("pointer-events", "all");
-    this.push_ns(this.el_bottom_target, true);
-    this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
-                       {start: this.harness_drag_start,
-                        move: this.harness_drag_move,
-                        end: this.harness_drag_end},
-                       'bottom');
+  var target_path = ['M', left, top - this.be.io_spacing/2,
+                     'v', this.be.io_spacing,
+                     'L', right, -this.be.io_spacing/2,
+                     'v', -this.be.io_spacing/2,
+                     'z'];
+  this.el_top_target = this.canvas.path(target_path).attr(attr);
+  this.el_top_target.setAttr("visibility", "hidden");
+  this.el_top_target.setAttr("pointer-events", "all");
+  this.push_ns(this.el_top_target, true);
+  this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
+                     {start: this.harness_drag_start,
+                      move: this.harness_drag_move,
+                      end: this.harness_drag_end},
+                     'top');
+
+  var target_path = ['M', left, -top + this.be.io_spacing/2,
+                     'v', -this.be.io_spacing,
+                     'L', right, this.be.io_spacing/2,
+                     'v', this.be.io_spacing/2,
+                     'z'];
+  this.el_bottom_target = this.canvas.path(target_path).attr(attr);
+  this.el_bottom_target.setAttr("visibility", "hidden");
+  this.el_bottom_target.setAttr("pointer-events", "all");
+  this.push_ns(this.el_bottom_target, true);
+  this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
+                     {start: this.harness_drag_start,
+                      move: this.harness_drag_move,
+                      end: this.harness_drag_end},
+                     'bottom');
+};
+
+Cell.prototype.init_expander = function(no) {
+  no = no || 2;
+  var height = no*this.be.io_spacing;
+  var width = this.be.io_spacing * 2;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.init_io(false, no, 1, left, right, true);
+
+  this.qty_cx = this.io.i.x;
+  this.qty_top = this.io.i.y + this.be.stroke_wire_fg * 2;
+
+  var cell_path = ["M", right, top,
+                   "v", height,
+                   "L", left, this.be.io_spacing/2,
+                   "v", -this.be.io_spacing,
+                   "z"];
+
+  var trace_path = [];
+  for (var i = 0; i < no; i++) {
+    var y = top + (i+0.5)*this.be.io_spacing;
+    trace_path.push('M', right, y, 'L', left, 0);
   }
+
+  this.con_bg = this.canvas.path(cell_path).attr(this.cell_bg_attr);
+  this.push_ns(this.con_bg);
+  this.draw_stubs();
+  this.con_fill = this.canvas.path(cell_path).attr(this.cell_fg_fill_attr);
+  this.push_s(this.con_fill);
+  this.con_trace = this.canvas.path(trace_path).attr(this.stub_fg_attr);
+  this.push_s(this.con_trace);
+  this.con_fg = this.canvas.path(cell_path).attr(this.cell_fg_line_attr);
+  this.push_s(this.con_fg);
+
+  if (this.locked || (this.canvas_type != 'cdraw')) return;
+
+  // Create drag targets to use for resizing the expander.
+  var attr = {
+    "stroke-width": 0,
+    cursor: 'row-resize'
+  };
+
+  var target_path = ['M', right, top - this.be.io_spacing/2,
+                     'v', this.be.io_spacing,
+                     'L', left, -this.be.io_spacing/2,
+                     'v', -this.be.io_spacing/2,
+                     'z'];
+  this.el_top_target = this.canvas.path(target_path).attr(attr);
+  this.el_top_target.setAttr("visibility", "hidden");
+  this.el_top_target.setAttr("pointer-events", "all");
+  this.push_ns(this.el_top_target, true);
+  this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
+                     {start: this.harness_drag_start,
+                      move: this.harness_drag_move,
+                      end: this.harness_drag_end},
+                     'top');
+
+  var target_path = ['M', right, -top + this.be.io_spacing/2,
+                     'v', -this.be.io_spacing,
+                     'L', left, this.be.io_spacing/2,
+                     'v', this.be.io_spacing/2,
+                     'z'];
+  this.el_bottom_target = this.canvas.path(target_path).attr(attr);
+  this.el_bottom_target.setAttr("visibility", "hidden");
+  this.el_bottom_target.setAttr("pointer-events", "all");
+  this.push_ns(this.el_bottom_target, true);
+  this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
+                     {start: this.harness_drag_start,
+                      move: this.harness_drag_move,
+                      end: this.harness_drag_end},
+                     'bottom');
 };
 
 Cell.prototype.init_null = function() {
@@ -1090,9 +1179,10 @@ Cell.prototype.push_ns = function(el, no_tgt) {
 };
 
 Cell.prototype.harness_drag_start = function(x, y, dir) {
-  // Test to see if the condenser's multi-bit output is currently
-  // hooked to a multi-bit input with a locked width.  Do this by
-  // temporarily forcing a different width and seeing if it fails.
+  // Test to see if the harness's multi-bit port is currently hooked
+  // directly or indirectly to another multi-bit port with a locked
+  // width.  Do this by temporarily forcing a different width and
+  // seeing if it fails.
   this.update_width(this.width + 1);
   this.dragging_disallowed = this.be.level.update_widths();
   this.update_width(this.width - 1);
@@ -1100,7 +1190,11 @@ Cell.prototype.harness_drag_start = function(x, y, dir) {
 
   if (this.dragging_disallowed) {
     this.be.drag.show_fail_xy(this.x, this.y);
-    $('#error').html('<p>This condenser cannot be resized because its output is connected to downstream logic with fixed width.</p>');
+    if (this.type == 'condenser') {
+      $('#error').html('<p>This condenser cannot be resized because its output is connected to downstream logic with fixed width.</p>');
+    } else {
+      $('#error').html('<p>This expander cannot be resized because its input is connected to upstream logic with fixed width.</p>');
+    }
     $(document.body).addClass('cursor-force-not-allowed');
     this.be.drag.disable_hover();
     return;
@@ -1132,15 +1226,15 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
   this.update_width(width, true);
 
   var height = width*this.be.io_spacing;
-  var cwidth = this.be.io_spacing * 2;
-  var left = -cwidth/2;
-  var right = cwidth/2;
+  var cwidth = this.be.io_spacing * ((this.type == 'condenser') ? 2 : -2);
+  var x_wide = -cwidth/2;
+  var x_thin = -x_wide;
   var top = -this.width*this.be.io_spacing/2;
   if (dir == 'top') {
     top = -top - height;
   }
 
-  var cell_path = ["M", left, top,
+  var cell_path = ["M", x_wide, top,
                    "v", height,
                    "l", cwidth, -(height-this.be.io_spacing)/2,
                    "v", -this.be.io_spacing,
@@ -1152,13 +1246,14 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
   var trace_path = [];
   for (var i = 0; i < width; i++) {
     var y = top + (i+0.5)*this.be.io_spacing;
-    trace_path.push('M', left, y, 'L', right, top + height/2);
+    trace_path.push('M', x_wide, y, 'L', x_thin, top + height/2);
   }
   this.con_trace.attr({path: trace_path});
 
   var new_y = this.y + top + height/2;
   var xform = 't' + this.x + ',' + new_y;
-  this.io.o.set_io.transform(xform);
+  var bus_port = (this.type == 'condenser') ? this.io.o : this.io.i;
+  bus_port.set_io.transform(xform);
   this.el_harness_stub_bg.transform(xform);
   this.el_harness_stub_fg.transform(xform);
   this.el_qty_text.transform(xform);
@@ -1185,36 +1280,39 @@ Cell.prototype.harness_drag_end = function(dir) {
   var dy = bigdir * change * this.be.io_spacing/2;
 
   // Replace this cell with a new one with the new width.
-  var new_cell = new Cell(this.be, 'cdraw', 'condenser',
+  var new_cell = new Cell(this.be, 'cdraw', this.type,
                           this.x, this.y + dy,
                           undefined, undefined, width);
   this.be.level.add_cell(new_cell);
 
   // Move old IO info to new IOs.
-  var w = new_cell.io.o.w = this.io.o.w;
+  var bus_port_name = (this.type == 'condenser') ? 'o' : 'i';
+  var w = new_cell.io[bus_port_name].w = this.io[bus_port_name].w;
   for (var i = 0; i < w.length; i++) {
-    w[i].o = new_cell.io.o;
+    w[i][bus_port_name] = new_cell.io[bus_port_name];
     w[i].redraw();
   }
-  this.io.o.w = [];
+  this.io[bus_port_name].w = [];
 
+  var wire_port_prefix = (this.type == 'condenser') ? 'i' : 'o';
   for (var j = 0; j < Math.min(width, this.width); j++) {
-    var old_port_name = 'i' + j;
+    var old_port_name = wire_port_prefix + j;
     var new_port_name = old_port_name;
     if (dir == 'bottom') {
       if (change > 0) {
-        new_port_name = 'i' + (j + change);
+        new_port_name = wire_port_prefix + (j + change);
       } else {
-        old_port_name = 'i' + (j - change);
+        old_port_name = wire_port_prefix + (j - change);
       }
     }
     var w = new_cell.io[new_port_name].w = this.io[old_port_name].w;
     for (var i = 0; i < w.length; i++) {
-      w[i].i = new_cell.io[new_port_name];
+      w[i][wire_port_prefix] = new_cell.io[new_port_name];
     }
     this.io[old_port_name].w = [];
     new_cell.io[new_port_name].update_value(this.io[old_port_name].value);
   }
+
   new_cell.propagate_value();
 
   // Delete the old cell now that it has been replaced.

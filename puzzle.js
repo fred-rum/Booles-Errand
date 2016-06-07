@@ -898,6 +898,42 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'The expander',
+   intro: '<p>An expander unbundles a multi-bit bus into its component single-bit wires. <b>Use an expander to convert one 3-bit signal into three 1-bit signals.</b></p>',
+   outro: '<p>The condenser and the expander are simple examples of a <i>wire harness</i>.  A general wire harness can take many forms, but the condenser and expander provide the basic building blocks to create any wire harness.</p>',
+   truth: [{a:0,   z2:0, z1:0, z0:0},
+           {a:1,   z2:0, z1:0, z0:1},
+           {a:2,   z2:0, z1:1, z0:0},
+           {a:3,   z2:0, z1:1, z0:1},
+           {a:4,   z2:1, z1:0, z0:0},
+           {a:5,   z2:1, z1:0, z0:1},
+           {a:6,   z2:1, z1:1, z0:0},
+           {a:7,   z2:1, z1:1, z0:1}],
+   avail: ['expander'],
+   cells: {
+     a: {type: 'input',
+         width: 3,
+         x: 100,
+         y: 100
+        }
+     ,
+     z2: {type: 'output',
+         x: 400,
+         y: 0
+         }
+     ,
+     z1: {type: 'output',
+         x: 400,
+         y: 100
+         }
+     ,
+     z0: {type: 'output',
+         x: 400,
+         y: 200
+         }
+   }
+  }
+,
   {name: 'Seven-segment decode',
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',

@@ -423,7 +423,7 @@ Level.prototype.encode_url = function() {
     var cell = this.all_cells[i];
     if (!cell.locked){
       var type = cell.type;
-      if (type == 'condenser') type += cell.width;
+      if ((type == 'condenser') || (type == 'expander')) type += cell.width;
       save.push(';', Math.round(cell.x / this.be.io_spacing * 20),
                 ',', type,
                 ',', Math.round(cell.y / this.be.io_spacing * 20));
@@ -480,7 +480,7 @@ Level.prototype.decode_url = function(save_str) {
         if (!this.update_box_quantity(type, -1)) {
           throw "exhausted cell type: " + type
         }
-        if (type == 'condenser') {
+        if ((type == 'condenser') || (type == 'expander')) {
           width = Math.min(8, Math.max(2, width || 2));
         } else {
           width = undefined;
@@ -747,7 +747,8 @@ Level.prototype.update_widths = function(pending) {
   // clear the prospective_width values.
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
-    if (!cell.locked && (cell.type != 'condenser')) {
+    if (!cell.locked &&
+        (cell.type != 'condenser') && (cell.type != 'expander')) {
       var new_width = cell.prospective_width || 1;
       var old_width = (pending && cell.pending_width) || cell.width;
       if (this.update_box_quantity(cell.type, old_width - new_width)){
@@ -765,7 +766,8 @@ Level.prototype.update_widths = function(pending) {
 Level.prototype.commit_widths = function() {
   for (var i = 0; i < this.all_cells.length; i++){
     var cell = this.all_cells[i];
-    if (!cell.locked && (cell.type != 'condenser')) {
+    if (!cell.locked &&
+        (cell.type != 'condenser') && (cell.type != 'expander')) {
       cell.update_width(cell.pending_width);
     }
     cell.pending_width = undefined;

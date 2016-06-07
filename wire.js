@@ -498,8 +498,9 @@ Wire.prototype.redraw_fg = function() {
     var fl_obj = this.in_flight[i];
     var age_len = fl_obj.age * this.path_length;
     var path = this.get_subpath(age_len, older_age_len);
+    var color = Wire.color(older_value, this.o.cell.output_width);
     older_el_subpath.attr({path: path,
-                           stroke: Wire.color(older_value, this.o.cell.width)});
+                           stroke: color});
 
     if (!fl_obj.el_subpath){
       // Draw a path placeholder of the appropriate color.
@@ -532,7 +533,7 @@ Wire.prototype.redraw_fg = function() {
   }
   var attr = {
     path: path,
-    stroke: Wire.color(older_value, this.o.cell.width),
+    stroke: Wire.color(older_value, this.o.cell.output_width),
     "stroke-dasharray": "",
     opacity: (this.pending_del == "null") ? "0.4" : "1.0"
   };
