@@ -382,6 +382,8 @@ Cell.prototype.bring_to_top = function() {
   for (var port_name in this.io) {
     this.io[port_name].bring_to_top();
   }
+
+  this.be.level.move_cell_to_end(this);
 };
 
 Cell.prototype.cell_drag_start = function(x, y) {
@@ -1091,6 +1093,9 @@ Cell.prototype.push_ns = function(el, no_tgt) {
 Cell.prototype.drag_harness_start = function(x, y, dir) {
   this.canvas_drag_offset_y = this.be.circuit.cdraw_to_canvas_y(y);
   this.pending_width = this.width;
+
+  // Pop cell to top for more natural dragging.
+  this.bring_to_top();
 };
 
 Cell.prototype.drag_harness_move = function(x, y, dir) {

@@ -399,6 +399,17 @@ Level.prototype.remove_cell = function(cell) {
   }
 };
 
+Level.prototype.move_cell_to_end = function(cell) {
+  for (var i = 0; i < this.all_cells.length; i++){
+    if (cell == this.all_cells[i]){
+      this.all_cells.splice(i, 1);
+      this.all_cells.push(cell);
+      return;
+    }
+  }
+  // If cell is not found, don't push it onto the list.
+};
+
 Level.prototype.update_url = function() {
   var save = [this.level.name];
 
