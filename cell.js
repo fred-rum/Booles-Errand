@@ -2,7 +2,7 @@
 
 "use strict";
 
-function Cell(be, canvas_type, type, x, y, name, locked) {
+function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this.be = be;
   this.name = name;
   this.locked = locked;
@@ -64,9 +64,10 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
 
   this.el_s = this.canvas.set();
   this.el_ns = this.canvas.set();
+  this.el_no_target = this.canvas.set();
   this.el_cell = this.canvas.set();
   if (typeof this["init_" + type] != "function") throw "bad cell type" + type;
-  this["init_" + type](); // Call cell-type initiator function by name
+  this["init_" + type](harness_width);
   if (type == "null") return; // do nothing else for the null cell
 
   if (this.canvas_type != "cdrag"){
@@ -115,7 +116,7 @@ function Cell(be, canvas_type, type, x, y, name, locked) {
   this.el_cell.forEach(init_drag, this);
 
   if ((this.canvas_type == 'cdraw') && (this.type == 'condenser')) {
-    this.update_width(2);
+    this.update_width(harness_width || 2);
   }
 }
 
@@ -126,14 +127,14 @@ Cell.prototype.change_cursor = function(cursor) {
   // Try various cursor possibilities from least preferred to most
   // preferred.  If the browser doesn't support one of the preferred
   // values, then it keeps the last value that worked.
-  this.el_cell.attr({cursor: "default"});
+  this.el_no_target.attr({cursor: "default"});
 
   if ((cursor == "grab") || (cursor == "grabbing")){
-    this.el_cell.attr({cursor: "-webkit-" + cursor});
-    this.el_cell.attr({cursor: "-moz-" + cursor});
+    this.el_no_target.attr({cursor: "-webkit-" + cursor});
+    this.el_no_target.attr({cursor: "-moz-" + cursor});
   }
 
-  this.el_cell.attr({cursor: cursor});
+  this.el_no_target.attr({cursor: cursor});
 };
 
 Cell.prototype.update_qty_text = function(n, pending) {
@@ -636,7 +637,12 @@ Cell.prototype.draw_stubs = function() {
   // set for translation.  (But the cell also keeps them separately
   // to avoid changing their Z level.)
   for (var name in this.io) {
-    this.push_s(this.io[name].draw_stub_fg());
+    var el_stub_fg = this.io[name].draw_stub_fg();
+    this.push_s(el_stub_fg);
+    if (((this.type == 'condenser') && (name == 'o')) ||
+        ((this.type == 'expander') && (name == 'i'))){
+      this.el_harness_stub_fg = el_stub_fg;
+    }
   }
 };
 
@@ -1000,11 +1006,52 @@ Cell.prototype.init_condenser = function(ni) {
     trace_path.push('M', left, y, 'L', right, 0);
   }
 
-  this.push_ns(this.canvas.path(cell_path).attr(this.cell_bg_attr));
+  this.con_bg = this.canvas.path(cell_path).attr(this.cell_bg_attr);
+  this.push_ns(this.con_bg);
   this.draw_stubs();
-  this.push_s(this.canvas.path(cell_path).attr(this.cell_fg_fill_attr));
-  this.push_s(this.canvas.path(trace_path).attr(this.stub_fg_attr));
-  this.push_s(this.canvas.path(cell_path).attr(this.cell_fg_line_attr));
+  this.con_fill = this.canvas.path(cell_path).attr(this.cell_fg_fill_attr);
+  this.push_s(this.con_fill);
+  this.con_trace = this.canvas.path(trace_path).attr(this.stub_fg_attr);
+  this.push_s(this.con_trace);
+  this.con_fg = this.canvas.path(cell_path).attr(this.cell_fg_line_attr);
+  this.push_s(this.con_fg);
+
+  if (!this.locked && this.canvas_type == 'cdraw') {
+    var attr = {
+      "stroke-width": 0,
+      cursor: 'row-resize'
+    };
+
+    var target_path = ['M', left, top - this.be.io_spacing/2,
+                       'v', this.be.io_spacing,
+                       'L', right, -this.be.io_spacing/2,
+                       'v', -this.be.io_spacing/2,
+                       'z'];
+    this.el_top_target = this.canvas.path(target_path).attr(attr);
+    this.el_top_target.setAttr("visibility", "hidden");
+    this.el_top_target.setAttr("pointer-events", "all");
+    this.push_ns(this.el_top_target, true);
+    this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
+                       {start: this.drag_harness_start,
+                        move: this.drag_harness_move,
+                        end: this.drag_harness_end},
+                       'top');
+
+    var target_path = ['M', left, -top + this.be.io_spacing/2,
+                       'v', -this.be.io_spacing,
+                       'L', right, this.be.io_spacing/2,
+                       'v', this.be.io_spacing/2,
+                       'z'];
+    this.el_bottom_target = this.canvas.path(target_path).attr(attr);
+    this.el_bottom_target.setAttr("visibility", "hidden");
+    this.el_bottom_target.setAttr("pointer-events", "all");
+    this.push_ns(this.el_bottom_target, true);
+    this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
+                       {start: this.drag_harness_start,
+                        move: this.drag_harness_move,
+                        end: this.drag_harness_end},
+                       'bottom');
+  }
 };
 
 Cell.prototype.init_null = function() {
@@ -1023,10 +1070,111 @@ Cell.prototype.init_null = function() {
 // raised in Z order, we also build el_cell here in drawing order.
 Cell.prototype.push_s = function(el) {
   this.el_s.push(el);
+  this.el_no_target.push(el);
   this.el_cell.push(el);
 };
 
-Cell.prototype.push_ns = function(el) {
+Cell.prototype.push_ns = function(el, no_tgt) {
   this.el_ns.push(el);
+  if (!no_tgt) this.el_no_target.push(el);
   this.el_cell.push(el);
+};
+
+Cell.prototype.drag_harness_start = function(x, y, dir) {
+  this.canvas_drag_offset_y = this.be.circuit.cdraw_to_canvas_y(y);
+  this.pending_width = this.width;
+};
+
+Cell.prototype.drag_harness_move = function(x, y, dir) {
+  var bigdir = (dir == 'top') ? -1 : 1;
+  var my = this.be.circuit.cdraw_to_canvas_y(y);
+  var canvas_dy = my - this.canvas_drag_offset_y;
+  var change = Math.round(canvas_dy / this.be.io_spacing);
+  var width = this.width + change * bigdir;
+  width = Math.min(8, Math.max(2, width));
+
+  if (width == this.pending_width) return;
+
+  change = width - this.pending_width;
+  this.update_width(width, true);
+
+  var height = width*this.be.io_spacing;
+  var cwidth = this.be.io_spacing * 2;
+  var left = -cwidth/2;
+  var right = cwidth/2;
+  var top = -this.width*this.be.io_spacing/2;
+  if (dir == 'top') {
+    top = -top - height;
+  }
+
+  var cell_path = ["M", left, top,
+                   "v", height,
+                   "l", cwidth, -(height-this.be.io_spacing)/2,
+                   "v", -this.be.io_spacing,
+                   "z"];
+  this.con_bg.attr({path: cell_path});
+  this.con_fill.attr({path: cell_path});
+  this.con_fg.attr({path: cell_path});
+
+  var trace_path = [];
+  for (var i = 0; i < width; i++) {
+    var y = top + (i+0.5)*this.be.io_spacing;
+    trace_path.push('M', left, y, 'L', right, top + height/2);
+  }
+  this.con_trace.attr({path: trace_path});
+
+  var new_y = this.y + top + height/2;
+  var xform = 't' + this.x + ',' + new_y;
+  this.io.o.set_io.transform(xform);
+  this.el_harness_stub_fg.transform(xform);
+  this.el_qty_text.transform(xform);
+};
+
+Cell.prototype.drag_harness_end = function(dir) {
+  var width = this.pending_width;
+  this.pending_width = undefined;
+  var change = width - this.width;
+  if (!change) return;
+
+  var bigdir = (dir == 'top') ? -1 : 1;
+  var dy = bigdir * change * this.be.io_spacing/2;
+
+  // Replace this cell with a new one with the new width.
+  var new_cell = new Cell(this.be, 'cdraw', 'condenser',
+                          this.x, this.y + dy,
+                          undefined, undefined, width);
+  this.be.level.add_cell(new_cell);
+
+  // Move old IO info to new IOs.
+  var w = new_cell.io.o.w = this.io.o.w;
+  for (var i = 0; i < w.length; i++) {
+    w[i].o = new_cell.io.o;
+    w[i].redraw();
+  }
+  this.io.o.w = [];
+
+  for (var j = 0; j < Math.min(width, this.width); j++) {
+    var old_port_name = 'i' + j;
+    var new_port_name = old_port_name;
+    if (dir == 'bottom') {
+      if (change > 0) {
+        new_port_name = 'i' + (j + change);
+      } else {
+        old_port_name = 'i' + (j - change);
+      }
+    }
+    var w = new_cell.io[new_port_name].w = this.io[old_port_name].w;
+    for (var i = 0; i < w.length; i++) {
+      w[i].i = new_cell.io[new_port_name];
+    }
+    this.io[old_port_name].w = [];
+    new_cell.io[new_port_name].update_value(this.io[old_port_name].value);
+  }
+  new_cell.propagate_value();
+
+  // Delete the old cell now that it has been replaced.
+  this.remove();
+  this.be.level.remove_cell(this);
+
+  this.be.level.update_url();
 };
