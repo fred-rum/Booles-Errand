@@ -2,7 +2,7 @@
 
 "use strict";
 
-function Io(be, canvas, cell, name, type, x, y) {
+function Io(be, canvas, cell, name, type, x, y, inner_x) {
   this.be = be;
   this.canvas = canvas;
 
@@ -27,7 +27,7 @@ function Io(be, canvas, cell, name, type, x, y) {
   this.has_new_value = false;
 
   this.path = ["M", x, y,
-               "H", 0]; // draw horizontally to the cell's center
+               "H", inner_x];
 
   // An IO for a cell in the cell box has graphics for the stub, but
   // it doesn't have a drag target or event handling.

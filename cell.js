@@ -599,7 +599,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
     if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
                         (no > 1) ? "o" + i : "o", "output",
-                        right+cw, y);
+                        right+cw, y, right);
     this.io[io_obj.name] = io_obj;
   }
 
@@ -614,7 +614,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
     if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
                         (ni > 1) ? "i" + i : "i", "input",
-                        left-cw, y);
+                        left-cw, y, left);
     this.io[io_obj.name] = io_obj;
   }
 };
@@ -626,7 +626,10 @@ Cell.prototype.draw_stubs = function() {
   // and not the IOs.
   var stub_path = [];
   for (var name in this.io) {
-    stub_path = stub_path.concat(this.io[name].path);
+    if (!((this.type == 'condenser') && (name == 'o')) &&
+        !((this.type == 'expander') && (name == 'i'))){
+      stub_path = stub_path.concat(this.io[name].path);
+    }
   }
   this.push_ns(this.canvas.path(stub_path).attr(this.stub_bg_attr));
 
@@ -637,12 +640,17 @@ Cell.prototype.draw_stubs = function() {
   // set for translation.  (But the cell also keeps them separately
   // to avoid changing their Z level.)
   for (var name in this.io) {
-    var el_stub_fg = this.io[name].draw_stub_fg();
-    this.push_s(el_stub_fg);
-    if (((this.type == 'condenser') && (name == 'o')) ||
-        ((this.type == 'expander') && (name == 'i'))){
-      this.el_harness_stub_fg = el_stub_fg;
+    if (!((this.type == 'condenser') && (name == 'o')) &&
+        !((this.type == 'expander') && (name == 'i'))){
+      this.push_s(this.io[name].draw_stub_fg());
     }
+  }
+
+  if (this.type == 'condenser') {
+    var el_stub_bg = this.canvas.path(this.io.o.path).attr(this.stub_bg_attr);
+    var el_stub_fg = this.io.o.draw_stub_fg();
+    this.push_ns(this.el_harness_stub_bg = el_stub_bg);
+    this.push_s(this.el_harness_stub_fg = el_stub_fg);
   }
 };
 
@@ -956,12 +964,12 @@ Cell.prototype.init_latch = function() {
   var top = -height/2;
 
   this.io['d'] = new Io(this.be, this.canvas, this, 'd', 'input',
-                        left - this.be.stub_len, -this.be.io_spacing);
+                        left - this.be.stub_len, -this.be.io_spacing, left);
   this.io['e'] = new Io(this.be, this.canvas, this, 'e', 'input',
-                        left - this.be.stub_len, 0);
+                        left - this.be.stub_len, 0, left);
 
   this.io['q'] = new Io(this.be, this.canvas, this, 'q', 'output',
-                        right + this.be.stub_len, -this.be.io_spacing);
+                        right + this.be.stub_len, -this.be.io_spacing, right);
 
   this.qty_cx = this.io['q'].x;
   this.qty_top = this.io['q'].y + this.be.io_spacing * 2 + this.be.stroke_wire_fg * 2;
@@ -1057,7 +1065,7 @@ Cell.prototype.init_condenser = function(ni) {
 Cell.prototype.init_null = function() {
   // A "null" port is used as the connection point for wires
   // currently being dragged.
-  var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0);
+  var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0, 0);
   this.io["null"] = io_obj;
   this.be.null_io = io_obj;
 };
@@ -1126,6 +1134,7 @@ Cell.prototype.drag_harness_move = function(x, y, dir) {
   var new_y = this.y + top + height/2;
   var xform = 't' + this.x + ',' + new_y;
   this.io.o.set_io.transform(xform);
+  this.el_harness_stub_bg.transform(xform);
   this.el_harness_stub_fg.transform(xform);
   this.el_qty_text.transform(xform);
 };
