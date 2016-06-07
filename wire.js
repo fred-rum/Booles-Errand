@@ -185,7 +185,7 @@ Wire.prototype.tick = function(speed) {
     if (fl_obj.age >= 1.0){
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
       var value = fl_obj.value;
-      if ((this.o.cell.width == 1) && (value == 1)) {
+      if ((this.o.cell.output_width == 1) && (value == 1)) {
         value *= ((1 << this.i.cell.input_width) - 1);
       }
       this.i.propagate_input(value);
