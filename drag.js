@@ -160,7 +160,7 @@ Drag.prototype.drag_end = function() {
   this.be.level.commit_widths();
   this.orig_io = null;
   this.new_io = null;
-  this.be.level.update_url();
+  this.be.level.encode_url();
 
   $(document.body).removeClass('cursor-force-default');
   this.enable_hover();
@@ -174,7 +174,7 @@ Drag.prototype.dblclick = function(x, y) {
   var io = this.closest_io(x, y);
   while (io.w.length > 0){
     io.w[0].remove();
-    this.be.level.update_url();
+    this.be.level.encode_url();
   }
 
   this.be.level.update_widths();

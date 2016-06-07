@@ -572,7 +572,7 @@ Cell.prototype.cell_drag_end = function() {
   }
   this.be.level.commit_widths();
 
-  this.be.level.update_url();
+  this.be.level.encode_url();
 };
 
 Cell.prototype.remove = function() {
@@ -1221,5 +1221,5 @@ Cell.prototype.harness_drag_end = function(dir) {
   this.remove();
   this.be.level.remove_cell(this);
 
-  this.be.level.update_url();
+  this.be.level.encode_url();
 };

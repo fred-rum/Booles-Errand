@@ -148,7 +148,7 @@ Level.prototype.begin = function(level_num) {
 
   // Restore additional cells and wire connections from the save data.
   if (save_str){
-    this.decode_save(save_str);
+    this.decode_url(save_str);
   } else {
     window.location.hash = encodeURI(level.name);
   }
@@ -410,7 +410,7 @@ Level.prototype.move_cell_to_end = function(cell) {
   // If cell is not found, don't push it onto the list.
 };
 
-Level.prototype.update_url = function() {
+Level.prototype.encode_url = function() {
   var save = [this.level.name];
 
   for (var i = 0; i < this.all_cells.length; i++) {
@@ -422,8 +422,10 @@ Level.prototype.update_url = function() {
     var emitted_cell = false;
     var cell = this.all_cells[i];
     if (!cell.locked){
+      var type = cell.type;
+      if (type == 'condenser') type += cell.width;
       save.push(';', Math.round(cell.x / this.be.io_spacing * 20),
-                ',', cell.type,
+                ',', type,
                 ',', Math.round(cell.y / this.be.io_spacing * 20));
       emitted_cell = true;
     }
@@ -451,10 +453,10 @@ Level.prototype.update_url = function() {
   window.location.hash = encodeURI(hash_str);
 };
 
-Level.prototype.decode_save = function(save_str) {
+Level.prototype.decode_url = function(save_str) {
   try {
     var ex_version_skip = /^1s([0-9]+)/;
-    var ex_cell = /^;(-?[0-9]+),([a-z][a-z0-9]*),(-?[0-9]+)/;
+    var ex_cell = /^;(-?[0-9]+),([a-z]*)([0-9]?),(-?[0-9]+)/;
     var ex_plus = /^\+([a-z][a-z0-9]*),([0-9]+),([a-z][a-z0-9]*)/;
     var ex_minus = /^-([0-9]+),([a-z][a-z0-9]*),([0-9]+),([a-z][a-z0-9]*)/;
 
@@ -473,13 +475,20 @@ Level.prototype.decode_save = function(save_str) {
       if (m = ex_cell.exec(save_str)){
         var x = Number(m[1]);
         var type = m[2];
-        var y = Number(m[3]);
+        var width = m[3];
+        var y = Number(m[4]);
         if (!this.update_box_quantity(type, -1)) {
           throw "exhausted cell type: " + type
         }
+        if (type == 'condenser') {
+          width = Math.min(8, Math.max(2, width || 2));
+        } else {
+          width = undefined;
+        }
         this.add_cell(new Cell(this.be, "cdraw", type,
                                x / 20 * this.be.io_spacing,
-                               y / 20 * this.be.io_spacing));
+                               y / 20 * this.be.io_spacing,
+                              undefined, undefined, width));
 
         save_str = save_str.substring(m[0].length);
 
