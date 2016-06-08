@@ -601,7 +601,8 @@ Cell.prototype.remove = function() {
   this.el_cell.remove();
 };
 
-Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
+Cell.prototype.init_io = function(inv, no, ni, left, right,
+                                  upsidedown, shallow) {
   var cw = this.be.stub_len;
   var cs = this.be.io_spacing;
 
@@ -612,7 +613,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
     if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
                         (no > 1) ? "o" + i : "o", "output",
-                        right+cw, y, right);
+                        right+cw, y, shallow ? right : 0);
     this.io[io_obj.name] = io_obj;
   }
 
@@ -627,7 +628,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right, upsidedown) {
     if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
                         (ni > 1) ? "i" + i : "i", "input",
-                        left-cw, y, left);
+                        left-cw, y, shallow ? left : 0);
     this.io[io_obj.name] = io_obj;
   }
 };
@@ -1015,7 +1016,7 @@ Cell.prototype.init_condenser = function(ni) {
   var right = width/2;
   var top = -height/2;
 
-  this.init_io(false, 1, ni, left, right, true);
+  this.init_io(false, 1, ni, left, right, true, true);
 
   var cell_path = ["M", left, top,
                    "v", height,
@@ -1086,7 +1087,7 @@ Cell.prototype.init_expander = function(no) {
   var right = width/2;
   var top = -height/2;
 
-  this.init_io(false, no, 1, left, right, true);
+  this.init_io(false, no, 1, left, right, true, true);
 
   this.qty_cx = this.io.i.x;
   this.qty_top = this.io.i.y;
