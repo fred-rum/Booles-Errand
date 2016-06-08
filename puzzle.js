@@ -697,6 +697,32 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Hidden truths',
+   intro: '<p>Whoops, we\'ve forgotten what circuit you\'re supposed to design here.  Well, <b>complete the case shown and we\'ll probably remember the next case.</b></p>',
+   outro: '<p>Did you have to take notes outside of the game?  For some of the later levels, you\'ll probably find that taking notes is essential.</p>',
+   truth: [{a:0, b:0,   z:0},
+           {a:0, b:1,   z:0},
+           {a:1, b:0,   z:1},
+           {a:1, b:1,   z:0}],
+   hide: ['truth'],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 50
+        }
+   }
+  }
+,
   {name: 'Build an XOR gate',
    intro: '<p><b>Implement the XOR function using only NAND gates.</b></p>',
    outro: '<p>Six NAND gates is good.  Five NAND gates is excellent.</p>',
