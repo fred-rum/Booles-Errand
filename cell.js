@@ -901,6 +901,10 @@ Cell.prototype.fit_input_text = function() {
   } else {
     var text = name + "=" + this.be.level.value(this.name);
   }
+
+  if (text === this.text) return;
+  this.text = text;
+
   this.el_text.attr({text: text, x: 0, "font-size": "10"});
   var bbox = this.el_text.getBBox(true);
 
@@ -930,6 +934,10 @@ Cell.prototype.fit_output_text = function() {
   } else {
     var text = name + "=" + value + "?";
   }
+
+  if (text === this.text) return;
+  this.text = text;
+
   this.el_text.attr({text: text, x: 0, "font-size": "10"});
   var bbox = this.el_text.getBBox(true);
   if (text.length < 3){

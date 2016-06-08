@@ -178,6 +178,8 @@ Io.prototype.color_stub = function(value) {
 };
 
 Io.prototype.update_value = function(value) {
+  if (value === this.value) return;
+
   this.value = value;
 
   this.color_stub(value);
