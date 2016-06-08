@@ -14,14 +14,14 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'z', 'i']]
         }
      ,
      z: {type: 'output',
-         x: 300,
-         y: 100
+         x: 200,
+         y: 0
         }
    }
   }
@@ -35,13 +35,13 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      z: {type: 'output',
-         x: 300,
-         y: 100
+         x: 200,
+         y: 0
         }
    }
   }
@@ -56,14 +56,14 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'z', 'i']]
         }
      ,
      z: {type: 'output',
-         x: 300,
-         y: 100
+         x: 200,
+         y: 0
         }
    }
   }
@@ -77,20 +77,20 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'inv', 'i']]
         }
      ,
      inv: {type: 'inv',
-           x: 250,
-           y: 150,
+           x: 150,
+           y: 50,
            io: [['o', 'z', 'i']]
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
    }
   }
@@ -104,19 +104,19 @@ Level.prototype.puzzle = [
    hide: ['speed'],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'z', 'i', 1]] // this wire is unlocked
         }
      ,
      inv: {type: 'inv',
-           x: 250,
-           y: 150
+           x: 150,
+           y: 50
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
    }
   }
@@ -131,13 +131,13 @@ Level.prototype.puzzle = [
    avail: ['inv', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
    }
   }
@@ -152,13 +152,13 @@ Level.prototype.puzzle = [
    avail: ['inv'],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      z: {type: 'output',
-         x: 1100,
-         y: 1100
+         x: 999,
+         y: 999
         }
    }
   }
@@ -172,74 +172,74 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'ia', 'i']]
         }
      ,
      ia: {type: 'inv',
-         x: 600,
-         y: 100,
+         x: 500,
+         y: 0,
          io: [['o', 'i0', 'i']]
         }
      ,
      i0: {type: 'inv',
-         x: 100,
-         y: 200,
+         x: 0,
+         y: 100,
          io: [['o', 'i1', 'i']]
         }
      ,
      i1: {type: 'inv',
-         x: 600,
-         y: 200,
+         x: 500,
+         y: 100,
          io: [['o', 'i2', 'i']]
         }
      ,
      i2: {type: 'inv',
-         x: 100,
-         y: 300,
+         x: 0,
+         y: 200,
          io: [['o', 'i3', 'i']]
         }
      ,
      i3: {type: 'inv',
-         x: 600,
-         y: 300,
+         x: 500,
+         y: 200,
          io: [['o', 'i4', 'i']]
         }
      ,
      i4: {type: 'inv',
-         x: 100,
-         y: 400,
+         x: 0,
+         y: 300,
          io: [['o', 'i5', 'i']]
         }
      ,
      i5: {type: 'inv',
-         x: 600,
-         y: 400,
+         x: 500,
+         y: 300,
          io: [['o', 'i6', 'i']]
         }
      ,
      i6: {type: 'inv',
-         x: 100,
-         y: 500,
+         x: 0,
+         y: 400,
          io: [['o', 'i7', 'i']]
         }
      ,
      i7: {type: 'inv',
-         x: 600,
-         y: 500,
+         x: 500,
+         y: 400,
          io: [['o', 'i8', 'i']]
         }
      ,
      i8: {type: 'inv',
-         x: 100,
-         y: 600,
+         x: 0,
+         y: 500,
          io: [['o', 'z', 'i']]
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 600
+         x: 500,
+         y: 500
         }
    }
   }
@@ -253,18 +253,18 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 50
         }
      ,
      z: {type: 'output',
-         x: 300,
-         y: 100
+         x: 200,
+         y: 0
         }
      ,
      y: {type: 'output',
-         x: 300,
-         y: 200
+         x: 200,
+         y: 100
         }
    }
   }
@@ -277,18 +277,18 @@ Level.prototype.puzzle = [
    avail: ['inv', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
      ,
      y: {type: 'output',
-         x: 400,
-         y: 200
+         x: 300,
+         y: 100
         }
    }
   }
@@ -303,18 +303,18 @@ Level.prototype.puzzle = [
    avail: ['and', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 50
         }
    }
   }
@@ -329,18 +329,18 @@ Level.prototype.puzzle = [
    avail: ['nand', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 50
         }
    }
   }
@@ -355,18 +355,18 @@ Level.prototype.puzzle = [
    avail: ['inv', 1, 'and', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
          x: 400,
-         y: 100
+         y: 50
         }
    }
   }
@@ -379,13 +379,13 @@ Level.prototype.puzzle = [
    avail: ['nand', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
    }
   }
@@ -400,18 +400,18 @@ Level.prototype.puzzle = [
    avail: ['or', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 50
         }
    }
   }
@@ -425,18 +425,18 @@ Level.prototype.puzzle = [
    avail: ['nor', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 50
         }
    }
   }
@@ -451,23 +451,23 @@ Level.prototype.puzzle = [
    avail: ['xor', 1, 'xnor', 1],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
-        }
-     ,
-     z: {type: 'output',
-         x: 400,
+         x: 0,
          y: 100
         }
      ,
+     z: {type: 'output',
+         x: 300,
+         y: 0
+        }
+     ,
      y: {type: 'output',
-         x: 400,
-         y: 200
+         x: 300,
+         y: 100
         }
    }
   }
@@ -483,23 +483,23 @@ Level.prototype.puzzle = [
    avail: ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
      s: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      a: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 300
+         x: 0,
+         y: 200
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 200
+         x: 500,
+         y: 100
         }
    }
   }
@@ -514,33 +514,33 @@ Level.prototype.puzzle = [
    avail: ['inv', 'nand'],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 190
+         x: 0,
+         y: 90
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 310
+         x: 0,
+         y: 210
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 100
+         x: 500,
+         y: 0
         }
      ,
      y: {type: 'output',
-         x: 600,
-         y: 200
+         x: 500,
+         y: 100
         }
      ,
      x: {type: 'output',
-         x: 600,
-         y: 300
+         x: 500,
+         y: 200
         }
      ,
      w: {type: 'output',
-         x: 600,
-         y: 400
+         x: 500,
+         y: 300
         }
    }
   }
@@ -555,33 +555,33 @@ Level.prototype.puzzle = [
    avail: ['inv', 'nor'],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 190
+         x: 0,
+         y: 90
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 310
+         x: 0,
+         y: 210
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 100
+         x: 500,
+         y: 0
         }
      ,
      y: {type: 'output',
-         x: 600,
-         y: 200
+         x: 500,
+         y: 100
         }
      ,
      x: {type: 'output',
-         x: 600,
-         y: 300
+         x: 500,
+         y: 200
         }
      ,
      w: {type: 'output',
-         x: 600,
-         y: 400
+         x: 500,
+         y: 300
         }
    }
   }
@@ -596,23 +596,23 @@ Level.prototype.puzzle = [
    avail: ['inv', 'nand'],
    cells: {
      s: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      a: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 300
+         x: 0,
+         y: 200
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 200
+         x: 500,
+         y: 100
         }
    }
   }
@@ -627,18 +627,18 @@ Level.prototype.puzzle = [
    avail: ['nand'],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
-         x: 700,
-         y: 150
+         x: 600,
+         y: 50
         }
    }
   }
@@ -657,23 +657,23 @@ Level.prototype.puzzle = [
    avail: ['xor'],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      c: {type: 'input',
-         x: 100,
-         y: 300
+         x: 0,
+         y: 200
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 200
+         x: 500,
+         y: 100
         }
    }
   }
@@ -691,23 +691,23 @@ Level.prototype.puzzle = [
            {a:1, b:1, c:1,   z:1}],
    cells: {
      a: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      c: {type: 'input',
-         x: 100,
-         y: 300
+         x: 0,
+         y: 200
         }
      ,
      z: {type: 'output',
-         x: 600,
-         y: 250
+         x: 500,
+         y: 100
         }
    }
   }
@@ -729,15 +729,15 @@ Level.prototype.puzzle = [
    cells: {
      a: {type: 'input',
          width: 3,
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'z', 'i']]
         }
      ,
      z: {type: 'output',
          width: 3,
-         x: 300,
-         y: 100
+         x: 200,
+         y: 0
         }
    }
   }
@@ -758,14 +758,14 @@ Level.prototype.puzzle = [
    cells: {
      a: {type: 'input',
          width: 3,
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      z: {type: 'output',
          width: 3,
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
    }
   }
@@ -786,19 +786,19 @@ Level.prototype.puzzle = [
    cells: {
      a: {type: 'input',
          width: 2,
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      s: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
          width: 2,
-         x: 400,
-         y: 100
+         x: 300,
+         y: 50
         }
    }
   }
@@ -812,20 +812,20 @@ Level.prototype.puzzle = [
    cells: {
      a: {type: 'input',
          width: 4,
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      b: {type: 'input',
          width: 4,
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
         }
      ,
      z: {type: 'output',
          width: 4,
-         x: 400,
-         y: 100
+         x: 300,
+         y: 50
         }
    }
   }
@@ -840,24 +840,24 @@ Level.prototype.puzzle = [
    avail: [],
    cells: {
      a1: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
          }
      ,
      a0: {type: 'input',
-         x: 100,
-         y: 200
+         x: 0,
+         y: 100
          }
      ,
      c: {type: 'condenser',
-         x: 250,
-         y: 150
+         x: 150,
+         y: 50
          }
      ,
      z: {type: 'output',
          width: 2,
-         x: 400,
-         y: 150
+         x: 300,
+         y: 50
         }
    }
   }
@@ -876,23 +876,23 @@ Level.prototype.puzzle = [
    avail: ['condenser'],
    cells: {
      a2: {type: 'input',
-         x: 100,
+         x: 0,
          y: 0
          }
      ,
      a1: {type: 'input',
-         x: 100,
+         x: 0,
          y: 100
          }
      ,
      a0: {type: 'input',
-         x: 100,
+         x: 0,
          y: 200
          }
      ,
      z: {type: 'output',
          width: 3,
-         x: 400,
+         x: 300,
          y: 100
         }
    }
@@ -913,22 +913,22 @@ Level.prototype.puzzle = [
    cells: {
      a: {type: 'input',
          width: 3,
-         x: 100,
+         x: 0,
          y: 100
         }
      ,
      z2: {type: 'output',
-         x: 400,
+         x: 300,
          y: 0
          }
      ,
      z1: {type: 'output',
-         x: 400,
+         x: 300,
          y: 100
          }
      ,
      z0: {type: 'output',
-         x: 400,
+         x: 300,
          y: 200
          }
    }
@@ -1097,27 +1097,27 @@ Level.prototype.puzzle = [
             {e:0, d:1,   q:0}]],
    cells: {
      e: {type: 'input',
-         x: 100,
-         y: 100,
+         x: 0,
+         y: 0,
          io: [['o', 'latch', 'e']]
         }
      ,
      d: {type: 'input',
-         x: 100,
-         y: 200,
+         x: 0,
+         y: 100,
          io: [['o', 'latch', 'd']]
         }
      ,
      latch: {
        type: 'latch',
-       x: 280,
-       y: 120,
+       x: 180,
+       y: 20,
        io: [['q', 'q', 'i']]
      }
      ,
      q: {type: 'output',
-         x: 400,
-         y: 100
+         x: 300,
+         y: 0
         }
    }
   }
@@ -1131,30 +1131,30 @@ Level.prototype.puzzle = [
             {s:0, r:0,   q:0}]],
    cells: {
      s: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      r: {type: 'input',
-         x: 100,
-         y: 200
-        }
-     ,
-     q: {type: 'output',
-         x: 600,
+         x: 0,
          y: 100
         }
      ,
+     q: {type: 'output',
+         x: 500,
+         y: 0
+        }
+     ,
      and: {type: 'and',
-           x: 480,
-           y: 100,
+           x: 380,
+           y: 0,
            io: [['o', 'q', 'i'],
                 ['o', 'or', 'i0']]
           }
      ,
      or: {type: 'or',
-          x: 360,
-          y: 90,
+          x: 260,
+          y: -10,
           io: [['o', 'and', 'i0']]
           }
    }
@@ -1175,37 +1175,37 @@ Level.prototype.puzzle = [
             {e:0, d:1,   q:0, '~q':1}]],
    cells: {
      e: {type: 'input',
-         x: 100,
-         y: 100
+         x: 0,
+         y: 0
         }
      ,
      d: {type: 'input',
-         x: 100,
-         y: 200
-        }
-     ,
-     q: {type: 'output',
-         x: 600,
+         x: 0,
          y: 100
         }
      ,
+     q: {type: 'output',
+         x: 500,
+         y: 0
+        }
+     ,
      '~q': {type: 'output',
-         x: 600,
-         y: 200
+         x: 500,
+         y: 100
         }
      ,
      nand1:{
        type: 'nand',
-       x: 480,
-       y: 100,
+       x: 380,
+       y: 0,
        io: [['o', 'q', 'i'],
             ['o', 'nand2', 'i0']]
      }
      ,
      nand2: {
        type: 'nand',
-       x: 480,
-       y: 200,
+       x: 380,
+       y: 100,
        io: [['o', '~q', 'i'],
             ['o', 'nand1', 'i1']]
      }
@@ -1292,41 +1292,41 @@ Level.prototype.puzzle = [
    cells: {
      e: {
        type: 'input',
-       x: 100,
+       x: 0,
        y: 100,
        io: [['o', 'inv1', 'i']]
      }
      ,
      d: {
        type: 'input',
-       x: 100,
+       x: 0,
        y: 200
      }
      ,
      inv1: {
        type: 'inv',
-       x: 225,
+       x: 125,
        y: 0,
        io: [['o', 'inv2', 'i']]
      }
      ,
      inv2: {
        type: 'inv',
-       x: 325,
+       x: 225,
        y: 0,
        io: [['o', 'latch', 'e']]
      }
      ,
      latch: {
        type: 'latch',
-       x: 450,
+       x: 350,
        y: 120,
        io: [['q', 'q', 'i']]
      }
      ,
      q: {
        type: 'output',
-       x: 600,
+       x: 500,
        y: 100
      }
    }
@@ -1346,41 +1346,41 @@ Level.prototype.puzzle = [
    cells: {
      e: {
        type: 'input',
-       x: 100,
+       x: 0,
        y: 100
      }
      ,
      d: {
        type: 'input',
-       x: 100,
+       x: 0,
        y: 200,
        io: [['o', 'inv1', 'i']]
      }
      ,
      inv1: {
        type: 'inv',
-       x: 225,
+       x: 125,
        y: 300,
        io: [['o', 'inv2', 'i']]
      }
      ,
      inv2: {
        type: 'inv',
-       x: 325,
+       x: 225,
        y: 300,
        io: [['o', 'latch', 'd']]
      }
      ,
      latch: {
        type: 'latch',
-       x: 450,
+       x: 350,
        y: 120,
        io: [['q', 'q', 'i']]
      }
      ,
      q: {
        type: 'output',
-       x: 600,
+       x: 500,
        y: 100
      }
    }
@@ -1407,20 +1407,20 @@ Level.prototype.puzzle = [
    cells: {
      b1: {
        type: 'input',
-       x: 100,
-       y: 100
+       x: 0,
+       y: 0
      }
      ,
      b2: {
        type: 'input',
-       x: 100,
-       y: 200
+       x: 0,
+       y: 100
      }
      ,
      z: {
        type: 'output',
-       x: 600,
-       y: 100
+       x: 500,
+       y: 50
      }
    }
   }
@@ -1448,20 +1448,20 @@ Level.prototype.puzzle = [
    cells: {
      d: {
        type: 'input',
-       x: 100,
-       y: 100
+       x: 0,
+       y: 0
      }
      ,
      clk: {
        type: 'input',
-       x: 100,
-       y: 200
+       x: 0,
+       y: 100
      }
      ,
      q: {
        type: 'output',
-       x: 700,
-       y: 100
+       x: 600,
+       y: 50
      }
    }
   }
@@ -1497,25 +1497,25 @@ Level.prototype.puzzle = [
    cells: {
      d: {
        type: 'input',
-       x: 100,
-       y: 100
+       x: 0,
+       y: 0
      }
      ,
      clk: {
        type: 'input',
-       x: 100,
-       y: 200
+       x: 0,
+       y: 100
      }
      ,
      r: {
        type: 'input',
-       x: 100,
-       y: 300
+       x: 0,
+       y: 200
      }
      ,
      q: {
        type: 'output',
-       x: 700,
+       x: 600,
        y: 100
      }
    }
