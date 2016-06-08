@@ -94,12 +94,14 @@ Wire.prototype.remove = function(removed_by_input_port) {
   this.el_bg.remove();
   this.remove_subpaths();
 
-  var busy = (this.i.value !== undefined);
-  if (busy && !this.pending_new && !removed_by_input_port){
+  if (!this.pending_new && !removed_by_input_port){
     // Update the attached cell input with the fact that it's
-    // disconnected.  If that changes the value, then the circuit has
-    // changed in a fundamental way, and the check results must be
-    // updated accordingly.
+    // disconnected.  If the attached cell is also being deleted, or
+    // if the cell input wasn't using the (pending new) wire value,
+    // then nothing is needed.  But if the wire value could (now or in
+    // the past) have influenced the test pin values, then all test
+    // results must be reset, and the current test sequence must be
+    // restarted.
     this.i.propagate_input(undefined);
     this.be.level.circuit_changed();
   }
