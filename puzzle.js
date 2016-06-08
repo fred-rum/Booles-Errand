@@ -1131,6 +1131,44 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Rotate by N',
+   intro: '<p><b>Rotate A to the left by N.</b>  In the C programming language, this function can be written as Z = ((A << N) | (A >> (8 - N)) & 255.</p>',
+   outro: '<p></p>',
+   truth: [{a:3, n:0,   z:3},
+           {a:3, n:1,   z:6},
+           {a:3, n:7,   z:129},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 255);
+     obj.n = this.rnd(0, 7);
+     obj.z = ((obj.a << obj.n) | (obj.a >> (8 - obj.n))) & 255;
+   },
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 8,
+         x: 0,
+         y: 0
+        }
+     ,
+     n: {type: 'input',
+         width: 3,
+         x: 0,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 1000,
+         y: 0,
+         width: 8
+         }
+   }
+  }
+,
   {name: 'Seven-segment decode',
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
