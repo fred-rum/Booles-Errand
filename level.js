@@ -212,7 +212,7 @@ Level.prototype.init_table = function() {
     }
   }
   html.push('</table>');
-  $("#truthtable").html(html.join(''));
+  $("#truth").html(html.join(''));
   if (level.hide.has("truth")){
     this.be.truth_table_width = 0;
   } else {
