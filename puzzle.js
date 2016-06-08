@@ -934,6 +934,36 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Multiply by 2',
+   intro: '<p><b>Z = A * 2.</b></p>',
+   outro: '<p>A circuit normally has a constant 0 or 1 easily available, but for this puzzle you had to create your own.  Were you able to create it from a single gate?</p>',
+   hint: ['<p>Multiplying a binary value by 2 is much like multiplying a decimal value by 10; you need only shift the value to the left and stick a 0 on the end.</p>',
+          '<p>You\'ll need to unbundle the multi-bit input before you can rearrange its bits.</p>',
+          '<p>You\'ll have to make your own 0.</p>'],
+   truth: [{a:0,   z:0},
+           {a:1,   z:2},
+           {a:2,   z:4},
+           {a:3,   z:6},
+           {a:4,   z:8},
+           {a:5,   z:10},
+           {a:6,   z:12},
+           {a:7,   z:14}],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 3,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         x: 500,
+         y: 0,
+         width: 4
+         }
+   }
+  }
+,
   {name: 'Seven-segment decode',
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
