@@ -617,6 +617,86 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Distributive property (1)',
+   intro: '<p>Someone left some glue on the circuit board, so now you\'re stuck with an OR gate attached to Z when you want to <b>implement (A | B) & C.</b></p>',
+   outro: '<p>Boolean logic has a distributive property such that (A | B) & C = (A & C) | (B & C).  This is similar to the distributive property in arithmetic: (A + B) &times; C = (A &times; C) + (B &times; C).</p>',
+   truth: [{a:0, b:0, c:0,   z:0},
+           {a:0, b:1, c:0,   z:0},
+           {a:1, b:0, c:0,   z:0},
+           {a:1, b:1, c:0,   z:0},
+           {a:0, b:0, c:1,   z:0},
+           {a:0, b:1, c:1,   z:1},
+           {a:1, b:0, c:1,   z:1},
+           {a:1, b:1, c:1,   z:1}],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     c: {type: 'input',
+         x: 0,
+         y: 200
+        }
+     ,
+     or: {type: 'or',
+          x: 300,
+          y: 100,
+          io: [['o', 'z', 'i']]
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'Distributive property (2)',
+   intro: '<p>Dang it, they did it again!  You\'re stuck with an AND gate when you want to <b>implement (A & B) | C.</b></p>',
+   outro: '<p>Boolean logic has a 2<sup>nd</sup> distributive property such that (A & B) | C = (A | C) & (B | C).  This is similar to the 2<sup>nd</sup> distributive property in arithmetic: (A &times; B) + C = (A + C) &times; (B + C).  Wait, no, arithmetic doesn\'t have that property.  But Boolean logic does.  Well, now we know which system is superior.</p>',
+   truth: [{a:0, b:0, c:0,   z:0},
+           {a:0, b:1, c:0,   z:0},
+           {a:1, b:0, c:0,   z:0},
+           {a:1, b:1, c:0,   z:1},
+           {a:0, b:0, c:1,   z:1},
+           {a:0, b:1, c:1,   z:1},
+           {a:1, b:0, c:1,   z:1},
+           {a:1, b:1, c:1,   z:1}],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     c: {type: 'input',
+         x: 0,
+         y: 200
+        }
+     ,
+     and: {type: 'and',
+           x: 300,
+           y: 100,
+           io: [['o', 'z', 'i']]
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'Build an XOR gate',
    intro: '<p><b>Implement the XOR function using only NAND gates.</b></p>',
    outro: '<p>Six NAND gates is good.  Five NAND gates is excellent.</p>',
