@@ -2,6 +2,11 @@
 
 'use strict';
 
+// Return a random integer between min and max, inclusive.
+Level.prototype.rnd = function(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 var x = undefined;
 Level.prototype.puzzle = [
   {name: 'Press play',
@@ -1049,15 +1054,19 @@ Level.prototype.puzzle = [
    truth: [{a:0,   z:0},
            {a:1,   z:2},
            {a:2,   z:4},
-           {a:3,   z:6},
-           {a:4,   z:8},
-           {a:5,   z:10},
-           {a:6,   z:12},
-           {a:7,   z:14}],
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:127, z:254}],
+   rnd: function(obj) {
+     obj.a = this.rnd(3, 126);
+     obj.z = obj.a * 2;
+   },
    avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
      a: {type: 'input',
-         width: 3,
+         width: 7,
          x: 0,
          y: 0
         }
@@ -1065,7 +1074,7 @@ Level.prototype.puzzle = [
      z: {type: 'output',
          x: 500,
          y: 0,
-         width: 4
+         width: 8
          }
    }
   }

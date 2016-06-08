@@ -196,8 +196,13 @@ Level.prototype.init_table = function() {
     for (var j = 0; j < truth_seq.length; j++){
       var last_line = (j == truth_seq.length - 1);
       html.push('<tr class="truthbody" id="row', num_rows, '">');
-      this.table_line(html, this.input_names, truth_seq[j], last_line);
-      this.table_line(html, this.output_names, truth_seq[j], last_line);
+      if (truth_seq[j].rnd) {
+        var span = this.input_names.length + this.output_names.length;
+        this.table_line_rnd(html, span, last_line);
+      } else {
+        this.table_line(html, this.input_names, truth_seq[j], last_line);
+        this.table_line(html, this.output_names, truth_seq[j], last_line);
+      }
       html.push('<td class="check"><svg id="check', num_rows, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
       this.row_result.push(undefined);
       this.row_seq.push(i);
@@ -225,6 +230,10 @@ Level.prototype.table_header = function(html, port_names) {
     this.push_padding(html, i, port_names.length, true);
     html.push('>', port_names[i].toUpperCase(), '</th>');
   }
+};
+
+Level.prototype.table_line_rnd = function(html, span, last_line) {
+  html.push('<td class="tdlr tdb" colspan="', span, '">random</td>');
 };
 
 Level.prototype.table_line = function(html, port_names, truth_line, last_line) {
@@ -335,6 +344,11 @@ Level.prototype.next_line = function() {
 };
 
 Level.prototype.update_pins = function() {
+  var truth_obj = this.level.truth[this.cur_seq][this.cur_line];
+  if (truth_obj.rnd && !truth_obj.initialized) {
+    this.level[truth_obj.rnd].call(this, truth_obj);
+    truth_obj.initialized = true;
+  }
   for (var i = 0; i < this.input_names.length; i++){
     // We want the value to appear right away on the IO stub, so we
     // push it all the way through to the input pin's output port.
@@ -382,8 +396,7 @@ Level.prototype.update_box_quantity = function(type, change) {
 };
 
 Level.prototype.value = function(name) {
-  var truth = this.puzzle[this.level_num].truth;
-  return truth[this.cur_seq][this.cur_line][name];
+  return this.level.truth[this.cur_seq][this.cur_line][name];
 };
 
 Level.prototype.add_cell = function(cell) {
@@ -567,13 +580,21 @@ Level.prototype.start = function() {
 Level.prototype.circuit_changed = function() {
   if (this.cleaning_up) return; // Ignore circuit changes while cleaning up.
 
+  for (var i = 0; i < this.row_result.length; i++){
+    this.record_result(i, undefined);
+    var i_seq = this.row_seq[i];
+    if (i_seq != this.cur_seq) {
+      var i_line = this.row_line[i];
+      var truth_seq = this.level.truth[i_seq];
+      if (truth_seq[i_line].rnd) {
+        truth_seq[i_line] = {rnd: truth_seq[i_line].rnd};
+      }
+    }
+  }
+
   this.row_allows_simple_click = false;
   this.select_seq(this.cur_seq);
   this.update_hover();
-
-  for (var i = 0; i < this.row_result.length; i++){
-    this.record_result(i, undefined);
-  }
 
   this.be.sim.start();
 };
