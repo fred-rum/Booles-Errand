@@ -968,70 +968,57 @@ Level.prototype.puzzle = [
    section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '<p>Were you able to design your circuit using 25 gates or fewer?</p>',
-   truth:[{a3:0, a2:0, a1:0, a0:0,   t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1},
-          {a3:0, a2:0, a1:0, a0:1,   t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0},
-          {a3:0, a2:0, a1:1, a0:0,   t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1},
-          {a3:0, a2:0, a1:1, a0:1,   t:1, tl:0, tr:1, c:1, bl:0, br:1, b:1},
-          {a3:0, a2:1, a1:0, a0:0,   t:0, tl:1, tr:1, c:1, bl:0, br:1, b:0},
-          {a3:0, a2:1, a1:0, a0:1,   t:1, tl:1, tr:0, c:1, bl:0, br:1, b:1},
-          {a3:0, a2:1, a1:1, a0:0,   t:1, tl:1, tr:0, c:1, bl:1, br:1, b:1},
-          {a3:0, a2:1, a1:1, a0:1,   t:1, tl:0, tr:1, c:0, bl:0, br:1, b:0},
-          {a3:1, a2:0, a1:0, a0:0,   t:1, tl:1, tr:1, c:1, bl:1, br:1, b:1},
-          {a3:1, a2:0, a1:0, a0:1,   t:1, tl:1, tr:1, c:1, bl:0, br:1, b:1}
+   truth:[{a:0,   t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1},
+          {a:1,   t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0},
+          {a:2,   t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1},
+          {a:3,   t:1, tl:0, tr:1, c:1, bl:0, br:1, b:1},
+          {a:4,   t:0, tl:1, tr:1, c:1, bl:0, br:1, b:0},
+          {a:5,   t:1, tl:1, tr:0, c:1, bl:0, br:1, b:1},
+          {a:6,   t:1, tl:1, tr:0, c:1, bl:1, br:1, b:1},
+          {a:7,   t:1, tl:0, tr:1, c:0, bl:0, br:1, b:0},
+          {a:8,   t:1, tl:1, tr:1, c:1, bl:1, br:1, b:1},
+          {a:9,   t:1, tl:1, tr:1, c:1, bl:0, br:1, b:1}
          ],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
-     a3: {type: 'input',
+     a: {type: 'input',
          x: 0,
-         y: 0
-        }
-     ,
-     a2: {type: 'input',
-         x: 0,
-         y: 100
-        }
-     ,
-     a1: {type: 'input',
-         x: 0,
-         y: 200
-        }
-     ,
-     a0: {type: 'input',
-         x: 0,
-         y: 300
+         y: 150,
+         width: 4
         }
      ,
      t: {type: 'output',
-         x: 875,
+         x: 1075,
          y: 0
         }
      ,
      tl: {type: 'output',
-         x: 800,
+         x: 1000,
          y: 75
         }
      ,
      tr: {type: 'output',
-         x: 950,
+         x: 1150,
          y: 75
         }
      ,
      c: {type: 'output',
-         x: 875,
+         x: 1075,
          y: 150
         }
      ,
      bl: {type: 'output',
-         x: 800,
+         x: 1000,
          y: 225
         }
      ,
      br: {type: 'output',
-         x: 950,
+         x: 1150,
          y: 225
         }
      ,
      b: {type: 'output',
-         x: 875,
+         x: 1075,
          y: 300
         }
    }
@@ -1040,17 +1027,18 @@ Level.prototype.puzzle = [
   {name: 'Seven-segment encode',
    intro: '<p><b>Recognize the value on a seven-segment display and encode it as a decimal value&nbsp;(0-9).</b></p>',
    outro: '<p>Were you able to design your circuit using 25 gates or fewer?</p>',
-   truth:[{t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1,   z3:0, z2:0, z1:0, z0:0},
-          {t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z3:0, z2:0, z1:0, z0:1},
-          {t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1,   z3:0, z2:0, z1:1, z0:0},
-          {t:1, tl:0, tr:1, c:1, bl:0, br:1, b:1,   z3:0, z2:0, z1:1, z0:1},
-          {t:0, tl:1, tr:1, c:1, bl:0, br:1, b:0,   z3:0, z2:1, z1:0, z0:0},
-          {t:1, tl:1, tr:0, c:1, bl:0, br:1, b:1,   z3:0, z2:1, z1:0, z0:1},
-          {t:1, tl:1, tr:0, c:1, bl:1, br:1, b:1,   z3:0, z2:1, z1:1, z0:0},
-          {t:1, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z3:0, z2:1, z1:1, z0:1},
-          {t:1, tl:1, tr:1, c:1, bl:1, br:1, b:1,   z3:1, z2:0, z1:0, z0:0},
-          {t:1, tl:1, tr:1, c:1, bl:0, br:1, b:1,   z3:1, z2:0, z1:0, z0:1}
+   truth:[{t:1, tl:1, tr:1, c:0, bl:1, br:1, b:1,   z:0},
+          {t:0, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z:1},
+          {t:1, tl:0, tr:1, c:1, bl:1, br:0, b:1,   z:2},
+          {t:1, tl:0, tr:1, c:1, bl:0, br:1, b:1,   z:3},
+          {t:0, tl:1, tr:1, c:1, bl:0, br:1, b:0,   z:4},
+          {t:1, tl:1, tr:0, c:1, bl:0, br:1, b:1,   z:5},
+          {t:1, tl:1, tr:0, c:1, bl:1, br:1, b:1,   z:6},
+          {t:1, tl:0, tr:1, c:0, bl:0, br:1, b:0,   z:7},
+          {t:1, tl:1, tr:1, c:1, bl:1, br:1, b:1,   z:8},
+          {t:1, tl:1, tr:1, c:1, bl:0, br:1, b:1,   z:9}
          ],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
      t: {type: 'input',
          x: 75,
@@ -1087,24 +1075,10 @@ Level.prototype.puzzle = [
          y: 300
         }
      ,
-     z3: {type: 'output',
-         x: 1000,
-         y: 0
-        }
-     ,
-     z2: {type: 'output',
-         x: 1000,
-         y: 100
-        }
-     ,
-     z1: {type: 'output',
-         x: 1000,
-         y: 200
-        }
-     ,
-     z0: {type: 'output',
-         x: 1000,
-         y: 300
+     z: {type: 'output',
+         x: 1200,
+         y: 150,
+         width: 4
         }
    }
   }
