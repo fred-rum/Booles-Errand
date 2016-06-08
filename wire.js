@@ -493,7 +493,7 @@ Wire.prototype.redraw_fg = function() {
 
   // If the value was multiplied up from 1 bit to the input port's
   // width, then we need to compress it back down to 1 bit here.
-  if ((this.o.cell.width == 1) && (older_value > 1)) older_value = 1;
+  if ((this.o.cell.output_width == 1) && (older_value > 1)) older_value = 1;
 
   var older_el_subpath = this.el_fg;
   var older_age_len = this.path_length;
