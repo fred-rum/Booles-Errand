@@ -203,7 +203,8 @@ Level.prototype.init_table = function() {
         this.table_line(html, this.input_names, truth_seq[j], last_line);
         this.table_line(html, this.output_names, truth_seq[j], last_line);
       }
-      html.push('<td class="check"><svg id="check', num_rows, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td></tr>');
+      this.table_blank_check(html, num_rows);
+      html.push('</tr>');
       this.row_result.push(undefined);
       this.row_seq.push(i);
       this.row_line.push(j);
@@ -261,6 +262,10 @@ Level.prototype.push_padding = function(html, i, num, last_line) {
   } else if (last_line){
     html.push(' class="tdb"');
   }
+};
+
+Level.prototype.table_blank_check = function(html, row) {
+  html.push('<td class="check"><svg id="check', row, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td>');
 };
 
 Level.prototype.row_enter = function(row, event) {
@@ -347,6 +352,12 @@ Level.prototype.update_pins = function() {
   var truth_obj = this.level.truth[this.cur_seq][this.cur_line];
   if (truth_obj.rnd && !truth_obj.initialized) {
     this.level[truth_obj.rnd].call(this, truth_obj);
+    var row = this.cur_row();
+    var html = [];
+    this.table_line(html, this.input_names, truth_obj, true);
+    this.table_line(html, this.output_names, truth_obj, true);
+    this.table_blank_check(html, row);
+    $('#row' + row).html(html.join(''));
     truth_obj.initialized = true;
   }
   for (var i = 0; i < this.input_names.length; i++){
@@ -588,6 +599,11 @@ Level.prototype.circuit_changed = function() {
       var truth_seq = this.level.truth[i_seq];
       if (truth_seq[i_line].rnd) {
         truth_seq[i_line] = {rnd: truth_seq[i_line].rnd};
+        var html = [];
+        var span = this.input_names.length + this.output_names.length;
+        this.table_line_rnd(html, span, true);
+        this.table_blank_check(html, i);
+        $('#row' + i).html(html.join(''));
       }
     }
   }
