@@ -166,9 +166,7 @@ Circuit.prototype.resize = function(maintain_center) {
   // We measure and set the interior width here so that the minimum
   // width of the truth table exactly matches the maximum width of
   // cbox (which is also based on its interior width.)
-  this.be.div_truth.width("auto");
-  var truth_width = this.be.div_truth.width();
-  this.be.div_truth.width(Math.max(truth_width + 20,
+  this.be.div_truth.width(Math.max(this.be.truth_table_width + 20,
                                    this.be.em_size * 8));
 
   // The actual div_truth may be smaller than what we just set due to

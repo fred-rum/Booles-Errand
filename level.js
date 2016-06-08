@@ -175,7 +175,7 @@ Level.prototype.init_table = function() {
     // actions that normally happen in the truth table.
     html.push('<table style="display: none;"><tr>');
   } else {
-    html.push('<table class="truth"><tr>');
+    html.push('<table id="truth-table" class="truth"><tr>');
   }
   this.table_header(html, this.input_names);
   this.table_header(html, this.output_names);
@@ -213,6 +213,12 @@ Level.prototype.init_table = function() {
   }
   html.push('</table>');
   $("#truthtable").html(html.join(''));
+  if (level.hide.has("truth")){
+    this.be.truth_table_width = 0;
+  } else {
+    this.div_truth_table = $('#truth-table');
+    this.be.truth_table_width = this.div_truth_table.width();
+  }
 
   for (var i = 0; i < num_rows; i++){
     var row = $('#row' + i);
@@ -359,6 +365,18 @@ Level.prototype.update_pins = function() {
     this.table_blank_check(html, row);
     $('#row' + row).html(html.join(''));
     truth_obj.initialized = true;
+
+    // The truth table may be wider now.  This looks a little awkward,
+    // but it's hard to do determine its maximum width in advance.  To
+    // minimize the awkwardness, don't let the table become narrower,
+    // even if some rows were reset.
+    if (this.be.truth_table_width) {
+      var new_width = this.div_truth_table.width();
+      if (new_width > this.be.truth_table_width) {
+        this.be.truth_table_width = new_width;
+        this.be.circuit.resize();
+      }
+    }
   }
   for (var i = 0; i < this.input_names.length; i++){
     // We want the value to appear right away on the IO stub, so we
