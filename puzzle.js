@@ -942,6 +942,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'The condenser',
+   ui: true,
    intro: '<p>A condenser bundles single-bit wires into a multi-bit bus.  <b>Use the condenser to convert two 1-bit signals into one 2-bit signal.</b></p>',
    outro: '<p>The multi-bit output gets its 2<sup>0</sup> bit (the <i>little end</i>) from the bottom input of the condenser and its 2<sup>n-1</sup> bit (the <i>big end</i>) from the top.</p>',
    truth: [{a1:0, a0:0,   z:0},
@@ -974,6 +975,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Resize a condenser',
+   ui: true,
    intro: '<p><b>Resize a condenser to three bits</b> by dragging its top edge upward or its bottom edge downward.  A condenser can resized to any width from 2 to 8 bits.</p>',
    outro: '<p>Individual wires allow for more flexible logic, while a multi-bit bus allows easier interpretation of a larger value.  A condenser allows both forms in the same circuit.</p>',
    truth: [{a2:0, a1:0, a0:0,   z:0},
@@ -1010,6 +1012,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'The expander',
+   ui: true,
    intro: '<p>An expander unbundles a multi-bit bus into its component single-bit wires. <b>Use an expander to convert one 3-bit signal into three 1-bit signals.</b></p>',
    outro: '<p>The condenser and the expander are simple examples of a <i>wire harness</i>.  A general wire harness can take many forms, but the condenser and expander provide the basic building blocks to create any wire harness.</p>',
    truth: [{a:0,   z2:0, z1:0, z0:0},
@@ -1042,6 +1045,55 @@ Level.prototype.puzzle = [
          x: 300,
          y: 200
          }
+   }
+  }
+,
+  {name: 'Random truths',
+   ui: true,
+   intro: '<p><b>Design a circuit to test whether A is equal to B.</b></p><p>When there are a lot of potential values to test, we\'ll speed things along by testing only a random subset of combinations.</p>',
+   outro: '<p>Don\'t try to game the system.  If you change the circuit, you get to keep the random values in the current row, but all other values are re-randomized.</p>',
+   truth: [{a:0, b:0,   z:1},
+           {a:0, b:1,   z:0},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:127, b:255,   z:0},
+           {a:255, b:255,   z:1}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 255);
+     var type = this.rnd(0, 2);
+     if (type == 0) {
+       obj.b = obj.a;
+     } else if (type == 1) {
+       var bit = this.rnd(0, 7);
+       obj.b = obj.a ^ (1 << bit);
+     } else {
+       obj.b = this.rnd(0, 255);
+     }
+     obj.z = (obj.a == obj.b) ? 1 : 0;
+   },
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 8,
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         width: 8,
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         width: 1,
+         x: 600,
+         y: 50
+        }
    }
   }
 ,
