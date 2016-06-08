@@ -94,7 +94,8 @@ Wire.prototype.remove = function(removed_by_input_port) {
   this.el_bg.remove();
   this.remove_subpaths();
 
-  if (!this.pending_new && !removed_by_input_port){
+  var busy = (this.i.value !== undefined);
+  if (busy && !this.pending_new && !removed_by_input_port){
     // Update the attached cell input with the fact that it's
     // disconnected.  If that changes the value, then the circuit has
     // changed in a fundamental way, and the check results must be
@@ -155,8 +156,9 @@ Wire.prototype.propagate_value = function() {
   }
 };
 
-Wire.prototype.reset = function() {
+Wire.prototype.reset = function(no_io_change) {
   this.newest_value = null;
+  if (no_io_change && !this.in_flight.length) return;
   this.remove_subpaths();
   this.in_flight = [];
   this.redraw_fg();

@@ -224,6 +224,8 @@ Io.prototype.update_value = function(value) {
 };
 
 Io.prototype.reset = function() {
+  var no_io_change = (this.value === undefined) && !this.has_new_value;
+
   this.update_value(undefined);
   this.has_new_value = false;
 
@@ -232,7 +234,7 @@ Io.prototype.reset = function() {
   // wires in one consistent direction from each cell.
   if (this.type == "input"){
     for (var i = 0; i < this.w.length; i++) {
-      this.w[i].reset();
+      this.w[i].reset(no_io_change);
     }
   }
 };
