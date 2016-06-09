@@ -835,6 +835,9 @@ Cell.prototype.init_mux = function(inv) {
                      'o', 'output',
                      right+this.be.stub_len, 0, 0);
 
+  this.qty_cx = this.io.o.x;
+  this.qty_top = this.io.o.y;
+
   this.io.i0 = new Io(this.be, this.canvas, this,
                       'i0', 'input',
                       left-this.be.stub_len, -data_height, 0);
