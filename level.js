@@ -7,8 +7,8 @@ function Level(be) {
 
   try {
     for (var i = 0; i < this.puzzle.length; i++){
-      var key_completed = 'boole.' + this.puzzle[i].name + '.completed';
-      this.puzzle[i].completed = localStorage.getItem(key_completed);
+      var key = 'boole.' + this.puzzle[i].name + '.completed';
+      this.puzzle[i].completed = localStorage.getItem(key);
     }
   }
   catch(e) {
@@ -74,6 +74,14 @@ Level.prototype.begin = function(level_num, show_soln) {
 
   if (show_soln) {
     save_str = this.level.soln;
+  } else if (!save_str) {
+    try {
+      var key = 'boole.' + this.level.name + '.progress';
+      save_str = localStorage.getItem(key);
+    }
+    catch(e) {
+      // continue
+    }
   }
 
   if (level.hide === undefined){
@@ -155,10 +163,9 @@ Level.prototype.begin = function(level_num, show_soln) {
   // Restore additional cells and wire connections from the save data.
   if (save_str){
     this.decode_url(save_str);
-  } else {
-    window.location.hash = encodeURI(level.name);
   }
   this.update_widths();
+  this.encode_url();
 
   // Initialize the level to the first row of the table, and
   // correspondingly set up the initial input values and output
@@ -459,12 +466,12 @@ Level.prototype.move_cell_to_end = function(cell) {
 };
 
 Level.prototype.encode_url = function() {
-  var save = [this.level.name];
+  var save = [];
 
   for (var i = 0; i < this.all_cells.length; i++) {
     if (!this.all_cells[i].locked) break;
   }
-  save.push('?1s', i);
+  save.push('1s', i);
 
   for (var i = 0; i < this.all_cells.length; i++) {
     var emitted_cell = false;
@@ -496,8 +503,17 @@ Level.prototype.encode_url = function() {
       }
     }
   }
+  var save_str = save.join('');
 
-  var hash_str = save.join('');
+  try {
+    var key = 'boole.' + this.level.name + '.progress';
+    localStorage.setItem(key, save_str);
+  }
+  catch(e) {
+    // continue
+  }
+
+  var hash_str = this.level.name + '?' + save_str;
   window.location.hash = encodeURI(hash_str);
 };
 
@@ -691,8 +707,8 @@ Level.prototype.done = function(fresh_play) {
 
     this.level.completed = true;
     try {
-      var key_completed = 'boole.' + this.level.name + '.completed';
-      localStorage.setItem(key_completed, "true");
+      var key = 'boole.' + this.level.name + '.completed';
+      localStorage.setItem(key, "true");
     }
     catch(e) {
       // continue
