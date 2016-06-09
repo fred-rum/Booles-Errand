@@ -510,7 +510,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Build a mux',
    section: 'Easy combinational circuits',
-   intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: If one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
+   intro: '<p><b>Build a circuit that performs the same function as a mux</b>, but without using a mux gate.</p><p>Tip: If one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
    outro: '<p>Now you\'re building real circuits!</p>',
    truth: [{s:0, a:0,        z:0},
            {s:0, a:1,        z:1},
@@ -623,7 +623,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Build another mux',
-   intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b>  You\'ve done this before, but this time you\'ll need to use De Morgan\'s laws to build the circuit using only NAND gates and NOT gates.</p>',
+   intro: '<p><b>Build another circuit that performs the same function as a mux.</b>  You\'ve done this before, but this time you\'ll need to use De Morgan\'s laws to build the circuit using only NAND gates and NOT gates.</p>',
    outro: '<p>Augustus De Morgan would be proud.</p>',
    truth: [{s:0, a:0,        z:0},
            {s:0, a:1,        z:1},
@@ -1179,7 +1179,7 @@ Level.prototype.puzzle = [
      obj.n = this.rnd(0, 7);
      obj.z = ((obj.a << obj.n) | (obj.a >> (8 - obj.n))) & 255;
    },
-   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   avail: ['expander', 'condenser', 'mux', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
      a: {type: 'input',
          width: 8,
