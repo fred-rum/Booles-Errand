@@ -37,6 +37,8 @@ function Level(be) {
     $('#level' + i).click($.proxy(this.click_level, this, i));
   }
 
+  $("#button-help").click($.proxy(this.click_help, this));
+
   $("#button-main").click($.proxy(this.click_main, this));
   $("#button-main2").click($.proxy(this.click_main, this));
 }
@@ -95,10 +97,6 @@ Level.prototype.begin = function(level_num) {
   this.named_cells = {};
   this.all_cells = [];
 
-  this.be.div_infotxt.html(this.text(level.intro));
-  smartquotes(this.be.div_infotxt[0]);
-  //this.be.div_infotxt.append('<br>version ' + 33);
-
   // Get a list of the input and output pins.
   this.input_names = [];
   this.output_names = [];
@@ -110,6 +108,10 @@ Level.prototype.begin = function(level_num) {
 
   // Initialize the truth table with columns for the input and output pins.
   this.init_table();
+
+  // Initialize the help menu.
+  this.init_help();
+  this.display_intro();
 
   // Initialize the cells required by the level while ignoring IO connections.
   for (var cell_name in level.cells){
@@ -680,42 +682,21 @@ Level.prototype.done = function(fresh_play) {
   // There are no failed rows/sequences.
   this.be.sim.click_pause();
 
-  this.level.completed = true;
-  try {
-    var key_completed = 'boole.' + this.level.name + '.completed';
-    localStorage.setItem(key_completed, "true");
-  }
-  catch(e) {
-    // continue
-  }
-  this.mark_complete(this.level_num);
+  if (!this.level.completed) {
+    this.add_outro_help();
 
-  var outro = this.text(this.level.outro);
-  var next = this.next_level(this.level_num + 1);
-  if (this.ui_only){
-    if (next){
-      var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
-      this.be.div_infotxt.html(html);
-      $("#next-puzzle").click($.proxy(this.change_level, this, next));
-    } else {
-      var html = outro + '<p>You\'ve completed all of the interface lessons.  Are you ready for some puzzles? <button type="button" id="next-main">Main menu</button></p>';
-      this.be.div_infotxt.html(html);
-      $("#next-main").click($.proxy(this.click_main, this));
+    this.level.completed = true;
+    try {
+      var key_completed = 'boole.' + this.level.name + '.completed';
+      localStorage.setItem(key_completed, "true");
     }
-  } else { // !this.ui_only
-    if (next){
-      var html = outro + '<p><button type="button" id="next-puzzle">Next puzzle</button></p>';
-      this.be.div_infotxt.html(html);
-      $("#next-puzzle").click($.proxy(this.change_level, this, next));
-    } else {
-      var html = outro + '<p>Congratulations!  You\'ve completed the last puzzle! <button type="button" id="next-main">Main menu</button></p>';
-      this.be.div_infotxt.html(html);
-      $("#next-main").click($.proxy(this.click_main, this));
+    catch(e) {
+      // continue
     }
+    this.mark_complete(this.level_num);
   }
-  smartquotes(this.be.div_infotxt[0]);
-  this.be.circuit.resize(false);
-  this.be.circuit.update_view();
+
+  this.click_help_outro();
 };
 
 Level.prototype.change_level = function(level_num) {
@@ -829,6 +810,119 @@ Level.prototype.commit_widths = function() {
   }
 };
 
+// Perform HTML substitutions on the info panel text.  This is
+// different than the smartquotes substitions because it can add or
+// delete HTML tags, not just replace text outside the tags.
 Level.prototype.text = function(str) {
   return (str || '').replace(/&play;/g,'<svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder"/><path d="M37,25v50l30,-25z" class="playcenter"/></svg>');
+};
+
+Level.prototype.init_help = function() {
+  var html = [];
+
+  this.cur_info = 'intro';
+  html.push('<p id="help-intro" class="help-drop help-selected">Show introduction.</p>');
+
+  if (!this.level.hint) this.level.hint = [];
+  if (this.level.hint.length == 1) {
+    html.push('<p id="help-hint0" class="help-drop">Show hint.</p>');
+  } else {
+    for (var i = 0; i < this.level.hint.length; i++) {
+      html.push('<p id="help-hint', i, '" class="help-drop">Show hint #', i+1, '.</p>');
+    }
+  }
+
+  if (this.level.soln) {
+    html.push('<p id="help-soln" class="help-drop">Show solution.</p>');
+  }
+
+  $('#help-drop').html(html.join(''));
+  if (this.level.completed) this.add_outro_help();
+
+  $('#help-intro').click($.proxy(this.click_help_intro, this));
+};
+
+Level.prototype.add_outro_help = function() {
+  $('#help-drop').append('<p id="help-outro" class="help-drop">Show conclusion.</p>');
+  $('#help-outro').click($.proxy(this.click_help_outro, this));
+};
+
+Level.prototype.click_help = function() {
+  if (this.help_showing) {
+    this.close_help();
+    return;
+  }
+
+  $('#help-drop').addClass('block-show');
+  this.help_showing = true;
+
+  $(window).on('mousedown.helpdrop', $.proxy(this.close_help, this));
+  $(window).on('touchstart.helpdrop', $.proxy(this.close_help, this));
+};
+
+Level.prototype.close_help = function(event) {
+  if (event && event.target.matches('.helpbutton,.help-drop')) {
+    // Don't close the help menu on this mousedown/touchdown event
+    // because if we did, then the subsequent 'click' event on
+    // mouseup/touchend would re-open it.  Instead, we leave the menu
+    // open on the mousedown/touchdown event, then have it close on
+    // the subsequent 'click' event.
+    return;
+  }
+
+  $('#help-drop').removeClass('block-show');
+  this.help_showing = false;
+  $(window).off('mousedown.helpdrop');
+  $(window).off('touchstart.helpdrop');
+};
+
+Level.prototype.select_help = function(label) {
+  $('#help-' + this.cur_info).removeClass('help-selected');
+  $('#help-' + label).addClass('help-selected');
+  this.cur_info = label;
+};
+
+Level.prototype.click_help_intro = function() {
+  this.select_help('intro');
+  this.close_help();
+  this.display_intro();
+  this.be.circuit.resize(false);
+  this.be.circuit.update_view();
+};
+
+Level.prototype.display_intro = function() {
+  this.be.div_infotxt.html(this.text(this.level.intro));
+  smartquotes(this.be.div_infotxt[0]);
+};
+
+Level.prototype.click_help_outro = function() {
+  this.select_help('outro');
+  this.close_help();
+
+  var outro = this.text(this.level.outro);
+  var next = this.next_level(this.level_num + 1);
+  if (this.ui_only){
+    if (next){
+      var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
+      this.be.div_infotxt.html(html);
+      $("#next-puzzle").click($.proxy(this.change_level, this, next));
+    } else {
+      var html = outro + '<p>You\'ve completed all of the interface lessons.  Are you ready for some puzzles? <button type="button" id="next-main">Main menu</button></p>';
+      this.be.div_infotxt.html(html);
+      $("#next-main").click($.proxy(this.click_main, this));
+    }
+  } else { // !this.ui_only
+    if (next){
+      var html = outro + '<p><button type="button" id="next-puzzle">Next puzzle</button></p>';
+      this.be.div_infotxt.html(html);
+      $("#next-puzzle").click($.proxy(this.change_level, this, next));
+    } else {
+      var html = outro + '<p>Congratulations!  You\'ve completed the last puzzle! <button type="button" id="next-main">Main menu</button></p>';
+      this.be.div_infotxt.html(html);
+      $("#next-main").click($.proxy(this.click_main, this));
+    }
+  }
+  smartquotes(this.be.div_infotxt[0]);
+  this.be.circuit.resize(false);
+  this.be.circuit.update_view();
 };

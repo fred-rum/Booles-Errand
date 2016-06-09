@@ -53,6 +53,12 @@ body {
 .pause-at:hover {
     fill: #ddd;
 }
+.nosel {
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */      
+}
 .infobutton {
     fill: #d0d0ff;
     cursor: pointer;
@@ -108,7 +114,25 @@ body {
     top: 2em;
     right: 0;
     z-index: 200;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */      
+}
+.block-show {
+    display: block !important;
+}
+.help-drop {
+    margin: 0;
+    padding: 0.625em;
     background-color: #c0c0ff;
+    cursor: pointer;
+}
+.help-drop:hover {
+    background-color: #a0a0ff;
+}
+.help-selected {
+    background-color: #bbb !important;
 }
 .controls {
     position: fixed;
@@ -179,7 +203,7 @@ body {
     pointer-events: none;
 }
 p {
-    margin: 10px;
+    margin: 0.625em;
 }
 table {
     margin-left: auto;
