@@ -74,7 +74,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
     this.bbox = this.el_ns.getBBox(true);
   }
 
-  var text_height = 11;
+  var text_height = 11/16 * this.be.em_size;
   var attr = {
     "text-anchor": "middle",
     "font-family": "Verdana, Helvetica, Arial, sans-serif",
@@ -238,7 +238,10 @@ Cell.prototype.reset = function() {
 Cell.prototype.calc_inv = function() { this.calc_buf(true); };
 Cell.prototype.calc_buf = function(inv) {
   var i = this.io.i.value;
-  if (i === undefined) return undefined;
+  if (i === undefined) {
+    this.io.o.propagate_output(undefined);
+    return;
+  }
   var value = i;
   var max = (1 << this.width) - 1;
   if (inv) value ^= max;
@@ -254,7 +257,8 @@ Cell.prototype.calc_and = function(inv) {
   if ((i0 === 0) || (i1 === 0)){
     value = 0;
   } else if ((i0 === undefined) || (i1 === undefined)){
-    return undefined;
+    this.io.o.propagate_output(undefined);
+    return;
   } else {
     value = i0 & i1;
   }
@@ -271,7 +275,8 @@ Cell.prototype.calc_or = function(inv) {
   if ((i0 === max) || (i1 === max)){
     value = max;
   } else if ((i0 === undefined) || (i1 === undefined)){
-    return undefined;
+    this.io.o.propagate_output(undefined);
+    return;
   } else {
     value = i0 | i1;
   }
@@ -283,14 +288,30 @@ Cell.prototype.calc_xnor = function() { this.calc_xor(true); };
 Cell.prototype.calc_xor = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
-  var value;
-  var max = (1 << this.width) - 1;
   if ((i0 === undefined) || (i1 === undefined)){
-    return undefined;
+    this.io.o.propagate_output(undefined);
+  } else {
+    var value = i0 ^ i1;
+    var max = (1 << this.width) - 1;
+    if (inv) value ^= max;
+    this.io.o.propagate_output(value);
   }
-  value = i0 ^ i1;
-  if (inv) value ^= max;
-  this.io.o.propagate_output(value);
+};
+
+Cell.prototype.calc_mux = function() {
+  var i0 = this.io.i0.value;
+  var i1 = this.io.i1.value;
+  var s = this.io.s.value;
+  var max = (1 << this.width) - 1;
+  if ((i0 === i1) || (s === 0)) {
+    this.io.o.propagate_output(i0);
+  } else if (s === max) {
+    this.io.o.propagate_output(i1);
+  } else if ((s === undefined) || (i0 === undefined) || (i1 === undefined)) {
+    this.io.o.propagate_output(undefined);
+  } else {
+    this.io.o.propagate_output((~s & i0) | (s & i1));
+  }
 };
 
 Cell.prototype.calc_const = function() {
@@ -801,6 +822,49 @@ Cell.prototype.init_xor = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
+Cell.prototype.init_mux = function(inv) {
+  var height = 3*this.be.io_spacing;
+  var nheight = 2*this.be.io_spacing;
+  var width = 1.2*this.be.io_spacing;
+  var data_height = 0.8*this.be.io_spacing;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.io.o = new Io(this.be, this.canvas, this,
+                     'o', 'output',
+                     right+this.be.stub_len, 0, 0);
+
+  this.io.i0 = new Io(this.be, this.canvas, this,
+                      'i0', 'input',
+                      left-this.be.stub_len, -data_height, 0);
+  this.io.i1 = new Io(this.be, this.canvas, this,
+                      'i1', 'input',
+                      left-this.be.stub_len, data_height, 0);
+  this.io.s = new Io(this.be, this.canvas, this,
+                     's', 'input',
+                     left, -top + this.be.stub_len, 'mux');
+
+  var cell_path = ["M", left, top,
+                   "v", height,
+                   "l", width, -this.be.io_spacing/2,
+                   "v", -nheight,
+                   "z"];
+
+  this.push_ns(this.canvas.path(cell_path).attr(this.cell_bg_attr));
+  this.draw_stubs();
+  this.push_s(this.canvas.path(cell_path).attr(this.cell_fg_attr));
+
+  var attr = {
+    "stroke-width": 0,
+    fill: "#000",
+    'text-anchor': 'start'
+  };
+  left += this.be.stroke_cell_fg;
+  this.push_ns(this.canvas.text(left, -data_height, '0').attr(attr));
+  this.push_ns(this.canvas.text(left, data_height, '1').attr(attr));
+};
+
 Cell.prototype.init_input = function() {
   var height = 1.5 * this.be.io_spacing;
   var width = height;
@@ -1008,12 +1072,12 @@ Cell.prototype.init_latch = function() {
     'text-anchor': 'start'
   };
   left += this.be.stroke_cell_fg;
-  this.push_s(this.canvas.text(left, -this.be.io_spacing, "D").attr(attr));
-  this.push_s(this.canvas.text(left, 0, "E").attr(attr));
+  this.push_ns(this.canvas.text(left, -this.be.io_spacing, "D").attr(attr));
+  this.push_ns(this.canvas.text(left, 0, "E").attr(attr));
 
   attr['text-anchor'] = 'end';
   right -= this.be.stroke_cell_fg;
-  this.push_s(this.canvas.text(right, -this.be.io_spacing, "Q").attr(attr));
+  this.push_ns(this.canvas.text(right, -this.be.io_spacing, "Q").attr(attr));
 };
 
 Cell.prototype.init_condenser = function(ni) {

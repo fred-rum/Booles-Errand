@@ -26,8 +26,15 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
 
   this.has_new_value = false;
 
-  this.path = ["M", x, y,
-               "H", inner_x];
+  if (inner_x == 'mux') {
+    // Special case: the stub is vertical, not horizontal.
+    this.path = ["M", x, y,
+                 "H", 0,
+                 "V", 0];
+  } else {
+    this.path = ["M", x, y,
+                 "H", inner_x];
+  }
 
   // An IO for a cell in the cell box has graphics for the stub, but
   // it doesn't have a drag target or event handling.

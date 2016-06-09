@@ -477,6 +477,37 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'The mux gate',
+   intro: '<p>A multiplexer (abbreviated as <i>mux</i>) selects one of its two data inputs as its output. The data input ports are on the left side of the mux, labeled "0" and "1".  The choice of which data value to output is based on the select input port on the bottom of the mux.  <b>Hook up the mux to output the value of A when S=0 and the value of B when S=1.</b></p>',
+   outro: '<p>The 2-to-1 mux corresponds to the ternary operator in the C programming language, e.g. Z = S ? B : A.</p>',
+   truth: [{s:0, a:0,        z:0},
+           {s:0, a:1,        z:1},
+           {s:1,      b:0,   z:0},
+           {s:1,      b:1,   z:1}],
+   avail: ['mux'],
+   cells: {
+     s: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     a: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 300,
+         y: 150
+        }
+   }
+  }
+,
   {name: 'Build a mux',
    section: 'Easy combinational circuits',
    intro: '<p><b>Build a circuit that outputs either A or B, depending on the value of S.</b></p><p>Tip: If one input of an AND gate is 1, then the output of the AND gate equals its other input.</p>',
