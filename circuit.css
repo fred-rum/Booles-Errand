@@ -102,6 +102,14 @@ body {
     background-color: #d0d0ff;
     z-index: 101;
 }
+#help-drop {
+    display: none;
+    position: fixed;
+    top: 2em;
+    right: 0;
+    z-index: 200;
+    background-color: #c0c0ff;
+}
 .controls {
     position: fixed;
     display: block;
