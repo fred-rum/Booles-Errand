@@ -122,8 +122,8 @@ function Circuit() {
   this.begin_level();
 }
 
-Circuit.prototype.begin_level = function(level_num) {
-  this.be.level.begin(level_num);
+Circuit.prototype.begin_level = function(level_num, show_soln) {
+  this.be.level.begin(level_num, show_soln);
 
   // The simulation controls are different in different levels, so we
   // measure their width at the beginning of each level.

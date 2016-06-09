@@ -48,7 +48,7 @@ Level.prototype.mark_complete = function(level_num) {
   $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>')
 };
 
-Level.prototype.begin = function(level_num) {
+Level.prototype.begin = function(level_num, show_soln) {
   var save_str = undefined;
 
   if (level_num === undefined){
@@ -71,6 +71,10 @@ Level.prototype.begin = function(level_num) {
   if (!level_num) level_num = 0;
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
+
+  if (show_soln) {
+    save_str = this.level.soln;
+  }
 
   if (level.hide === undefined){
     level.hide = new Set();
@@ -699,7 +703,7 @@ Level.prototype.done = function(fresh_play) {
   this.click_help_outro();
 };
 
-Level.prototype.change_level = function(level_num) {
+Level.prototype.change_level = function(level_num, show_soln) {
   this.cleaning_up = true;
 
   for (var i = 0; i < this.all_cells.length; i++){
@@ -715,7 +719,7 @@ Level.prototype.change_level = function(level_num) {
 
   this.cleaning_up = false;
 
-  this.be.circuit.begin_level(level_num);
+  this.be.circuit.begin_level(level_num, show_soln);
 };
 
 Level.prototype.record_result = function(row, result) {
@@ -818,37 +822,36 @@ Level.prototype.text = function(str) {
 };
 
 Level.prototype.init_help = function() {
-  var html = [];
+  this.div_help_drop = $('#help-drop');
+  this.div_help_drop.html('');
 
   this.cur_info = 'intro';
-  html.push('<p id="help-intro" class="help-drop help-selected">Show introduction.</p>');
+
+  this.div_help_drop.append('<p id="help-intro" class="help-drop help-selected">Show introduction</p>');
+  $('#help-intro').click($.proxy(this.click_help_intro, this));
 
   if (!this.level.hint) this.level.hint = [];
   if (this.level.hint.length == 1) {
-    html.push('<p id="help-hint0" class="help-drop">Show hint.</p>');
+    this.div_help_drop.append('<p id="help-hint0" class="help-drop">Show hint</p>');
   } else {
     for (var i = 0; i < this.level.hint.length; i++) {
-      html.push('<p id="help-hint', i, '" class="help-drop">Show hint #', i+1, '.</p>');
+      this.div_help_drop.append('<p id="help-hint' + i + '" class="help-drop">Show hint #' + (i+1) + '</p>');
     }
+  }
+  for (var i = 0; i < this.level.hint.length; i++) {
+    $('#help-hint' + i).click($.proxy(this.click_help_hint, this, i));
   }
 
   if (this.level.soln) {
-    html.push('<p id="help-soln" class="help-drop">Show solution.</p>');
-  }
-
-  $('#help-drop').html(html.join(''));
-
-  $('#help-intro').click($.proxy(this.click_help_intro, this));
-
-  for (var i = 0; i < this.level.hint.length; i++) {
-    $('#help-hint' + i).click($.proxy(this.click_help_hint, this, i));
+    this.div_help_drop.append('<p id="help-soln" class="help-drop">Show sample solution</p>');
+    $('#help-soln').click($.proxy(this.click_help_soln, this));
   }
 
   if (this.level.completed) this.add_outro_help();
 };
 
 Level.prototype.add_outro_help = function() {
-  $('#help-drop').append('<p id="help-outro" class="help-drop">Show conclusion.</p>');
+  this.div_help_drop.append('<p id="help-outro" class="help-drop">Show conclusion.</p>');
   $('#help-outro').click($.proxy(this.click_help_outro, this));
 };
 
@@ -858,7 +861,7 @@ Level.prototype.click_help = function() {
     return;
   }
 
-  $('#help-drop').addClass('block-show');
+  this.div_help_drop.addClass('block-show');
   this.help_showing = true;
 
   $(window).on('mousedown.helpdrop', $.proxy(this.close_help, this));
@@ -875,7 +878,7 @@ Level.prototype.close_help = function(event) {
     return;
   }
 
-  $('#help-drop').removeClass('block-show');
+  this.div_help_drop.removeClass('block-show');
   this.help_showing = false;
   $(window).off('mousedown.helpdrop');
   $(window).off('touchstart.helpdrop');
@@ -909,6 +912,11 @@ Level.prototype.click_help_hint = function(num) {
   this.be.circuit.update_view();
 };
 
+Level.prototype.click_help_soln = function() {
+  this.close_help();
+  this.change_level(this.level_num, true);
+};
+
 Level.prototype.click_help_outro = function() {
   this.select_help('outro');
   this.close_help();
@@ -919,7 +927,7 @@ Level.prototype.click_help_outro = function() {
     if (next){
       var html = outro + '<p><button type="button" id="next-puzzle">Next interface lesson</button></p>';
       this.be.div_infotxt.html(html);
-      $("#next-puzzle").click($.proxy(this.change_level, this, next));
+      $("#next-puzzle").click($.proxy(this.change_level, this, next, false));
     } else {
       var html = outro + '<p>You\'ve completed all of the interface lessons.  Are you ready for some puzzles? <button type="button" id="next-main">Main menu</button></p>';
       this.be.div_infotxt.html(html);
@@ -929,7 +937,7 @@ Level.prototype.click_help_outro = function() {
     if (next){
       var html = outro + '<p><button type="button" id="next-puzzle">Next puzzle</button></p>';
       this.be.div_infotxt.html(html);
-      $("#next-puzzle").click($.proxy(this.change_level, this, next));
+      $("#next-puzzle").click($.proxy(this.change_level, this, next, false));
     } else {
       var html = outro + '<p>Congratulations!  You\'ve completed the last puzzle! <button type="button" id="next-main">Main menu</button></p>';
       this.be.div_infotxt.html(html);
