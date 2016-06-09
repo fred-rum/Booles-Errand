@@ -160,7 +160,7 @@ Drag.prototype.drag_end = function() {
   this.be.level.commit_widths();
   this.orig_io = null;
   this.new_io = null;
-  this.be.level.encode_url();
+  this.be.level.save_progress();
 
   $(document.body).removeClass('cursor-force-default');
   this.enable_hover();
@@ -174,7 +174,7 @@ Drag.prototype.dblclick = function(x, y) {
   var io = this.closest_io(x, y);
   while (io.w.length > 0){
     io.w[0].remove();
-    this.be.level.encode_url();
+    this.be.level.save_progress();
   }
 
   this.be.level.update_widths();
@@ -429,7 +429,11 @@ Drag.prototype.update_free_drag = function(x, y) {
 Drag.prototype.drag_locked_start = function(x, y) {
   var io = this.closest_locked_io(x, y);
   this.show_fail(io);
-  $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
+  if (this.be.showing_soln) {
+    $('#error').html('<p>The sample solution cannot be edited.  Restore your progress from the help menu.</p>');
+  } else {
+    $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
+  }
   $(document.body).addClass('cursor-force-not-allowed');
   this.disable_hover();
 };

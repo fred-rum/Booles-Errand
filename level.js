@@ -48,7 +48,7 @@ Level.prototype.mark_complete = function(level_num) {
   $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>')
 };
 
-Level.prototype.begin = function(level_num, show_soln) {
+Level.prototype.begin = function(level_num) {
   var save_str = undefined;
 
   if (level_num === undefined){
@@ -72,7 +72,7 @@ Level.prototype.begin = function(level_num, show_soln) {
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
 
-  if (show_soln) {
+  if (this.be.showing_soln) {
     save_str = this.level.soln;
   } else if (!save_str) {
     try {
@@ -162,10 +162,10 @@ Level.prototype.begin = function(level_num, show_soln) {
 
   // Restore additional cells and wire connections from the save data.
   if (save_str){
-    this.decode_url(save_str);
+    this.restore_progress(save_str);
   }
   this.update_widths();
-  this.encode_url();
+  this.save_progress();
 
   // Initialize the level to the first row of the table, and
   // correspondingly set up the initial input values and output
@@ -465,7 +465,9 @@ Level.prototype.move_cell_to_end = function(cell) {
   // If cell is not found, don't push it onto the list.
 };
 
-Level.prototype.encode_url = function() {
+Level.prototype.save_progress = function() {
+  if (this.be.showing_soln) return;
+
   var save = [];
 
   for (var i = 0; i < this.all_cells.length; i++) {
@@ -517,7 +519,7 @@ Level.prototype.encode_url = function() {
   window.location.hash = encodeURI(hash_str);
 };
 
-Level.prototype.decode_url = function(save_str) {
+Level.prototype.restore_progress = function(save_str) {
   try {
     var ex_version_skip = /^1s([0-9]+)/;
     var ex_cell = /^;(-?[0-9]+),([a-z]*)([0-9]?),(-?[0-9]+)/;
@@ -552,7 +554,7 @@ Level.prototype.decode_url = function(save_str) {
         this.add_cell(new Cell(this.be, "cdraw", type,
                                x / 20 * this.be.io_spacing,
                                y / 20 * this.be.io_spacing,
-                              undefined, undefined, width));
+                               undefined, undefined, width));
 
         save_str = save_str.substring(m[0].length);
 
@@ -735,7 +737,8 @@ Level.prototype.change_level = function(level_num, show_soln) {
 
   this.cleaning_up = false;
 
-  this.be.circuit.begin_level(level_num, show_soln);
+  this.be.showing_soln = show_soln;
+  this.be.circuit.begin_level(level_num);
 };
 
 Level.prototype.record_result = function(row, result) {
@@ -867,7 +870,7 @@ Level.prototype.init_help = function() {
 };
 
 Level.prototype.add_outro_help = function() {
-  this.div_help_drop.append('<p id="help-outro" class="help-drop">Show conclusion.</p>');
+  this.div_help_drop.append('<p id="help-outro" class="help-drop">Show conclusion</p>');
   $('#help-outro').click($.proxy(this.click_help_outro, this));
 };
 

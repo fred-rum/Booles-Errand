@@ -65,6 +65,10 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   this.el_target.setAttr("pointer-events", "all");
 
   this.be.drag.enable_drag(this);
+  if (this.be.showing_soln) {
+    this.locked = true;
+    this.be.drag.disable_drag(this);
+  }
 
   // Placeholders to display IO value in text and rectangle object.
   // The position of the text and the size and position of the rectangle

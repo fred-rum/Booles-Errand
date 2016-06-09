@@ -100,7 +100,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
 
   this.bring_to_top();
 
-  if (this.locked){
+  if (this.locked || this.be.showing_soln){
     this.change_cursor("not-allowed");
   } else {
     this.change_cursor("grab");
@@ -420,10 +420,13 @@ Cell.prototype.bring_to_top = function() {
 };
 
 Cell.prototype.cell_drag_start = function(x, y) {
-  this.dragging_disallowed = this.locked || (this.quantity === 0);
+  this.dragging_disallowed =
+    this.locked || (this.quantity === 0) || this.be.showing_soln;
 
   if (this.dragging_disallowed) {
-    if (this.locked){
+    if (this.be.showing_soln) {
+      $('#error').html('<p>The sample solution cannot be edited.  Restore your progress from the help menu.</p>');
+    } else if (this.locked){
       // Show the fail icon only on cdraw, not on cbox.
       this.be.drag.show_fail_xy(this.x, this.y);
       $('#error').html('<p>This logic element is locked by the puzzle and cannot be moved or deleted.</p>');
@@ -605,7 +608,7 @@ Cell.prototype.cell_drag_end = function() {
   }
   this.be.level.commit_widths();
 
-  this.be.level.encode_url();
+  this.be.level.save_progress();
 };
 
 Cell.prototype.remove = function() {
@@ -1395,5 +1398,5 @@ Cell.prototype.harness_drag_end = function(dir) {
   this.remove();
   this.be.level.remove_cell(this);
 
-  this.be.level.encode_url();
+  this.be.level.save_progress();
 };
