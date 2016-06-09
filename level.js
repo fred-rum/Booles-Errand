@@ -837,9 +837,14 @@ Level.prototype.init_help = function() {
   }
 
   $('#help-drop').html(html.join(''));
-  if (this.level.completed) this.add_outro_help();
 
   $('#help-intro').click($.proxy(this.click_help_intro, this));
+
+  for (var i = 0; i < this.level.hint.length; i++) {
+    $('#help-hint' + i).click($.proxy(this.click_help_hint, this, i));
+  }
+
+  if (this.level.completed) this.add_outro_help();
 };
 
 Level.prototype.add_outro_help = function() {
@@ -893,6 +898,15 @@ Level.prototype.click_help_intro = function() {
 Level.prototype.display_intro = function() {
   this.be.div_infotxt.html(this.text(this.level.intro));
   smartquotes(this.be.div_infotxt[0]);
+};
+
+Level.prototype.click_help_hint = function(num) {
+  this.select_help('hint' + num);
+  this.close_help();
+  this.be.div_infotxt.html(this.text(this.level.hint[num]));
+  smartquotes(this.be.div_infotxt[0]);
+  this.be.circuit.resize(false);
+  this.be.circuit.update_view();
 };
 
 Level.prototype.click_help_outro = function() {
