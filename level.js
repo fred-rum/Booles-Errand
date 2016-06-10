@@ -73,7 +73,7 @@ Level.prototype.begin = function(level_num) {
   var level = this.level = this.puzzle[level_num];
 
   if (this.be.showing_soln) {
-    save_str = this.level.soln;
+    save_str = this.level.soln[this.be.showing_soln-1];
   } else if (!save_str) {
     try {
       var key = 'boole.' + this.level.name + '.progress';
@@ -854,27 +854,31 @@ Level.prototype.init_help = function() {
   this.div_help_drop.append('<p id="help-intro" class="help-drop help-selected">Show introduction</p>');
   $('#help-intro').click($.proxy(this.click_help_intro, this));
 
-  if (!this.level.hint) this.level.hint = [];
-  if (this.level.hint.length == 1) {
-    this.div_help_drop.append('<p id="help-hint0" class="help-drop">Show hint</p>');
-  } else {
-    for (var i = 0; i < this.level.hint.length; i++) {
-      this.div_help_drop.append('<p id="help-hint' + i + '" class="help-drop">Show hint #' + (i+1) + '</p>');
-    }
+  if (!this.level.hint) {
+    this.level.hint = [];
+  } else if (!Array.isArray(this.level.hint)) {
+    this.level.hint = [this.level.hint];
   }
   for (var i = 0; i < this.level.hint.length; i++) {
+    var numtext = (this.level.hint.length == 1) ? '' : ' #' + (i+1);
+    this.div_help_drop.append('<p id="help-hint' + i + '" class="help-drop">Show hint' + numtext + '</p>');
     $('#help-hint' + i).click($.proxy(this.click_help_hint, this, i));
   }
 
-  if (this.be.showing_soln) {
-    $('#helpiconfill').attr({fill: '#fbb'});
-    this.div_help_drop.append('<p id="help-restore" class="help-drop">Restore my progress</p>');
-    $('#help-restore').click($.proxy(this.click_help_restart, this, false));
-  } else {
-    $('#helpiconfill').attr({fill: ''});
-    if (this.level.soln) {
-      this.div_help_drop.append('<p id="help-soln" class="help-drop">Show sample solution</p>');
-      $('#help-soln').click($.proxy(this.click_help_restart, this, true));
+  if (!this.level.soln) {
+    this.level.soln = [];
+  } else if (!Array.isArray(this.level.soln)) {
+    this.level.soln = [this.level.soln];
+  }
+  $('#helpiconfill').attr({fill: this.be.showing_soln ? '#fbb' : ''});
+  for (var i = 0; i < this.level.soln.length; i++) {
+    if (i+1 == this.be.showing_soln) {
+      this.div_help_drop.append('<p id="help-restore" class="help-drop">Restore my progress</p>');
+      $('#help-restore').click($.proxy(this.click_help_restart, this, false));
+    } else {
+      var numtext = (this.level.soln.length == 1) ? '' : ' #' + (i+1);
+      this.div_help_drop.append('<p id="help-soln' + i + '" class="help-drop">Show sample solution' + numtext + '</p>');
+      $('#help-soln' + i).click($.proxy(this.click_help_restart, this, i+1));
     }
   }
 
