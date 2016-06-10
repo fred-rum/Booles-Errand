@@ -151,11 +151,16 @@ Level.prototype.begin = function(level_num) {
         var cell_name2 = conn_list[i][1];
         var io_name2 = conn_list[i][2];
         var unlocked = conn_list[i][3];
-        new Wire(this.be,
-                 this.named_cells[cell_name].io[io_name],
-                 this.named_cells[cell_name2].io[io_name2],
-                 false, // pending_del
-                 !unlocked); // locked
+        if (!save_str || !unlocked) {
+          // If there's a save_str, don't draw unlocked wires.
+          // Instead, allow the save_str to determine those wires are
+          // drawn or not.
+          new Wire(this.be,
+                   this.named_cells[cell_name].io[io_name],
+                   this.named_cells[cell_name2].io[io_name2],
+                   false, // pending_del
+                   !unlocked); // locked
+        }
       }
     }
   }
