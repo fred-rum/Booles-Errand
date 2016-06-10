@@ -861,9 +861,16 @@ Level.prototype.init_help = function() {
     $('#help-hint' + i).click($.proxy(this.click_help_hint, this, i));
   }
 
-  if (this.level.soln) {
-    this.div_help_drop.append('<p id="help-soln" class="help-drop">Show sample solution</p>');
-    $('#help-soln').click($.proxy(this.click_help_soln, this));
+  if (this.be.showing_soln) {
+    $('#helpiconfill').attr({fill: '#fbb'});
+    this.div_help_drop.append('<p id="help-restore" class="help-drop">Restore my progress</p>');
+    $('#help-restore').click($.proxy(this.click_help_restart, this, false));
+  } else {
+    $('#helpiconfill').attr({fill: ''});
+    if (this.level.soln) {
+      this.div_help_drop.append('<p id="help-soln" class="help-drop">Show sample solution</p>');
+      $('#help-soln').click($.proxy(this.click_help_restart, this, true));
+    }
   }
 
   if (this.level.completed) this.add_outro_help();
@@ -931,9 +938,9 @@ Level.prototype.click_help_hint = function(num) {
   this.be.circuit.update_view();
 };
 
-Level.prototype.click_help_soln = function() {
+Level.prototype.click_help_restart = function(show_soln) {
   this.close_help();
-  this.change_level(this.level_num, true);
+  this.change_level(this.level_num, show_soln);
 };
 
 Level.prototype.click_help_outro = function() {

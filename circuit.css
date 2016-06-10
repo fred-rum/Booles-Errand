@@ -134,6 +134,12 @@ body {
 .help-selected {
     background-color: #bbb !important;
 }
+#help-restore {
+    background-color: #fbb;
+}
+#help-restore:hover {
+    background-color: #e99;
+}
 .controls {
     position: fixed;
     display: block;
