@@ -43,8 +43,6 @@ function Circuit() {
   this.be.cbox_width = this.be.div_cbox_container.outerWidth();
   this.be.div_cdrag.width(this.be.cbox_width);
 
-  this.be.controls_height = this.be.div_controls.outerHeight();
-
   this.be.zoom_width = this.be.div_zoom.outerWidth();
   this.be.zoom_height = this.be.div_zoom.outerHeight();
 
@@ -127,6 +125,7 @@ Circuit.prototype.begin_level = function(level_num) {
 
   // The simulation controls are different in different levels, so we
   // measure their width at the beginning of each level.
+  this.be.controls_height = this.be.div_controls.outerHeight();
   this.be.controls_width = this.be.div_controls.outerWidth();
 
   this.resize();
