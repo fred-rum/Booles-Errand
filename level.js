@@ -665,6 +665,9 @@ Level.prototype.circuit_changed = function() {
   this.be.sim.start();
 };
 
+// done() gets called by Sim when there are no events left to process.
+// fresh_play is true if the user clicked play, and there was nothing
+// to do.
 Level.prototype.done = function(fresh_play) {
   var result = true;
   for (var cell_name in this.named_cells){
