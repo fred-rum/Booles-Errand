@@ -50,7 +50,7 @@ Sim.prototype.click_play = function () {
   this.start();
   this.be.level.click_play();
   if (this.no_new_events()) {
-    this.be.level.done(true);
+    this.done(true);
   }
 };
 
@@ -131,7 +131,7 @@ Sim.prototype.tick = function() {
 
   if (this.no_new_events()) {
     this.pause();
-    this.be.level.done(false);
+    this.done(false);
   } else if ((this.pause_at == 'gate') && !this.new_other_events.length){
     this.click_pause();
   }
@@ -143,21 +143,23 @@ Sim.prototype.reset = function() {
   this.new_other_events = [];
 };
 
-Sim.prototype.pass_row = function(func, fresh_play, row_type) {
-  if (fresh_play){
-    func();
+Sim.prototype.done = function(fresh_play) {
+  var pass_status = this.be.level.done();
+  if ((pass_status == 'fail') || (pass_status == 'done')) {
+    this.click_pause();
+  } else if (fresh_play) {
+    this.be.level.advance_truth(pass_status);
   } else if ((this.pause_at == 'done') ||
-             ((this.pause_at == 'seq') && (row_type != 'seq'))){
-    this.delay_timer = setTimeout(func, 1000/this.speed);
+             ((this.pause_at == 'seq') && (pass_status != 'seq'))) {
+    // Delay briefly, then continue to the next line or seq.
+    this.delay_timer = setTimeout($.proxy(this.be.level.advance_truth,
+                                          this.be.level, pass_status),
+                                  Math.min(2000, 1000/this.speed));
   } else {
+    // Pause-at-line or pause-at-seq.
     this.click_pause();
   }
 };
-
-Sim.prototype.pass_delay_complete = function(next_row) {
-  this.delay_timer = undefined;
-  this.be.level.select_row(next_row);
-}
 
 Sim.prototype.keypress = function(event) {
   var key = String.fromCharCode(event.which);

@@ -666,9 +666,7 @@ Level.prototype.circuit_changed = function() {
 };
 
 // done() gets called by Sim when there are no events left to process.
-// fresh_play is true if the user clicked play, and there was nothing
-// to do.
-Level.prototype.done = function(fresh_play) {
+Level.prototype.done = function() {
   var result = true;
   for (var cell_name in this.named_cells){
     if (this.named_cells[cell_name].type == "output"){
@@ -678,43 +676,17 @@ Level.prototype.done = function(fresh_play) {
   }
   this.record_result(this.cur_row(), result);
 
-  if (!result) return;
+  if (!result) return 'fail';
 
-  if (this.cur_line < this.level.truth[this.cur_seq].length - 1){
-    // Advance to the next line of the sequence if not pause-at-line.
-    this.be.sim.pass_row($.proxy(this.next_line, this), fresh_play, 'line');
-    if (this.be.sim.paused()){
-      // Attempting to continue to the next line triggered pause-at-line.
-      // In that case, clicking on the next line should advance simulation
-      // to that line, rather than resetting to the beginning of the sequence.
-      this.row_allows_simple_click = this.cur_row() + 1;
-      this.update_hover();
-    }
-    return;
+  if (this.cur_line < this.level.truth[this.cur_seq].length - 1) {
+    this.row_allows_simple_click = this.cur_row() + 1;
+    this.update_hover();
+    return 'line';
   }
 
-  // Look for the first failure after the current sequence, if any;
-  // otherwise, the first failure overall.
-  var first_failed_seq = null;
-  for (var i = 0; i < this.row_result.length; i++){
-    var seq = this.row_seq[i];
-    if (!this.row_result[i] &&
-        ((first_failed_seq === null) ||
-         ((first_failed_seq < this.cur_seq) && (seq >= this.cur_seq)))){
-      first_failed_seq = seq;
-    }
-  }
-
-  // There is a failed sequence, so advance to that sequence.
-  if (first_failed_seq !== null){
-    this.be.sim.pass_row($.proxy(this.select_seq, this, first_failed_seq),
-                         fresh_play, 'seq');
-    return;
-  }
+  if (this.first_failed_seq() !== null) return 'seq';
 
   // There are no failed rows/sequences.
-  this.be.sim.click_pause();
-
   if (!this.level.completed) {
     this.add_outro_help();
 
@@ -737,6 +709,33 @@ Level.prototype.done = function(fresh_play) {
   this.be.controls_height = this.be.div_controls.outerHeight();
 
   this.click_help_outro();
+
+  return 'done';
+};
+
+Level.prototype.advance_truth = function(type) {
+  if (type == 'line') {
+    this.next_line();
+  } else {
+    // There is guaranteed to be a failed sequence somewhere, or we
+    // wouldn't be here.
+    this.select_seq(this.first_failed_seq());
+  }
+};
+
+Level.prototype.first_failed_seq = function() {
+  // Look for the first failure after the current sequence, if any;
+  // otherwise, the first failure overall.
+  var first_failed_seq = null;
+  for (var i = 0; i < this.row_result.length; i++){
+    var seq = this.row_seq[i];
+    if (!this.row_result[i] &&
+        ((first_failed_seq === null) ||
+         ((first_failed_seq < this.cur_seq) && (seq >= this.cur_seq)))){
+      first_failed_seq = seq;
+    }
+  }
+  return first_failed_seq;
 };
 
 Level.prototype.change_level = function(level_num, show_soln) {
