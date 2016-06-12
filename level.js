@@ -738,16 +738,13 @@ Level.prototype.advance_truth = function(type) {
 Level.prototype.first_failed_seq = function() {
   // Look for the first failure after the current sequence, if any;
   // otherwise, the first failure overall.
-  var first_failed_seq = null;
-  for (var i = 0; i < this.row_result.length; i++){
-    var seq = this.row_seq[i];
-    if (!this.row_result[i] &&
-        ((first_failed_seq === null) ||
-         ((first_failed_seq < this.cur_seq) && (seq >= this.cur_seq)))){
-      first_failed_seq = seq;
-    }
+  for (var i = this.cur_row() + 1; i < this.row_result.length; i++){
+    if (!this.row_result[i]) return this.row_seq[i];
   }
-  return first_failed_seq;
+  for (var i = 0; i < this.row_result.length; i++){
+    if (!this.row_result[i]) return this.row_seq[i];
+  }
+  return null;
 };
 
 Level.prototype.change_level = function(level_num, show_soln) {
