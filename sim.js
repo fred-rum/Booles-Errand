@@ -132,7 +132,6 @@ Sim.prototype.tick = function() {
   }
 
   if (this.no_new_events()) {
-    this.pause();
     this.done(false);
   } else if ((this.pause_at == 'gate') && !this.new_other_events.length){
     this.click_pause();
@@ -146,13 +145,14 @@ Sim.prototype.reset = function() {
 };
 
 Sim.prototype.done = function(fresh_play) {
+  this.pause();
+
   var pass_status = this.be.level.done();
   if ((pass_status == 'fail') || (pass_status == 'done')) {
     if (fresh_play) {
       // The user clicked play, but there was nothing to do.
       // Delay briefly before pausing to show feedback that play was
       // clicked.
-      this.pause();
       this.delay_timer = setTimeout($.proxy(this.click_pause, this), 250);
     } else {
       this.click_pause();
