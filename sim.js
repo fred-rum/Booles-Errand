@@ -148,7 +148,15 @@ Sim.prototype.reset = function() {
 Sim.prototype.done = function(fresh_play) {
   var pass_status = this.be.level.done();
   if ((pass_status == 'fail') || (pass_status == 'done')) {
-    this.click_pause();
+    if (fresh_play) {
+      // The user clicked play, but there was nothing to do.
+      // Delay briefly before pausing to show feedback that play was
+      // clicked.
+      this.pause();
+      this.delay_timer = setTimeout($.proxy(this.click_pause, this), 250);
+    } else {
+      this.click_pause();
+    }
   } else if (fresh_play) {
     this.be.level.advance_truth(pass_status);
   } else if ((this.pause_at == 'done') ||
