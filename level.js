@@ -330,6 +330,7 @@ Level.prototype.update_hover = function() {
 };
 
 Level.prototype.row_click = function(row, event) {
+  this.be.sim.click_pause();
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click){
     if (row == old_row + 1){
@@ -371,7 +372,7 @@ Level.prototype.select_seq = function(seq) {
 };
 
 Level.prototype.next_line = function() {
-  this.start();
+  this.not_done();
   this.select_row(this.cur_row() + 1);
 };
 
@@ -622,19 +623,30 @@ Level.prototype.restore_progress = function(save_str) {
   }
 };
 
-Level.prototype.click_play = function() {
-  this.row_allows_simple_click = false;
-  this.update_hover();
-};
-
-Level.prototype.start = function() {
-  // While the circuit is running, we mark all check pins as pending
-  // to avoid confusing the user (even if we're sure of the final
-  // value).
+Level.prototype.not_done = function() {
+  // If there is anything to simulate in the current row, we mark all
+  // check pins as pending.  To avoid confusing the user, we do this
+  // even if we are sure of the final value.
   for (var cell_name in this.named_cells){
     if (this.named_cells[cell_name].type == "output"){
       this.named_cells[cell_name].check_pending();
     }
+  }
+
+  // While simulation is delayed at the end of a row,
+  // row_allows_simple_click is active for the user, but once the
+  // delay is over and simulation resumes on the next row, then it
+  // must become false once again.  The same is true if simulation was
+  // paused at the end of the row, and then the user clicks play.
+  // However, if simulation was paused and the user manually selects
+  // the next row (the one that allows the simple click), this change
+  // of row causes not_done() to be called, but we keep
+  // row_allows_simple_click active in case the user wants to double
+  // click.  not_done() gets called again when the user clicks play
+  // (or the equivalent such as a double click).
+  if (!this.be.sim.paused()) {
+    this.row_allows_simple_click = false;
+    this.update_hover();
   }
 };
 
@@ -658,11 +670,11 @@ Level.prototype.circuit_changed = function() {
     }
   }
 
-  this.row_allows_simple_click = false;
   this.select_seq(this.cur_seq);
-  this.update_hover();
 
-  this.be.sim.start();
+  // Normally the changing stimulus pin values would have already
+  // triggered sim.start(), but in case they haven't...
+  this.be.sim.not_done();
 };
 
 // done() gets called by Sim when there are no events left to process.

@@ -41,14 +41,13 @@ Sim.prototype.resize_slider = function () {
 };
 
 Sim.prototype.click_play = function () {
-  if (this.running) return;
+  if (this.running) return; // Should be impossible.
 
   $("#button-play").hide();
   $("#button-pause").show();
   this.running = true;
   this.is_still_paused = false;
-  this.start();
-  this.be.level.click_play();
+  this.not_done();
   if (this.no_new_events()) {
     this.done(true);
   }
@@ -61,20 +60,23 @@ Sim.prototype.click_pause = function () {
   this.pause();
 };
 
-Sim.prototype.start = function() {
+Sim.prototype.not_done = function() {
+  // If the regular simulation timer is currently running, then we
+  // already know that we're not done, and we don't have to repeat
+  // the not_done() actions.
+  if (this.timer) return;
+
+  // If we're currently delaying before doing something else, the call
+  // of not_done() interrupts that and returns to regular simulation.
   if (this.delay_timer){
     clearTimeout(this.delay_timer);
     this.delay_timer = undefined;
   }
 
-  if (!this.timer){
-    // start() gets called when any new event is registered.  If the
-    // timer is not already running
-    this.be.level.start();
+  this.be.level.not_done();
 
-    if (this.running){
-      this.timer = setInterval($.proxy(this.tick, this), 50);
-    }
+  if (this.running){
+    this.timer = setInterval($.proxy(this.tick, this), 50);
   }
 };
 
@@ -99,7 +101,7 @@ Sim.prototype.no_new_events = function() {
 
 Sim.prototype.register_obj = function(obj, fresh_cell_output) {
   if (this.no_new_events()){
-    this.start();
+    this.not_done();
   }
 
   if (fresh_cell_output){
