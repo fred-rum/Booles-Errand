@@ -57,7 +57,7 @@ Sim.prototype.click_pause = function () {
   $("#button-pause").hide();
   $("#button-play").show();
   this.running = false;
-  this.pause();
+  this.stop_timer();
 };
 
 Sim.prototype.not_done = function() {
@@ -80,7 +80,7 @@ Sim.prototype.not_done = function() {
   }
 };
 
-Sim.prototype.pause = function() {
+Sim.prototype.stop_timer = function() {
   if (this.timer){
     clearInterval(this.timer);
     this.timer = undefined;
@@ -139,13 +139,13 @@ Sim.prototype.tick = function() {
 };
 
 Sim.prototype.reset = function() {
-  this.pause();
+  this.stop_timer();
   this.new_output_events = [];
   this.new_other_events = [];
 };
 
 Sim.prototype.done = function(fresh_play) {
-  this.pause();
+  this.stop_timer();
 
   var pass_status = this.be.level.done();
   if ((pass_status == 'fail') || (pass_status == 'done')) {
