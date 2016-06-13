@@ -123,6 +123,8 @@ function Circuit() {
 Circuit.prototype.begin_level = function(level_num) {
   this.be.level.begin(level_num);
 
+  this.unhide_info();
+
   // The simulation controls are different in different levels, so we
   // measure their width at the beginning of each level.
   this.be.controls_height = this.be.div_controls.outerHeight();
@@ -528,13 +530,17 @@ Circuit.prototype.click_info_hide = function() {
 }
 
 Circuit.prototype.click_info_unhide = function() {
+  this.unhide_info();
+  this.resize();
+  this.update_view();
+}
+
+Circuit.prototype.unhide_info = function() {
   this.info_hidden = false;
   this.be.div_info_stub.css({display: "none"});
   this.be.div_main_stub.css({display: "none"});
   this.be.div_info.css({display: "block"});
-  this.resize();
-  this.update_view();
-}
+};
 
 // This is called as soon as the DOM is ready.
 $(function() {

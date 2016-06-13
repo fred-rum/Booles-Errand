@@ -734,6 +734,7 @@ Level.prototype.done = function() {
 
   this.mark_currently_completed(true);
 
+  this.be.circuit.unhide_info();
   this.click_help_outro();
 
   return 'done';
