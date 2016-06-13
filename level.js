@@ -95,7 +95,12 @@ Level.prototype.begin = function(level_num) {
   if (level.avail === undefined){
     level.avail = ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'];
   }
+
   this.be.hide_cbox = (level.avail.length == 0);
+  var display = this.be.hide_cbox ? 'none' : 'block';
+  this.be.div_cbox_container.css({display: display});
+  this.be.div_cdrag.css({display: display});
+
   for (var i = 0; i < level.avail.length; i++){
     var name = level.avail[i];
     if (typeof name == 'string'){

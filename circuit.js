@@ -231,9 +231,6 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_cdrag.css({display: 'none'});
     this.be.cbox_width = 0;
   } else {
-    this.be.div_cbox_container.css({display: 'block'});
-    this.be.div_cdrag.css({display: 'block'});
-
     // Move the cbox below div_truth and decrease its height
     // accordingly.  div_truth may not be an exact integer height, but
     // jQuery always reports its height as an integer, and so the top of
