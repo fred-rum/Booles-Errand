@@ -966,8 +966,11 @@ Level.prototype.click_next = function() {
 
 Level.prototype.mark_currently_completed = function(currently_completed) {
   if (currently_completed) {
-    $('#truth').css({'background-color': '#d0ffd0'});
-    $('.check').css({'background-color': '#d0ffd0'});
+    //$('#truth').css({'background-color': '#d0ffd0'});
+    //$('.check').css({'background-color': '#d0ffd0'});
+    $('#info').css({'background-color': '#d0ffd0'});
+    $('#info-stub').css({'background-color': '#d0ffd0'});
+    $('.infobutton').css({fill: '#d0ffd0'});
     if (this.level_num == this.puzzle.length - 1) {
       $('#span-next-main').css({display: 'block'});
     } else {
@@ -975,8 +978,11 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     }
     this.be.controls_height = this.be.div_controls.outerHeight();
   } else {
-    $('#truth').css({'background-color': ''});
-    $('.check').css({'background-color': ''});
+    //$('#truth').css({'background-color': ''});
+    //$('.check').css({'background-color': ''});
+    $('#info').css({'background-color': ''});
+    $('#info-stub').css({'background-color': ''});
+    $('.infobutton').css({fill: ''});
     $('#span-next-puzzle').css({display: 'none'});
     $('#span-next-main').css({display: 'none'});
   }
