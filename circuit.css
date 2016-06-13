@@ -66,6 +66,12 @@ body {
 .infobutton:hover {
     fill: #b0b0ff;
 }
+.infobutton.complete {
+    fill: #d0ffd0;
+}
+.infobutton.complete:hover {
+    fill: #a0eea0;
+}
 #truth {
     position: fixed;
     top: 0;
@@ -130,6 +136,12 @@ body {
 }
 .help-drop:hover {
     background-color: #a0a0ff;
+}
+.help-drop.complete {
+    background-color: #b0ffb0;
+}
+.help-drop.complete:hover {
+    background-color: #90ee90;
 }
 .help-selected {
     background-color: #bbb !important;

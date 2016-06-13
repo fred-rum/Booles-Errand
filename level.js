@@ -970,7 +970,8 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     //$('.check').css({'background-color': '#d0ffd0'});
     $('#info').css({'background-color': '#d0ffd0'});
     $('#info-stub').css({'background-color': '#d0ffd0'});
-    $('.infobutton').css({fill: '#d0ffd0'});
+    $('.help-drop').addClass('complete');
+    $('.infobutton').addClass('complete');
     if (this.level_num == this.puzzle.length - 1) {
       $('#span-next-main').css({display: 'block'});
     } else {
@@ -982,7 +983,8 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     //$('.check').css({'background-color': ''});
     $('#info').css({'background-color': ''});
     $('#info-stub').css({'background-color': ''});
-    $('.infobutton').css({fill: ''});
+    $('.help-drop').removeClass('complete');
+    $('.infobutton').removeClass('complete');
     $('#span-next-puzzle').css({display: 'none'});
     $('#span-next-main').css({display: 'none'});
   }
