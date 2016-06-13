@@ -339,3 +339,6 @@ body.cursor-force-not-allowed, body.cursor-force-not-allowed * {
 body.cursor-force-row-resize, body.cursor-force-row-resize * {
     cursor: row-resize !important;
 }
+.nowrap {
+    white-space: nowrap;
+}
