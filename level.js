@@ -85,9 +85,13 @@ Level.prototype.begin = function(level_num) {
   }
 
   if (level.hide === undefined){
-    level.hide = new Set();
+    level.hide = {};
   } else if (Array.isArray(level.hide)){
-    level.hide = new Set(level.hide);
+    var hide = {};
+    for (var i = 0; i < level.hide.length; i++) {
+      hide[level.hide[i]] = true;
+    }
+    level.hide = hide;
   }
 
   this.box_cells = {};
@@ -187,7 +191,7 @@ Level.prototype.begin = function(level_num) {
   this.cur_line = 0;
   this.select_seq(0);
 
-  this.be.sim.begin_level(level.hide.has("speed"), this.sequenced);
+  this.be.sim.begin_level(level.hide.speed, this.sequenced);
 };
 
 Level.prototype.init_table = function() {
@@ -195,7 +199,7 @@ Level.prototype.init_table = function() {
   this.sequenced = false;
   this.row_result = [];
   var html = [];
-  this.be.hide_truth = level.hide.has("truth");
+  this.be.hide_truth = level.hide.truth;
   if (this.be.hide_truth){
     // Create the truth table HTML, but hidden.  This is easier than
     // not creating the HTML and trying to prevent the various
@@ -241,7 +245,7 @@ Level.prototype.init_table = function() {
   html.push('</table>');
   $("#truth").html(html.join(''));
   this.div_truth_table = $('#truth-table');
-  if (level.hide.has("truth")){
+  if (level.hide.truth){
     this.be.truth_table_width = 0;
   } else {
     this.be.truth_table_width = this.div_truth_table.width();
