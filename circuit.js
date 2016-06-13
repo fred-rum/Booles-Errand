@@ -178,14 +178,12 @@ Circuit.prototype.resize = function(maintain_center) {
   if (this.be.hide_truth && this.be.hide_cbox) {
     // Hide the truth div altogether (but only if the cbox div will
     // also be hidden).
-    this.be.div_truth.css({display: 'none'});
     this.be.truth_width = 0;
   } else {
     // The actual div_truth may be smaller than what we just set due to
     // the max-width property, so we measure it again to get the final
     // width.  Here, we measure the outer width since that's what useful
     // for positioning adjacent elements.
-    this.be.div_truth.css({display: 'block'});
     this.be.truth_width = this.be.div_truth.outerWidth();
   }
 
@@ -227,8 +225,6 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.truth_height = new_truth_height;
 
   if (this.be.hide_cbox) {
-    this.be.div_cbox_container.css({display: 'none'});
-    this.be.div_cdrag.css({display: 'none'});
     this.be.cbox_width = 0;
   } else {
     // Move the cbox below div_truth and decrease its height

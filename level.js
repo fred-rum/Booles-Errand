@@ -197,11 +197,16 @@ Level.prototype.init_table = function() {
   this.sequenced = false;
   this.row_result = [];
   var html = [];
+
   this.be.hide_truth = level.hide.truth;
+  var display = (this.be.hide_truth && this.be.hide_cbox) ? 'none' : 'block';
+  this.be.div_truth.css({display: display});
+
   if (this.be.hide_truth){
     // Create the truth table HTML, but hidden.  This is easier than
-    // not creating the HTML and trying to prevent the various
-    // actions that normally happen in the truth table.
+    // not creating the HTML and trying to prevent the various actions
+    // that normally happen in the truth table.  (Note that the entire
+    // truth_div may also be hidden as per the code above.)
     html.push('<table style="display: none;"><tr>');
   } else {
     html.push('<table id="truth-table" class="truth"><tr>');
