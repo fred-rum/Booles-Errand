@@ -222,6 +222,9 @@ body {
 p {
     margin: 0.625em;
 }
+input {
+    margin: 0.625em;
+}
 table {
     margin-left: auto;
     margin-right: auto;

@@ -499,6 +499,19 @@ Level.prototype.save_progress = function() {
   // automatically refit it on a window resize.
   this.be.view_is_fit = false;
 
+  var save_str = this.encode_progress();
+
+  var failed = this.save_data('boole.' + this.level.name + '.progress',
+                              save_str);
+  if (failed) {
+    var hash_str = this.level.name + '?' + save_str;
+    window.location.hash = encodeURI(hash_str);
+  } else {
+    window.location.hash = '';
+  }
+};
+
+Level.prototype.encode_progress = function() {
   var save = [];
 
   for (var i = 0; i < this.all_cells.length; i++) {
@@ -536,16 +549,8 @@ Level.prototype.save_progress = function() {
       }
     }
   }
-  var save_str = save.join('');
 
-  var failed = this.save_data('boole.' + this.level.name + '.progress',
-                              save_str);
-  if (failed) {
-    var hash_str = this.level.name + '?' + save_str;
-    window.location.hash = encodeURI(hash_str);
-  } else {
-    window.location.hash = '';
-  }
+  return save.join('');
 };
 
 Level.prototype.restore_progress = function(save_str) {
@@ -930,6 +935,11 @@ Level.prototype.init_help = function() {
   this.div_help_drop.append('<p id="help-outro" class="help-drop">Show conclusion</p>');
   $('#help-outro').click($.proxy(this.click_help_outro, this));
   if (!this.level.completed) $('#help-outro').css({display: 'none'});
+
+  if (!this.be.showing_soln) {
+    this.div_help_drop.append('<p id="help-copy" class="help-drop">Copy my progress</p>');
+    $('#help-copy').click($.proxy(this.click_help_copy, this));
+  }
 };
 
 Level.prototype.click_help = function() {
@@ -1000,6 +1010,29 @@ Level.prototype.click_help_outro = function() {
 
   this.be.div_infotxt.html(this.text(this.level.outro));
   smartquotes(this.be.div_infotxt[0]);
+  this.be.circuit.resize(false);
+  this.be.circuit.update_view();
+};
+
+Level.prototype.click_help_copy = function() {
+  this.select_help('copy');
+  this.close_help();
+
+  var url = window.location.href.split('#', 2)[0];
+  url = encodeURI(url + '#' + this.level.name + '?' + this.encode_progress());
+  var html = '<p>Copy this URL to save or share your progress for this puzzle:</p><input type="text" id="copyinput" size="' + url.length + '" value="' + url + '"/>';
+  this.be.div_infotxt.html(this.text(html));
+  $('#copyinput').select();
+  try {
+    var success = document.execCommand('copy');
+    if (success) {
+      var html = '<p>The following URL was copied to your clipboard:</p><p><b>' + url + '</b></p><p>Use it to save or share your progress for this puzzle.</p>';
+      this.be.div_infotxt.html(this.text(html));
+    }
+  }
+  catch (e) {
+    // Do nothing.
+  }
   this.be.circuit.resize(false);
   this.be.circuit.update_view();
 };
