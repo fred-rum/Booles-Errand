@@ -118,8 +118,7 @@ Level.prototype.begin = function(level_num) {
     if (cell_obj.type == "output") this.output_names.push(cell_name);
   }
 
-  $('#span-next-puzzle').css({display: 'none'});
-  $('#span-next-main').css({display: 'none'});
+  this.mark_currently_completed(false);
 
   // Initialize the truth table with columns for the input and output pins.
   this.init_table();
@@ -670,6 +669,8 @@ Level.prototype.circuit_changed = function() {
     }
   }
 
+  this.mark_currently_completed(false);
+
   this.select_seq(this.cur_seq);
 
   // Normally the changing stimulus pin values would have already
@@ -713,12 +714,7 @@ Level.prototype.done = function() {
     this.mark_complete(this.level_num);
   }
 
-  if (this.level_num == this.puzzle.length - 1) {
-    $('#span-next-main').css({display: 'block'});
-  } else {
-    $('#span-next-puzzle').css({display: 'block'});
-  }
-  this.be.controls_height = this.be.div_controls.outerHeight();
+  this.mark_currently_completed(true);
 
   this.click_help_outro();
 
@@ -966,4 +962,22 @@ Level.prototype.click_help_outro = function() {
 
 Level.prototype.click_next = function() {
   this.change_level(this.level_num + 1);
+};
+
+Level.prototype.mark_currently_completed = function(currently_completed) {
+  if (currently_completed) {
+    $('#truth').css({'background-color': '#d0ffd0'});
+    $('.check').css({'background-color': '#d0ffd0'});
+    if (this.level_num == this.puzzle.length - 1) {
+      $('#span-next-main').css({display: 'block'});
+    } else {
+      $('#span-next-puzzle').css({display: 'block'});
+    }
+    this.be.controls_height = this.be.div_controls.outerHeight();
+  } else {
+    $('#truth').css({'background-color': ''});
+    $('.check').css({'background-color': ''});
+    $('#span-next-puzzle').css({display: 'none'});
+    $('#span-next-main').css({display: 'none'});
+  }
 };
