@@ -134,7 +134,12 @@ Circuit.prototype.begin_level = function(level_num) {
 };
 
 Circuit.prototype.resize_event = function() {
-  this.resize(true);
+  if (this.be.view_is_fit) {
+    this.resize(false);
+    this.fit_view();
+  } else {
+    this.resize(true);
+  }
   this.update_view();
 };
 
@@ -390,6 +395,8 @@ Circuit.prototype.fit_view = function() {
     this.be.canvas_left = bbox_cx - cdraw_cx / scale;
     this.be.canvas_top = bbox_cy - cdraw_cy / scale;
   }
+
+  this.be.view_is_fit = true;
 };
 
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
@@ -432,6 +439,10 @@ Circuit.prototype.canvas_drag_start = function(x, y) {
 };
 
 Circuit.prototype.canvas_drag_move = function(x, y) {
+  // Since the user made a change to the canvas position, we won't
+  // automatically refit it on a window resize.
+  this.be.view_is_fit = false;
+
   var screen_dx = x - this.old_drag_x;
   var screen_dy = y - this.old_drag_y;
   var canvas_dx = screen_dx / this.be.scale;
@@ -493,6 +504,10 @@ Circuit.prototype.click_zoom_out = function() {
 };
 
 Circuit.prototype.zoom = function(ratio) {
+  // Since the user made a change to the canvas scale, we won't
+  // automatically refit it on a window resize.
+  this.be.view_is_fit = false;
+
   this.rescale((this.be.window_width + this.be.cbox_width) / 2,
                (this.be.window_height + this.be.info_height) / 2,
                this.be.scale * ratio);

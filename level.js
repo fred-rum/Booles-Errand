@@ -478,6 +478,10 @@ Level.prototype.move_cell_to_end = function(cell) {
 Level.prototype.save_progress = function() {
   if (this.be.showing_soln) return;
 
+  // Since the user made a change to the circuit, we won't
+  // automatically refit it on a window resize.
+  this.be.view_is_fit = false;
+
   var save = [];
 
   for (var i = 0; i < this.all_cells.length; i++) {
