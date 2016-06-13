@@ -198,7 +198,8 @@ Circuit.prototype.resize = function(maintain_center) {
   // sim & zoom controls accordingly.
   this.be.controls_offset = {
     top: -1,
-    left: (this.be.truth_width + this.be.window_width - this.be.controls_width) / 2
+    left: (this.be.truth_width + this.be.window_width -
+           this.be.controls_width) / 2
   };
   if (this.info_hidden){
     var info_stub_offset = {
@@ -214,7 +215,6 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.info_height = this.be.div_info.outerHeight();
     this.be.controls_offset.top = this.be.info_height - 1;
   }
-  this.be.div_controls.offset(this.be.controls_offset);
 
   // Make sure that div_truth is at least as tall as div_info.
   if (new_truth_height < this.be.info_height) {
@@ -252,6 +252,12 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.cbox_width = this.be.div_cbox_container.outerWidth();
     this.be.div_cdrag.width(this.be.cbox_width);
   }
+
+  if (this.be.info_height == this.be.truth_height) {
+    this.be.controls_offset.left = (this.be.cbox_width + this.be.window_width -
+                                    this.be.controls_width) / 2;
+  }
+  this.be.div_controls.offset(this.be.controls_offset);
 
   if (maintain_center){
     // If we want the canvas objects to stay centered in the viewable
