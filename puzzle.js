@@ -116,6 +116,7 @@ Level.prototype.puzzle = [
    truth: [{a: 0, z: 1},
            {a: 1, z: 0}],
    hide: ['speed'],
+   avail: [],
    cells: {
      a: {type: 'input',
          x: 0,
