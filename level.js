@@ -7,7 +7,7 @@ function Level(be) {
 
   for (var i = 0; i < this.puzzle.length; i++){
     var key = 'boole.' + this.puzzle[i].name + '.completed';
-    this.puzzle[i].completed = this.load_data(key);
+    this.puzzle[i].completed = this.be.circuit.load_data(key);
   }
 
   var html = [];
@@ -58,19 +58,19 @@ Level.prototype.begin = function(level_num) {
     }
   }
   if (level_num === undefined) {
-    var level_name = this.load_data('boole.state.level');
+    var level_name = this.be.circuit.load_data('boole.state.level');
     level_num = this.level_name_to_num(level_name);
   }
 
   if (!level_num) level_num = 0;
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
-  this.save_data('boole.state.level', level.name);
+  this.be.circuit.save_data('boole.state.level', level.name);
 
   if (this.be.showing_soln) {
     save_str = level.soln[this.be.showing_soln-1];
   } else if (!save_str) {
-    save_str = this.load_data('boole.' + level.name + '.progress');
+    save_str = this.be.circuit.load_data('boole.' + level.name + '.progress');
   }
 
   if (level.hide === undefined){
@@ -501,7 +501,7 @@ Level.prototype.save_progress = function() {
 
   var save_str = this.encode_progress();
 
-  var failed = this.save_data('boole.' + this.level.name + '.progress',
+  var failed = this.be.circuit.save_data('boole.' + this.level.name + '.progress',
                               save_str);
   if (failed) {
     var hash_str = this.level.name + '?' + save_str;
@@ -737,7 +737,7 @@ Level.prototype.done = function() {
     $('#help-outro').css({display: ''});
 
     this.level.completed = true;
-    this.save_data('boole.' + this.level.name + '.completed', 'true');
+    this.be.circuit.save_data('boole.' + this.level.name + '.completed', 'true');
     this.mark_complete(this.level_num);
   }
 
@@ -1064,24 +1064,5 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     $('.infobutton').removeClass('complete');
     $('#span-next-puzzle').css({display: 'none'});
     $('#span-next-main').css({display: 'none'});
-  }
-};
-
-Level.prototype.save_data = function(key, data) {
-  try {
-    localStorage.setItem(key, data);
-    return false;
-  }
-  catch(e) {
-    return true;
-  }
-};
-
-Level.prototype.load_data = function(key) {
-  try {
-    return localStorage.getItem(key);
-  }
-  catch(e) {
-    return undefined;
   }
 };

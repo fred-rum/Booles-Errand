@@ -21,7 +21,18 @@ function Sim(be) {
   $("#pause-at-seq").click($.proxy(this.click_pause_at, this, 'seq'));
   $("#pause-at-done").click($.proxy(this.click_pause_at, this, 'done'));
 
-  this.preferred_speed = 1.0;
+  var speed = this.be.circuit.load_data('boole.state.speed');
+  if (speed === undefined) speed = 1;
+  speed = Number(speed);
+  if (isNaN(speed) || (speed < 0.25) || ((speed > 16) && (speed != Infinity))) {
+    speed = 1;
+  }
+  this.preferred_speed = speed;
+
+  this.slider_min = 30;
+  this.slider_default = 110;
+  this.slider_max = 260;
+
   var slider = $("#speed-slider");
   this.slider_knob = $("#speed-knob")[0];
   this.slider_text = $("#speed-text")[0];
@@ -31,7 +42,17 @@ function Sim(be) {
                      {start: this.speed_drag_start,
                       move: this.speed_drag_move,
                       end: this.speed_drag_end});
-}
+
+  var linear = Math.log(speed)/Math.LN2; // log2
+  if (speed == Infinity) {
+    var x = this.slider_max;
+  } else if (linear > 0) {
+    x = (linear / 4) * (this.slider_max - this.slider_default) + this.slider_default;
+  } else {
+    var x = ((linear + 2) / 2) * (this.slider_default - this.slider_min) + this.slider_min;
+  }
+  this.set_slider(x);
+};
 
 Sim.prototype.resize_slider = function () {
   var slider = $("#speed-slider");
@@ -190,38 +211,39 @@ Sim.prototype.speed_drag_start = function(x, y) {
 
 Sim.prototype.speed_drag_move = function(x, y) {
   x = (x - this.slider_left) * 350/this.slider_width;
-  var slider_min = 30;
-  var slider_default = 110;
-  var slider_max = 260;
-
-  if (x >= slider_max){
-    x = slider_max;
+  if (x >= this.slider_max){
+    x = this.slider_max;
     this.speed = Infinity;
-  } else if (x > slider_default+15){
+  } else if (x > this.slider_default+15){
     // linear ranges from 0.0 at slider_default to 4.0 at slider_max.
-    var linear = 4.0 * (x - slider_default) / (slider_max - slider_default);
+    var linear = 4.0 * (x - this.slider_default) / (this.slider_max - this.slider_default);
     this.speed = Math.pow(2, linear);
-  } else if (x > slider_default-15){
-    x = slider_default;
+  } else if (x > this.slider_default-15){
+    x = this.slider_default;
     this.speed = 1.0;
   } else {
-    if (x < slider_min) x = slider_min;
+    if (x < this.slider_min) x = this.slider_min;
     // linear ranges from -2.0 at slider_min to 0.0 at slider_default.
-    var linear = -2.0 + 2.0 * (x - slider_min) / (slider_default - slider_min);
+    var linear = -2.0 + 2.0 * (x - this.slider_min) / (this.slider_default - this.slider_min);
     this.speed = Math.pow(2, linear);
   }
 
+  this.set_slider(x);
+
+  this.preferred_speed = this.speed;
+  this.be.circuit.save_data('boole.state.speed', String(this.speed));
+};
+
+Sim.prototype.set_slider = function(x) {
   this.slider_knob.setAttribute('cx', x);
 
-  var f = (x - slider_min) / (slider_max - slider_min);
+  var f = (x - this.slider_min) / (this.slider_max - this.slider_min);
   var min_color = this.slider_min_color;
   var max_color = this.slider_max_color;
   var r = min_color.r + (max_color.r - min_color.r) * f;
   var g = min_color.g + (max_color.g - min_color.g) * f;
   var b = min_color.b + (max_color.b - min_color.b) * f;
   this.slider_text.setAttribute('fill', Raphael.rgb(r, g, b));
-
-  this.preferred_speed = this.speed;
 };
 
 Sim.prototype.speed_drag_end = function() {

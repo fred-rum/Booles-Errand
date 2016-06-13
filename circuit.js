@@ -535,6 +535,25 @@ Circuit.prototype.unhide_info = function() {
   this.be.div_info.css({display: "block"});
 };
 
+Circuit.prototype.save_data = function(key, data) {
+  try {
+    localStorage.setItem(key, data);
+    return false;
+  }
+  catch(e) {
+    return true;
+  }
+};
+
+Circuit.prototype.load_data = function(key) {
+  try {
+    return localStorage.getItem(key);
+  }
+  catch(e) {
+    return undefined;
+  }
+};
+
 // This is called as soon as the DOM is ready.
 $(function() {
   new Circuit();
