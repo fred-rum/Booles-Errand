@@ -168,11 +168,19 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.div_truth.width(Math.max(this.be.truth_table_width + 20,
                                    this.be.em_size * 8));
 
-  // The actual div_truth may be smaller than what we just set due to
-  // the max-width property, so we measure it again to get the final
-  // width.  Here, we measure the outer width since that's what useful
-  // for positioning adjacent elements.
-  this.be.truth_width = this.be.div_truth.outerWidth();
+  if (this.be.hide_truth && this.be.hide_cbox) {
+    // Hide the truth div altogether (but only if the cbox div will
+    // also be hidden).
+    this.be.div_truth.css({display: 'none'});
+    this.be.truth_width = 0;
+  } else {
+    // The actual div_truth may be smaller than what we just set due to
+    // the max-width property, so we measure it again to get the final
+    // width.  Here, we measure the outer width since that's what useful
+    // for positioning adjacent elements.
+    this.be.div_truth.css({display: 'block'});
+    this.be.truth_width = this.be.div_truth.outerWidth();
+  }
 
   this.be.div_truth.outerHeight("auto");
   var new_truth_height = this.be.div_truth.outerHeight();
@@ -215,26 +223,35 @@ Circuit.prototype.resize = function(maintain_center) {
   }
   this.be.truth_height = new_truth_height;
 
-  // Move the cbox below div_truth and decrease its height
-  // accordingly.  div_truth may not be an exact integer height, but
-  // jQuery always reports its height as an integer, and so the top of
-  // cbox is always at an integer offset (which is necessary to allow
-  // smooth dragging from cbox to cdraw, which is also at an integer
-  // offset).
-  var cbox_height = this.be.window_height - this.be.truth_height;
-  var cbox_offset = {
-    top: this.be.truth_height,
-    left: 0
-  };
-  this.be.div_cbox_container.offset(cbox_offset);
-  this.be.div_cbox_container.height(cbox_height);
+  if (this.be.hide_cbox) {
+    this.be.div_cbox_container.css({display: 'none'});
+    this.be.div_cdrag.css({display: 'none'});
+    this.be.cbox_width = 0;
+  } else {
+    this.be.div_cbox_container.css({display: 'block'});
+    this.be.div_cdrag.css({display: 'block'});
 
-  var cbox_scale = Math.min(1.0,
-                            Math.max(0.5, cbox_height / this.be.box_height));
-  this.be.div_cbox.width(this.be.em_size * 8 * cbox_scale);
-  this.be.div_cbox.height(this.be.box_height * cbox_scale);
-  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
-  this.be.div_cdrag.width(this.be.cbox_width);
+    // Move the cbox below div_truth and decrease its height
+    // accordingly.  div_truth may not be an exact integer height, but
+    // jQuery always reports its height as an integer, and so the top of
+    // cbox is always at an integer offset (which is necessary to allow
+    // smooth dragging from cbox to cdraw, which is also at an integer
+    // offset).
+    var cbox_height = this.be.window_height - this.be.truth_height;
+    var cbox_offset = {
+      top: this.be.truth_height,
+      left: 0
+    };
+    this.be.div_cbox_container.offset(cbox_offset);
+    this.be.div_cbox_container.height(cbox_height);
+
+    var cbox_scale = Math.min(1.0,
+                              Math.max(0.5, cbox_height / this.be.box_height));
+    this.be.div_cbox.width(this.be.em_size * 8 * cbox_scale);
+    this.be.div_cbox.height(this.be.box_height * cbox_scale);
+    this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+    this.be.div_cdrag.width(this.be.cbox_width);
+  }
 
   if (maintain_center){
     // If we want the canvas objects to stay centered in the viewable

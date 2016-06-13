@@ -95,6 +95,7 @@ Level.prototype.begin = function(level_num) {
   if (level.avail === undefined){
     level.avail = ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'];
   }
+  this.be.hide_cbox = (level.avail.length == 0);
   for (var i = 0; i < level.avail.length; i++){
     var name = level.avail[i];
     if (typeof name == 'string'){
@@ -189,7 +190,8 @@ Level.prototype.init_table = function() {
   this.sequenced = false;
   this.row_result = [];
   var html = [];
-  if (level.hide.has("truth")){
+  this.be.hide_truth = level.hide.has("truth");
+  if (this.be.hide_truth){
     // Create the truth table HTML, but hidden.  This is easier than
     // not creating the HTML and trying to prevent the various
     // actions that normally happen in the truth table.
