@@ -235,10 +235,10 @@ Level.prototype.init_table = function() {
   }
   html.push('</table>');
   $("#truth").html(html.join(''));
+  this.div_truth_table = $('#truth-table');
   if (level.hide.has("truth")){
     this.be.truth_table_width = 0;
   } else {
-    this.div_truth_table = $('#truth-table');
     this.be.truth_table_width = this.div_truth_table.width();
   }
 
@@ -812,6 +812,16 @@ Level.prototype.click_main = function() {
   this.be.sim.click_pause();
   $("#level" + this.level_num).css({"background-color": "#ff8"});
   $("#main_container").css({display: "block"});
+
+  var height = $('#main').prop('scrollHeight');
+  if (this.level_num == this.puzzle.length - 1) {
+    var top = height;
+  } else {
+    var cy = ($('#level' + this.level_num).offset().top +
+              $('#level' + (this.level_num + 1)).offset().top) / 2;
+    var top = cy - $('#main').height()/2;
+  }
+  $('#main').scrollTop(top);
 };
 
 Level.prototype.click_level = function(level_num, event) {
