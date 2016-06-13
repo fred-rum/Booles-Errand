@@ -5,14 +5,9 @@
 function Level(be) {
   this.be = be;
 
-  try {
-    for (var i = 0; i < this.puzzle.length; i++){
-      var key = 'boole.' + this.puzzle[i].name + '.completed';
-      this.puzzle[i].completed = localStorage.getItem(key);
-    }
-  }
-  catch(e) {
-    // continue
+  for (var i = 0; i < this.puzzle.length; i++){
+    var key = 'boole.' + this.puzzle[i].name + '.completed';
+    this.puzzle[i].completed = this.load_data(key);
   }
 
   var html = [];
@@ -59,29 +54,23 @@ Level.prototype.begin = function(level_num) {
       var a = anchor.split('?', 2);
       var level_name = a[0];
       if (a.length == 2) save_str = a[1];
-      for (var i = 0; i < this.puzzle.length; i++){
-        if (this.puzzle[i].name == level_name){
-          level_num = i;
-          break;
-        }
-      }
+      level_num = this.level_name_to_num(level_name);
     }
+  }
+  if (level_num === undefined) {
+    var level_name = this.load_data('boole.state.level');
+    level_num = this.level_name_to_num(level_name);
   }
 
   if (!level_num) level_num = 0;
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
+  this.save_data('boole.state.level', level.name);
 
   if (this.be.showing_soln) {
-    save_str = this.level.soln[this.be.showing_soln-1];
+    save_str = level.soln[this.be.showing_soln-1];
   } else if (!save_str) {
-    try {
-      var key = 'boole.' + this.level.name + '.progress';
-      save_str = localStorage.getItem(key);
-    }
-    catch(e) {
-      // continue
-    }
+    save_str = this.load_data('boole.' + level.name + '.progress');
   }
 
   if (level.hide === undefined){
@@ -193,6 +182,15 @@ Level.prototype.begin = function(level_num) {
 
   this.be.sim.begin_level(level.hide.speed, this.sequenced);
 };
+
+Level.prototype.level_name_to_num = function(name) {
+  for (var i = 0; i < this.puzzle.length; i++){
+    if (this.puzzle[i].name == name){
+      return i;
+    }
+  }
+  return undefined;
+}
 
 Level.prototype.init_table = function() {
   var level = this.level;
@@ -535,16 +533,14 @@ Level.prototype.save_progress = function() {
   }
   var save_str = save.join('');
 
-  try {
-    var key = 'boole.' + this.level.name + '.progress';
-    localStorage.setItem(key, save_str);
+  var failed = this.save_data('boole.' + this.level.name + '.progress',
+                              save_str);
+  if (failed) {
+    var hash_str = this.level.name + '?' + save_str;
+    window.location.hash = encodeURI(hash_str);
+  } else {
+    window.location.hash = '';
   }
-  catch(e) {
-    // continue
-  }
-
-  var hash_str = this.level.name + '?' + save_str;
-  window.location.hash = encodeURI(hash_str);
 };
 
 Level.prototype.restore_progress = function(save_str) {
@@ -731,13 +727,7 @@ Level.prototype.done = function() {
     this.add_outro_help();
 
     this.level.completed = true;
-    try {
-      var key = 'boole.' + this.level.name + '.completed';
-      localStorage.setItem(key, "true");
-    }
-    catch(e) {
-      // continue
-    }
+    this.save_data('boole.' + this.level.name + '.completed', 'true');
     this.mark_complete(this.level_num);
   }
 
@@ -1039,5 +1029,24 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     $('.infobutton').removeClass('complete');
     $('#span-next-puzzle').css({display: 'none'});
     $('#span-next-main').css({display: 'none'});
+  }
+};
+
+Level.prototype.save_data = function(key, data) {
+  try {
+    localStorage.setItem(key, data);
+    return false;
+  }
+  catch(e) {
+    return true;
+  }
+};
+
+Level.prototype.load_data = function(key) {
+  try {
+    return localStorage.getItem(key);
+  }
+  catch(e) {
+    return undefined;
   }
 };
