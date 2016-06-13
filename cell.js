@@ -47,7 +47,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   };
   this.cell_fg_fill_attr = {
     "stroke-width": this.be.stroke_cell_fg,
-    "stroke-linejoin": "miter",
+    "stroke-linejoin": "round",
     stroke: "#fff",
     fill: "#fff"
   };
