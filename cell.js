@@ -23,6 +23,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this.cell_fg_attr = {
     "stroke-width": this.be.stroke_cell_fg,
     "stroke-linejoin": "miter",
+    "stroke-linecap": "round", // for pending_del dashed lines
     stroke: "#000",
     fill: "#fff"
   };
@@ -519,7 +520,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
   } else {
     del = false;
   }
-  if (del && !this.pending_del){
+  if (del && (del != this.pending_del)){
     var attr;
     if (del == "new"){
       attr = {
