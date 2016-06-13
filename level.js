@@ -729,7 +729,7 @@ Level.prototype.done = function() {
 
   // There are no failed rows/sequences.
   if (!this.level.completed) {
-    this.add_outro_help();
+    $('#help-outro').css({display: ''});
 
     this.level.completed = true;
     this.save_data('boole.' + this.level.name + '.completed', 'true');
@@ -927,12 +927,9 @@ Level.prototype.init_help = function() {
     }
   }
 
-  if (this.level.completed) this.add_outro_help();
-};
-
-Level.prototype.add_outro_help = function() {
   this.div_help_drop.append('<p id="help-outro" class="help-drop">Show conclusion</p>');
   $('#help-outro').click($.proxy(this.click_help_outro, this));
+  if (!this.level.completed) $('#help-outro').css({display: 'none'});
 };
 
 Level.prototype.click_help = function() {
