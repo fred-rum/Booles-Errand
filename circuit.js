@@ -202,12 +202,8 @@ Circuit.prototype.resize = function(maintain_center) {
            this.be.controls_width) / 2
   };
   if (this.info_hidden){
-    var info_stub_offset = {
-      top: 0,
-      left: this.be.truth_width - 1
-    };
-    this.be.div_info_stub.offset(info_stub_offset);
-    this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
+    // For now, just set the info panel stub height.  We'll set its
+    // width and position later.
     this.be.info_height = this.be.div_info_stub.outerHeight();
   } else {
     this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
@@ -250,7 +246,40 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_cbox.width(this.be.em_size * 8 * cbox_scale);
     this.be.div_cbox.height(this.be.box_height * cbox_scale);
     this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+
+    // The measured cbox_width appears to be rounded up if fractional,
+    // which is what we want for setting the cdrag width.
     this.be.div_cdrag.width(this.be.cbox_width);
+  }
+
+  if (this.be.hide_truth && this.info_hidden){
+    // If the info panel is hidden, then we allow the hidden truth
+    // table width to be subordinate to the cbox width.  Possibly this
+    // applies to only the 'Hidden truths' puzzle since it is the only
+    // one that hides the truth table, but has gates available in
+    // cbox.
+
+    // If the info panel is not hidden, then changing the truth width
+    // changes the info width, which changes the info height, which
+    // changes the cbox height, which changes the cbox width, which
+    // changes the truth width, which is a circular dependency chain.
+    // So we don't reduce the truth width when the info panel is
+    // showing.
+
+    // If the info panel is hidden and the truth table is visible,
+    // then the truth table is always wider than the cbox width for
+    // the browsers I've tried.  So I don't bother with the extra code
+    // that would be needed to try to reduce its width here.
+    this.be.truth_width = this.be.cbox_width;
+    this.be.div_truth.outerWidth(this.be.truth_width);
+  }
+  if (this.info_hidden) {
+    var info_stub_offset = {
+      top: 0,
+      left: this.be.truth_width - 1
+    };
+    this.be.div_info_stub.offset(info_stub_offset);
+    this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
   }
 
   if (this.be.info_height == this.be.truth_height) {
