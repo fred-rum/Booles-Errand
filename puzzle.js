@@ -13,7 +13,7 @@ Level.prototype.puzzle = [
    section: 'Introduction to combinational circuits',
    ui: true,
    intro: '<p>&#9733; <b>Press the play button &play; below</b> to transmit the electrical value from the stimulus pin "A" to the test pin "Z". &#9733;</p>',
-   outro: '<p>Congratulations!</p>',
+   outro: '<p>Click the "Next puzzle" button to learn more about the circuit design puzzles in Boole\'s Errand.</p>',
    hint: ['<p>You don\'t need a hint for this puzzle.  But don\'t be afraid to ask for one when things get more difficult.</p>'],
    truth: [{a: 1,   z: 1}],
    hide: ['truth', 'speed'],
