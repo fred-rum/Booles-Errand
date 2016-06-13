@@ -242,6 +242,7 @@ Level.prototype.init_table = function() {
     this.be.truth_table_width = this.div_truth_table.width();
   }
 
+  this.row_top = [];
   for (var i = 0; i < num_rows; i++){
     var row = $('#row' + i);
     row.hover($.proxy(this.row_enter, this, i),
@@ -250,7 +251,11 @@ Level.prototype.init_table = function() {
     row.dblclick($.proxy(this.row_dblclick, this, i));
     this.be.bdrag.drag(row, this, 'truth',
                        {dblclick: this.row_dblclick});
+
+    this.row_top.push(row.offset().top);
   }
+  this.row_top.push(this.div_truth_table.height());
+
 };
 
 Level.prototype.table_header = function(html, port_names) {
@@ -638,20 +643,27 @@ Level.prototype.not_done = function() {
     }
   }
 
-  // While simulation is delayed at the end of a row,
-  // row_allows_simple_click is active for the user, but once the
-  // delay is over and simulation resumes on the next row, then it
-  // must become false once again.  The same is true if simulation was
-  // paused at the end of the row, and then the user clicks play.
-  // However, if simulation was paused and the user manually selects
-  // the next row (the one that allows the simple click), this change
-  // of row causes not_done() to be called, but we keep
-  // row_allows_simple_click active in case the user wants to double
-  // click.  not_done() gets called again when the user clicks play
-  // (or the equivalent such as a double click).
   if (!this.be.sim.paused()) {
+    // While simulation is delayed at the end of a row,
+    // row_allows_simple_click is active for the user, but once the
+    // delay is over and simulation resumes on the next row, then it
+    // must become false once again.  The same is true if simulation
+    // was paused at the end of the row, and then the user clicks
+    // play.  However, if simulation was paused and the user manually
+    // selects the next row (the one that allows the simple click),
+    // this change of row causes not_done() to be called, but we keep
+    // row_allows_simple_click active in case the user wants to double
+    // click.  not_done() gets called again when the user clicks play
+    // (or the equivalent such as a double click).
     this.row_allows_simple_click = false;
     this.update_hover();
+
+    // If not_done() is called because the user clicked play, scroll
+    // the current row of the truth table into view.  Note that if the
+    // user clicks in the truth table, this automatically pauses
+    // simulation before not_done() is called, so the truth table is
+    // not scrolled in that case.
+    this.scroll_truth();
   }
 };
 
@@ -735,6 +747,20 @@ Level.prototype.advance_truth = function(type) {
     // wouldn't be here.
     this.select_seq(this.first_failed_seq());
   }
+
+  this.scroll_truth();
+};
+
+Level.prototype.scroll_truth = function() {
+  // Scroll the maximum amount to the right to ensure that the test
+  // results are visible.
+  this.be.div_truth.scrollLeft(this.be.truth_table_width);
+
+  // Try to scroll the current sequence into view.
+  var row = this.cur_row();
+  var cy = (this.row_top[row] + this.row_top[row + 1]) / 2;
+  var top = cy - this.be.truth_height/2;
+  this.be.div_truth.scrollTop(top);
 };
 
 Level.prototype.first_failed_seq = function() {
