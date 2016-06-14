@@ -219,6 +219,8 @@ Io.prototype.update_value = function(value) {
 };
 
 Io.prototype.reset = function() {
+  var i_was_undefined = (this.value === undefined);
+
   this.update_value(undefined);
 
   // We know that all wires (that can potentially propagate values)
@@ -226,7 +228,7 @@ Io.prototype.reset = function() {
   // wires in one consistent direction from each cell.
   if (this.type == "input"){
     for (var i = 0; i < this.w.length; i++) {
-      this.w[i].reset();
+      this.w[i].reset(i_was_undefined);
     }
   }
 

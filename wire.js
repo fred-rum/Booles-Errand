@@ -175,10 +175,12 @@ Wire.prototype.release_value = function() {
   }
 };
 
-Wire.prototype.reset = function(no_io_change) {
+Wire.prototype.reset = function(i_was_undefined) {
   // As a performance optimization, we avoid expensive reset
-  // operations if the wire is already in a reset state.
-  if ((this.i.value === undefined) && !this.in_flight.length) return;
+  // operations if the wire is already in a reset state.  We know that
+  // the input port is undefined now (since it was just reset), but we
+  // need to check whether it was *previously* undefined.
+  if (i_was_undefined && !this.in_flight.length) return;
 
   this.remove_subpaths();
   this.remove_sparks();
