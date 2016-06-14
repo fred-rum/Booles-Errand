@@ -713,6 +713,8 @@ Level.prototype.circuit_changed = function() {
   // Normally the changing stimulus pin values would have already
   // triggered sim.start(), but in case they haven't...
   this.be.sim.not_done();
+
+  this.be.sim.click_pause();
 };
 
 // done() gets called by Sim when there are no events left to process.
