@@ -142,12 +142,12 @@ Sim.prototype.tick = function() {
   } else {
     this.old_output_events = [];
   }
-  this.old_other_events = this.new_other_events;
-  this.new_other_events = [];
-
   for (var i = 0; i < this.old_output_events.length; i++) {
     this.old_output_events[i].tick(this.speed);
   }
+
+  this.old_other_events = this.new_other_events;
+  this.new_other_events = [];
   for (var i = 0; i < this.old_other_events.length; i++) {
     this.old_other_events[i].tick(this.speed);
   }

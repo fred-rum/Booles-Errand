@@ -24,7 +24,7 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   this.min_color = Raphael.getRGB("#aaf");
   this.max_color = Raphael.getRGB("#8d8");
 
-  this.has_new_value = false;
+  this.registered = false;
 
   if (inner_x == 'mux') {
     // Special case: the stub is vertical, not horizontal.
@@ -219,19 +219,20 @@ Io.prototype.update_value = function(value) {
 };
 
 Io.prototype.reset = function() {
-  var no_io_change = (this.value === undefined) && !this.has_new_value;
-
   this.update_value(undefined);
-  this.has_new_value = false;
 
   // We know that all wires (that can potentially propagate values)
   // are connected to cells on both ends, so we only need to reset
   // wires in one consistent direction from each cell.
   if (this.type == "input"){
     for (var i = 0; i < this.w.length; i++) {
-      this.w[i].reset(no_io_change);
+      this.w[i].reset();
     }
   }
+
+  // The simulation events are also being reset, so if this IO was
+  // registered, it isn't anymore.
+  this.registered = false;
 };
 
 Io.prototype.propagate_input = function(value) {
@@ -245,38 +246,48 @@ Io.prototype.propagate_output = function(value) {
   if (value === this.value) return;
 
   this.update_value(value);
-
-  if (this.w.length){
-    // Don't register for a new tick if there are no wires to
-    // propagate to.  Doing so could cause simulation to pause at the
-    // gate output when it could otherwise complete the table row.
-    this.register_output();
-  }
+  this.register_output();
 };
 
 // register_ouput() is separated from propagate_output() because it
 // can also be called when there is no new IO output, but there is a
 // newly connected wire that we want to start propagating on.
 Io.prototype.register_output = function() {
+  var propagated = false;
+  for (var i = 0; i < this.w.length; i++) {
+    // Don't propagate values across pending (uncommitted) new wires.
+    // This also prevents propagating to the null cell.
+    if (!this.w[i].pending_new) {
+      this.w[i].propagate_value();
+      propagated = true;
+    }
+  }
+
+  // Don't register for a new tick if there are no wires to
+  // propagate to (or only new wires, which don't propagate values).
+  // Doing so could cause simulation to pause at the gate output
+  // when it could otherwise complete the table row.
+  //
   // register_output() may be called multiple times in a tick
   // (e.g. due to changing cell inputs, or because more wires are
   // connected while simulation is paused).  Register the output to
   // tick only once.
-  if (this.has_new_value) return;
-
-  this.be.sim.register_obj(this, true);
-  this.has_new_value = true;
+  if (propagated && !this.registered) {
+    this.be.sim.register_obj(this, true);
+    this.registered = true;
+  }
 };
 
 Io.prototype.tick = function(speed) {
   // tick() is called for output ports first in a tick, and the value
-  // is only propagated to the beginning of the next wire in this
-  // tick.  Thus, we know that ticking one output port cannot corrupt
-  // the pending value to be propagated on any other output port.
-  this.has_new_value = false;
+  // is only released to be in flight on the wire in this tick.  Thus,
+  // we know that ticking one output port cannot corrupt the pending
+  // value to be propagated on any other output port.
   for (var i = 0; i < this.w.length; i++) {
-    this.w[i].propagate_value();
+    this.w[i].release_value();
   }
+
+  this.registered = false;
 };
 
 Io.prototype.bring_to_top = function() {

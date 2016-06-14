@@ -126,41 +126,59 @@ Wire.prototype.restore_old = function() {
 }
 
 Wire.prototype.propagate_value = function() {
-  // Don't propagate values across pending (uncommitted) new wires.
-  // This also prevents propagating to the null cell.
-  if (this.pending_new) return;
+  // If there is a previous value being held (because it was
+  // propagated from the IO in this same tick), discard it first.
+  if (this.in_flight.length) {
+    var fl_obj = this.in_flight[this.in_flight.length-1];
+    if (fl_obj.held) {
+      if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
+      if (fl_obj.el_spark) fl_obj.el_spark.remove();
+      this.in_flight.splice(-1, 1);
+    }
+  }
 
-
-  // The output IO always propagates its value first in the tick,
-  // before any wires have updated.  If any values are in flight, then
-  // the wire must already be registered to receive an update in this
-  // tick.  We avoid duplicating the registration, and we record that
-  // the newest value should not advance in age in this tick.
-  if (this.in_flight.length){
-    // The output IO is guaranteed to propagate no more than one value
-    // per tick, so we can record the value in a simple variable.
-    // The value is put into the in-flight queue later in the tick,
-    // so it is safe from being overwritten in later ticks.
-    this.newest_value = this.o.value;
+  if (this.in_flight.length) {
+    // Don't propagate the newest value if it is the same as the most
+    // recent value in flight.
+    var fl_obj = this.in_flight[this.in_flight.length-1];
+    if (this.o.value === fl_obj.value) return;
   } else {
-    // This wire isn't registered yet, so we register it in order to
-    // propagate the new value.  We also put the new value in the
-    // in-flight queue.  This indicates that it is OK to advance its
-    // age when the wire eventually ticks.  It also keeps the value
-    // safe from being overwritten in case the output port propagates
-    // a new value in the next tick before the wire can tick.
+    // No values are in flight, so don't propagate the newest value
+    // if it is the same as the value at the wire's output end.
+    if (this.o.value === this.i.value) return;
+  }
+
+  var fl_obj = {
+    value: this.o.value,
+    age: 0,
+    held: true
+  };
+  this.in_flight.push(fl_obj);
+  this.draw_spark(fl_obj);
+};
+
+Wire.prototype.release_value = function() {
+  // Ignore the call if there is no held value.
+  if (!this.in_flight.length || !this.in_flight[this.in_flight.length-1].held) {
+    return;
+  }
+
+  this.in_flight[this.in_flight.length-1].held = false;
+
+  // If there are already other values in flight on the wire, then
+  // it is already registered for a tick.  But if the held value is
+  // the only value in flight, then we have to register the wire to
+  // get the next tick.
+  if (this.in_flight.length == 1) {
     this.be.sim.register_obj(this, false);
-    var fl_obj = {
-      age: 0,
-      value: this.o.value
-    };
-    this.in_flight.push(fl_obj);
   }
 };
 
 Wire.prototype.reset = function(no_io_change) {
-  this.newest_value = null;
-  if (no_io_change && !this.in_flight.length) return;
+  // As a performance optimization, we avoid expensive reset
+  // operations if the wire is already in a reset state.
+  if ((this.i.value === undefined) && !this.in_flight.length) return;
+
   this.remove_subpaths();
   this.in_flight = [];
   this.redraw_fg();
@@ -172,19 +190,12 @@ Wire.prototype.tick = function(speed) {
   // we don't trigger any more ticks.
   if (this.dead) return;
 
-  if (this.in_flight.length) {
-    // Don't propagate the newest value if it is the same as the most
-    // recent value in flight.
-    var fl_obj = this.in_flight[this.in_flight.length-1];
-    if (this.newest_value === fl_obj.value) this.newest_value = null;
-  } else {
-    // No values are in flight, so don't propagate the newest value
-    // if it is the same as the value at the wire's output end.
-    if (this.newest_value === this.i.value) this.newest_value = null;
-  }
-
   for (var i = 0; i < this.in_flight.length; i++){
     var fl_obj = this.in_flight[i];
+
+    // A 'held' value is stuck at age 0 until released.
+    if (fl_obj.held) continue;
+
     fl_obj.age += this.be.wire_speed * speed / this.path_length;
     if (fl_obj.age >= 1.0){
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
@@ -202,21 +213,9 @@ Wire.prototype.tick = function(speed) {
   this.redraw_fg();
   //this.measure_perf("segmented");
 
-  // Only after everything in the in-flight queue has advanced in age
-  // can we put the newest_value (propagated from the output port
-  // earlier in this tick) into the queue.
-  if (this.newest_value !== null){
-    var fl_obj = {
-      age: 0,
-      value: this.newest_value
-    };
-    this.in_flight.push(fl_obj);
-    this.newest_value = null;
-  }
-
-  if (this.in_flight.length){
-    // There is still data in flight, so register the wire to tick
-    // again.
+  if (this.in_flight.length && !this.in_flight[0].held){
+    // There is still data in flight (that isn't being held), so
+    // register the wire to tick again.
     this.be.sim.register_obj(this, false);
   }
 };
