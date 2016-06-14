@@ -67,6 +67,10 @@ Level.prototype.begin = function(level_num) {
   var level = this.level = this.puzzle[level_num];
   this.be.circuit.save_data('boole.state.level', level.name);
 
+//  if (true) { // cheat
+//    save_str = level.soln; // [level.soln.length-1]
+//    console.log(save_str);
+//  } else
   if (this.be.showing_soln) {
     save_str = level.soln[this.be.showing_soln-1];
   } else if (!save_str) {

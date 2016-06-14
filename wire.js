@@ -188,6 +188,7 @@ Wire.prototype.tick = function(speed) {
     fl_obj.age += this.be.wire_speed * speed / this.path_length;
     if (fl_obj.age >= 1.0){
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
+      if (fl_obj.el_spark) fl_obj.el_spark.remove();
       var value = fl_obj.value;
       if ((this.o.cell.output_width == 1) && (value == 1)) {
         value *= ((1 << this.i.cell.input_width) - 1);
@@ -232,6 +233,38 @@ Wire.prototype.reorder_z = function(ref_bg, ref_fg) {
 
 
 // Private functions and members
+
+Wire.prototype.get_point = function(z) {
+  var x1 = this.o.cell.x + this.o.x;
+  var y1 = this.o.cell.y + this.o.y;
+  var x2 = this.i.cell.x + this.i.x;
+  var y2 = this.i.cell.y + this.i.y;
+
+  var aw = this.aw;
+  var len_aa = aw.angle_a * aw.r;
+  var len_b = len_aa + aw.seg_len;
+  var path_length = this.path_length;
+
+  var xd, yd;
+  if (z < len_aa){
+    var angle = z / aw.r;
+    var sign_ya = aw.cwa ? 1 : -1;
+    xd = aw.r*Math.sin(angle);
+    yd = aw.r*(1-Math.cos(angle)) * sign_ya;
+    return [x1+xd, y1+yd];
+  } else if (z < len_b){
+    var d = z - len_aa;
+    xd = (aw.xb-aw.xa) * (d / aw.seg_len);
+    yd = (aw.yb-aw.ya) * (d / aw.seg_len);
+    return [aw.xa+xd, aw.ya+yd];
+  } else {
+    var angle = (path_length - z) / aw.r;
+    var sign_yb = aw.cwb ? 1 : -1;
+    xd = -aw.r*Math.sin(angle);
+    yd = aw.r*(1-Math.cos(angle)) * sign_yb;
+    return [x2+xd, y2+yd];
+  }
+};
 
 Wire.prototype.get_subpath = function(z1, z2) {
   // Raphael's (and thus presumably the browser's) getSubpath function
@@ -477,6 +510,71 @@ Wire.prototype.compute = function() {
   this.arcwire(x1, y1, x2-x1, y2-y1);
 };
 
+Wire.prototype.draw_spark = function(fl_obj) {
+  if (!fl_obj.el_spark || (fl_obj.age !== fl_obj.spark_age)) {
+    // Radius range for outer points.
+    var max_r1 = this.be.io_handle_size / 2;
+    var min_r1 = max_r1/2;
+
+    // Radius range for inner points.
+    var max_r0 = max_r1/3;
+    var min_r0 = max_r1/5;
+
+    // Number of points (total of inner & outer points).
+    var npoints = this.be.level.rnd(5, 10) * 2;
+
+    // Starting angle (a random rotation).
+    var angle0 = Math.random() * Math.PI * 2;
+
+    var path = [];
+    for (var i = 0; i < npoints; i++) {
+      var angle = angle0 + (Math.PI * 2) / npoints * i;
+
+      // Add a random jitter up to half the angle to the next point.
+      angle += Math.random() * Math.PI / npoints;
+
+      var max_r = (i & 1) ? max_r1 : max_r0;
+      var min_r = (i & 1) ? min_r1 : min_r0;
+      var r = Math.random() * (max_r - min_r) + min_r;
+
+      var x = Math.cos(angle) * r;
+      var y = Math.sin(angle) * r;
+      path.push((i == 0) ? 'M' : 'L');
+      path.push(x, y);
+    }
+    path.push('z');
+
+    if (fl_obj.el_spark) {
+      fl_obj.el_spark.attr({path: path});
+    } else {
+      var el_top = this.el_fg;
+      for (i = 0; i < this.in_flight.length; i++){
+        var iter_obj = this.in_flight[i];
+        if (iter_obj.el_subpath) el_top = iter_obj.el_subpath;
+        if (iter_obj.el_spark) el_top = iter_obj.el_spark;
+      }
+
+      var attr = {
+        "stroke-width": this.be.stroke_io_handle,
+        stroke: "#f80",
+        fill: "#ff0",
+        opacity: "0.80"
+      };
+      fl_obj.el_spark = this.be.cdraw.path(path).attr(attr);
+      fl_obj.el_spark.setAttr("pointer-events", "none");
+      fl_obj.el_spark.insertAfter(el_top);
+    }
+
+    fl_obj.spark_age = fl_obj.age;
+  }
+
+  var age_len = fl_obj.age * this.path_length;
+  var cxy = this.get_point(age_len);
+  var cx = cxy[0];
+  var cy = cxy[1];
+  fl_obj.el_spark.transform('t' + cx + ',' + cy);
+};
+
 Wire.prototype.redraw_fg = function() {
   if (this.pending_del == "del"){
     var attr = {
@@ -506,6 +604,8 @@ Wire.prototype.redraw_fg = function() {
     older_el_subpath.attr({path: path,
                            stroke: color});
 
+    this.draw_spark(fl_obj);
+
     if (!fl_obj.el_subpath){
       // Draw a path placeholder of the appropriate color.
       // The actual path will be inserted at the next loop
@@ -517,7 +617,6 @@ Wire.prototype.redraw_fg = function() {
       fl_obj.el_subpath.insertAfter(older_el_subpath);
       fl_obj.el_subpath.setAttr("pointer-events", "none");
     }
-
     older_value = fl_obj.value;
     older_el_subpath = fl_obj.el_subpath;
     older_age_len = age_len;
@@ -559,6 +658,10 @@ Wire.prototype.remove_subpaths = function() {
     if (fl_obj.el_subpath){
       fl_obj.el_subpath.remove();
       fl_obj.el_subpath = undefined;
+    }
+    if (fl_obj.el_spark) {
+      fl_obj.el_spark.remove();
+      fl_obj.el_spark = undefined;
     }
   }
 }
