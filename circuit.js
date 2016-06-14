@@ -478,6 +478,10 @@ Circuit.prototype.canvas_mousewheel = function(event) {
 }
 
 Circuit.prototype.rescale = function(x, y, new_scale) {
+  // Since the user made a change to the canvas scale, we won't
+  // automatically refit it on a window resize.
+  this.be.view_is_fit = false;
+
   if (new_scale > 2.0) new_scale = 2.0;
   var old_canvas_mx = x / this.be.scale;
   var old_canvas_my = y / this.be.scale;
@@ -499,10 +503,6 @@ Circuit.prototype.click_zoom_out = function() {
 };
 
 Circuit.prototype.zoom = function(ratio) {
-  // Since the user made a change to the canvas scale, we won't
-  // automatically refit it on a window resize.
-  this.be.view_is_fit = false;
-
   this.rescale((this.be.window_width + this.be.cbox_width) / 2,
                (this.be.window_height + this.be.info_height) / 2,
                this.be.scale * ratio);
