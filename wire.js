@@ -515,6 +515,7 @@ Wire.prototype.redraw_fg = function() {
       };
       fl_obj.el_subpath = this.be.cdraw.path("M0,0").attr(attr);
       fl_obj.el_subpath.insertAfter(older_el_subpath);
+      fl_obj.el_subpath.setAttr("pointer-events", "none");
     }
 
     older_value = fl_obj.value;
