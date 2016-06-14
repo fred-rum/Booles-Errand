@@ -93,6 +93,7 @@ Wire.prototype.remove = function(removed_by_input_port) {
   this.el_fg.remove();
   this.el_bg.remove();
   this.remove_subpaths();
+  this.remove_sparks();
 
   if (!this.pending_new && !removed_by_input_port){
     // Update the attached cell input with the fact that it's
@@ -180,6 +181,7 @@ Wire.prototype.reset = function(no_io_change) {
   if ((this.i.value === undefined) && !this.in_flight.length) return;
 
   this.remove_subpaths();
+  this.remove_sparks();
   this.in_flight = [];
   this.redraw_fg();
 };
@@ -516,7 +518,7 @@ Wire.prototype.draw_spark = function(fl_obj) {
     //
     // It would be nice to also avoid duplicate sparks at the same
     // position along the initial arc, but (a) floating point errors,
-    // and (b) complications with tick order and with moving wires.
+    // (b) wire tick order, and (c) moving wires.
     for (var i = 0; i < this.o.w.length; i++) {
       var cmp_in_flight = this.o.w[i].in_flight;
       if (cmp_in_flight.length) {
@@ -591,6 +593,11 @@ Wire.prototype.draw_spark = function(fl_obj) {
 };
 
 Wire.prototype.redraw_fg = function() {
+  for (var i = 0; i < this.in_flight.length; i++){
+    var fl_obj = this.in_flight[i];
+    this.draw_spark(fl_obj);
+  }
+
   if (this.pending_del == "del"){
     var attr = {
       path: this.path,
@@ -618,8 +625,6 @@ Wire.prototype.redraw_fg = function() {
     var color = Wire.color(older_value, this.o.cell.output_width);
     older_el_subpath.attr({path: path,
                            stroke: color});
-
-    this.draw_spark(fl_obj);
 
     if (!fl_obj.el_subpath){
       // Draw a path placeholder of the appropriate color.
@@ -674,6 +679,13 @@ Wire.prototype.remove_subpaths = function() {
       fl_obj.el_subpath.remove();
       fl_obj.el_subpath = undefined;
     }
+  }
+}
+
+Wire.prototype.remove_sparks = function() {
+  // Remove all propagating sparks.
+  for (var i = 0; i < this.in_flight.length; i++){
+    var fl_obj = this.in_flight[i];
     if (fl_obj.el_spark) {
       fl_obj.el_spark.remove();
       fl_obj.el_spark = undefined;
