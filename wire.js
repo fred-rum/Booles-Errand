@@ -510,6 +510,22 @@ Wire.prototype.compute = function() {
 };
 
 Wire.prototype.draw_spark = function(fl_obj) {
+  if (!fl_obj.el_spark && fl_obj.held) {
+    // Don't create a new spark directly at the output port if there
+    // is already a spark on another wire there.
+    //
+    // It would be nice to also avoid duplicate sparks at the same
+    // position along the initial arc, but (a) floating point errors,
+    // and (b) complications with tick order and with moving wires.
+    for (var i = 0; i < this.o.w.length; i++) {
+      var cmp_in_flight = this.o.w[i].in_flight;
+      if (cmp_in_flight.length) {
+        var cmp_obj = cmp_in_flight[cmp_in_flight.length-1];
+        if (cmp_obj.el_spark && cmp_obj.held) return;
+      }
+    }
+  }
+
   if (!fl_obj.el_spark || (fl_obj.age !== fl_obj.spark_age)) {
     // Radius range for outer points.
     var max_r1 = this.be.io_handle_size / 2;
