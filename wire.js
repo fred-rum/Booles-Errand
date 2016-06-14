@@ -236,18 +236,14 @@ Wire.prototype.reorder_z = function(ref_bg, ref_fg) {
 // Private functions and members
 
 Wire.prototype.get_point = function(z) {
-  var x1 = this.o.cell.x + this.o.x;
-  var y1 = this.o.cell.y + this.o.y;
-  var x2 = this.i.cell.x + this.i.x;
-  var y2 = this.i.cell.y + this.i.y;
-
   var aw = this.aw;
   var len_aa = aw.angle_a * aw.r;
   var len_b = len_aa + aw.seg_len;
-  var path_length = this.path_length;
 
   var xd, yd;
   if (z < len_aa){
+    var x1 = this.o.cell.x + this.o.x;
+    var y1 = this.o.cell.y + this.o.y;
     var angle = z / aw.r;
     var sign_ya = aw.cwa ? 1 : -1;
     xd = aw.r*Math.sin(angle);
@@ -259,7 +255,9 @@ Wire.prototype.get_point = function(z) {
     yd = (aw.yb-aw.ya) * (d / aw.seg_len);
     return [aw.xa+xd, aw.ya+yd];
   } else {
-    var angle = (path_length - z) / aw.r;
+    var x2 = this.i.cell.x + this.i.x;
+    var y2 = this.i.cell.y + this.i.y;
+    var angle = (this.path_length - z) / aw.r;
     var sign_yb = aw.cwb ? 1 : -1;
     xd = -aw.r*Math.sin(angle);
     yd = aw.r*(1-Math.cos(angle)) * sign_yb;
@@ -267,42 +265,15 @@ Wire.prototype.get_point = function(z) {
   }
 };
 
+// Raphael's (and thus presumably the browser's) getSubpath function
+// is slow and estimates the subpath using cubic Bezier segments.
+// This is understandable for a general case path, but our path is so
+// simple that we can do much better.  This function is measured to be
+// at least twice as fast as the built-in function.
 Wire.prototype.get_subpath = function(z1, z2) {
-  // Raphael's (and thus presumably the browser's) getSubpath function
-  // is slow and estimates the subpath using cubic Bezier segments.
-  // This is understandable for a general case path, but our path is
-  // so simple that we can do much better.
-  var x1 = this.o.cell.x + this.o.x;
-  var y1 = this.o.cell.y + this.o.y;
-  var x2 = this.i.cell.x + this.i.x;
-  var y2 = this.i.cell.y + this.i.y;
-
   var aw = this.aw;
   var len_aa = aw.angle_a * aw.r;
   var len_b = len_aa + aw.seg_len;
-  var path_length = this.path_length;
-
-  function get_point(z) {
-    var xd, yd;
-    if (z < len_aa){
-      var angle = z / aw.r;
-      var sign_ya = aw.cwa ? 1 : -1;
-      xd = aw.r*Math.sin(angle);
-      yd = aw.r*(1-Math.cos(angle)) * sign_ya;
-      return [x1+xd, y1+yd];
-    } else if (z < len_b){
-      var d = z - len_aa;
-      xd = (aw.xb-aw.xa) * (d / aw.seg_len);
-      yd = (aw.yb-aw.ya) * (d / aw.seg_len);
-      return [aw.xa+xd, aw.ya+yd];
-    } else {
-      var angle = (path_length - z) / aw.r;
-      var sign_yb = aw.cwb ? 1 : -1;
-      xd = -aw.r*Math.sin(angle);
-      yd = aw.r*(1-Math.cos(angle)) * sign_yb;
-      return [x2+xd, y2+yd];
-    }
-  }
 
   var seg1 =
     (z1 < len_aa) ? 0 :
@@ -314,41 +285,41 @@ Wire.prototype.get_subpath = function(z1, z2) {
     2;
   var la, lb;
 
-  var path = ["M"].concat(get_point(z1));
+  var path = ["M"].concat(this.get_point(z1));
   if (seg1 == 0){
     if (seg2 == 0){
       // seg1 == 0, seg2 == 0
       la = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
       path = path.concat("A", aw.r, aw.r, 0, la, aw.cwa,
-                         get_point(z2));
+                         this.get_point(z2));
     } else {
       // seg1 == 0, seg2 > 0
       la = ((len_aa-z1)/aw.r > Math.PI) ? 1 : 0;
       path = path.concat("A", aw.r, aw.r, 0, la, aw.cwa,
                          aw.xa, aw.ya);
       if (seg2 == 1){
-        path = path.concat("L", get_point(z2));
+        path = path.concat("L", this.get_point(z2));
       } else {
         lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
         path = path.concat("L", aw.xb, aw.yb,
                            "A", aw.r, aw.r, 0, lb, aw.cwb,
-                           get_point(z2));
+                           this.get_point(z2));
       }
     }
   } else if (seg1 == 1){
     if (seg2 == 1){
-      path = path.concat("L", get_point(z2));
+      path = path.concat("L", this.get_point(z2));
     } else {
       lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
       path = path.concat("L", aw.xb, aw.yb,
                          "A", aw.r, aw.r, 0, lb, aw.cwb,
-                         get_point(z2));
+                         this.get_point(z2));
     }
   } else {
     // seg1 == 2
     lb = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
     path = path.concat("A", aw.r, aw.r, 0, lb, aw.cwb,
-                       get_point(z2));
+                       this.get_point(z2));
   }
 
   return path;
