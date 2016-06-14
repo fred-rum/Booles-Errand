@@ -44,23 +44,11 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   }
 
 
-  var tw = this.be.io_handle_size;
+  var tw = this.be.io_handle_size; // Actually, double the IO handle size.
   var attr = {
-    "stroke-width": this.be.stroke_io_handle,
+    "stroke-width": 0,
   };
-  if (cell.locked) {
-    this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
-  } else if (type == 'input') {
-    var intersect_y = Math.sqrt(tw*tw - tw*tw/4);
-    this.el_target = this.canvas.path(['M',x+tw/2, y-intersect_y,
-                                       'a', tw, tw, 0, 1, 0,
-                                       0, intersect_y*2]).attr(attr);
-  } else {
-    var intersect_y = Math.sqrt(tw*tw - tw*tw/4);
-    this.el_target = this.canvas.path(['M',x-tw/2, y-intersect_y,
-                                       'a', tw, tw, 0, 1, 1,
-                                       0, intersect_y*2]).attr(attr);
-  }
+  this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
   this.el_target.setAttr("visibility", "hidden");
   this.el_target.setAttr("pointer-events", "all");
 
@@ -94,8 +82,7 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   this.el_value_text_bg.attr(attr_bg);
   this.el_value_text_bg.setAttr("pointer-events", "none");
 
-  this.set_io = this.canvas.set(this.el_target,
-                                this.el_value_text_bg,
+  this.set_io = this.canvas.set(this.el_value_text_bg,
                                 this.el_value_text);
 }
 
@@ -116,6 +103,7 @@ Io.prototype.draw_stub_fg = function() {
   this.set_io.push(this.el_stub_end);
 
   this.stub = this.canvas.path(this.path).attr(stub_fg_attr);
+  this.stub.setAttr("pointer-events", "none");
   return this.stub;
 };
 
@@ -123,10 +111,6 @@ Io.prototype.connect = function(wire) {
   if (wire.locked){
     this.locked = true;
     this.be.drag.disable_drag(this);
-
-    // Drop the IO target below all others so that the 'not-allowed'
-    // cursor doesn't show up when another target is nearby.
-    this.el_target.insertAfter(this.be.wire);
   } else if (!this.w.length && this.el_stub_end){
     this.el_stub_end.setAttr("visibility", "visible");
   }
@@ -299,7 +283,6 @@ Io.prototype.bring_to_top = function() {
   this.el_value_text_bg.insertBefore(this.be.z_io);
   this.el_value_text.insertBefore(this.be.z_io);
   this.el_stub_end.insertBefore(this.be.z_io);
-  this.el_target.insertBefore(this.be.z_io);
 };
 
 Io.prototype.mark_old = function(type) {

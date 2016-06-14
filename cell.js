@@ -640,6 +640,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
                         (no > 1) ? "o" + i : "o", "output",
                         right+cw, y, shallow ? right : 0);
     this.io[io_obj.name] = io_obj;
+    this.push_ns(io_obj.el_target, true);
   }
 
   if (no > 0){
@@ -655,6 +656,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
                         (ni > 1) ? "i" + i : "i", "input",
                         left-cw, y, shallow ? left : 0);
     this.io[io_obj.name] = io_obj;
+    this.push_ns(io_obj.el_target, true);
   }
 };
 
@@ -670,7 +672,9 @@ Cell.prototype.draw_stubs = function() {
       stub_path = stub_path.concat(this.io[name].path);
     }
   }
-  this.push_ns(this.canvas.path(stub_path).attr(this.stub_bg_attr));
+  var el_stub_bg = this.canvas.path(stub_path).attr(this.stub_bg_attr);
+  el_stub_bg.setAttr("pointer-events", "none");
+  this.push_ns(el_stub_bg);
 
   // In contrast, the stub foregrounds can be drawn in different
   // colors depending on the IO state.  Therefore, each is its own
@@ -851,6 +855,9 @@ Cell.prototype.init_mux = function(inv) {
   this.io.s = new Io(this.be, this.canvas, this,
                      's', 'input',
                      left, -top + this.be.stub_len, 'mux');
+  this.push_ns(this.io.i0.el_target);
+  this.push_ns(this.io.i1.el_target);
+  this.push_ns(this.io.s.el_target);
 
   var cell_path = ["M", left, top,
                    "v", height,
@@ -1058,16 +1065,18 @@ Cell.prototype.init_latch = function() {
   var right = width/2;
   var top = -height/2;
 
-  this.io['d'] = new Io(this.be, this.canvas, this, 'd', 'input',
-                        left - this.be.stub_len, -this.be.io_spacing, left);
-  this.io['e'] = new Io(this.be, this.canvas, this, 'e', 'input',
-                        left - this.be.stub_len, 0, left);
+  this.io.d = new Io(this.be, this.canvas, this, 'd', 'input',
+                     left - this.be.stub_len, -this.be.io_spacing, left);
+  this.io.e = new Io(this.be, this.canvas, this, 'e', 'input',
+                     left - this.be.stub_len, 0, left);
+  this.io.q = new Io(this.be, this.canvas, this, 'q', 'output',
+                     right + this.be.stub_len, -this.be.io_spacing, right);
+  this.push_ns(this.io.d.el_target);
+  this.push_ns(this.io.e.el_target);
+  this.push_ns(this.io.q.el_target);
 
-  this.io['q'] = new Io(this.be, this.canvas, this, 'q', 'output',
-                        right + this.be.stub_len, -this.be.io_spacing, right);
-
-  this.qty_cx = this.io['q'].x;
-  this.qty_top = this.io['q'].y + this.be.io_spacing * 2;
+  this.qty_cx = this.io.q.x;
+  this.qty_top = this.io.q.y + this.be.io_spacing * 2;
 
   this.push_ns(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr));
   this.draw_stubs();
@@ -1252,9 +1261,9 @@ Cell.prototype.push_s = function(el) {
   this.el_cell.push(el);
 };
 
-Cell.prototype.push_ns = function(el, no_tgt) {
+Cell.prototype.push_ns = function(el, is_tgt) {
   this.el_ns.push(el);
-  if (!no_tgt) this.el_no_target.push(el);
+  if (!is_tgt) this.el_no_target.push(el);
   this.el_cell.push(el);
 };
 
