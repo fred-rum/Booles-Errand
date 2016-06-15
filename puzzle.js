@@ -1438,7 +1438,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'An SR latch',
    intro: '<p>A D latch is typically built with an <i>SR latch</i> inside, as shown in the circuit below. It can be <i>set</i> to 1 or <i>reset</i> to 0 by its inputs. If it is currently neither set nor reset, then it holds its last value by recirculating that value infinitely.</p><p><b>Connect the S pin so that it sets the latch to 1 and the R pin so that it resets the latch to 0.</b></p>',
-   outro: '<p>What happens if S and R are both 1?</p>',
+   outro: '<p>If the <i>latch</i> is locked, nothing can get through the <i>gate</i>.  Circuit designers are quite the laugh riot, aren\'t they?</p>',
    soln: '1s5-0,o,4,i1-1,o,5,i;200,inv,100+o,3,i1',
    truth: [[{s:1, r:0,   q:1},
             {s:0, r:0,   q:1},
