@@ -24,17 +24,12 @@ function Circuit() {
   this.be.div_main_stub = $("#main-stub");
   this.be.div_cdrag = $("#cdrag");
   this.be.div_cdraw = $("#cdraw");
-  this.be.div_cbox_container = $("#cbox_container");
   this.be.div_cbox = $("#cbox");
-
-  //this.be.div_cbox.width("6.4em");
-  //this.be.div_truth.css({"font-size": "80%"});
-  //this.be.div_info.css({"font-size": "80%"});
 
   // We want cdrag to be wide enough to overlap the border between
   // cbox and cdraw.  jquery appears to round up for outerwidth(),
   // which is what we want to avoid a sub-pixel gap.
-  this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+  this.be.cbox_width = this.be.div_cbox.outerWidth();
   this.be.div_cdrag.width(this.be.cbox_width);
 
   this.be.zoom_width = this.be.div_zoom.outerWidth();
@@ -51,7 +46,7 @@ function Circuit() {
   // Sizes are based on the "em" size in the document.  Thus,
   // devices with very small pixels (like phones) will scale up as
   // appropriate.
-  var em_size = this.be.em_size = this.be.div_cbox_container.width() / 8;
+  var em_size = this.be.em_size = this.be.div_truth.width() / 8;
   this.be.io_spacing = em_size * 10/8;
   this.be.io_handle_size = this.be.io_spacing * 3/4;
   this.be.stub_len = em_size * 5/8;
@@ -232,14 +227,14 @@ Circuit.prototype.resize = function(maintain_center) {
       top: this.be.truth_height,
       left: 0
     };
-    this.be.div_cbox_container.offset(cbox_offset);
-    this.be.div_cbox_container.height(cbox_height);
+    this.be.div_cbox.offset(cbox_offset);
+    this.be.div_cbox.height(cbox_height);
 
     var cbox_scale = Math.min(1.0,
                               Math.max(0.5, cbox_height / this.be.box_height));
-    this.be.div_cbox.width(this.be.em_size * 8 * cbox_scale);
-    this.be.div_cbox.height(this.be.box_height * cbox_scale);
-    this.be.cbox_width = this.be.div_cbox_container.outerWidth();
+    this.be.cbox.setSize(this.be.em_size * 8 * cbox_scale,
+                         this.be.box_height * cbox_scale);
+    this.be.cbox_width = this.be.div_cbox.outerWidth();
 
     // The measured cbox_width appears to be rounded up if fractional,
     // which is what we want for setting the cdrag width.

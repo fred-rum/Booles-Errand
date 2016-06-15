@@ -77,7 +77,7 @@ body {
     top: 0;
     left: 0;
     height: auto;
-    width: auto;
+    width: 8em; /* used as the reference width to get em_size */
     max-width: 50vw;
     max-height: 50vh;
     overflow: auto;
@@ -169,10 +169,10 @@ body {
     top: 0;
     left: 0;
     height: 100%;
-    width: 8em; /* resized in Javascript to match cbox_container + border */
+    width: 8em; /* resized in Javascript to match cbox + border */
     z-index: -1;
 }
-#cbox_container {
+#cbox {
     position: fixed;
     top: 0;
     left: 0;
@@ -185,12 +185,6 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     z-index: 2;
-}
-#cbox {
-    top: 0;
-    left: 0;
-    width: 8em;
-    height: 100%;
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */

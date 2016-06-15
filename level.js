@@ -95,7 +95,7 @@ Level.prototype.begin = function(level_num) {
 
   this.be.hide_cbox = (level.avail.length == 0);
   var display = this.be.hide_cbox ? 'none' : 'block';
-  this.be.div_cbox_container.css({display: display});
+  this.be.div_cbox.css({display: display});
   this.be.div_cdrag.css({display: display});
 
   for (var i = 0; i < level.avail.length; i++){
