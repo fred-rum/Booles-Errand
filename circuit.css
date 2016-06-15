@@ -337,7 +337,9 @@ body.cursor-force-not-allowed, body.cursor-force-not-allowed * {
 body.cursor-force-row-resize, body.cursor-force-row-resize * {
     cursor: row-resize !important;
 }
-.nowrap {
+/* I almost always use span for this purpose, so I don't even bother
+   giving it a class name. */
+span {
     white-space: nowrap;
 }
 svg {
