@@ -14,12 +14,6 @@ function Circuit() {
   this.be.cbox = Raphael("cbox", "100%", "100%");
   this.be.cdraw = Raphael("cdraw", "100%", "100%");
 
-  // An inline SVG sits on the baseline, so if it is 100% of the div
-  // height, then the space left for descenders will cause a vertical
-  // scrollbar to appear.  Setting display: block instead of inline
-  // prevents that.
-  $("#cbox svg").attr({"display": "block"});
-
   this.be.window = $(window);
   this.be.div_truth = $("#truth");
   this.be.div_info = $("#info");

@@ -898,7 +898,7 @@ Level.prototype.commit_widths = function() {
 // different than the smartquotes substitions because it can add or
 // delete HTML tags, not just replace text outside the tags.
 Level.prototype.text = function(str) {
-  return (str || '').replace(/&play;/g,'<svg style="vertical-align:middle" width="1em" height="1em" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder"/><path d="M37,25v50l30,-25z" class="playcenter"/></svg>');
+  return (str || '').replace(/&play;/g,'<svg width="1em" height="1em" viewBox="0 0 100 100"><rect x="10" y="10" width="80" height="80" rx="20" ry="20" class="playborder"/><path d="M37,25v50l30,-25z" class="playcenter"/></svg>');
 };
 
 Level.prototype.init_help = function() {

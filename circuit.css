@@ -346,3 +346,6 @@ body.cursor-force-row-resize, body.cursor-force-row-resize * {
 .nowrap {
     white-space: nowrap;
 }
+svg {
+    vertical-align: middle;
+}
