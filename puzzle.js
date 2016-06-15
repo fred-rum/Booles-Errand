@@ -78,9 +78,37 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Wire fanout',
+   ui: true,
+   intro: '<p>Multiple wires can be connected to the same data source. <b>Add a wire to connect A to Z and another wire to connect A <span class="nowrap">to Y.</span></b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left side of both test pins.</p><p>Tip: A wire cannot connect from an input port directly to another input port. If you drag from Z to Y, it will move the existing wire (if any), or it will fail.',
+   outro: '<p>As many wires as you want can <i>fan out</i> from any output port.</p>',
+   hint: ['<p>If a wire is connected to an input or output port, a short crossbar indicates the spot where you can interact with the wire or add another wire.</p>'],
+   soln: '1s3-0,o,1,i-0,o,2,i',
+   truth: [{a: 0,   z: 0, y: 0},
+           {a: 1,   z: 1, y: 1}],
+   hide: ['speed'],
+   avail: [],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 50
+        }
+     ,
+     z: {type: 'output',
+         x: 200,
+         y: 0
+        }
+     ,
+     y: {type: 'output',
+         x: 200,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'The NOT gate',
    intro: '<p><b>A NOT gate changes a 0 to 1, or changes a 1 to a 0.</b>  In other words, the output of a NOT gate is 1 only if its input is <i>not</i> 1.</p>',
-   outro: '<p><b>The NOT gate is typically represented in text with a tilde.  E.g. Z = ~A.</b>  (But be warned: most programming languages apply the tilde operation to general integers, so extra steps must be taken to limit the result to just 0 or 1.)</p><p><b>A NOT gate is also called an inverter.</b></p>',
+   outro: '<p><b>The NOT gate is typically represented in text with a tilde.  E.g. <span class="nowrap">Z = ~A.</span></b>  (But be warned: most programming languages apply the tilde operation to general integers, so extra steps must be taken to limit the result to just 0 or 1.)</p><p><b>A NOT gate is also called an inverter.</b></p><p>We\'ll practice with the NOT gate for a bit before introducing some more interesting gates.</p>',
    hint: ['<p>Press play &play; to watch the NOT gate do its thing.</p>'],
    truth: [{a: 0,   z: 1},
            {a: 1,   z: 0}],
@@ -138,7 +166,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Create a gate',
    ui: true,
-   intro: '<p><b>Drag the NOT gate from the inventory box at the left into the drawing area. Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: Simply touching two wire stubs is not sufficient to transmit a value between them. A wire must be drawn from one to the other.</p>',
+   intro: '<p>Your stock of gates is in the inventory box on the left.  <b>Drag the NOT gate from the inventory box into the drawing area and wire it into the circuit.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: Simply touching two wire stubs is not sufficient to transmit a value between them. A wire must be drawn from one to the other.</p>',
    outro: '<p>The stock of gates in the inventory may be limited.  Design efficiently!</p><p>You can delete a gate and return it to the inventory by dragging it off the canvas.  Deleting a gate also deletes all wires connected to the gate.</p>',
    hint: ['<p>This is just like the previous puzzle, except that you have to drag the NOT gate from the inventory box on the left.</p>'],
    soln: '1s2-0,o,2,i;150,inv,0+o,1,i',
@@ -159,10 +187,37 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'A simple circuit',
+   intro: '<p><b>Check the truth table to see how this circuit should be connected.</b></p><p>Tip: The table says that when A is 1, Z must get a 1 value, and Y must get a 0. It also says what values must go to the test pins when A is 0.</p>',
+   outro: '<p>It looks like you\'re getting the hang of it!</p>',
+   hint: ['<p>Sorry, but there won\'t be any more hints for the easy puzzles.  If you\'re still stuck, you can use the main menu to look at the introductory puzzles again.  Or you can use the help menu to see a sample solution.  It\'s up to you to decide if that\'s cheating or not.</p>'],
+   soln: '1s3-0,o,3,i-0,o,1,i;160,inv,100+o,2,i',
+   truth: [{a: 1,   z: 1, y: 0},
+           {a: 0,   z: 0, y: 1}],
+   hide: ['speed'],
+   avail: ['inv', 1],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         x: 300,
+         y: 0
+        }
+     ,
+     y: {type: 'output',
+         x: 300,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'Zoom controls',
    ui: true,
    intro: '<p>For larger puzzles, you can zoom in <svg width="1em" height="1em" viewBox="0 0 100 100"><circle cx="37" cy="37" r="20" stroke="#888" stroke-width="7" fill="none"/><path d="M37,30v14M30,37h14M52,52L83,83" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>, zoom out <svg width="1em" height="1em" viewBox="0 0 100 100"><circle cx="37" cy="37" r="20" stroke="#888" stroke-width="7" fill="none"/><path d="M30,37h14M52,52L83,83" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>, and zoom to fit <svg width="1em" height="1em" viewBox="0 0 100 100"><rect x="15" y="15" width="70" height="70" stroke="#888" stroke-width="3" fill="none"/><path d="M50,42V20M40,30L50,20L60,30M58,50H80M70,40L80,50L70,60M50,58V80M40,70L50,80L60,70M42,50H20M30,40L20,50L30,60" stroke="#888" stroke-width="5" stroke-linecap="round" fill="none"/></svg> using the controls in the lower right.  You can also zoom in and out using the scroll wheel on your mouse or by pinching in the drawing area on a touchscreen.</p><p>You can also pan the drawing area by dragging the background.</p><p>Tip: on a touch screen, you can drag a gate or wire and simultaneously pan or zoom the drawing area to where you want to put it.</p>',
-   outro: '<p>You can play this game on a small screen such as a smartphone, but you\'ll have to do a lot of zooming and panning.  You may find the later puzzles easier on a larger screen.</p><p>If you need more drawing room, you can hide this info panel by clicking the arrow in the corner<svg width="1em" height="1em" viewBox="0 0 100 100"><path d="M30,45H15V15H45V30" stroke="#888" stroke-width="3" fill="none"/><path d="M30,55v-25h25M30,30L80,80" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>.</p>',
+   outro: '<p>You can play this game on a small screen such as a smartphone, but you\'ll have to do a lot of zooming and panning.  You\'ll find the later puzzles to be much easier on a larger screen.</p><p>If you need more drawing room, you can hide this info panel by clicking the arrow in the corner<svg width="1em" height="1em" viewBox="0 0 100 100"><path d="M30,45H15V15H45V30" stroke="#888" stroke-width="3" fill="none"/><path d="M30,55v-25h25M30,30L80,80" stroke="#888" stroke-width="7" stroke-linecap="round" fill="none"/></svg>.</p>',
    soln: '1s2-0,o,2,i;500,inv,500+o,1,i',
    truth: [{a: 0,   z: 1},
            {a: 1,   z: 0}],
@@ -183,8 +238,8 @@ Level.prototype.puzzle = [
 ,
   {name: 'Simulation controls',
    ui: true,
-   intro: '<p><b>Here are some new ways to control the simulation.</b></p><p>The small buttons next to the play button &play; tell the simulation to pause when the propagating values have reached a <span class="nowrap">gate <svg width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>,</span> when one truth table line has passed <span class="nowrap">testing <svg width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>,</span> or when all truth table rows have <span class="nowrap">passed <svg width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>.</span></p><p>The "speed" slider adjusts the speed of data flow from slow to fast.</p>',
-   outro: '<p><b>You can restart a test or switch to testing a different truth table row by clicking on that row.</b> Double clicking a row selects it and immediately starts simulation (as if you clicked play &play;). If simulation is paused immediately after one truth table row has passed, clicking play &play; automatically advances to the next row.</p>',
+   intro: '<p>Feeling impatient? <b>The "speed" slider to the right of the play button &play; adjusts the speed of data flow to be faster or slower.</b></p><p>You can pause simulation at precise points using the small buttons to the left of the play button <span class="nowrap">&play;.</span>  These controls pause simulation when all propagating values have reached a <span class="nowrap">gate <svg width="1.2857em" height="1em" viewBox="-4 -2 18 14" fill="none"><path d="M0,0v10h5a5,5,0,0,0,0,-10h-5z" stroke="#888" stroke-width="1.5"/><path d="M-2.5,2.5H0M-2.5,7.5H0M12.5,5H10" stroke="#888" stroke-width="1"/></svg>,</span> when one truth table row has passed its <span class="nowrap">tests <svg width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M1.25,5l2.5,5l5,-10" stroke="#888" stroke-width="1.5"/></svg>,</span> or when all truth table rows have <span class="nowrap">passed <svg width="1em" height="1em" viewBox="-2 -2 14 14" fill="none"><path d="M0.25,2.5l1.25,2.5l2.5,-5M0.25,7.5l1.25,2.5l2.5,-5M5.5,2.5l1.25,2.5l2.5,-5M5.5,7.5l1.25,2.5l2.5,-5" stroke="#888" stroke-width="1"/></svg>.</span></p>',
+   outro: '<p>If simulation is paused immediately after one truth table row has passed, clicking play &play; automatically advances to the next row. <b>You can restart a test or switch to testing a different truth table row by clicking on that row.</b> Double clicking a row selects it and immediately starts simulation (as if you clicked play &play;).</p>',
    hint: ['<p>You can complete this puzzle simply by pressing the play button &play;, but understanding the speed slider especially will speed your way through the rest of the puzzles.</p>'],
    truth: [{a: 0,   z: 0},
            {a: 1,   z: 1}],
@@ -263,62 +318,9 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'Wire fanout',
-   ui: true,
-   intro: '<p><b>Add a wire to connect A to Z and another wire to connect A to Y.</b></p><p>Tip: The stub on the right side of the stimulus pin is an output port, which can be connected to the input ports on the left sides of both test pins.</p><p>Tip: A wire cannot connect from an input directly to another input. If you drag from Z to Y, it will move the existing wire (if any), or it will fail.',
-   outro: '<p>As many wires as you want can "fan out" from any output port.</p>',
-   hint: ['<p>If a wire is connected to an input or output port, a short crossbar indicates the spot where you can interact with the wire or add another wire.</p>'],
-   soln: '1s3-0,o,1,i-0,o,2,i',
-   truth: [{a: 0,   z: 0, y: 0},
-           {a: 1,   z: 1, y: 1}],
-   avail: [],
-   cells: {
-     a: {type: 'input',
-         x: 0,
-         y: 50
-        }
-     ,
-     z: {type: 'output',
-         x: 200,
-         y: 0
-        }
-     ,
-     y: {type: 'output',
-         x: 200,
-         y: 100
-        }
-   }
-  }
-,
-  {name: 'A simple circuit',
-   intro: '<p><b>Check the truth table</b> to see how this circuit should be connected.</p><p>Tip: The table says that when A is 1, Z must get a 1 value, and Y must get 0. It also says what values must go to the test pins when A is 0.</p>',
-   outro: '<p>It looks like you\'re getting the hang of it!</p>',
-   hint: ['<p>Sorry, but there won\'t be any more hints for the easy puzzles.  If you\'re still stuck, you can use the main menu to look at the introductory puzzles again.  Or you can use the help menu to see a sample solution.  It\'s up to you to decide if that\'s cheating or not.</p>'],
-   soln: '1s3-0,o,3,i-0,o,1,i;160,inv,100+o,2,i',
-   truth: [{a: 1,   z: 1, y: 0},
-           {a: 0,   z: 0, y: 1}],
-   avail: ['inv', 1],
-   cells: {
-     a: {type: 'input',
-         x: 0,
-         y: 0
-        }
-     ,
-     z: {type: 'output',
-         x: 300,
-         y: 0
-        }
-     ,
-     y: {type: 'output',
-         x: 300,
-         y: 100
-        }
-   }
-  }
-,
   {name: 'The AND gate',
-   intro: '<p><b>An AND gate outputs a 1 only if its first input is 1 <i>and</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
-   outro: '<p><b>The AND gate is typically represented in text with an ampersand.  E.g. Z = A &amp; B.</b></p><p><b>Make sure you clearly understand the relationship of the AND gate\'s output with its inputs</b>, as displayed in the truth table. You will soon learn five other simple logic gates, each of which perform a different logic function.</p>',
+   intro: '<p>George Boole formalized the logic system that is now used by circuit designs everywhere.  You already learned about the NOT gate, but there are six other simple Boolean logic gates that form the fundamental basis of the system.</p><p><b>An AND gate outputs a 1 only if its first input is 1 <i>and</i> its second input is 1.</b> Otherwise the output of the AND gate is 0.</p>',
+   outro: '<p><b>The AND gate is typically represented in text with an ampersand.  E.g. <span class="nowrap">Z = A &amp; B.</span></b></p><p><b>Make sure you clearly understand the relationship of the AND gate\'s output with its inputs</b>, as displayed in the truth table. You will soon learn more types of Boolean logic gates which you can use to build more complex designs.</p>',
    soln: '1s3-0,o,3,i0-1,o,3,i1;150,and,50+o,2,i',
    truth: [{a:0, b:0,   z:0},
            {a:0, b:1,   z:0},
@@ -371,8 +373,8 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'NAND is NOT-AND',
-   intro: '<p><b>A NAND gate can be decomposed into an AND gate followed by an NOT gate.</b> The result is NOT 1 only if the AND gate\'s output is 1. In other words, it performs a NOT-AND function, also known as NAND.</p>',
-   outro: '<p>The NAND function is expressed as Z = ~(A & B).</p><p>Because a NAND gate combines the functions of an AND gate and an NOT gate, it combines the shape of the AND gate with the bubble from the NOT gate.</p>',
+   intro: '<p><b>A NAND gate can be decomposed into an AND gate followed by a NOT gate.</b> The result is NOT 1 only if the AND gate\'s output is 1. In other words, it performs a NOT-AND function, also known as NAND.</p>',
+   outro: '<p>The NAND function is expressed as <span class="nowrap">Z = ~(A & B).</span></p><p>Because a NAND gate combines the functions of an AND gate and an NOT gate, it combines the shape of the AND gate with the bubble from the NOT gate.</p>',
    soln: '1s3-0,o,4,i0-1,o,4,i1;275,inv,50+o,2,i;150,and,50+o,3,i',
    truth: [{a:0, b:0,   z:1},
            {a:0, b:1,   z:1},
@@ -398,7 +400,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'NOT with NAND',
-   intro: '<p>By tying its inputs to the same source, <b>a NAND gate can perform the same function as a NOT gate.</b></p>',
+   intro: '<p>By tying both of its inputs to the same source, <b>a NAND gate can perform the same function as a NOT gate.</b></p>',
    outro: '<p>NAND gates are particularly small and fast in most types of circuits, so it is convenient that they are also so versatile.</p>',
    soln: '1s2-0,o,2,i0-0,o,2,i1;150,nand,0+o,1,i',
    truth: [{a:0,  z:1},
@@ -419,7 +421,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'The OR gate',
    intro: '<p><b>An OR gate outputs a 1 if its first input is 1 <i>or</i> its second input is 1</b> (or both are 1). Otherwise the output of the OR gate is 0.</p>',
-   outro: '<p><b>The OR gate is typically represented in text with a vertical bar.  E.g. Z = A | B.</b></p><p>An OR gate is more precisely described with the legal term "and/or" because its output is 1 if its first input is 1 <i>and/or</i> its second input is 1. The OR operation is also sometimes called <i>inclusive OR</i> because it includes the case that both inputs are 1. We\'ll demonstrate the <i>exclusive OR</i> operation a little later.</p>',
+   outro: '<p><b>The OR gate is typically represented in text with a vertical bar.  E.g. <span class="nowrap">Z = A | B.</span></b></p><p>An OR gate is more precisely described with the legal term "and/or" because its output is 1 if its first input is 1 <i>and/or</i> its second input is 1. The OR operation is also sometimes called <i>inclusive OR</i> because it includes the case that both inputs are 1. You\'ll learn the <i>exclusive OR</i> gate a little later.</p>',
    soln: '1s3-0,o,3,i0-1,o,3,i1;150,or,50+o,2,i',
    truth: [{a:0, b:0,   z:0},
            {a:0, b:1,   z:1},
@@ -445,7 +447,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'The NOR gate',
-   intro: '<p><b>A NOR gate outputs an inverted value as compared to an OR gate.</b>  I.e. Z = ~(A | B).</p><p>In this puzzle we introduce the concept of a "don\'t care" value. If A is 1, we know that the output of the NOR gate must always be 0, so we <i>don\'t care</i> what B is. Likewise, we <i>don\'t care</i> what A is when B is 1.</p>',
+   intro: '<p><b>A NOR gate outputs an inverted value as compared to an OR gate.</b>  I.e. <span class="nowrap">Z = ~(A | B).</span></p><p>In this puzzle we introduce the concept of a "don\'t care" value. If A is 1, we know that the output of the NOR gate must always be 0, so we <i>don\'t care</i> what B is. Likewise, we <i>don\'t care</i> what A is when B is 1.</p>',
    outro: '<p>This circuit simulator uses a black color to represent a value that is unknown, which includes "don\'t care" values. If a logic gate has an unknown input, a logic gate may output a known or unknown value depending on its other inputs and its logic function.</p>',
    soln: '1s3-0,o,3,i0-1,o,3,i1;150,nor,50+o,2,i',
    truth: [{a:0, b:0,   z:1},
@@ -472,7 +474,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'The XOR and XNOR gates',
    intro: '<p>An XOR gate performs an "exclusive or" function. <b>An XOR gate outputs a 1 if its first input is &nbsp;1 <i>or</i> its second input is &nbsp;1 <i>excluding</i> the case that both inputs are 1.</b> I.e. unlike an OR gate, an XOR gate outputs 0 if both of its inputs are 1.</p><p><b>An XNOR gate outputs an inverted value as compared to an XOR gate.</b></p>',
-   outro: '<p><b>The XOR gate is typically represented in text with a carat.  E.g. Z = A ^ B.</b></p><p>Another perspective on the XOR operation is that it outputs a 1 if its first input is <i>not equal</i> to its second input, i.e. Z = (A != B).</p><p>The XNOR gate can be represented as Z = ~(A ^ B) or as Z = (A == B).</p>',
+   outro: '<p><b>The XOR gate is typically represented in text with a carat.  E.g. <span class="nowrap">Z = A ^ B.</span></b></p><p>Another perspective on the XOR operation is that it outputs a 1 if its first input is <i>not equal</i> to its second input, i.e. <span class="nowrap">Z = (A != B).</span></p><p>The XNOR gate can be represented as <span class="nowrap">Z = ~(A ^ B)</span> or as <span class="nowrap">Z = (A == B).</span></p>',
    soln: '1s4-0,o,5,i0-0,o,4,i0-1,o,4,i1-1,o,5,i1;160,xnor,90+o,3,i;160,xor,10+o,2,i',
    truth: [{a:0, b:0,   z:0, y:1},
            {a:0, b:1,   z:1, y:0},
@@ -504,7 +506,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'The mux gate',
    intro: '<p>A multiplexer (abbreviated as <i>mux</i>) selects one of its two data inputs as its output. The data input ports are on the left side of the mux, labeled "0" and "1".  The choice of which data value to output is based on the select input port on the bottom of the mux.  <b>Hook up the mux to output the value of A when S=0 and the value of B when S=1.</b></p>',
-   outro: '<p>The 2-to-1 mux corresponds to the if-then-else statement or the ?: operation in many programming languages, e.g. Z = S ? B : A.</p>',
+   outro: '<p>The 2-to-1 mux corresponds to the if-then-else statement or the ?: operation in many programming languages, e.g. <span class="nowrap">Z = S ? B : A.</span></p>',
    soln: '1s4-0,o,4,s-1,o,4,i0-2,o,4,i1;175,mux,150+o,3,i',
    truth: [{s:0, a:0,        z:0},
            {s:0, a:1,        z:1},
