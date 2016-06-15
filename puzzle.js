@@ -139,7 +139,7 @@ Level.prototype.puzzle = [
   {name: 'Create a gate',
    ui: true,
    intro: '<p><b>Drag the NOT gate from the inventory box at the left into the drawing area. Wire it so that data flows from A, through the NOT gate, to Z.</b></p><p>Tip to drag the NOT gate: While the mouse is over the NOT gate, press and hold the mouse button, then move the mouse into the drawing area near the stimulus and test pins before releasing the mouse button.</p><p>Tip: Simply touching two wire stubs is not sufficient to transmit a value between them. A wire must be drawn from one to the other.</p>',
-   outro: '<p>The stock of gates in the inventory may be limited.  Design efficiently!</p>',
+   outro: '<p>The stock of gates in the inventory may be limited.  Design efficiently!</p><p>You can delete a gate and return it to the inventory by dragging it off the canvas.  Deleting a gate also deletes all wires connected to the gate.</p>',
    hint: ['<p>This is just like the previous puzzle, except that you have to drag the NOT gate from the inventory box on the left.</p>'],
    soln: '1s2-0,o,2,i;150,inv,0+o,1,i',
    truth: [{a: 0, z: 1},
