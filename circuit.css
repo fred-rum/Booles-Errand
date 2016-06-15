@@ -315,6 +315,7 @@ th.check, td.check {
 table.levels {
     border: thin solid;
     cursor: pointer;
+    line-height: 1.15;
 }
 tr.levels:hover {
     background-color: #ddd;
