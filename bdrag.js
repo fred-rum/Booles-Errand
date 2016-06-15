@@ -8,7 +8,8 @@ function Bdrag(be) {
   this.tapdata = {};
 }
 
-Bdrag.prototype.drag = function (jel, context, type, callbacks, extra) {
+Bdrag.prototype.drag = function (jel, context, type, callbacks, extra,
+                                 mouse_only) {
   var data = {
     jel: jel,
     context: context,
@@ -17,7 +18,9 @@ Bdrag.prototype.drag = function (jel, context, type, callbacks, extra) {
     extra: extra
   };
   jel.on('mousedown.booletouch', $.proxy(this.mousedown, this, data));
-  jel.on('touchstart.booletouch', $.proxy(this.touchstart, this, data));
+  if (!mouse_only) {
+    jel.on('touchstart.booletouch', $.proxy(this.touchstart, this, data));
+  }
 };
 
 Bdrag.prototype.undrag = function (jel) {

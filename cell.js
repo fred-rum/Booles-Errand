@@ -106,15 +106,6 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
     this.change_cursor("grab");
   }
 
-  var init_drag = function (el, num) {
-    this.be.bdrag.drag($(el.node), this, 'cell',
-                       {start: this.cell_drag_start,
-                        move: this.cell_drag_move,
-                        end: this.cell_drag_end});
-    return true;
-  }
-  this.el_cell_drag.forEach(init_drag, this);
-
   if ((this.canvas_type == 'cdraw') &&
       ((this.type == 'condenser') || (this.type == 'expander'))) {
     this.update_width(harness_width || 2);
@@ -672,7 +663,7 @@ Cell.prototype.draw_stubs = function() {
     }
   }
   var el_stub_bg = this.canvas.path(stub_path).attr(this.stub_bg_attr);
-  this.push_el(el_stub_bg);
+  this.push_el(el_stub_bg, 'drag_cbox');
 
   // In contrast, the stub foregrounds can be drawn in different
   // colors depending on the IO state.  Therefore, each is its own
@@ -692,7 +683,7 @@ Cell.prototype.draw_stubs = function() {
     var port = this.io[port_name];
     var el_stub_bg = this.canvas.path(port.path).attr(this.stub_bg_attr);
     var el_stub_fg = port.draw_stub_fg();
-    this.push_el(this.el_harness_stub_bg = el_stub_bg);
+    this.push_el(this.el_harness_stub_bg = el_stub_bg, 'drag_cbox');
     this.push_el(this.el_harness_stub_fg = el_stub_fg, 'mark_del');
   }
 };
@@ -1268,9 +1259,16 @@ Cell.prototype.push_el = function(el, type) {
     this.el_s.push(el);
   }
 
-  if (type == 'drag_cell') {
+  if ((type == 'drag_cell') ||
+      ((type == 'drag_cbox') && (this.canvas_type == 'cbox'))) {
     // This el captures cell drag events.
     this.el_cell_drag.push(el);
+    this.be.bdrag.drag($(el.node), this, 'cell',
+                       {start: this.cell_drag_start,
+                        move: this.cell_drag_move,
+                        end: this.cell_drag_end},
+                       undefined,
+                       (type == 'drag_cbox')); // ignore touch events if true
   } else if (type != 'drag_other') {
     // This el passes through mouse/touch events.
     el.setAttr("pointer-events", "none");
