@@ -91,6 +91,7 @@ Drag.prototype.remove_old_wires = function() {
 
 Drag.prototype.commit_new_wires = function() {
   var attr = {stroke: "#eee"}
+  if (this.new_wires.length) this.be.level.circuit_changed();
   for (var i = 0; i < this.new_wires.length; i++){
     this.new_wires[i].el_bg.attr(attr);
     this.new_wires[i].pending_new = false;
