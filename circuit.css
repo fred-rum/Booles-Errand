@@ -316,6 +316,10 @@ table.levels {
     border: thin solid;
     cursor: pointer;
     line-height: 1.15;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */      
 }
 tr.levels:hover {
     background-color: #ddd;
