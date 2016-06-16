@@ -499,9 +499,9 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
              (y >= this.be.window_height) ||
              ((x < this.be.info_width) && (y < this.be.info_height)) ||
              ((x < this.be.truth_width) && (y < this.be.truth_height)) ||
-             ((x >= this.be.controls_offset.left) &&
-              (x < this.be.controls_offset.left + this.be.controls_width) &&
-              (y < this.be.controls_offset.top + this.be.controls_height)) ||
+             ((x >= this.be.controls_left) &&
+              (x < this.be.controls_left + this.be.controls_width) &&
+              (y < this.be.controls_top + this.be.controls_height)) ||
              ((x >= this.be.window_width - this.be.main_stub_width) &&
               (y < this.be.main_stub_height)) ||
              ((x >= this.be.window_width - this.be.zoom_width) &&

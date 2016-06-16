@@ -114,11 +114,6 @@ Circuit.prototype.begin_level = function(level_num) {
 
   this.unhide_info();
 
-  // The simulation controls are different in different levels, so we
-  // measure their width at the beginning of each level.
-  this.be.controls_height = this.be.div_controls.outerHeight();
-  this.be.controls_width = this.be.div_controls.outerWidth();
-
   this.resize();
   this.fit_view();
   this.update_view();
@@ -188,13 +183,7 @@ Circuit.prototype.resize = function(maintain_center) {
   // z-index, this won't be visible, and the minor difference in text
   // position won't be noticeable, either.
 
-  // Position either info panel or the info stub, and then position the
-  // sim & zoom controls accordingly.
-  this.be.controls_offset = {
-    top: -1,
-    left: (this.be.truth_width + this.be.window_width -
-           this.be.controls_width) / 2
-  };
+  // Position either the info panel or the info stub.
   if (this.info_hidden){
     // For now, just set the info panel stub height.  We'll set its
     // width and position later.
@@ -203,7 +192,6 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
     this.be.info_width = Infinity;
     this.be.info_height = this.be.div_info.outerHeight();
-    this.be.controls_offset.top = this.be.info_height - 1;
   }
 
   // Make sure that div_truth is at least as tall as div_info.
@@ -276,11 +264,38 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
   }
 
-  if (this.be.info_height == this.be.truth_height) {
-    this.be.controls_offset.left = (this.be.cbox_width + this.be.window_width -
-                                    this.be.controls_width) / 2;
+  // Position the sim controls.
+
+  if (this.info_hidden) {
+    var avail_width = (this.be.window_width -
+                       this.be.info_width - this.be.main_stub_width);
+    var cx = this.be.info_width + avail_width/2;
+    this.be.controls_top = -1;
+  } else {
+    if (this.be.info_height == this.be.truth_height) {
+      avail_width = this.be.window_width - this.be.cbox_width;
+    } else {
+      avail_width = this.be.window_width - this.be.truth_width;
+    }
+    cx = this.be.window_width - avail_width/2;
+    this.be.controls_top = this.be.info_height - 1;
   }
-  this.be.div_controls.offset(this.be.controls_offset);
+
+  // Position the sim controls at the left edge (to avoid an
+  // accidental line break at their right edge), then measure their
+  // desired width after any necessary line break to meet the
+  // avail_width constraint.
+  this.be.div_controls.css({top: this.be.controls_top,
+                            left: 0,
+                            'max-width': avail_width});
+  this.be.controls_width = this.be.div_controls.outerWidth();
+  this.be.controls_height = this.be.div_controls.outerHeight();
+
+  // Horizontally center the sim controls in the available space using
+  // their actual width (with the avail_width contraint).
+  this.be.controls_left = cx - this.be.controls_width/2;
+  this.be.div_controls.css({left: this.be.controls_left});
+  console.log(cx, this.be.controls_left, avail_width, this.be.controls_width);
 
   if (maintain_center){
     // If we want the canvas objects to stay centered in the viewable
