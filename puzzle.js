@@ -1289,83 +1289,8 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'Multiply by 2',
-   intro: '<p><b>Z = A * 2.</b></p>',
-   outro: '<p>Multiplying by a constant power of 2 is incredibly trivial.  Are you ready for something tougher?</p>',
-   hint: ['<p>Multiplying a binary value by 2 is much like multiplying a decimal value by 10; you need only shift the value to the left and stick a 0 on the end.</p>',
-          '<p>You\'ll need to unbundle the multi-bit input before you can rearrange its bits.</p>',
-          '<p>You\'ll have to make your own 0.</p>'],
-   soln: '1s2-0,o,4,i;375,condenser8,0+o,1,i;250,xor,100+o,2,i0;125,expander7,0+o0,3,i0+o0,3,i1+o0,2,i1+o1,2,i2+o2,2,i3+o3,2,i4+o4,2,i5+o5,2,i6+o6,2,i7',
-   truth: [{a:0,   z:0},
-           {a:1,   z:2},
-           {a:2,   z:4},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {a:127, z:254}],
-   rnd: function(obj) {
-     obj.a = this.rnd(3, 126);
-     obj.z = obj.a * 2;
-   },
-   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
-   cells: {
-     a: {type: 'input',
-         width: 7,
-         x: 0,
-         y: 0
-        }
-     ,
-     z: {type: 'output',
-         x: 500,
-         y: 0,
-         width: 8
-         }
-   }
-  }
-,
-  {name: 'Rotate by N',
-   section: 'Advanced combinational circuits',
-   intro: '<p><b>Rotate A to the left by N.</b>  In the C programming language, this function can be written as Z = ((A << N) | (A >> (8 - N)) & 255.</p>',
-   outro: '<p>Whew, that\'s a lot of gates.  Thank goodness for gate clusters!</p>',
-   hint: ['<p>You don\'t need to fully decode N.  Instead, you can process each bit of N independently of the other bit values.</p>'],
-   soln: '1s3-0,o,3,i-0,o,10,i0-1,o,5,i;30,expander8,-150+o0,4,i4+o1,4,i5+o2,4,i6+o3,4,i7+o4,4,i0+o5,4,i1+o6,4,i2+o7,4,i3;160,condenser8,-150+o,10,i1;100,expander3,200+o0,12,s+o1,11,s+o2,10,s;330,expander8,-150+o0,7,i2+o1,7,i3+o2,7,i4+o3,7,i5+o4,7,i6+o5,7,i7+o6,7,i0+o7,7,i1;470,condenser8,-150+o,11,i1;640,expander8,-150+o0,9,i1+o1,9,i2+o2,9,i3+o3,9,i4+o4,9,i5+o5,9,i6+o6,9,i7+o7,9,i0;750,condenser8,-150+o,12,i1;245,mux,20+o,6,i+o,11,i0;555,mux,30+o,12,i0+o,8,i;850,mux,40+o,2,i',
-   truth: [{a:3, n:0,   z:3},
-           {a:3, n:1,   z:6},
-           {a:3, n:7,   z:129},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'}],
-   rnd: function(obj) {
-     obj.a = this.rnd(0, 255);
-     obj.n = this.rnd(0, 7);
-     obj.z = ((obj.a << obj.n) | (obj.a >> (8 - obj.n))) & 255;
-   },
-   avail: ['expander', 'condenser', 'mux', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
-   cells: {
-     a: {type: 'input',
-         width: 8,
-         x: 0,
-         y: 0
-        }
-     ,
-     n: {type: 'input',
-         width: 3,
-         x: 0,
-         y: 200
-        }
-     ,
-     z: {type: 'output',
-         x: 1000,
-         y: 0,
-         width: 8
-         }
-   }
-  }
-,
   {name: 'Seven-segment decode',
+   section: 'Advanced combinational circuits',
    intro: '<p><b>Decode each decimal value&nbsp;(0-9) to drive a seven-segment display.</b></p>',
    outro: '<p>Were you able to design your circuit using 25 gates or fewer?</p>',
    hint: ['<p>Yes, this is a big puzzle.  Take your time.</p>',
@@ -1489,6 +1414,119 @@ Level.prototype.puzzle = [
          y: 150,
          width: 4
         }
+   }
+  }
+,
+  {name: 'Increment',
+   section: 'Arithmetic',
+   intro: '<p><b>Z = A + 1.</b></p>',
+   outro: '<p></p>',
+   hint: ['<p>Boolean arithmetic is just like decimal arithmetic, except that instead of carrying a 1 to the next digit when the result exceeds 9, you carry a 1 to the next bit when the result exceeds 1.</p>',
+          '<p>The carry chain is key to incrementing.  Once you know whether to add 1 to a particular bit of A, the actual addition is trivial.</p>'],
+   soln: '1s2-0,o,3,i;600,condenser4,0+o,1,i;100,expander4,0+o0,4,i+o0,5,i1+o0,9,i1+o1,5,i0+o1,9,i0+o2,8,i0+o2,6,i0+o3,7,i0;450,inv,30+o,2,i0;450,xor,-20+o,2,i1;450,xor,-70+o,2,i2;450,xor,-120+o,2,i3;270,and,70+o,7,i1;270,and,160+o,8,i1+o,6,i1',
+   truth: [{a:0,   z:1},
+           {a:1,   z:2},
+           {a:2,   z:3},
+           {a:3,   z:4},
+           {a:4,   z:5},
+           {a:5,   z:6},
+           {a:6,   z:7},
+           {a:7,   z:8},
+           {a:8,   z:9},
+           {a:9,   z:10},
+           {a:10,  z:11},
+           {a:11,  z:12},
+           {a:12,  z:13},
+           {a:13,  z:14},
+           {a:14,  z:15}],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         x: 700,
+         y: 0,
+         width: 4
+         }
+   }
+  }
+,
+  {name: 'Multiply by 2',
+   intro: '<p><b>Z = A * 2.</b></p>',
+   outro: '<p>Multiplying by a constant power of 2 is incredibly trivial.  Are you ready for something tougher?</p>',
+   hint: ['<p>Multiplying a binary value by 2 is much like multiplying a decimal value by 10; you need only shift the value to the left and stick a 0 on the end.</p>',
+          '<p>You\'ll need to unbundle the multi-bit input before you can rearrange its bits.</p>',
+          '<p>You\'ll have to make your own 0.</p>'],
+   soln: '1s2-0,o,4,i;375,condenser8,0+o,1,i;250,xor,100+o,2,i0;125,expander7,0+o0,3,i0+o0,3,i1+o0,2,i1+o1,2,i2+o2,2,i3+o3,2,i4+o4,2,i5+o5,2,i6+o6,2,i7',
+   truth: [{a:0,   z:0},
+           {a:1,   z:2},
+           {a:2,   z:4},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:127, z:254}],
+   rnd: function(obj) {
+     obj.a = this.rnd(3, 126);
+     obj.z = obj.a * 2;
+   },
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 7,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         x: 500,
+         y: 0,
+         width: 8
+         }
+   }
+  }
+,
+  {name: 'Rotate by N',
+   intro: '<p><b>Rotate A to the left by N.</b>  In the C programming language, this function can be written as Z = ((A << N) | (A >> (8 - N)) & 255.</p>',
+   outro: '<p>Whew, that\'s a lot of gates.  Thank goodness for gate clusters!</p>',
+   hint: ['<p>You don\'t need to fully decode N.  Instead, you can process each bit of N independently of the other bit values.</p>'],
+   soln: '1s3-0,o,3,i-0,o,10,i0-1,o,5,i;30,expander8,-150+o0,4,i4+o1,4,i5+o2,4,i6+o3,4,i7+o4,4,i0+o5,4,i1+o6,4,i2+o7,4,i3;160,condenser8,-150+o,10,i1;100,expander3,200+o0,12,s+o1,11,s+o2,10,s;330,expander8,-150+o0,7,i2+o1,7,i3+o2,7,i4+o3,7,i5+o4,7,i6+o5,7,i7+o6,7,i0+o7,7,i1;470,condenser8,-150+o,11,i1;640,expander8,-150+o0,9,i1+o1,9,i2+o2,9,i3+o3,9,i4+o4,9,i5+o5,9,i6+o6,9,i7+o7,9,i0;750,condenser8,-150+o,12,i1;245,mux,20+o,6,i+o,11,i0;555,mux,30+o,12,i0+o,8,i;850,mux,40+o,2,i',
+   truth: [{a:3, n:0,   z:3},
+           {a:3, n:1,   z:6},
+           {a:3, n:7,   z:129},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 255);
+     obj.n = this.rnd(0, 7);
+     obj.z = ((obj.a << obj.n) | (obj.a >> (8 - obj.n))) & 255;
+   },
+   avail: ['expander', 'condenser', 'mux', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 8,
+         x: 0,
+         y: 0
+        }
+     ,
+     n: {type: 'input',
+         width: 3,
+         x: 0,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 1000,
+         y: 0,
+         width: 8
+         }
    }
   }
 ,
