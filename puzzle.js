@@ -572,6 +572,32 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Generate constants',
+   intro: '<p>0 and 1 values are easily available in traditional circuit designs, but in this puzzle </b>you need to generate your own constants.</b></p>',
+   outro: '<p>Did you get the optimal solution of one gate per constant?</p>',
+   truth: [{a: 0,   z: 0, y: 1},
+           {a: 1,   z: 0, y: 1}],
+   avail: ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   hint: '<p>How does each gate behave when its inputs are the same value?</p>',
+   soln: '1s3-0,o,3,i0-0,o,3,i1-0,o,4,i0-0,o,4,i1;170,xor,0+o,1,i;170,xnor,100+o,2,i',
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 50
+        }
+     ,
+     z: {type: 'output',
+         x: 300,
+         y: 0
+        }
+     ,
+     y: {type: 'output',
+         x: 300,
+         y: 100
+        }
+   }
+  }
+,
   {name: 'De Morgan&rsquo;s law (1)',
    intro: '<p>Augustus De Morgan demonstrated that "not (A and B)" is the same as "(not A) or (not B)".  <b>Use De Morgan\'s law to output the desired values for the truth table</b> using only inverters and NAND gates.</p>',
    outro: '<p>Both the OR gate and the NAND gate output a 1 for three out of four combinations of input values.  They differ only in which combination outputs a 0.</p>',
@@ -1265,7 +1291,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Multiply by 2',
    intro: '<p><b>Z = A * 2.</b></p>',
-   outro: '<p>A circuit normally has a constant 0 or 1 easily available, but for this puzzle you had to create your own.  Were you able to create it from a single gate?</p>',
+   outro: '<p>Multiplying by a constant power of 2 is incredibly trivial.  Are you ready for something tougher?</p>',
    hint: ['<p>Multiplying a binary value by 2 is much like multiplying a decimal value by 10; you need only shift the value to the left and stick a 0 on the end.</p>',
           '<p>You\'ll need to unbundle the multi-bit input before you can rearrange its bits.</p>',
           '<p>You\'ll have to make your own 0.</p>'],
