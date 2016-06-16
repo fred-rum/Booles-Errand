@@ -777,6 +777,72 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Subset of OR',
+   intro: '<p>Would someone please get rid of that glue bottle!</p>',
+   outro: '<p>If one input of an OR gate is 1 in a certain set of cases, and the other input is 1 for no additional cases, the output of the OR gate always equals its first input.</p>',
+   truth: [{a:0, b:0,   z:0},
+           {a:0, b:1,   z:0},
+           {a:1, b:0,   z:0},
+           {a:1, b:1,   z:1}],
+   soln: ['1s4-0,o,4,i0-1,o,4,i1;140,and,50+o,2,i0+o,2,i1',
+          '1s4-0,o,4,i0-1,o,4,i1-1,o,5,i1-1,o,5,i0;150,and,10+o,2,i0;150,xor,90+o,2,i1'],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     or: {type: 'or',
+           x: 300,
+           y: 50,
+           io: [['o', 'z', 'i']]
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 50
+        }
+   }
+  }
+,
+  {name: 'Superset of AND',
+   intro: '<p>OK, no more glue fights in the lab!</p>',
+   outro: '<p>If one input of an AND gate is 1 in a certain set of cases, and the other input is 1 for at least all of the same cases, the output of the AND gate always equals its first input.</p>',
+   truth: [{a:0, b:0,   z:1},
+           {a:0, b:1,   z:1},
+           {a:1, b:0,   z:1},
+           {a:1, b:1,   z:0}],
+   soln: ['1s4-0,o,4,i0-1,o,4,i1;140,nand,50+o,2,i0+o,2,i1',
+          '1s4-0,o,4,i0-1,o,4,i1-1,o,5,i1-1,o,5,i0;150,nand,10+o,2,i0;150,xnor,90+o,2,i1'],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     and: {type: 'and',
+           x: 300,
+           y: 50,
+           io: [['o', 'z', 'i']]
+        }
+     ,
+     z: {type: 'output',
+         x: 400,
+         y: 50
+        }
+   }
+  }
+,
   {name: 'Hidden truths',
    intro: '<p>Whoops, we\'ve forgotten what circuit you\'re supposed to design here.  Well, <b>complete the case shown on the stimulus and test pins, and then we\'ll probably remember the next case.</b></p>',
    outro: '<p>Did you have to take notes outside of the game?  For some of the later levels, you\'ll probably find that taking notes is essential.</p>',
