@@ -230,8 +230,13 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_cbox.offset(cbox_offset);
     this.be.div_cbox.height(cbox_height);
 
-    var cbox_scale = Math.min(1.0,
-                              Math.max(0.5, cbox_height / this.be.box_height));
+    var max_width = this.be.window_width / 5;
+    var max_scale = max_width / (this.be.em_size * 8);
+
+    var cbox_scale = Math.max(0.5,
+                              Math.min(1.0,
+                                       max_scale,
+                                       cbox_height / this.be.box_height));
     this.be.cbox.setSize(this.be.em_size * 8 * cbox_scale,
                          this.be.box_height * cbox_scale);
     this.be.cbox_width = this.be.div_cbox.outerWidth();
