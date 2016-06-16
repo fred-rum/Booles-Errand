@@ -836,13 +836,16 @@ Level.prototype.click_main = function() {
   $("#level" + this.level_num).css({"background-color": "#ff8"});
   $("#main_container").css({display: "block"});
 
-  var height = $('#main').prop('scrollHeight');
+  // Scroll the current level into view (centered, if possible).
+  var main = $('#main');
   if (this.level_num == this.puzzle.length - 1) {
-    var top = height;
+    var top = main.prop('scrollHeight');
   } else {
-    var cy = ($('#level' + this.level_num).offset().top +
-              $('#level' + (this.level_num + 1)).offset().top) / 2;
-    var top = cy - $('#main').height()/2;
+    var tr = $('#level' + this.level_num);
+    var cy = main.scrollTop() + tr.offset().top + tr.height()/2;
+    var top = cy - main.height()/2;
+    // If top is negative or is too high, the browser will
+    // automatically cap scrolling as needed.
   }
   $('#main').scrollTop(top);
 };
