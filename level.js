@@ -185,6 +185,8 @@ Level.prototype.begin = function(level_num) {
   this.select_seq(0);
 
   this.be.sim.begin_level(level.hide.speed, this.sequenced);
+
+  this.circuit_is_reset = true;
 };
 
 Level.prototype.level_name_to_num = function(name) {
@@ -683,11 +685,14 @@ Level.prototype.not_done = function() {
     // simulation before not_done() is called, so the truth table is
     // not scrolled in that case.
     this.scroll_truth();
+
+    this.circuit_is_reset = false;
   }
 };
 
 Level.prototype.circuit_changed = function() {
   if (this.cleaning_up) return; // Ignore circuit changes while cleaning up.
+  if (this.circuit_is_reset) return; // Ignore duplicate circuit changes.
 
   for (var i = 0; i < this.row_result.length; i++){
     this.record_result(i, undefined);
@@ -715,6 +720,8 @@ Level.prototype.circuit_changed = function() {
   this.be.sim.not_done();
 
   this.be.sim.click_pause();
+
+  this.circuit_is_reset = true;
 };
 
 // done() gets called by Sim when there are no events left to process.

@@ -128,10 +128,17 @@ Wire.prototype.restore_old = function() {
 
 Wire.prototype.propagate_value = function() {
   // If there is a previous value being held (because it was
-  // propagated from the IO in this same tick), discard it first.
+  // propagated from the IO in this same tick, and the IO value hasn't
+  // changed (because a new wire caused it to re-propagate), don't do
+  // anything.
+  //
+  // Otherwise, if there is a previous value being held, discard it
+  // first, then get the new value if it is needed.
   if (this.in_flight.length) {
     var fl_obj = this.in_flight[this.in_flight.length-1];
     if (fl_obj.held) {
+      if (fl_obj.value === this.o.value) return;
+
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
       if (fl_obj.el_spark) fl_obj.el_spark.remove();
       this.in_flight.splice(-1, 1);
