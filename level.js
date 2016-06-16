@@ -1039,7 +1039,7 @@ Level.prototype.click_help_copy = function() {
   try {
     var success = document.execCommand('copy');
     if (success) {
-      var html = '<p>The following URL was copied to your clipboard:</p><p><b>' + url + '</b></p><p>Use it to save or share your progress for this puzzle.</p>';
+      var html = '<p>The following URL has been copied to your clipboard:</p><p><b>' + url + '</b></p><p>Use it to save or share your progress for this puzzle.</p>';
       this.be.div_infotxt.html(this.text(html));
     }
   }
