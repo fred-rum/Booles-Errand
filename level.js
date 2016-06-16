@@ -780,6 +780,8 @@ Level.prototype.scroll_truth = function() {
   this.be.div_truth.scrollLeft(this.be.truth_table_width);
 
   // Try to scroll the current sequence into view.
+  // We don't need to include the current scroll amount because we get
+  // the row offset from saved data, not from its current offset.
   var row = this.cur_row();
   var cy = (this.row_top[row] + this.row_top[row + 1]) / 2;
   var top = cy - this.be.truth_height/2;
