@@ -295,7 +295,6 @@ Circuit.prototype.resize = function(maintain_center) {
   // their actual width (with the avail_width contraint).
   this.be.controls_left = cx - this.be.controls_width/2;
   this.be.div_controls.css({left: this.be.controls_left});
-  console.log(cx, this.be.controls_left, avail_width, this.be.controls_width);
 
   if (maintain_center){
     // If we want the canvas objects to stay centered in the viewable
