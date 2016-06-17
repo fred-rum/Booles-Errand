@@ -355,7 +355,7 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
     } else if (failure == 'mismatch downstream') {
       $('#error').html('<p>Connecting a multi-bit wire here would conflict with a different logic width downstream.</p>');
     } else if (io.locked) {
-      $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
+      $('#error').html('<p>The wire at this port is locked for this challenge and cannot be modified.</p>');
     } else if (io.type == 'output'){
       $('#error').html('<p>A wire cannot be created from an output port to another output port.</p>');
     } else {
@@ -435,7 +435,7 @@ Drag.prototype.drag_locked_start = function(x, y) {
   if (this.be.showing_soln) {
     $('#error').html('<p>The sample solution cannot be edited.  Restore your progress from the help menu.</p>');
   } else {
-    $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
+    $('#error').html('<p>The wire at this port is locked for this challenge and cannot be modified.</p>');
   }
   $(document.body).addClass('cursor-force-not-allowed');
   this.disable_hover();

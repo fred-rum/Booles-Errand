@@ -429,7 +429,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
     } else if (this.locked){
       // Show the fail icon only on cdraw, not on cbox.
       this.be.drag.show_fail_xy(this.x, this.y);
-      $('#error').html('<p>This logic element is locked by the puzzle and cannot be moved or deleted.</p>');
+      $('#error').html('<p>This logic element is locked for this challenge and cannot be moved or deleted.</p>');
     } else {
       $('#error').html('<p>You have already used all available gates of this type.</p>');
     }
