@@ -151,7 +151,7 @@ Io.prototype.remove = function() {
     this.el_value_text.remove();
     this.el_value_text_bg.remove();
   }
-}
+};
 
 Io.prototype.redraw = function() {
   for (var i = 0; i < this.w.length; i++) {

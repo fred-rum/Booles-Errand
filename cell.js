@@ -230,7 +230,7 @@ Cell.prototype.reset = function() {
   for (var port_name in this.io) {
     this.io[port_name].reset();
   }
-}
+};
 
 
 // Private functions & members
@@ -320,7 +320,7 @@ Cell.prototype.calc_const = function() {
 
 Cell.prototype.calc_input = function() {
   this.io.o.propagate_output(this.be.level.value(this.name));
-}
+};
 
 Cell.prototype.calc_output = function() {
   var value = this.value = this.io.i.value;
@@ -349,7 +349,7 @@ Cell.prototype.calc_output = function() {
     this.el_check.attr(attr);
     this.el_check.setAttr('visibility', 'visible');
   }
-}
+};
 
 Cell.prototype.calc_latch = function() {
   var d = this.io.d.value;
@@ -393,7 +393,7 @@ Cell.prototype.calc_expander = function() {
 
 Cell.prototype.check_pending = function() {
   this.el_question.setAttr('visibility', 'visible');
-}
+};
 
 Cell.prototype.done_check = function() {
   var exp_value = this.be.level.value(this.name);

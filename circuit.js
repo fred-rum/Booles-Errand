@@ -475,7 +475,7 @@ Circuit.prototype.canvas_mousewheel = function(event) {
 
   var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
   this.rescale(event.pageX, event.pageY, new_scale);
-}
+};
 
 Circuit.prototype.rescale = function(x, y, new_scale) {
   // Since the user made a change to the canvas scale, we won't
@@ -520,13 +520,13 @@ Circuit.prototype.click_info_hide = function() {
   this.be.div_main_stub.css({display: 'block'});
   this.resize();
   this.update_view();
-}
+};
 
 Circuit.prototype.click_info_unhide = function() {
   this.unhide_info();
   this.resize();
   this.update_view();
-}
+};
 
 Circuit.prototype.unhide_info = function() {
   this.info_hidden = false;

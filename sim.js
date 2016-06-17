@@ -52,7 +52,7 @@ function Sim(be) {
     var x = ((linear + 2) / 2) * (this.slider_default - this.slider_min) + this.slider_min;
   }
   this.set_slider(x);
-};
+}
 
 Sim.prototype.resize_slider = function () {
   var slider = $('#speed-slider');

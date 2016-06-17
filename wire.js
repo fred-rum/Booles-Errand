@@ -118,13 +118,13 @@ Wire.prototype.mark_old = function(type) {
     this.remove_subpaths();
   }
   this.redraw_fg();
-}
+};
 
 Wire.prototype.restore_old = function() {
   this.pending_del = false;
   this.el_fg.attr({'stroke-dasharray': ''});
   this.redraw_fg();
-}
+};
 
 Wire.prototype.propagate_value = function() {
   // If there is a previous value being held (because it was
@@ -660,7 +660,7 @@ Wire.prototype.remove_subpaths = function() {
       fl_obj.el_subpath = undefined;
     }
   }
-}
+};
 
 Wire.prototype.remove_sparks = function() {
   // Remove all propagating sparks.
@@ -671,4 +671,4 @@ Wire.prototype.remove_sparks = function() {
       fl_obj.el_spark = undefined;
     }
   }
-}
+};
