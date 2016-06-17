@@ -1,4 +1,4 @@
-// Copyright 2016 Christopher P. Nelson - All rights reserved.
+// Copyright 2016 Chris Nelson - All rights reserved.
 
 "use strict";
 
