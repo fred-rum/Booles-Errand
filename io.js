@@ -38,7 +38,7 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
 
   // An IO for a cell in the cell box has graphics for the stub, but
   // it doesn't have a drag target or event handling.
-  if (this.canvas != this.be.cdraw){
+  if (this.canvas != this.be.cdraw) {
     this.set_io = this.canvas.set();
     return;
   }
@@ -108,10 +108,10 @@ Io.prototype.draw_stub_fg = function() {
 };
 
 Io.prototype.connect = function(wire) {
-  if (wire.locked){
+  if (wire.locked) {
     this.locked = true;
     this.be.drag.disable_drag(this);
-  } else if (!this.w.length && this.el_stub_end){
+  } else if (!this.w.length && this.el_stub_end) {
     this.el_stub_end.setAttr('visibility', 'visible');
   }
 
@@ -128,10 +128,10 @@ Io.prototype.connect = function(wire) {
 };
 
 Io.prototype.disconnect = function(wire) {
-  for (var i = 0; i < this.w.length; i++){
-    if (wire == this.w[i]){
+  for (var i = 0; i < this.w.length; i++) {
+    if (wire == this.w[i]) {
       this.w.splice(i, 1);
-      if (!this.w.length && this.el_stub_end){
+      if (!this.w.length && this.el_stub_end) {
         this.el_stub_end.setAttr('visibility', 'hidden');
       }
       return;
@@ -144,7 +144,7 @@ Io.prototype.remove = function() {
     this.w[0].remove(this.type == 'input');
   }
 
-  if (this.canvas == this.be.cdraw){
+  if (this.canvas == this.be.cdraw) {
     this.be.drag.remove_io(this);
     this.el_target.remove();
     this.el_stub_end.remove();
@@ -154,7 +154,7 @@ Io.prototype.remove = function() {
 }
 
 Io.prototype.redraw = function() {
-  for (var i = 0; i < this.w.length; i++){
+  for (var i = 0; i < this.w.length; i++) {
     this.w[i].redraw();
   }
 };
@@ -179,7 +179,7 @@ Io.prototype.update_value = function(value) {
 
   this.color_stub(value);
 
-  if (value === undefined){
+  if (value === undefined) {
     value = '';
     var bg_opacity = 0;
   } else {
@@ -226,7 +226,7 @@ Io.prototype.reset = function() {
   // We know that all wires (that can potentially propagate values)
   // are connected to cells on both ends, so we only need to reset
   // wires in one consistent direction from each cell.
-  if (this.type == 'input'){
+  if (this.type == 'input') {
     for (var i = 0; i < this.w.length; i++) {
       this.w[i].reset(i_was_undefined);
     }
@@ -300,7 +300,7 @@ Io.prototype.bring_to_top = function() {
 
 Io.prototype.mark_old = function(type) {
   this.pending_del = type;
-  for (var i = 0; i < this.w.length; i++){
+  for (var i = 0; i < this.w.length; i++) {
     this.w[i].mark_old(type);
   }
 };
@@ -308,7 +308,7 @@ Io.prototype.mark_old = function(type) {
 Io.prototype.restore_old = function() {
   this.pending_del = false;
   this.color_stub(this.value);
-  for (var i = 0; i < this.w.length; i++){
+  for (var i = 0; i < this.w.length; i++) {
     this.w[i].restore_old();
   }
 };

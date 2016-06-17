@@ -9,7 +9,7 @@ function Wire(be, io1, io2, pending_new, locked) {
   // direction, so we reverse the ports as appropriate.  Note that the
   // null_cell has port type "null", so we have to look at the other
   // port to tell the desired direction.
-  if ((io1.type == 'output') || (io2.type == 'input')){
+  if ((io1.type == 'output') || (io2.type == 'input')) {
     this.o = io1;
     this.i = io2;
   } else {
@@ -43,7 +43,7 @@ function Wire(be, io1, io2, pending_new, locked) {
   this.i.connect(this);
 
   this.pending_new = pending_new;
-  if (pending_new){
+  if (pending_new) {
     var attr = {stroke: '#eeb'};
     this.el_bg.attr(attr);
   }
@@ -79,7 +79,7 @@ Wire.prototype.measure_perf = function(name) {
   this.measured[name] = true;
 
   var n0 = performance.now();
-  for (var i = 0; i < 1000; i++){
+  for (var i = 0; i < 1000; i++) {
     this.redraw_fg();
   }
   var n1 = performance.now();
@@ -95,7 +95,7 @@ Wire.prototype.remove = function(removed_by_input_port) {
   this.remove_subpaths();
   this.remove_sparks();
 
-  if (!this.pending_new && !removed_by_input_port){
+  if (!this.pending_new && !removed_by_input_port) {
     // Update the attached cell input with the fact that it's
     // disconnected.  If the attached cell is also being deleted, or
     // if the cell input wasn't using the (pending new) wire value,
@@ -114,7 +114,7 @@ Wire.prototype.remove = function(removed_by_input_port) {
 
 Wire.prototype.mark_old = function(type) {
   this.pending_del = type;
-  if (type == 'del'){
+  if (type == 'del') {
     this.remove_subpaths();
   }
   this.redraw_fg();
@@ -201,14 +201,14 @@ Wire.prototype.tick = function(speed) {
   // we don't trigger any more ticks.
   if (this.dead) return;
 
-  for (var i = 0; i < this.in_flight.length; i++){
+  for (var i = 0; i < this.in_flight.length; i++) {
     var fl_obj = this.in_flight[i];
 
     // A 'held' value is stuck at age 0 until released.
     if (fl_obj.held) continue;
 
     fl_obj.age += this.be.wire_speed * speed / this.path_length;
-    if (fl_obj.age >= 1.0){
+    if (fl_obj.age >= 1.0) {
       if (fl_obj.el_subpath) fl_obj.el_subpath.remove();
       if (fl_obj.el_spark) fl_obj.el_spark.remove();
       var value = fl_obj.value;
@@ -224,7 +224,7 @@ Wire.prototype.tick = function(speed) {
   this.redraw_fg();
   //this.measure_perf('segmented');
 
-  if (this.in_flight.length && !this.in_flight[0].held){
+  if (this.in_flight.length && !this.in_flight[0].held) {
     // There is still data in flight (that isn't being held), so
     // register the wire to tick again.
     this.be.sim.register_obj(this, false);
@@ -234,8 +234,8 @@ Wire.prototype.tick = function(speed) {
 Wire.prototype.reorder_z = function(ref_bg, ref_fg) {
   this.el_bg.insertBefore(ref_bg);
   this.el_fg.insertBefore(ref_fg);
-  for (var i = this.in_flight.length-1; i >= 0 ; i--){
-    if (this.in_flight[i].el_subpath){
+  for (var i = this.in_flight.length-1; i >= 0 ; i--) {
+    if (this.in_flight[i].el_subpath) {
       this.in_flight[i].el_subpath.insertBefore(ref_fg);
     }
   }
@@ -250,7 +250,7 @@ Wire.prototype.get_point = function(z) {
   var len_b = len_aa + aw.seg_len;
 
   var xd, yd;
-  if (z < len_aa){
+  if (z < len_aa) {
     var x1 = this.o.cell.x + this.o.x;
     var y1 = this.o.cell.y + this.o.y;
     var angle = z / aw.r;
@@ -258,7 +258,7 @@ Wire.prototype.get_point = function(z) {
     xd = aw.r*Math.sin(angle);
     yd = aw.r*(1-Math.cos(angle)) * sign_ya;
     return [x1+xd, y1+yd];
-  } else if (z < len_b){
+  } else if (z < len_b) {
     var d = z - len_aa;
     xd = (aw.xb-aw.xa) * (d / aw.seg_len);
     yd = (aw.yb-aw.ya) * (d / aw.seg_len);
@@ -295,8 +295,8 @@ Wire.prototype.get_subpath = function(z1, z2) {
   var la, lb;
 
   var path = ['M'].concat(this.get_point(z1));
-  if (seg1 == 0){
-    if (seg2 == 0){
+  if (seg1 == 0) {
+    if (seg2 == 0) {
       // seg1 == 0, seg2 == 0
       la = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
       path = path.concat('A', aw.r, aw.r, 0, la, aw.cwa,
@@ -306,7 +306,7 @@ Wire.prototype.get_subpath = function(z1, z2) {
       la = ((len_aa-z1)/aw.r > Math.PI) ? 1 : 0;
       path = path.concat('A', aw.r, aw.r, 0, la, aw.cwa,
                          aw.xa, aw.ya);
-      if (seg2 == 1){
+      if (seg2 == 1) {
         path = path.concat('L', this.get_point(z2));
       } else {
         lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
@@ -315,8 +315,8 @@ Wire.prototype.get_subpath = function(z1, z2) {
                            this.get_point(z2));
       }
     }
-  } else if (seg1 == 1){
-    if (seg2 == 1){
+  } else if (seg1 == 1) {
+    if (seg2 == 1) {
       path = path.concat('L', this.get_point(z2));
     } else {
       lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
@@ -411,14 +411,14 @@ Wire.prototype.arcwire = function (x1, y1, xc, yc) {
     cwa = 0;
     cwb = 0;
 
-    if (dx*dx+dy*dy < 4){
+    if (dx*dx+dy*dy < 4) {
       // For wires shorter than 2r, reduce the radius proportionally.
       // This makes dragging out a new wire look smoother.
       r *= Math.sqrt(dx*dx+dy*dy)/2;
     }
 
     var xy = dx/dy;
-    if (dy >= 0){
+    if (dy >= 0) {
       /* 0 < dy < 4 */
       //      ,-.
       //     /   )
@@ -428,7 +428,7 @@ Wire.prototype.arcwire = function (x1, y1, xc, yc) {
       la = 1;
       lb = 0;
       slope = Math.sqrt(xy*xy+1)-xy; /* slope < 0 */
-      if (dy == 0){
+      if (dy == 0) {
         /* xy == Infinity, so the slope value is poorly defined. */
         angle = Math.PI;
       } else {
@@ -545,7 +545,7 @@ Wire.prototype.draw_spark = function(fl_obj) {
       fl_obj.el_spark.attr({path: path});
     } else {
       var el_top = this.el_fg;
-      for (i = 0; i < this.in_flight.length; i++){
+      for (i = 0; i < this.in_flight.length; i++) {
         var iter_obj = this.in_flight[i];
         if (iter_obj.el_subpath) el_top = iter_obj.el_subpath;
         if (iter_obj.el_spark) el_top = iter_obj.el_spark;
@@ -573,12 +573,12 @@ Wire.prototype.draw_spark = function(fl_obj) {
 };
 
 Wire.prototype.redraw_fg = function() {
-  for (var i = 0; i < this.in_flight.length; i++){
+  for (var i = 0; i < this.in_flight.length; i++) {
     var fl_obj = this.in_flight[i];
     this.draw_spark(fl_obj);
   }
 
-  if (this.pending_del == 'del'){
+  if (this.pending_del == 'del') {
     var attr = {
       path: this.path,
       stroke: '#e88', // red
@@ -598,7 +598,7 @@ Wire.prototype.redraw_fg = function() {
   var older_el_subpath = this.el_fg;
   var older_age_len = this.path_length;
 
-  for (var i = 0; i < this.in_flight.length; i++){
+  for (var i = 0; i < this.in_flight.length; i++) {
     var fl_obj = this.in_flight[i];
     var age_len = fl_obj.age * this.path_length;
     var path = this.get_subpath(age_len, older_age_len);
@@ -606,7 +606,7 @@ Wire.prototype.redraw_fg = function() {
     older_el_subpath.attr({path: path,
                            stroke: color});
 
-    if (!fl_obj.el_subpath){
+    if (!fl_obj.el_subpath) {
       // Draw a path placeholder of the appropriate color.
       // The actual path will be inserted at the next loop
       // iteration or the end of the loop.
@@ -622,14 +622,14 @@ Wire.prototype.redraw_fg = function() {
     older_age_len = age_len;
   }
 
-  if (older_age_len == 0){
+  if (older_age_len == 0) {
     // The newest value in flight has age 0, so there's no point in
     // drawing the last (0-length) subpath.
     return;
   }
 
   var path;
-  if (older_age_len >= this.path_length){
+  if (older_age_len >= this.path_length) {
     // This only happens if there are no values in flight.
     path = this.path;
   } else {
@@ -653,9 +653,9 @@ Wire.prototype.redraw = function() {
 
 Wire.prototype.remove_subpaths = function() {
   // Remove all propagating subpaths.
-  for (var i = 0; i < this.in_flight.length; i++){
+  for (var i = 0; i < this.in_flight.length; i++) {
     var fl_obj = this.in_flight[i];
-    if (fl_obj.el_subpath){
+    if (fl_obj.el_subpath) {
       fl_obj.el_subpath.remove();
       fl_obj.el_subpath = undefined;
     }
@@ -664,7 +664,7 @@ Wire.prototype.remove_subpaths = function() {
 
 Wire.prototype.remove_sparks = function() {
   // Remove all propagating sparks.
-  for (var i = 0; i < this.in_flight.length; i++){
+  for (var i = 0; i < this.in_flight.length; i++) {
     var fl_obj = this.in_flight[i];
     if (fl_obj.el_spark) {
       fl_obj.el_spark.remove();

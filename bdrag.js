@@ -81,7 +81,7 @@ Bdrag.prototype.touchstart = function (data, event) {
 
   if (data.callbacks.dblclick && (e.timeStamp !== undefined)) {
     var tapdata = this.tapdata[data.type];
-    if ((tapdata !== undefined) && (tapdata.jel == data.jel)){
+    if ((tapdata !== undefined) && (tapdata.jel == data.jel)) {
       var delay = e.timeStamp - tapdata.timeStamp;
       if ((delay < 500) && (delay > 0)) {
         data.callbacks.dblclick.call(data.context,
@@ -108,10 +108,10 @@ Bdrag.prototype.touchstart = function (data, event) {
 
       // Detect second touch for a pinch.
       if (data.callbacks.pinch_start && this.touchdata[data.type] &&
-          (data.pinchid === undefined)){
+          (data.pinchid === undefined)) {
         data.pinchid = t.identifier;
         for (var i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier == data.touchid){
+          if (e.touches[i].identifier == data.touchid) {
             data.callbacks.pinch_start.call(data.context,
                                             e.touches[i].pageX,
                                             e.touches[i].pageY,
@@ -124,7 +124,7 @@ Bdrag.prototype.touchstart = function (data, event) {
 
       if (this.touchdata[data.type]) break;
 
-      if (!this.dragging){
+      if (!this.dragging) {
         var doc = $(document);
         doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
         doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
@@ -155,9 +155,9 @@ Bdrag.prototype.touchmove = function (event) {
   for (var j = 0; j < types.length; j++) {
     var type = types[j];
     var data = this.touchdata[type];
-    if (data){
+    if (data) {
       for (var i = 0; i < e.touches.length; i++) {
-        if (e.touches[i].identifier == data.touchid){
+        if (e.touches[i].identifier == data.touchid) {
           if (data.callbacks.move) {
             var x = e.touches[i].pageX;
             var y = e.touches[i].pageY;
@@ -170,10 +170,10 @@ Bdrag.prototype.touchmove = function (event) {
       var deleteme = (i == e.touches.length);
       var deletepinch = false;
 
-      if (data.pinchid !== undefined){
+      if (data.pinchid !== undefined) {
         for (var i = 0; i < e.touches.length; i++) {
-          if (e.touches[i].identifier == data.pinchid){
-            if (deleteme){
+          if (e.touches[i].identifier == data.pinchid) {
+            if (deleteme) {
               deleteme = false;
               data.touchid = data.pinchid;
               data.pinchid = undefined;
@@ -204,7 +204,7 @@ Bdrag.prototype.touchmove = function (event) {
           data.callbacks.end.call(data.context, data.extra);
         }
         this.touchdata[type] = undefined;
-      } else if (deletepinch){
+      } else if (deletepinch) {
         data.pinchid = undefined;
       }
     }

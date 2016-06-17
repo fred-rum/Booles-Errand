@@ -184,7 +184,7 @@ Circuit.prototype.resize = function(maintain_center) {
   // position won't be noticeable, either.
 
   // Position either the info panel or the info stub.
-  if (this.info_hidden){
+  if (this.info_hidden) {
     // For now, just set the info panel stub height.  We'll set its
     // width and position later.
     this.be.info_height = this.be.div_info_stub.outerHeight();
@@ -234,7 +234,7 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.div_cdrag.width(this.be.cbox_width);
   }
 
-  if (this.be.hide_truth && this.info_hidden){
+  if (this.be.hide_truth && this.info_hidden) {
     // If the info panel is hidden, then we allow the hidden truth
     // table width to be subordinate to the cbox width.  Possibly this
     // applies to only the 'Hidden truths' puzzle since it is the only
@@ -296,7 +296,7 @@ Circuit.prototype.resize = function(maintain_center) {
   this.be.controls_left = cx - this.be.controls_width/2;
   this.be.div_controls.css({left: this.be.controls_left});
 
-  if (maintain_center){
+  if (maintain_center) {
     // If we want the canvas objects to stay centered in the viewable
     // area, we adjust the canvas_left/top coordinates as needed.
     // This takes into account not only the change in the window size,
@@ -312,11 +312,11 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.canvas_top -= canvas_dy;
   }
 
-  if (this.be.window_width > this.cdraw_width){
+  if (this.be.window_width > this.cdraw_width) {
     this.cdraw_width = this.be.window_width + 1000;
     this.be.div_cdraw.width(this.cdraw_width);
   }
-  if (this.be.window_height > this.cdraw_height){
+  if (this.be.window_height > this.cdraw_height) {
     this.cdraw_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.cdraw_height);
   }
@@ -327,12 +327,12 @@ Circuit.prototype.resize = function(maintain_center) {
 Circuit.prototype.fit_view = function() {
   var bbox = {};
   var all_cells = this.be.level.all_cells;
-  for (var i = 0; i < all_cells.length; i++){
+  for (var i = 0; i < all_cells.length; i++) {
     var bbox_left = all_cells[i].bbox.left + all_cells[i].x;
     var bbox_right = all_cells[i].bbox.right + all_cells[i].x;
     var bbox_top = all_cells[i].bbox.top + all_cells[i].y;
     var bbox_bottom = all_cells[i].bbox.bottom + all_cells[i].y;
-    if (bbox.left === undefined){
+    if (bbox.left === undefined) {
       bbox.left = bbox_left;
       bbox.top = bbox_top;
       bbox.right = bbox_right;
@@ -345,7 +345,7 @@ Circuit.prototype.fit_view = function() {
     }
   }
 
-  if (bbox.left === undefined){
+  if (bbox.left === undefined) {
     // Handle the case that no cells are in cdraw.
     this.be.canvas_left = 0;
     this.be.canvas_top = 0;
@@ -378,7 +378,7 @@ Circuit.prototype.fit_view = function() {
     var y_scale2 = cdraw_height2 / bbox_height;
     var scale2 = Math.min(x_scale2, y_scale2);
 
-    if (scale1 > scale2){
+    if (scale1 > scale2) {
       var scale = this.be.scale = Math.min(scale1, 2.0);
       var cdraw_cx = cdraw_left1 + cdraw_width1 / 2;
       var cdraw_cy = cdraw_top1 + cdraw_height1 / 2;

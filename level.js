@@ -5,15 +5,15 @@
 function Level(be) {
   this.be = be;
 
-  for (var i = 0; i < this.puzzle.length; i++){
+  for (var i = 0; i < this.puzzle.length; i++) {
     var key = 'boole.' + this.puzzle[i].name + '.completed';
     this.puzzle[i].completed = this.be.circuit.load_data(key);
   }
 
   var html = [];
   html.push('<table class="levels"><tr><td></td><td colspan="2">&#9733; <b>= Interface lessons</b></td></tr>');
-  for (var i = 0; i < this.puzzle.length; i++){
-    if (this.puzzle[i].section){
+  for (var i = 0; i < this.puzzle.length; i++) {
+    if (this.puzzle[i].section) {
       html.push('<tr><td colspan="3"><b>', this.puzzle[i].section, '</b></td></tr>');
     }
     html.push('<tr class="levels" id="level', i, '">');
@@ -26,7 +26,7 @@ function Level(be) {
   html.push('</table>');
   $('#levels').html(html.join(''));
 
-  for (var i = 0; i < this.puzzle.length; i++){
+  for (var i = 0; i < this.puzzle.length; i++) {
     if (this.puzzle[i].completed) this.mark_complete(i);
     $('#level' + i).click($.proxy(this.click_level, this, i));
   }
@@ -48,9 +48,9 @@ Level.prototype.mark_complete = function(level_num) {
 Level.prototype.begin = function(level_num) {
   var save_str = undefined;
 
-  if (level_num === undefined){
+  if (level_num === undefined) {
     var anchor = decodeURI(window.location.hash.substring(1));
-    if (anchor != ''){
+    if (anchor != '') {
       var a = anchor.split('?', 2);
       var level_name = a[0];
       if (a.length == 2) save_str = a[1];
@@ -77,9 +77,9 @@ Level.prototype.begin = function(level_num) {
     save_str = this.be.circuit.load_data('boole.' + level.name + '.progress');
   }
 
-  if (level.hide === undefined){
+  if (level.hide === undefined) {
     level.hide = {};
-  } else if (Array.isArray(level.hide)){
+  } else if (Array.isArray(level.hide)) {
     var hide = {};
     for (var i = 0; i < level.hide.length; i++) {
       hide[level.hide[i]] = true;
@@ -89,7 +89,7 @@ Level.prototype.begin = function(level_num) {
 
   this.box_cells = {};
   this.be.box_height = this.be.box_spacing;
-  if (level.avail === undefined){
+  if (level.avail === undefined) {
     level.avail = ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'];
   }
 
@@ -98,9 +98,9 @@ Level.prototype.begin = function(level_num) {
   this.be.div_cbox.css({display: display});
   this.be.div_cdrag.css({display: display});
 
-  for (var i = 0; i < level.avail.length; i++){
+  for (var i = 0; i < level.avail.length; i++) {
     var name = level.avail[i];
-    if (typeof name == 'string'){
+    if (typeof name == 'string') {
       var cell = this.add_box_cell(name);
     } else {
       cell.update_quantity(name);
@@ -115,7 +115,7 @@ Level.prototype.begin = function(level_num) {
   // Get a list of the input and output pins.
   this.input_names = [];
   this.output_names = [];
-  for (var cell_name in level.cells){
+  for (var cell_name in level.cells) {
     var cell_obj = level.cells[cell_name];
     if (cell_obj.type == 'input') this.input_names.push(cell_name);
     if (cell_obj.type == 'output') this.output_names.push(cell_name);
@@ -131,7 +131,7 @@ Level.prototype.begin = function(level_num) {
   this.display_intro();
 
   // Initialize the cells required by the level while ignoring IO connections.
-  for (var cell_name in level.cells){
+  for (var cell_name in level.cells) {
     var cell_obj = level.cells[cell_name];
     var cell = new Cell(this.be, 'cdraw',
                         cell_obj.type,
@@ -148,10 +148,10 @@ Level.prototype.begin = function(level_num) {
   }
 
   // Connect the cell IOs as required by the level.
-  for (var cell_name in level.cells){
+  for (var cell_name in level.cells) {
     var conn_list = level.cells[cell_name].io;
-    if (conn_list){
-      for (var i = 0; i < conn_list.length; i++){
+    if (conn_list) {
+      for (var i = 0; i < conn_list.length; i++) {
         var io_name = conn_list[i][0];
         var cell_name2 = conn_list[i][1];
         var io_name2 = conn_list[i][2];
@@ -171,7 +171,7 @@ Level.prototype.begin = function(level_num) {
   }
 
   // Restore additional cells and wire connections from the save data.
-  if (save_str){
+  if (save_str) {
     this.restore_progress(save_str);
   }
   this.update_widths();
@@ -190,8 +190,8 @@ Level.prototype.begin = function(level_num) {
 };
 
 Level.prototype.level_name_to_num = function(name) {
-  for (var i = 0; i < this.puzzle.length; i++){
-    if (this.puzzle[i].name == name){
+  for (var i = 0; i < this.puzzle.length; i++) {
+    if (this.puzzle[i].name == name) {
       return i;
     }
   }
@@ -208,7 +208,7 @@ Level.prototype.init_table = function() {
   var display = (this.be.hide_truth && this.be.hide_cbox) ? 'none' : 'block';
   this.be.div_truth.css({display: display});
 
-  if (this.be.hide_truth){
+  if (this.be.hide_truth) {
     // Create the truth table HTML, but hidden.  This is easier than
     // not creating the HTML and trying to prevent the various actions
     // that normally happen in the truth table.  (Note that the entire
@@ -223,8 +223,8 @@ Level.prototype.init_table = function() {
   var num_rows = 0;
   this.row_seq = [];
   this.row_line = [];
-  for (var i = 0; i < level.truth.length; i++){
-    if (Array.isArray(level.truth[i])){
+  for (var i = 0; i < level.truth.length; i++) {
+    if (Array.isArray(level.truth[i])) {
       if (level.truth[i].length > 1) this.sequenced = true;
     } else {
       // A non-sequencing table row can be specified without the array,
@@ -233,7 +233,7 @@ Level.prototype.init_table = function() {
     }
     var truth_seq = level.truth[i];
     truth_seq.first_row = num_rows;
-    for (var j = 0; j < truth_seq.length; j++){
+    for (var j = 0; j < truth_seq.length; j++) {
       var last_line = (j == truth_seq.length - 1);
       html.push('<tr class="truthbody" id="row', num_rows, '">');
       if (truth_seq[j].rnd) {
@@ -254,14 +254,14 @@ Level.prototype.init_table = function() {
   html.push('</table>');
   $('#truth').html(html.join(''));
   this.div_truth_table = $('#truth-table');
-  if (level.hide.truth){
+  if (level.hide.truth) {
     this.be.truth_table_width = 0;
   } else {
     this.be.truth_table_width = this.div_truth_table.width();
   }
 
   this.row_top = [];
-  for (var i = 0; i < num_rows; i++){
+  for (var i = 0; i < num_rows; i++) {
     var row = $('#row' + i);
     row.hover($.proxy(this.row_enter, this, i),
               $.proxy(this.row_leave, this, i));
@@ -277,7 +277,7 @@ Level.prototype.init_table = function() {
 };
 
 Level.prototype.table_header = function(html, port_names) {
-  for (var i = 0; i < port_names.length; i++){
+  for (var i = 0; i < port_names.length; i++) {
     html.push('<th');
     this.push_padding(html, i, port_names.length, true);
     html.push('>', port_names[i].toUpperCase(), '</th>');
@@ -289,11 +289,11 @@ Level.prototype.table_line_rnd = function(html, span, last_line) {
 };
 
 Level.prototype.table_line = function(html, port_names, truth_line, last_line) {
-  for (var i = 0; i < port_names.length; i++){
+  for (var i = 0; i < port_names.length; i++) {
     html.push('<td');
     this.push_padding(html, i, port_names.length, last_line);
     html.push('>');
-    if (truth_line[port_names[i]] !== undefined){
+    if (truth_line[port_names[i]] !== undefined) {
       html.push(truth_line[port_names[i]]);
     }
     html.push('</td>');
@@ -302,15 +302,15 @@ Level.prototype.table_line = function(html, port_names, truth_line, last_line) {
 
 Level.prototype.push_padding = function(html, i, num, last_line) {
   var tdb = last_line ? ' tdb' : '';
-  if (i == 0){
-    if (i < num-1){
+  if (i == 0) {
+    if (i < num-1) {
       html.push(' class="tdl', tdb, '"');
     } else {
       html.push(' class="tdlr', tdb, '"');
     }
-  } else if (i == num-1){
+  } else if (i == num-1) {
     html.push(' class="tdr', tdb, '"');
-  } else if (last_line){
+  } else if (last_line) {
     html.push(' class="tdb"');
   }
 };
@@ -322,15 +322,15 @@ Level.prototype.table_blank_check = function(html, row) {
 Level.prototype.row_enter = function(row, event) {
   this.hover_row = row;
   var old_row = this.cur_row();
-  if (row === this.row_allows_simple_click){
-    if (row != old_row){
+  if (row === this.row_allows_simple_click) {
+    if (row != old_row) {
       $('#row' + row).css({'background-color': '#ddd'});
     }
   } else {
     var seq = this.row_seq[row];
     for (var i = 0; i < this.level.truth[seq].length; i++) {
       var i_row = this.level.truth[seq].first_row + i;
-      if (i_row != old_row){
+      if (i_row != old_row) {
         $('#row' + i_row).css({'background-color': '#ddd'});
       }
     }
@@ -340,13 +340,13 @@ Level.prototype.row_enter = function(row, event) {
 Level.prototype.row_leave = function(row, event) {
   this.hover_row = undefined;
   var old_row = this.cur_row();
-  for (var i = 0; i < this.row_result.length; i++){
+  for (var i = 0; i < this.row_result.length; i++) {
     if (i != old_row) $('#row' + i).css({'background-color': ''});
   }
 };
 
 Level.prototype.update_hover = function() {
-  if (this.hover_row !== undefined){
+  if (this.hover_row !== undefined) {
     var row = this.hover_row;
     this.row_leave(row);
     this.row_enter(row);
@@ -356,8 +356,8 @@ Level.prototype.update_hover = function() {
 Level.prototype.row_click = function(row, event) {
   this.be.sim.click_pause();
   var old_row = this.cur_row();
-  if (row === this.row_allows_simple_click){
-    if (row == old_row + 1){
+  if (row === this.row_allows_simple_click) {
+    if (row == old_row + 1) {
       // The user is selecting the next line of a sequence, and the
       // current line is complete and passed.  Go ahead and advance to
       // the next line, rather than starting the sequence over.
@@ -424,7 +424,7 @@ Level.prototype.update_pins = function() {
       }
     }
   }
-  for (var i = 0; i < this.input_names.length; i++){
+  for (var i = 0; i < this.input_names.length; i++) {
     // We want the value to appear right away on the IO stub, so we
     // push it all the way through to the input pin's output port.
     // This also registers the value for propagation on the next wire
@@ -433,7 +433,7 @@ Level.prototype.update_pins = function() {
     cell.propagate_value();
     cell.fit_input_text();
   }
-  for (var i = 0; i < this.output_names.length; i++){
+  for (var i = 0; i < this.output_names.length; i++) {
     var cell = this.named_cells[this.output_names[i]];
     cell.calc_output();
     cell.fit_output_text();
@@ -444,7 +444,7 @@ Level.prototype.reset_sim = function() {
   this.row_allows_simple_click = false;
   this.update_hover();
   this.be.sim.reset();
-  for (var i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++) {
     this.all_cells[i].reset();
   }
 };
@@ -463,7 +463,7 @@ Level.prototype.add_box_cell = function(type) {
 Level.prototype.update_box_quantity = function(type, change) {
   var cell = this.be.level.box_cells[type];
   if (cell === undefined) return false;
-  if (cell.quantity !== undefined){
+  if (cell.quantity !== undefined) {
     if (cell.quantity + change < 0) return false;
     cell.update_quantity(cell.quantity + change);
   }
@@ -479,8 +479,8 @@ Level.prototype.add_cell = function(cell) {
 };
 
 Level.prototype.remove_cell = function(cell) {
-  for (var i = 0; i < this.all_cells.length; i++){
-    if (cell == this.all_cells[i]){
+  for (var i = 0; i < this.all_cells.length; i++) {
+    if (cell == this.all_cells[i]) {
       this.all_cells.splice(i, 1);
       return;
     }
@@ -488,8 +488,8 @@ Level.prototype.remove_cell = function(cell) {
 };
 
 Level.prototype.move_cell_to_end = function(cell) {
-  for (var i = 0; i < this.all_cells.length; i++){
-    if (cell == this.all_cells[i]){
+  for (var i = 0; i < this.all_cells.length; i++) {
+    if (cell == this.all_cells[i]) {
       this.all_cells.splice(i, 1);
       this.all_cells.push(cell);
       return;
@@ -528,7 +528,7 @@ Level.prototype.encode_progress = function() {
   for (var i = 0; i < this.all_cells.length; i++) {
     var emitted_cell = false;
     var cell = this.all_cells[i];
-    if (!cell.locked){
+    if (!cell.locked) {
       var type = cell.type;
       if ((type == 'condenser') || (type == 'expander')) type += cell.width;
       save.push(';', Math.round(cell.x / this.be.io_spacing * 20),
@@ -538,7 +538,7 @@ Level.prototype.encode_progress = function() {
     }
     for (var port_name in cell.io) {
       var io = cell.io[port_name];
-      if (io.type == 'output'){
+      if (io.type == 'output') {
         for (var j = 0; j < io.w.length; j++) {
           var wire = io.w[j];
           if (!wire.locked) {
@@ -569,7 +569,7 @@ Level.prototype.restore_progress = function(save_str) {
     var m;
     var wires = [];
 
-    if (m = ex_version_skip.exec(save_str)){
+    if (m = ex_version_skip.exec(save_str)) {
       var skip = Number(m[1]);
       if (skip != this.all_cells.length) throw 'wrong skip';
       save_str = save_str.substring(m[0].length);
@@ -577,8 +577,8 @@ Level.prototype.restore_progress = function(save_str) {
       throw 'bad version/skip string';
     }
 
-    while (save_str != ''){
-      if (m = ex_cell.exec(save_str)){
+    while (save_str != '') {
+      if (m = ex_cell.exec(save_str)) {
         var x = Number(m[1]);
         var type = m[2];
         var width = m[3];
@@ -598,8 +598,8 @@ Level.prototype.restore_progress = function(save_str) {
 
         save_str = save_str.substring(m[0].length);
 
-        while (save_str != ''){
-          if (m = ex_plus.exec(save_str)){
+        while (save_str != '') {
+          if (m = ex_plus.exec(save_str)) {
             wires.push({o_cell: this.all_cells.length-1,
                         o_port: m[1],
                         i_cell: Number(m[2]),
@@ -609,7 +609,7 @@ Level.prototype.restore_progress = function(save_str) {
             break;
           }
         }
-      } else if (m = ex_minus.exec(save_str)){
+      } else if (m = ex_minus.exec(save_str)) {
         wires.push({o_cell: Number(m[1]),
                     o_port: m[2],
                     i_cell: Number(m[3]),
@@ -620,7 +620,7 @@ Level.prototype.restore_progress = function(save_str) {
       }
     }
 
-    for (var i = 0; i < wires.length; i++){
+    for (var i = 0; i < wires.length; i++) {
       var w = wires[i];
       if (w.o_cell >= this.all_cells.length) throw 'bad o_cell #: ' + w.o_cell;
       if (w.i_cell >= this.all_cells.length) throw 'bad i_cell #: ' + w.i_cell;
@@ -630,8 +630,8 @@ Level.prototype.restore_progress = function(save_str) {
       var io_i = i_cell.io[w.i_port];
       if (!io_o) throw 'bad o port: ' + w.o_port;
       if (!io_i) throw 'bad i port: ' + w.i_port;
-      if (io_i.w.length > 0){
-        if (io_i.w[0].o == io_o){
+      if (io_i.w.length > 0) {
+        if (io_i.w[0].o == io_o) {
           // If the save data duplicates a locked wire, we silently
           // discard it without throwing an exception.
         } else {
@@ -658,8 +658,8 @@ Level.prototype.not_done = function() {
   // If there is anything to simulate in the current row, we mark all
   // check pins as pending.  To avoid confusing the user, we do this
   // even if we are sure of the final value.
-  for (var cell_name in this.named_cells){
-    if (this.named_cells[cell_name].type == 'output'){
+  for (var cell_name in this.named_cells) {
+    if (this.named_cells[cell_name].type == 'output') {
       this.named_cells[cell_name].check_pending();
     }
   }
@@ -694,7 +694,7 @@ Level.prototype.circuit_changed = function() {
   if (this.cleaning_up) return; // Ignore circuit changes while cleaning up.
   if (this.circuit_is_reset) return; // Ignore duplicate circuit changes.
 
-  for (var i = 0; i < this.row_result.length; i++){
+  for (var i = 0; i < this.row_result.length; i++) {
     this.record_result(i, undefined);
     var i_seq = this.row_seq[i];
     if (i_seq != this.cur_seq) {
@@ -727,8 +727,8 @@ Level.prototype.circuit_changed = function() {
 // done() gets called by Sim when there are no events left to process.
 Level.prototype.done = function() {
   var result = true;
-  for (var cell_name in this.named_cells){
-    if (this.named_cells[cell_name].type == 'output'){
+  for (var cell_name in this.named_cells) {
+    if (this.named_cells[cell_name].type == 'output') {
       var cell_result = this.named_cells[cell_name].done_check();
       result = result && cell_result;
     }
@@ -791,10 +791,10 @@ Level.prototype.scroll_truth = function() {
 Level.prototype.first_failed_seq = function() {
   // Look for the first failure after the current sequence, if any;
   // otherwise, the first failure overall.
-  for (var i = this.cur_row() + 1; i < this.row_result.length; i++){
+  for (var i = this.cur_row() + 1; i < this.row_result.length; i++) {
     if (!this.row_result[i]) return this.row_seq[i];
   }
-  for (var i = 0; i < this.row_result.length; i++){
+  for (var i = 0; i < this.row_result.length; i++) {
     if (!this.row_result[i]) return this.row_seq[i];
   }
   return null;
@@ -803,7 +803,7 @@ Level.prototype.first_failed_seq = function() {
 Level.prototype.change_level = function(level_num, show_soln) {
   this.cleaning_up = true;
 
-  for (var i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++) {
     this.all_cells[i].remove();
   }
 
@@ -824,9 +824,9 @@ Level.prototype.record_result = function(row, result) {
   this.row_result[row] = result;
 
   var id = '#check' + row;
-  if (result === undefined){
+  if (result === undefined) {
     $(id).html('');
-  } else if (result){
+  } else if (result) {
     $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>');
   } else {
     $(id).html('<path d="M4.5,4.5l24,24m0,-24l-24,24" class="xmark"/>');
@@ -856,7 +856,7 @@ Level.prototype.click_level = function(level_num, event) {
   $('#main_container').css({display: 'none'});
   $('#level' + this.level_num).css({'background-color': ''});
 
-  if (level_num === this.level_num){
+  if (level_num === this.level_num) {
     // The user selected the same level he was previously on.
     // Return to the level without resetting it.
     return;
@@ -866,10 +866,10 @@ Level.prototype.click_level = function(level_num, event) {
 };
 
 Level.prototype.update_widths = function(pending) {
-  for (var i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
     if (((cell.type == 'input') || (cell.type == 'condenser')) &&
-        (cell.width > 1)){
+        (cell.width > 1)) {
       var failure = cell.propagate_width(cell.width);
       if (failure) break;
     }
@@ -877,13 +877,13 @@ Level.prototype.update_widths = function(pending) {
 
   // Even if there's a failure, we still perform this step in order to
   // clear the prospective_width values.
-  for (var i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
     if (!cell.locked &&
         (cell.type != 'condenser') && (cell.type != 'expander')) {
       var new_width = cell.prospective_width || 1;
       var old_width = (pending && cell.pending_width) || cell.width;
-      if (this.update_box_quantity(cell.type, old_width - new_width)){
+      if (this.update_box_quantity(cell.type, old_width - new_width)) {
         cell.update_width(new_width, pending);
       } else {
         if (!failure) failure = 'exhausted cells';
@@ -896,7 +896,7 @@ Level.prototype.update_widths = function(pending) {
 };
 
 Level.prototype.commit_widths = function() {
-  for (var i = 0; i < this.all_cells.length; i++){
+  for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
     if (!cell.locked &&
         (cell.type != 'condenser') && (cell.type != 'expander')) {

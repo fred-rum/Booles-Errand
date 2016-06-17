@@ -50,7 +50,7 @@ Drag.prototype.reset = function() {
 };
 
 Drag.prototype.remove_null_wire = function() {
-  if (this.null_wire){
+  if (this.null_wire) {
     // remove_null_wire
     this.null_wire.remove();
     this.null_wire = null;
@@ -60,21 +60,21 @@ Drag.prototype.remove_null_wire = function() {
 Drag.prototype.gen_old_wires = function(io) {
   var type = (this.new_io == this.be.null_io) ? 'null' : 'del';
   this.old_wires = this.old_wires.concat(io.w.slice(0));
-  for (var i = 0; i < this.old_wires.length; i++){
+  for (var i = 0; i < this.old_wires.length; i++) {
     this.old_wires[i].mark_old(type);
   }
 };
 
 // Revert the pending change for old and new wires.
 Drag.prototype.restore_old_wires = function() {
-  for (var i = 0; i < this.old_wires.length; i++){
+  for (var i = 0; i < this.old_wires.length; i++) {
     this.old_wires[i].restore_old();
   }
   this.old_wires = [];
 };
 
 Drag.prototype.remove_new_wires = function() {
-  for (var i = 0; i < this.new_wires.length; i++){
+  for (var i = 0; i < this.new_wires.length; i++) {
     this.new_wires[i].remove();
   }
   this.new_wires = [];
@@ -83,7 +83,7 @@ Drag.prototype.remove_new_wires = function() {
 // Commit the pending change for old and new wires.
 Drag.prototype.remove_old_wires = function() {
   // Delete the old wires.
-  for (var i = 0; i < this.old_wires.length; i++){
+  for (var i = 0; i < this.old_wires.length; i++) {
     this.old_wires[i].remove();
   }
   this.old_wires = [];
@@ -92,7 +92,7 @@ Drag.prototype.remove_old_wires = function() {
 Drag.prototype.commit_new_wires = function() {
   var attr = {stroke: '#eee'}
   if (this.new_wires.length) this.be.level.circuit_changed();
-  for (var i = 0; i < this.new_wires.length; i++){
+  for (var i = 0; i < this.new_wires.length; i++) {
     this.new_wires[i].el_bg.attr(attr);
     this.new_wires[i].pending_new = false;
 
@@ -152,7 +152,7 @@ Drag.prototype.drag_end = function() {
   }
 
   this.remove_null_wire();
-  if (this.new_io == this.be.null_io){
+  if (this.new_io == this.be.null_io) {
     this.restore_old_wires();
   } else {
     this.remove_old_wires();
@@ -173,7 +173,7 @@ Drag.prototype.mouse_double_click = function(event) {
 
 Drag.prototype.dblclick = function(x, y) {
   var io = this.closest_io(x, y);
-  while (io.w.length > 0){
+  while (io.w.length > 0) {
     io.w[0].remove();
     this.be.level.save_progress();
   }
@@ -200,7 +200,7 @@ Drag.prototype.hover_move = function(event) {
 
   if (io.locked) return;
 
-  if ((io != this.pending_hover_io) && !this.no_hover){
+  if ((io != this.pending_hover_io) && !this.no_hover) {
     this.show_handle(this.el_handle1, io);
   }
   this.pending_hover_io = io;
@@ -229,13 +229,13 @@ Drag.prototype.closest_io = function(x, y, limit) {
 
   var mx = this.be.circuit.cdraw_to_canvas_x(x);
   var my = this.be.circuit.cdraw_to_canvas_y(y);
-  for (var i = 0; i < this.io_set.length; i++){
+  for (var i = 0; i < this.io_set.length; i++) {
     var io = this.io_set[i];
     var dx = io.x + io.cell.x - mx;
     var dy = io.y + io.cell.y - my;
     var d = (dx * dx) + (dy * dy);
     if ((d < limit2) &&
-        ((d < closest_d) || (!io.locked && closest_io.locked))){
+        ((d < closest_d) || (!io.locked && closest_io.locked))) {
       closest_d = d;
       var closest_io = io;
     }
@@ -275,7 +275,7 @@ Drag.prototype.remove_io = function(io) {
   io.el_target.undblclick();
   io.el_target.unhover();
 
-  for (var i = 0; i < this.io_set.length; i++){
+  for (var i = 0; i < this.io_set.length; i++) {
     if (this.io_set[i] == io) {
       this.io_set.splice(i, 1);
       break;
@@ -332,7 +332,7 @@ Drag.prototype.hide_fail = function() {
 Drag.prototype.connect_o_to_i = function(o, i) {
   // If the new wire would duplicate an existing one, then
   // we delete the existing one instead of creating a new one.
-  if ((i.w.length > 0) && (i.w[0].o == o)){
+  if ((i.w.length > 0) && (i.w[0].o == o)) {
     this.gen_old_wires(i);
   } else {
     this.gen_old_wires(i);
@@ -344,10 +344,10 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
   // Like cannot drag to like unless there are one or more wires
   // on the original IO that can be moved.  The exception is
   // when the new IO is the same as the original IO.
-  if (io == this.orig_io){
+  if (io == this.orig_io) {
     io = this.be.null_io;
   } else if ((this.orig_empty && (this.orig_io.type == io.type)) ||
-             io.locked || failure){
+             io.locked || failure) {
     if (failure == 'exhausted cells') {
       $('#error').html('<p>Connecting a multi-bit wire here would replicate more gates downstream than are available.</p>');
     } else if (failure == 'mismatch') {
@@ -356,7 +356,7 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
       $('#error').html('<p>Connecting a multi-bit wire here would conflict with a different logic width downstream.</p>');
     } else if (io.locked) {
       $('#error').html('<p>The wire at this port is locked for this challenge and cannot be modified.</p>');
-    } else if (io.type == 'output'){
+    } else if (io.type == 'output') {
       $('#error').html('<p>A wire cannot be created from an output port to another output port.</p>');
     } else {
       $('#error').html('<p>A wire cannot be created from an input port to another input port.</p>');
@@ -382,7 +382,7 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
     this.connect_o_to_i(this.orig_io, io);
   } else if ((this.orig_io.type == 'output') && (io.type == 'output')) {
     this.gen_old_wires(this.orig_io);
-    for (var i = 0; i < this.old_wires.length; i++){
+    for (var i = 0; i < this.old_wires.length; i++) {
       this.new_wires.push(new Wire(this.be, this.old_wires[i].i, this.new_io,
                                    true));
     }
@@ -390,7 +390,7 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
     this.connect_o_to_i(io, this.orig_io);
   } else if ((this.orig_io.type == 'input') && (io.type == 'input')) {
     this.gen_old_wires(this.orig_io);
-    if (io.w.length && (io.w[0].o == this.orig_io.w[0].o)){
+    if (io.w.length && (io.w[0].o == this.orig_io.w[0].o)) {
       // The new wire would duplicate an existing connection at
       // this location.  Rather than delete the existing wire and
       // replace it with a new one (which would trigger signal
@@ -406,15 +406,15 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
 };
 
 Drag.prototype.update_free_drag = function(x, y) {
-  if (this.new_io == this.be.null_io){
+  if (this.new_io == this.be.null_io) {
     this.be.null_io.x = this.be.circuit.cdraw_to_canvas_x(x);
     this.be.null_io.y = this.be.circuit.cdraw_to_canvas_y(y);
 
-    if (this.null_wire){
+    if (this.null_wire) {
       this.null_wire.redraw();
     } else {
       // create_null_wire
-      if ((this.orig_io.type == 'input') && (!this.orig_empty)){
+      if ((this.orig_io.type == 'input') && (!this.orig_empty)) {
         var from_io = this.orig_io.w[0].o;
       } else {
         var from_io = this.orig_io;
@@ -452,13 +452,13 @@ Drag.prototype.closest_locked_io = function(x, y) {
   var closest_d = Infinity;
   var mx = this.be.circuit.cdraw_to_canvas_x(x);
   var my = this.be.circuit.cdraw_to_canvas_y(y);
-  for (var i = 0; i < this.io_set.length; i++){
+  for (var i = 0; i < this.io_set.length; i++) {
     var io = this.io_set[i];
     if (io.locked) {
       var dx = io.x + io.cell.x - mx;
       var dy = io.y + io.cell.y - my;
       var d = (dx * dx) + (dy * dy);
-      if (d < closest_d){
+      if (d < closest_d) {
         closest_d = d;
         var closest_io = io;
       }

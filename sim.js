@@ -89,24 +89,24 @@ Sim.prototype.not_done = function() {
 
   // If we're currently delaying before doing something else, the call
   // of not_done() interrupts that and returns to regular simulation.
-  if (this.delay_timer){
+  if (this.delay_timer) {
     clearTimeout(this.delay_timer);
     this.delay_timer = undefined;
   }
 
   this.be.level.not_done();
 
-  if (this.running){
+  if (this.running) {
     this.timer = setInterval($.proxy(this.tick, this), 50);
   }
 };
 
 Sim.prototype.stop_timer = function() {
-  if (this.timer){
+  if (this.timer) {
     clearInterval(this.timer);
     this.timer = undefined;
   }
-  if (this.delay_timer){
+  if (this.delay_timer) {
     clearTimeout(this.delay_timer);
     this.delay_timer = undefined;
   }
@@ -121,11 +121,11 @@ Sim.prototype.no_new_events = function() {
 };
 
 Sim.prototype.register_obj = function(obj, fresh_cell_output) {
-  if (this.no_new_events()){
+  if (this.no_new_events()) {
     this.not_done();
   }
 
-  if (fresh_cell_output){
+  if (fresh_cell_output) {
     this.new_output_events.push(obj);
   } else {
     this.new_other_events.push(obj);
@@ -136,7 +136,7 @@ Sim.prototype.tick = function() {
   // Simulate through a gate if we don't pause at gates *or* if there
   // are no wire events to process.  (The latter implies that we
   // paused at a gate boundary, but were then restarted.)
-  if ((this.pause_at != 'gate') || !this.new_other_events.length){
+  if ((this.pause_at != 'gate') || !this.new_other_events.length) {
     this.old_output_events = this.new_output_events;
     this.new_output_events = [];
   } else {
@@ -154,7 +154,7 @@ Sim.prototype.tick = function() {
 
   if (this.no_new_events()) {
     this.done(false);
-  } else if ((this.pause_at == 'gate') && !this.new_other_events.length){
+  } else if ((this.pause_at == 'gate') && !this.new_other_events.length) {
     this.click_pause();
   }
 };
@@ -196,11 +196,11 @@ Sim.prototype.keypress = function(event) {
   var key = String.fromCharCode(event.which);
   var bucky = event.ctrlKey || event.altKey || event.metaKey;
 
-  if ((key == '-') && !bucky){
+  if ((key == '-') && !bucky) {
     this.be.circuit.click_zoom_out();
-  } else if (((key == '=') || (key == '+')) && !bucky){
+  } else if (((key == '=') || (key == '+')) && !bucky) {
     this.be.circuit.click_zoom_in();
-  } else if (((key == 'f') || (key == 'F')) && !bucky){
+  } else if (((key == 'f') || (key == 'F')) && !bucky) {
     this.be.circuit.click_zoom_fit();
   } // else console.log(event.which + ' = "' + key + '"');
 };
@@ -211,14 +211,14 @@ Sim.prototype.speed_drag_start = function(x, y) {
 
 Sim.prototype.speed_drag_move = function(x, y) {
   x = (x - this.slider_left) * 350/this.slider_width;
-  if (x >= this.slider_max){
+  if (x >= this.slider_max) {
     x = this.slider_max;
     this.speed = Infinity;
-  } else if (x > this.slider_default+15){
+  } else if (x > this.slider_default+15) {
     // linear ranges from 0.0 at slider_default to 4.0 at slider_max.
     var linear = 4.0 * (x - this.slider_default) / (this.slider_max - this.slider_default);
     this.speed = Math.pow(2, linear);
-  } else if (x > this.slider_default-15){
+  } else if (x > this.slider_default-15) {
     x = this.slider_default;
     this.speed = 1.0;
   } else {
@@ -257,7 +257,7 @@ Sim.prototype.click_pause_at = function(type) {
 };
 
 Sim.prototype.begin_level = function(hidden_speed, sequenced) {
-  if (hidden_speed){
+  if (hidden_speed) {
     $('#pause-at')[0].setAttribute('display', 'none');
     $('#speed-slider')[0].setAttribute('display', 'none');
 
@@ -270,7 +270,7 @@ Sim.prototype.begin_level = function(hidden_speed, sequenced) {
     $('#speed-slider')[0].setAttribute('display', '');
     this.speed = this.preferred_speed;
 
-    if (sequenced){
+    if (sequenced) {
       $('#pause-at-seq').removeClass('pause-at-hidden');
     } else {
       $('#pause-at-seq').addClass('pause-at-hidden');

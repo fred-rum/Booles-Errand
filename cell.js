@@ -71,7 +71,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this['init_' + type](harness_width);
   if (type == 'null') return; // do nothing else for the null cell
 
-  if (this.canvas_type != 'cdrag'){
+  if (this.canvas_type != 'cdrag') {
     var bbox = this.el_cell.getBBox(true); // ignore transforms
     this.bbox = {
       left: bbox.x,
@@ -109,7 +109,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
 
   this.bring_to_top();
 
-  if (this.locked || this.be.showing_soln){
+  if (this.locked || this.be.showing_soln) {
     this.change_cursor('not-allowed');
   } else {
     this.change_cursor('grab');
@@ -130,7 +130,7 @@ Cell.prototype.change_cursor = function(cursor) {
   // values, then it keeps the last value that worked.
   this.el_cell_drag.attr({cursor: 'default'});
 
-  if ((cursor == 'grab') || (cursor == 'grabbing')){
+  if ((cursor == 'grab') || (cursor == 'grabbing')) {
     this.el_cell_drag.attr({cursor: '-webkit-' + cursor});
     this.el_cell_drag.attr({cursor: '-moz-' + cursor});
   }
@@ -155,10 +155,10 @@ Cell.prototype.update_qty_text = function(n, pending) {
 Cell.prototype.update_quantity = function(n) {
   this.update_qty_text(n);
 
-  if (n && !this.quantity){
+  if (n && !this.quantity) {
     this.el_s.attr({stroke: '#000'});
     this.change_cursor('grab');
-  } else if (!n && this.quantity){
+  } else if (!n && this.quantity) {
     this.el_s.attr({stroke: '#aaa'});
     this.change_cursor('not-allowed');
   }
@@ -227,7 +227,7 @@ Cell.prototype.propagate_value = function() {
 };
 
 Cell.prototype.reset = function() {
-  for (var port_name in this.io){
+  for (var port_name in this.io) {
     this.io[port_name].reset();
   }
 }
@@ -254,9 +254,9 @@ Cell.prototype.calc_and = function(inv) {
   var i1 = this.io.i1.value;
   var value;
   var max = (1 << this.width) - 1;
-  if ((i0 === 0) || (i1 === 0)){
+  if ((i0 === 0) || (i1 === 0)) {
     value = 0;
-  } else if ((i0 === undefined) || (i1 === undefined)){
+  } else if ((i0 === undefined) || (i1 === undefined)) {
     this.io.o.propagate_output(undefined);
     return;
   } else {
@@ -272,9 +272,9 @@ Cell.prototype.calc_or = function(inv) {
   var i1 = this.io.i1.value;
   var value;
   var max = (1 << this.width) - 1;
-  if ((i0 === max) || (i1 === max)){
+  if ((i0 === max) || (i1 === max)) {
     value = max;
-  } else if ((i0 === undefined) || (i1 === undefined)){
+  } else if ((i0 === undefined) || (i1 === undefined)) {
     this.io.o.propagate_output(undefined);
     return;
   } else {
@@ -288,7 +288,7 @@ Cell.prototype.calc_xnor = function() { this.calc_xor(true); };
 Cell.prototype.calc_xor = function(inv) {
   var i0 = this.io.i0.value;
   var i1 = this.io.i1.value;
-  if ((i0 === undefined) || (i1 === undefined)){
+  if ((i0 === undefined) || (i1 === undefined)) {
     this.io.o.propagate_output(undefined);
   } else {
     var value = i0 ^ i1;
@@ -325,7 +325,7 @@ Cell.prototype.calc_input = function() {
 Cell.prototype.calc_output = function() {
   var value = this.value = this.io.i.value;
   var exp_value = this.be.level.value(this.name);
-  if ((exp_value === undefined) || (value === undefined)){
+  if ((exp_value === undefined) || (value === undefined)) {
     this.el_check.setAttr('visibility', 'hidden');
     this.el_question.setAttr('visibility', 'visible');
   } else {
@@ -354,8 +354,8 @@ Cell.prototype.calc_output = function() {
 Cell.prototype.calc_latch = function() {
   var d = this.io.d.value;
   var e = this.io.e.value;
-  if (e === 1){
-    if (d === undefined){
+  if (e === 1) {
+    if (d === undefined) {
       this.io.q.propagate_output(undefined);
     } else {
       this.io.q.propagate_output(d);
@@ -397,10 +397,10 @@ Cell.prototype.check_pending = function() {
 
 Cell.prototype.done_check = function() {
   var exp_value = this.be.level.value(this.name);
-  if (exp_value === undefined){
+  if (exp_value === undefined) {
     this.el_question.setAttr('visibility', 'hidden');
     return true;
-  } else if (this.value === undefined){
+  } else if (this.value === undefined) {
     return undefined;
   } else {
     this.el_question.setAttr('visibility', 'hidden');
@@ -426,7 +426,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
   if (this.dragging_disallowed) {
     if (this.be.showing_soln) {
       $('#error').html('<p>The sample solution cannot be edited.  Restore your progress from the help menu.</p>');
-    } else if (this.locked){
+    } else if (this.locked) {
       // Show the fail icon only on cdraw, not on cbox.
       this.be.drag.show_fail_xy(this.x, this.y);
       $('#error').html('<p>This logic element is locked for this challenge and cannot be moved or deleted.</p>');
@@ -445,7 +445,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // Pop cell to top for more natural dragging.
   this.bring_to_top();
 
-  if (this.canvas_type == 'cbox'){
+  if (this.canvas_type == 'cbox') {
     // Typically when a cell is grabbed from the box, this line
     // decreases its quantity, but check_for_del() immediately
     // increases its (pending) quantity right back again since the
@@ -458,7 +458,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // mouse events from reaching the scrollbar.
   $(this.be.div_cdrag).css('z-index', '99')
 
-  if (this.canvas == this.be.cdraw){
+  if (this.canvas == this.be.cdraw) {
     var canvas_x = this.x;
     var canvas_y = this.y;
     this.cdraw_cell = this;
@@ -499,7 +499,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
       (x >= 0) &&
       (x < this.be.cbox_width) &&
       (y >= this.be.truth_height) &&
-      (y < this.be.window_height)){
+      (y < this.be.window_height)) {
     // A new cell is still within the cell box
     // (or has been returned to the cell box.)
     del = 'new';
@@ -514,14 +514,14 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
              ((x >= this.be.window_width - this.be.main_stub_width) &&
               (y < this.be.main_stub_height)) ||
              ((x >= this.be.window_width - this.be.zoom_width) &&
-              (y >= this.be.window_height - this.be.zoom_height))){
+              (y >= this.be.window_height - this.be.zoom_height))) {
     del = 'del';
   } else {
     del = false;
   }
-  if (del && (del != this.pending_del)){
+  if (del && (del != this.pending_del)) {
     var attr;
-    if (del == 'new'){
+    if (del == 'new') {
       attr = {
         stroke: '#aaa', // grey
         'stroke-dasharray': ''
@@ -539,13 +539,13 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     }
     this.pending_del = del;
 
-    if (this.canvas_type == 'cdraw'){
+    if (this.canvas_type == 'cdraw') {
       this.be.level.remove_cell(this);
       this.be.level.update_box_quantity(this.type, +this.width);
     }
 
     this.be.level.update_widths(true);
-  } else if (!del && this.pending_del){
+  } else if (!del && this.pending_del) {
     var attr = {
       stroke: '#000', // black
       'stroke-dasharray': ''
@@ -557,7 +557,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     }
     this.pending_del = del;
 
-    if (this.canvas_type == 'cdraw'){
+    if (this.canvas_type == 'cdraw') {
       this.be.level.add_cell(this);
       this.be.level.update_box_quantity(this.type, -this.width);
     }
@@ -603,7 +603,7 @@ Cell.prototype.cell_drag_end = function() {
   this.cdrag_cell.remove();
   this.be.cdrag_cell = undefined;
 
-  if (this.cdraw_cell.pending_del){
+  if (this.cdraw_cell.pending_del) {
     this.cdraw_cell.remove();
   }
   this.be.level.commit_widths();
@@ -642,7 +642,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
     this.push_el(io_obj.el_target, 'drag_other');
   }
 
-  if (no > 0){
+  if (no > 0) {
     // Position the quantity text just below the last output stub.
     this.qty_cx = io_obj.x;
     this.qty_top = io_obj.y;
@@ -667,7 +667,7 @@ Cell.prototype.draw_stubs = function() {
   var stub_path = [];
   for (var name in this.io) {
     if (!((this.type == 'condenser') && (name == 'o')) &&
-        !((this.type == 'expander') && (name == 'i'))){
+        !((this.type == 'expander') && (name == 'i'))) {
       stub_path = stub_path.concat(this.io[name].path);
     }
   }
@@ -682,7 +682,7 @@ Cell.prototype.draw_stubs = function() {
   // to avoid changing their Z level.)
   for (var name in this.io) {
     if (!((this.type == 'condenser') && (name == 'o')) &&
-        !((this.type == 'expander') && (name == 'i'))){
+        !((this.type == 'expander') && (name == 'i'))) {
       this.push_el(this.io[name].draw_stub_fg(), 'mark_del');
     }
   }
@@ -698,11 +698,11 @@ Cell.prototype.draw_stubs = function() {
 };
 
 Cell.prototype.draw_inv = function(inv, right, bg, y) {
-  if (inv){
+  if (inv) {
     var inv_r = this.be.inv_bubble_size/2;
     var inv_cx = right+inv_r;
     var attr = bg ? this.cell_bg_attr : this.cell_fg_attr;
-    if (bg){
+    if (bg) {
       this.push_el(this.canvas.circle(inv_cx, y||0, inv_r).attr(attr),
                    'drag_cell');
     } else {
@@ -981,7 +981,7 @@ Cell.prototype.init_output = function() {
 Cell.prototype.fit_input_text = function() {
   var name = this.name.toUpperCase();
   var value = this.be.level.value(this.name);
-  if (value === undefined){
+  if (value === undefined) {
     var text = name + '=X';
   } else {
     var text = name + '=' + this.be.level.value(this.name);
@@ -1014,7 +1014,7 @@ Cell.prototype.fit_input_text = function() {
 Cell.prototype.fit_output_text = function() {
   var name = this.name.toUpperCase();
   var value = this.be.level.value(this.name);
-  if (value === undefined){
+  if (value === undefined) {
     var text = name;
   } else {
     var text = name + '=' + value + '?';
@@ -1025,7 +1025,7 @@ Cell.prototype.fit_output_text = function() {
 
   this.el_text.attr({text: text, x: 0, 'font-size': '10'});
   var bbox = this.el_text.getBBox(true);
-  if (text.length < 3){
+  if (text.length < 3) {
     // To prevent the text from getting weirdly huge, we pretend that
     // a short text string is wider than it really is.
     var inc = bbox.width * (3 / text.length - 1);
