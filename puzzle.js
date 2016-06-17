@@ -1455,6 +1455,49 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Full adder',
+   intro: '<p>When performing a full multi-bit addition of A+B, most bits require also adding a carry bit.  This can be made easier by creating a <i>full adder</i> module to <b>add a single bit of A+B+C<sub>in</sub> to get a result bit and a carry out, C<sub>out</sub>.</b></p>',
+   outro: '<p>Seven gates is good.  Five is excellent.</p>',
+   hint: ['<p>Try starting with a circuit that works when C<sub>in</sub> is 0, then add logic to handle the cases when C<sub>in</sub> is 1.</p>',
+          '<p>You may feel more comfortable with the AND and OR gates, but sometimes XOR is more appropriate.</p>'],
+   soln: ['1s5-0,o,5,i0-0,o,7,i0-0,o,8,i0-1,o,6,i0-1,o,7,i1-1,o,9,i0-2,o,6,i1-2,o,9,i1-2,o,8,i1;380,xor,50+o,3,i;260,xor,60+o,5,i1;260,and,120+o,11,i0;190,and,190+o,10,i0;190,and,250+o,10,i1;300,or,220+o,11,i1;410,or,150+o,4,i',
+          '1s5-0,o,8,i0-0,o,7,i0-1,o,5,i0-1,o,6,i0-2,o,5,i1-2,o,6,i1;140,xor,110+o,8,i1+o,7,i1;140,and,190+o,9,i1;280,and,100+o,9,i0;280,xor,10+o,3,i;400,or,150+o,4,i'],
+   truth: [{a:0, b:0, Cin:0,   z:0, Cout:0},
+           {a:1, b:0, Cin:0,   z:1, Cout:0},
+           {a:0, b:1, Cin:0,   z:1, Cout:0},
+           {a:1, b:1, Cin:0,   z:0, Cout:1},
+           {a:0, b:0, Cin:1,   z:1, Cout:0},
+           {a:1, b:0, Cin:1,   z:0, Cout:1},
+           {a:0, b:1, Cin:1,   z:0, Cout:1},
+           {a:1, b:1, Cin:1,   z:1, Cout:1}],
+   cells: {
+     a: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         x: 0,
+         y: 100
+        }
+     ,
+     Cin: {type: 'input',
+         x: 0,
+         y: 200
+        }
+     ,
+     z: {type: 'output',
+         x: 500,
+         y: 50
+        }
+     ,
+     Cout: {type: 'output',
+         x: 500,
+         y: 150
+        }
+   }
+  }
+,
   {name: 'Multiply by 2',
    intro: '<p><b>Z = A * 2.</b></p>',
    outro: '<p>Multiplying by a constant power of 2 is incredibly trivial.  Are you ready for something tougher?</p>',

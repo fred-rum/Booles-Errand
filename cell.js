@@ -979,7 +979,7 @@ Cell.prototype.init_output = function() {
 };
 
 Cell.prototype.fit_input_text = function() {
-  var name = this.name.toUpperCase();
+  var name = this.be.level.upper_str(this.name);
   var value = this.be.level.value(this.name);
   if (value === undefined) {
     var text = name + '=X';
@@ -1012,7 +1012,7 @@ Cell.prototype.fit_input_text = function() {
 };
 
 Cell.prototype.fit_output_text = function() {
-  var name = this.name.toUpperCase();
+  var name = this.be.level.upper_str(this.name);
   var value = this.be.level.value(this.name);
   if (value === undefined) {
     var text = name;

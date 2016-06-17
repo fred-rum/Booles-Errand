@@ -276,11 +276,19 @@ Level.prototype.init_table = function() {
 
 };
 
+Level.prototype.upper_str = function(str) {
+  if (/[A-Z]/.test(str)) {
+    return str;
+  } else {
+    return str.toUpperCase();
+  }
+};
+
 Level.prototype.table_header = function(html, port_names) {
   for (var i = 0; i < port_names.length; i++) {
     html.push('<th');
     this.push_padding(html, i, port_names.length, true);
-    html.push('>', port_names[i].toUpperCase(), '</th>');
+    html.push('>', this.upper_str(port_names[i]), '</th>');
   }
 };
 
