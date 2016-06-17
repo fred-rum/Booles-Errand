@@ -391,6 +391,21 @@ Cell.prototype.calc_expander = function() {
   }
 };
 
+Cell.prototype.calc_adder = function() {
+  var a = this.io.a.value;
+  var b = this.io.b.value;
+  var c = this.io.cin.value;
+  if ((a === undefined) || (b === undefined) || (c === undefined)) {
+    this.io.cout.propagate_output(undefined);
+    this.io.s.propagate_output(undefined);
+  } else {
+    var cout = (a & b) | (a & c) | (b & c);
+    var s = a ^ b ^ c;
+    this.io.cout.propagate_output(cout);
+    this.io.s.propagate_output(s);
+  }
+};
+
 Cell.prototype.check_pending = function() {
   this.el_question.setAttr('visibility', 'visible');
 };
@@ -1246,6 +1261,55 @@ Cell.prototype.init_expander = function(no) {
                       move: this.harness_drag_move,
                       end: this.harness_drag_end},
                      'bottom');
+};
+
+Cell.prototype.init_adder = function() {
+  var height = 4 * this.be.io_spacing;
+  var width = 4 * this.be.io_spacing;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.io.a = new Io(this.be, this.canvas, this, 'a', 'input',
+                     left - this.be.stub_len, -this.be.io_spacing, left);
+  this.io.b = new Io(this.be, this.canvas, this, 'b', 'input',
+                     left - this.be.stub_len, 0, left);
+  this.io.cin = new Io(this.be, this.canvas, this, 'cin', 'input',
+                       left - this.be.stub_len, this.be.io_spacing, left);
+  this.io.cout = new Io(this.be, this.canvas, this, 'cout', 'output',
+                        right + this.be.stub_len, -this.be.io_spacing/2, right);
+  this.io.s = new Io(this.be, this.canvas, this, 's', 'output',
+                     right + this.be.stub_len, this.be.io_spacing/2, right);
+  this.push_el(this.io.a.el_target, 'drag_other');
+  this.push_el(this.io.b.el_target, 'drag_other');
+  this.push_el(this.io.cin.el_target, 'drag_other');
+  this.push_el(this.io.cout.el_target, 'drag_other');
+  this.push_el(this.io.s.el_target, 'drag_other');
+
+  this.qty_cx = this.io.s.x;
+  this.qty_top = this.be.io_spacing * 1.5;
+
+  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr), 'drag_cell');
+  this.draw_stubs();
+  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
+
+  var attr = {
+    'stroke-width': 0,
+    fill: '#000',
+    'text-anchor': 'middle'
+  };
+  this.push_el(this.canvas.text(0, 0, '+').attr(attr));
+
+  attr['text-anchor'] = 'start'
+  left += this.be.stroke_cell_fg;
+  this.push_el(this.canvas.text(left, -this.be.io_spacing, 'A').attr(attr));
+  this.push_el(this.canvas.text(left, 0, 'B').attr(attr));
+  this.push_el(this.canvas.text(left, this.be.io_spacing, 'Cin').attr(attr));
+
+  attr['text-anchor'] = 'end';
+  right -= this.be.stroke_cell_fg;
+  this.push_el(this.canvas.text(right, -this.be.io_spacing/2, 'Cout').attr(attr));
+  this.push_el(this.canvas.text(right, this.be.io_spacing/2, 'S').attr(attr));
 };
 
 Cell.prototype.init_null = function() {

@@ -1425,6 +1425,45 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Add',
+   intro: '<p>Now that\'ve built a one-bit full adder, you can use the full adder module to build a multi-bit adder. <b>Z = A + B.</b></p>',
+   outro: '<p>If Z were the same width as A and B, then the addition could <i>overflow</i>, producing a larger value than would fit in Z.  Software that adds with large numbers in fixed-width registers has to keep this in mind.</p>',
+   soln: '1s3-0,o,3,i-1,o,4,i;100,expander4,0+o0,8,a+o1,7,a+o2,6,a+o3,10,a;100,expander4,100+o0,9,i0+o0,9,i1+o0,8,b+o1,7,b+o2,6,b+o3,10,b;600,condenser5,50+o,2,i;380,adder,10+cout,10,cin+s,5,i2;380,adder,120+cout,6,cin+s,5,i1;380,adder,230+cout,7,cin+s,5,i0;250,xor,250+o,8,cin;380,adder,-100+cout,5,i4+s,5,i3',
+   truth: [{a:0, b:0,   z:0},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:15, b:15,   z:30}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 15);
+     obj.b = this.rnd(0, 15);
+     obj.z = obj.a + obj.b;
+   },
+   avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 700,
+         y: 50,
+         width: 5
+         }
+   }
+  }
+,
   {name: 'Multiply by 2',
    intro: '<p><b>Z = A * 2.</b></p>',
    outro: '<p>Multiplying by a constant power of 2 is incredibly trivial.  Are you ready for something tougher?</p>',
