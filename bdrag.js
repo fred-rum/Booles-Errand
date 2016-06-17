@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Bdrag(be) {
   this.be = be;

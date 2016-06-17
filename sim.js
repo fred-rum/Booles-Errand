@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Sim(be) {
   this.be = be;
@@ -12,14 +12,14 @@ function Sim(be) {
 
   $(document).keypress($.proxy(this.keypress, this));
 
-  $("#button-play").click($.proxy(this.click_play, this));
-  $("#button-pause").click($.proxy(this.click_pause, this));
+  $('#button-play').click($.proxy(this.click_play, this));
+  $('#button-pause').click($.proxy(this.click_pause, this));
 
   this.pause_at = 'done';
-  $("#pause-at-gate").click($.proxy(this.click_pause_at, this, 'gate'));
-  $("#pause-at-line").click($.proxy(this.click_pause_at, this, 'line'));
-  $("#pause-at-seq").click($.proxy(this.click_pause_at, this, 'seq'));
-  $("#pause-at-done").click($.proxy(this.click_pause_at, this, 'done'));
+  $('#pause-at-gate').click($.proxy(this.click_pause_at, this, 'gate'));
+  $('#pause-at-line').click($.proxy(this.click_pause_at, this, 'line'));
+  $('#pause-at-seq').click($.proxy(this.click_pause_at, this, 'seq'));
+  $('#pause-at-done').click($.proxy(this.click_pause_at, this, 'done'));
 
   var speed = this.be.circuit.load_data('boole.state.speed');
   if (speed === undefined) speed = 1;
@@ -33,11 +33,11 @@ function Sim(be) {
   this.slider_default = 110;
   this.slider_max = 260;
 
-  var slider = $("#speed-slider");
-  this.slider_knob = $("#speed-knob")[0];
-  this.slider_text = $("#speed-text")[0];
-  this.slider_min_color = Raphael.getRGB("#88d");
-  this.slider_max_color = Raphael.getRGB("#6d6");
+  var slider = $('#speed-slider');
+  this.slider_knob = $('#speed-knob')[0];
+  this.slider_text = $('#speed-text')[0];
+  this.slider_min_color = Raphael.getRGB('#88d');
+  this.slider_max_color = Raphael.getRGB('#6d6');
   this.be.bdrag.drag(slider, this, 'speed',
                      {start: this.speed_drag_start,
                       move: this.speed_drag_move,
@@ -55,7 +55,7 @@ function Sim(be) {
 };
 
 Sim.prototype.resize_slider = function () {
-  var slider = $("#speed-slider");
+  var slider = $('#speed-slider');
   var slider_offset = slider.offset();
   this.slider_left = slider_offset.left;
   this.slider_width = slider.width();
@@ -64,8 +64,8 @@ Sim.prototype.resize_slider = function () {
 Sim.prototype.click_play = function () {
   if (this.running) return; // Should be impossible.
 
-  $("#button-play").hide();
-  $("#button-pause").show();
+  $('#button-play').hide();
+  $('#button-pause').show();
   this.running = true;
   this.is_still_paused = false;
   this.not_done();
@@ -75,8 +75,8 @@ Sim.prototype.click_play = function () {
 };
 
 Sim.prototype.click_pause = function () {
-  $("#button-pause").hide();
-  $("#button-play").show();
+  $('#button-pause').hide();
+  $('#button-play').show();
   this.running = false;
   this.stop_timer();
 };
@@ -251,9 +251,9 @@ Sim.prototype.speed_drag_end = function() {
 };
 
 Sim.prototype.click_pause_at = function(type) {
-  $("#pause-at-" + this.pause_at).removeClass('pause-at-selected');
+  $('#pause-at-' + this.pause_at).removeClass('pause-at-selected');
   this.pause_at = type;
-  $("#pause-at-" + this.pause_at).addClass('pause-at-selected');
+  $('#pause-at-' + this.pause_at).addClass('pause-at-selected');
 };
 
 Sim.prototype.begin_level = function(hidden_speed, sequenced) {

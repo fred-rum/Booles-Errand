@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Level(be) {
   this.be = be;
@@ -24,20 +24,20 @@ function Level(be) {
     html.push('</td><td>', this.puzzle[i].name, '</td></tr>');
   }
   html.push('</table>');
-  $("#levels").html(html.join(''));
+  $('#levels').html(html.join(''));
 
   for (var i = 0; i < this.puzzle.length; i++){
     if (this.puzzle[i].completed) this.mark_complete(i);
     $('#level' + i).click($.proxy(this.click_level, this, i));
   }
 
-  $("#button-help").click($.proxy(this.click_help, this));
+  $('#button-help').click($.proxy(this.click_help, this));
 
-  $("#button-main").click($.proxy(this.click_main, this));
-  $("#button-main2").click($.proxy(this.click_main, this));
+  $('#button-main').click($.proxy(this.click_main, this));
+  $('#button-main2').click($.proxy(this.click_main, this));
 
-  $("#next-puzzle").click($.proxy(this.click_next, this));
-  $("#next-main").click($.proxy(this.click_main, this));
+  $('#next-puzzle').click($.proxy(this.click_next, this));
+  $('#next-main').click($.proxy(this.click_main, this));
 }
 
 Level.prototype.mark_complete = function(level_num) {
@@ -117,8 +117,8 @@ Level.prototype.begin = function(level_num) {
   this.output_names = [];
   for (var cell_name in level.cells){
     var cell_obj = level.cells[cell_name];
-    if (cell_obj.type == "input") this.input_names.push(cell_name);
-    if (cell_obj.type == "output") this.output_names.push(cell_name);
+    if (cell_obj.type == 'input') this.input_names.push(cell_name);
+    if (cell_obj.type == 'output') this.output_names.push(cell_name);
   }
 
   this.mark_currently_completed(false);
@@ -133,7 +133,7 @@ Level.prototype.begin = function(level_num) {
   // Initialize the cells required by the level while ignoring IO connections.
   for (var cell_name in level.cells){
     var cell_obj = level.cells[cell_name];
-    var cell = new Cell(this.be, "cdraw",
+    var cell = new Cell(this.be, 'cdraw',
                         cell_obj.type,
                         cell_obj.x / 20 * this.be.io_spacing,
                         cell_obj.y / 20 * this.be.io_spacing,
@@ -252,7 +252,7 @@ Level.prototype.init_table = function() {
     }
   }
   html.push('</table>');
-  $("#truth").html(html.join(''));
+  $('#truth').html(html.join(''));
   this.div_truth_table = $('#truth-table');
   if (level.hide.truth){
     this.be.truth_table_width = 0;
@@ -324,14 +324,14 @@ Level.prototype.row_enter = function(row, event) {
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click){
     if (row != old_row){
-      $("#row" + row).css({"background-color": "#ddd"});
+      $('#row' + row).css({'background-color': '#ddd'});
     }
   } else {
     var seq = this.row_seq[row];
     for (var i = 0; i < this.level.truth[seq].length; i++) {
       var i_row = this.level.truth[seq].first_row + i;
       if (i_row != old_row){
-        $("#row" + i_row).css({"background-color": "#ddd"});
+        $('#row' + i_row).css({'background-color': '#ddd'});
       }
     }
   }
@@ -341,7 +341,7 @@ Level.prototype.row_leave = function(row, event) {
   this.hover_row = undefined;
   var old_row = this.cur_row();
   for (var i = 0; i < this.row_result.length; i++){
-    if (i != old_row) $("#row" + i).css({"background-color": ""});
+    if (i != old_row) $('#row' + i).css({'background-color': ''});
   }
 };
 
@@ -382,8 +382,8 @@ Level.prototype.cur_row = function() {
 }
 
 Level.prototype.select_row = function(row) {
-  $("#row" + this.cur_row()).css({"background-color": ""});
-  $("#row" + row).css({"background-color": "#ff8"});
+  $('#row' + this.cur_row()).css({'background-color': ''});
+  $('#row' + row).css({'background-color': '#ff8'});
   this.cur_seq = this.row_seq[row];
   this.cur_line = this.row_line[row];
   this.update_hover();
@@ -450,7 +450,7 @@ Level.prototype.reset_sim = function() {
 };
 
 Level.prototype.add_box_cell = function(type) {
-  var cell = new Cell(this.be, "cbox", type, 0, 0);
+  var cell = new Cell(this.be, 'cbox', type, 0, 0);
   this.box_cells[type] = cell;
   var bbox = cell.bbox;
   var cx = (this.be.em_size*4) - (bbox.right + bbox.left) / 2; // align center
@@ -571,10 +571,10 @@ Level.prototype.restore_progress = function(save_str) {
 
     if (m = ex_version_skip.exec(save_str)){
       var skip = Number(m[1]);
-      if (skip != this.all_cells.length) throw "wrong skip";
+      if (skip != this.all_cells.length) throw 'wrong skip';
       save_str = save_str.substring(m[0].length);
     } else {
-      throw "bad version/skip string";
+      throw 'bad version/skip string';
     }
 
     while (save_str != ''){
@@ -584,14 +584,14 @@ Level.prototype.restore_progress = function(save_str) {
         var width = m[3];
         var y = Number(m[4]);
         if (!this.update_box_quantity(type, -1)) {
-          throw "exhausted cell type: " + type
+          throw 'exhausted cell type: ' + type
         }
         if ((type == 'condenser') || (type == 'expander')) {
           width = Math.min(8, Math.max(2, width || 2));
         } else {
           width = undefined;
         }
-        this.add_cell(new Cell(this.be, "cdraw", type,
+        this.add_cell(new Cell(this.be, 'cdraw', type,
                                x / 20 * this.be.io_spacing,
                                y / 20 * this.be.io_spacing,
                                undefined, undefined, width));
@@ -616,26 +616,26 @@ Level.prototype.restore_progress = function(save_str) {
                     i_port: m[4]});
         save_str = save_str.substring(m[0].length);
       } else {
-        throw "not recognized: " + save_str;
+        throw 'not recognized: ' + save_str;
       }
     }
 
     for (var i = 0; i < wires.length; i++){
       var w = wires[i];
-      if (w.o_cell >= this.all_cells.length) throw "bad o_cell #: " + w.o_cell;
-      if (w.i_cell >= this.all_cells.length) throw "bad i_cell #: " + w.i_cell;
+      if (w.o_cell >= this.all_cells.length) throw 'bad o_cell #: ' + w.o_cell;
+      if (w.i_cell >= this.all_cells.length) throw 'bad i_cell #: ' + w.i_cell;
       var o_cell = this.all_cells[w.o_cell];
       var i_cell = this.all_cells[w.i_cell];
       var io_o = o_cell.io[w.o_port];
       var io_i = i_cell.io[w.i_port];
-      if (!io_o) throw "bad o port: " + w.o_port;
-      if (!io_i) throw "bad i port: " + w.i_port;
+      if (!io_o) throw 'bad o port: ' + w.o_port;
+      if (!io_i) throw 'bad i port: ' + w.i_port;
       if (io_i.w.length > 0){
         if (io_i.w[0].o == io_o){
           // If the save data duplicates a locked wire, we silently
           // discard it without throwing an exception.
         } else {
-          throw "input port busy: " + w.i_port;
+          throw 'input port busy: ' + w.i_port;
         }
       } else {
         var w = new Wire(this.be, io_o, io_i);
@@ -649,7 +649,7 @@ Level.prototype.restore_progress = function(save_str) {
   }
   catch (ex) {
     //onsole.log(ex);
-    //onsole.log("remaining:", save_str)
+    //onsole.log('remaining:', save_str)
     // Exit without decoding any more.
   }
 };
@@ -659,7 +659,7 @@ Level.prototype.not_done = function() {
   // check pins as pending.  To avoid confusing the user, we do this
   // even if we are sure of the final value.
   for (var cell_name in this.named_cells){
-    if (this.named_cells[cell_name].type == "output"){
+    if (this.named_cells[cell_name].type == 'output'){
       this.named_cells[cell_name].check_pending();
     }
   }
@@ -728,7 +728,7 @@ Level.prototype.circuit_changed = function() {
 Level.prototype.done = function() {
   var result = true;
   for (var cell_name in this.named_cells){
-    if (this.named_cells[cell_name].type == "output"){
+    if (this.named_cells[cell_name].type == 'output'){
       var cell_result = this.named_cells[cell_name].done_check();
       result = result && cell_result;
     }
@@ -823,7 +823,7 @@ Level.prototype.change_level = function(level_num, show_soln) {
 Level.prototype.record_result = function(row, result) {
   this.row_result[row] = result;
 
-  var id = "#check" + row;
+  var id = '#check' + row;
   if (result === undefined){
     $(id).html('');
   } else if (result){
@@ -835,8 +835,8 @@ Level.prototype.record_result = function(row, result) {
 
 Level.prototype.click_main = function() {
   this.be.sim.click_pause();
-  $("#level" + this.level_num).css({"background-color": "#ff8"});
-  $("#main_container").css({display: "block"});
+  $('#level' + this.level_num).css({'background-color': '#ff8'});
+  $('#main_container').css({display: 'block'});
 
   // Scroll the current level into view (centered, if possible).
   var main = $('#main');
@@ -853,8 +853,8 @@ Level.prototype.click_main = function() {
 };
 
 Level.prototype.click_level = function(level_num, event) {
-  $("#main_container").css({display: "none"});
-  $("#level" + this.level_num).css({"background-color": ""});
+  $('#main_container').css({display: 'none'});
+  $('#level' + this.level_num).css({'background-color': ''});
 
   if (level_num === this.level_num){
     // The user selected the same level he was previously on.

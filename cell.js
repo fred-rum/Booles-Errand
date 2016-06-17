@@ -1,14 +1,14 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this.be = be;
   this.name = name;
   this.locked = locked;
   this.canvas_type = canvas_type;
-  this.canvas = (canvas_type == "cdraw") ? this.be.cdraw :
-                (canvas_type == "cbox")  ? this.be.cbox :
+  this.canvas = (canvas_type == 'cdraw') ? this.be.cdraw :
+                (canvas_type == 'cbox')  ? this.be.cbox :
                                            this.be.cdrag;
 
   this.type = type;
@@ -21,57 +21,57 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this.pending_del = false;
 
   this.cell_fg_attr = {
-    "stroke-width": this.be.stroke_cell_fg,
-    "stroke-linejoin": "miter",
-    "stroke-linecap": "round", // for pending_del dashed lines
-    stroke: "#000",
-    fill: "#fff"
+    'stroke-width': this.be.stroke_cell_fg,
+    'stroke-linejoin': 'miter',
+    'stroke-linecap': 'round', // for pending_del dashed lines
+    stroke: '#000',
+    fill: '#fff'
   };
   this.cell_bg_attr = {
-    "stroke-width": this.be.stroke_cell_bg,
-    "stroke-linejoin": "round",
-    fill: "#000", // solid fill can't be seen, but it catches mouse events
-    stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee"
+    'stroke-width': this.be.stroke_cell_bg,
+    'stroke-linejoin': 'round',
+    fill: '#000', // solid fill can't be seen, but it catches mouse events
+    stroke: (this.canvas_type == 'cbox') ? '#d0ffd0' : '#eee'
   };
 
   this.cell_label_attr = {
-    "stroke-width": 0,
-    fill: "#000"
+    'stroke-width': 0,
+    fill: '#000'
   };
 
   // For the case that the foreground lines & fill are drawn separately.
   this.cell_fg_line_attr = {
-    "stroke-width": this.be.stroke_cell_fg,
-    "stroke-linejoin": "miter",
-    "stroke-linecap": "round",
-    stroke: "#000",
-    fill: "none"
+    'stroke-width': this.be.stroke_cell_fg,
+    'stroke-linejoin': 'miter',
+    'stroke-linecap': 'round',
+    stroke: '#000',
+    fill: 'none'
   };
   this.cell_fg_fill_attr = {
-    "stroke-width": this.be.stroke_cell_fg,
-    "stroke-linejoin": "round",
-    stroke: "#fff",
-    fill: "#fff"
+    'stroke-width': this.be.stroke_cell_fg,
+    'stroke-linejoin': 'round',
+    stroke: '#fff',
+    fill: '#fff'
   };
 
   this.stub_bg_attr = {
-    "stroke-width": this.be.stroke_wire_bg,
-    stroke: (this.canvas_type == "cbox") ? "#d0ffd0" : "#eee",
-    "stroke-linecap": "round"
+    'stroke-width': this.be.stroke_wire_bg,
+    stroke: (this.canvas_type == 'cbox') ? '#d0ffd0' : '#eee',
+    'stroke-linecap': 'round'
   };
   this.stub_fg_attr = {
-    "stroke-width": this.be.stroke_wire_fg,
+    'stroke-width': this.be.stroke_wire_fg,
     stroke: Wire.color(undefined)
   };
 
   this.el_s = this.canvas.set();
   this.el_cell_drag = this.canvas.set();
   this.el_cell = this.canvas.set();
-  if (typeof this["init_" + type] != "function") throw "bad cell type" + type;
-  this["init_" + type](harness_width);
-  if (type == "null") return; // do nothing else for the null cell
+  if (typeof this['init_' + type] != 'function') throw 'bad cell type' + type;
+  this['init_' + type](harness_width);
+  if (type == 'null') return; // do nothing else for the null cell
 
-  if (this.canvas_type != "cdrag"){
+  if (this.canvas_type != 'cdrag'){
     var bbox = this.el_cell.getBBox(true); // ignore transforms
     this.bbox = {
       left: bbox.x,
@@ -86,14 +86,14 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
 
   var text_height = 11/16 * this.be.em_size;
   var attr = {
-    "text-anchor": "middle",
-    "font-family": "Verdana, Helvetica, Arial, sans-serif",
-    //"font-family": "Courier New, Fixed, monospace",
-    "font-size": text_height
+    'text-anchor': 'middle',
+    'font-family': 'Verdana, Helvetica, Arial, sans-serif',
+    //'font-family': 'Courier New, Fixed, monospace',
+    'font-size': text_height
   };
   this.qty_y = 0;
-  this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, "").attr(attr);
-  this.el_qty_text.setAttr("visibility", "hidden");
+  this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, '').attr(attr);
+  this.el_qty_text.setAttr('visibility', 'hidden');
   this.push_el(this.el_qty_text);
 
   // Make a separate xform set that includes the IO elements so that they
@@ -105,14 +105,14 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   for (var port_name in this.io) {
     this.set_xform.push(this.io[port_name].set_io);
   }
-  this.set_xform.transform("t" + this.x + "," + this.y);
+  this.set_xform.transform('t' + this.x + ',' + this.y);
 
   this.bring_to_top();
 
   if (this.locked || this.be.showing_soln){
-    this.change_cursor("not-allowed");
+    this.change_cursor('not-allowed');
   } else {
-    this.change_cursor("grab");
+    this.change_cursor('grab');
   }
 
   if ((this.canvas_type == 'cdraw') &&
@@ -128,11 +128,11 @@ Cell.prototype.change_cursor = function(cursor) {
   // Try various cursor possibilities from least preferred to most
   // preferred.  If the browser doesn't support one of the preferred
   // values, then it keeps the last value that worked.
-  this.el_cell_drag.attr({cursor: "default"});
+  this.el_cell_drag.attr({cursor: 'default'});
 
-  if ((cursor == "grab") || (cursor == "grabbing")){
-    this.el_cell_drag.attr({cursor: "-webkit-" + cursor});
-    this.el_cell_drag.attr({cursor: "-moz-" + cursor});
+  if ((cursor == 'grab') || (cursor == 'grabbing')){
+    this.el_cell_drag.attr({cursor: '-webkit-' + cursor});
+    this.el_cell_drag.attr({cursor: '-moz-' + cursor});
   }
 
   this.el_cell_drag.attr({cursor: cursor});
@@ -140,8 +140,8 @@ Cell.prototype.change_cursor = function(cursor) {
 
 Cell.prototype.update_qty_text = function(n, pending) {
   var attr = {
-    text: "x" + n,
-    fill: (pending || !n) ? "#aaa" : "#000"
+    text: 'x' + n,
+    fill: (pending || !n) ? '#aaa' : '#000'
   };
   this.el_qty_text.attr(attr);
   var bbox = this.el_qty_text.getBBox(true);
@@ -156,11 +156,11 @@ Cell.prototype.update_quantity = function(n) {
   this.update_qty_text(n);
 
   if (n && !this.quantity){
-    this.el_s.attr({stroke: "#000"});
-    this.change_cursor("grab");
+    this.el_s.attr({stroke: '#000'});
+    this.change_cursor('grab');
   } else if (!n && this.quantity){
-    this.el_s.attr({stroke: "#aaa"});
-    this.change_cursor("not-allowed");
+    this.el_s.attr({stroke: '#aaa'});
+    this.change_cursor('not-allowed');
   }
 
   this.quantity = n;
@@ -221,7 +221,7 @@ Cell.prototype.update_prospective_width = function(n, pending_new) {
 };
 
 Cell.prototype.propagate_value = function() {
-  var calc_func_name = "calc_" + this.type;
+  var calc_func_name = 'calc_' + this.type;
   if (!this[calc_func_name]) return;
   this[calc_func_name]();
 };
@@ -326,8 +326,8 @@ Cell.prototype.calc_output = function() {
   var value = this.value = this.io.i.value;
   var exp_value = this.be.level.value(this.name);
   if ((exp_value === undefined) || (value === undefined)){
-    this.el_check.setAttr("visibility", "hidden");
-    this.el_question.setAttr("visibility", "visible");
+    this.el_check.setAttr('visibility', 'hidden');
+    this.el_question.setAttr('visibility', 'visible');
   } else {
     var attr = {};
     var height = 1.5 * this.be.io_spacing;
@@ -335,19 +335,19 @@ Cell.prototype.calc_output = function() {
     var right = width/2;
     var left = right + height*1/3;
     if (value === exp_value) {
-      attr.stroke = "#0c0";
-      attr.path = ["M", left, 0,
-                   "l", height*1/6, height*1/3,
-                   "l", height*2/6, -height*2/3];
+      attr.stroke = '#0c0';
+      attr.path = ['M', left, 0,
+                   'l', height*1/6, height*1/3,
+                   'l', height*2/6, -height*2/3];
     } else {
-      attr.stroke = "#f00";
-      attr.path = ["M", left, -height*1/3,
-                   "l", height*2/3, height*2/3,
-                   "m", 0, -height*2/3,
-                   "l", -height*2/3, height*2/3];
+      attr.stroke = '#f00';
+      attr.path = ['M', left, -height*1/3,
+                   'l', height*2/3, height*2/3,
+                   'm', 0, -height*2/3,
+                   'l', -height*2/3, height*2/3];
     }
     this.el_check.attr(attr);
-    this.el_check.setAttr("visibility", "visible");
+    this.el_check.setAttr('visibility', 'visible');
   }
 }
 
@@ -392,24 +392,24 @@ Cell.prototype.calc_expander = function() {
 };
 
 Cell.prototype.check_pending = function() {
-  this.el_question.setAttr("visibility", "visible");
+  this.el_question.setAttr('visibility', 'visible');
 }
 
 Cell.prototype.done_check = function() {
   var exp_value = this.be.level.value(this.name);
   if (exp_value === undefined){
-    this.el_question.setAttr("visibility", "hidden");
+    this.el_question.setAttr('visibility', 'hidden');
     return true;
   } else if (this.value === undefined){
     return undefined;
   } else {
-    this.el_question.setAttr("visibility", "hidden");
+    this.el_question.setAttr('visibility', 'hidden');
     return this.value === this.be.level.value(this.name);
   }
 };
 
 Cell.prototype.bring_to_top = function() {
-  if (this.canvas_type != "cdraw") return;
+  if (this.canvas_type != 'cdraw') return;
 
   this.el_cell.insertBefore(this.be.z_cell);
   for (var port_name in this.io) {
@@ -445,7 +445,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // Pop cell to top for more natural dragging.
   this.bring_to_top();
 
-  if (this.canvas_type == "cbox"){
+  if (this.canvas_type == 'cbox'){
     // Typically when a cell is grabbed from the box, this line
     // decreases its quantity, but check_for_del() immediately
     // increases its (pending) quantity right back again since the
@@ -456,7 +456,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
   // Bring the drag div (and its associated canvas) to the top of the Z order.
   // This allows drawn elements to cross the scrollbar, and also prevents
   // mouse events from reaching the scrollbar.
-  $(this.be.div_cdrag).css("z-index", "99")
+  $(this.be.div_cdrag).css('z-index', '99')
 
   if (this.canvas == this.be.cdraw){
     var canvas_x = this.x;
@@ -465,9 +465,9 @@ Cell.prototype.cell_drag_start = function(x, y) {
   } else { // canvas == cbox
     var canvas_x = this.be.circuit.cdraw_to_canvas_x(x);
     var canvas_y = this.be.circuit.cdraw_to_canvas_y(y);
-    this.cdraw_cell = new Cell(this.be, "cdraw", this.type, canvas_x, canvas_y);
+    this.cdraw_cell = new Cell(this.be, 'cdraw', this.type, canvas_x, canvas_y);
   }
-  this.cdrag_cell = new Cell(this.be, "cdrag", this.type, canvas_x, canvas_y,
+  this.cdrag_cell = new Cell(this.be, 'cdrag', this.type, canvas_x, canvas_y,
                              this.name);
 
   // Remember how far the cell's x,y coordinate is from the canvas
@@ -488,7 +488,7 @@ Cell.prototype.cell_drag_start = function(x, y) {
 Cell.prototype.move = function(dx, dy) {
   this.x += dx;
   this.y += dy;
-  this.set_xform.transform("t" + this.x + "," + this.y);
+  this.set_xform.transform('t' + this.x + ',' + this.y);
 };
 
 Cell.prototype.check_for_del = function(x, y, is_new) {
@@ -502,7 +502,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
       (y < this.be.window_height)){
     // A new cell is still within the cell box
     // (or has been returned to the cell box.)
-    del = "new";
+    del = 'new';
   } else if ((x < this.be.cbox_width) ||
              (x >= this.be.window_width) ||
              (y >= this.be.window_height) ||
@@ -515,31 +515,31 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
               (y < this.be.main_stub_height)) ||
              ((x >= this.be.window_width - this.be.zoom_width) &&
               (y >= this.be.window_height - this.be.zoom_height))){
-    del = "del";
+    del = 'del';
   } else {
     del = false;
   }
   if (del && (del != this.pending_del)){
     var attr;
-    if (del == "new"){
+    if (del == 'new'){
       attr = {
-        stroke: "#aaa", // grey
-        "stroke-dasharray": ""
+        stroke: '#aaa', // grey
+        'stroke-dasharray': ''
       };
     } else {
       attr = {
-        stroke: "#e88", // red
-        "stroke-dasharray": "-"
+        stroke: '#e88', // red
+        'stroke-dasharray': '-'
       };
     }
     this.el_s.attr(attr);
 
     for (var name in this.io) {
-      this.io[name].mark_old("del");
+      this.io[name].mark_old('del');
     }
     this.pending_del = del;
 
-    if (this.canvas_type == "cdraw"){
+    if (this.canvas_type == 'cdraw'){
       this.be.level.remove_cell(this);
       this.be.level.update_box_quantity(this.type, +this.width);
     }
@@ -547,8 +547,8 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     this.be.level.update_widths(true);
   } else if (!del && this.pending_del){
     var attr = {
-      stroke: "#000", // black
-      "stroke-dasharray": ""
+      stroke: '#000', // black
+      'stroke-dasharray': ''
     };
     this.el_s.attr(attr);
 
@@ -557,7 +557,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     }
     this.pending_del = del;
 
-    if (this.canvas_type == "cdraw"){
+    if (this.canvas_type == 'cdraw'){
       this.be.level.add_cell(this);
       this.be.level.update_box_quantity(this.type, -this.width);
     }
@@ -599,7 +599,7 @@ Cell.prototype.cell_drag_end = function() {
   $(document.body).removeClass('cursor-force-grabbing');
   this.be.drag.enable_hover();
 
-  $(this.be.div_cdrag).css("z-index", "-1")
+  $(this.be.div_cdrag).css('z-index', '-1')
   this.cdrag_cell.remove();
   this.be.cdrag_cell = undefined;
 
@@ -636,7 +636,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
     var y = ((i+0.5)*cs)-(no*cs/2);
     if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
-                        (no > 1) ? "o" + i : "o", "output",
+                        (no > 1) ? 'o' + i : 'o', 'output',
                         right+cw, y, shallow ? right : 0);
     this.io[io_obj.name] = io_obj;
     this.push_el(io_obj.el_target, 'drag_other');
@@ -652,7 +652,7 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
     var y = ((i+0.5)*cs)-(ni*cs/2);
     if (upsidedown) y = -y;
     var io_obj = new Io(this.be, this.canvas, this,
-                        (ni > 1) ? "i" + i : "i", "input",
+                        (ni > 1) ? 'i' + i : 'i', 'input',
                         left-cw, y, shallow ? left : 0);
     this.io[io_obj.name] = io_obj;
     this.push_el(io_obj.el_target, 'drag_other');
@@ -721,10 +721,10 @@ Cell.prototype.init_buf = function(inv) {
 
   this.init_io(inv, 1, 1, left, right);
 
-  var cell_path = ["M", left, -height/2,
-                   "v", height,
-                   "l", width, -height/2,
-                   "z"];
+  var cell_path = ['M', left, -height/2,
+                   'v', height,
+                   'l', width, -height/2,
+                   'z'];
   this.push_el(this.canvas.path(cell_path).attr(this.cell_bg_attr),
                'drag_cell');
   this.draw_inv(inv, right, true);
@@ -747,12 +747,12 @@ Cell.prototype.init_and = function(inv) {
 
   this.init_io(inv, 1, ni, left, right);
 
-  var cell_path = ["M", left, top,
-                   "v", height,
-                   "h", box_width,
-                   "a", r, r, 0, 0, 0, 0, -height,
-                   "h", -box_width,
-                   "z"];
+  var cell_path = ['M', left, top,
+                   'v', height,
+                   'h', box_width,
+                   'a', r, r, 0, 0, 0, 0, -height,
+                   'h', -box_width,
+                   'z'];
 
   this.push_el(this.canvas.path(cell_path).attr(this.cell_bg_attr),
                'drag_cell');
@@ -781,11 +781,11 @@ Cell.prototype.init_or = function(inv) {
   var ary = height;
   var arx = cell_width * 2/Math.sqrt(3);
   var lr = r*2.5;
-  var cell_path = ["M", left, top,
-                   "a", lr, lr, 0, 0, 1, 0, height,
-                   "a", arx, ary, 0, 0, 0, cell_width, -height/2,
-                   "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
-                   "z"];
+  var cell_path = ['M', left, top,
+                   'a', lr, lr, 0, 0, 1, 0, height,
+                   'a', arx, ary, 0, 0, 0, cell_width, -height/2,
+                   'a', arx, ary, 0, 0, 0, -cell_width, -height/2,
+                   'z'];
 
   this.push_el(this.canvas.path(cell_path).attr(this.cell_bg_attr),
                'drag_cell');
@@ -813,20 +813,20 @@ Cell.prototype.init_xor = function(inv) {
   var ary = height;
   var arx = cell_width * 2/Math.sqrt(3);
   var lr = r*2.5;
-  var cell_path_fg = ["M", left, top,
-                      "a", lr, lr, 0, 0, 1, 0, height,
-                      "a", arx, ary, 0, 0, 0, cell_width, -height/2,
-                      "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
-                      "z",
-                      "m", -bar_space, 0,
-                      "a", lr, lr, 0, 0, 1, 0, height];
-  var cell_path_bg = ["M", far_left, top,
-                      "a", lr, lr, 0, 0, 1, 0, height,
-                      "h", bar_space,
-                      "a", arx, ary, 0, 0, 0, cell_width, -height/2,
-                      "a", arx, ary, 0, 0, 0, -cell_width, -height/2,
-                      "h", -bar_space,
-                      "z"];
+  var cell_path_fg = ['M', left, top,
+                      'a', lr, lr, 0, 0, 1, 0, height,
+                      'a', arx, ary, 0, 0, 0, cell_width, -height/2,
+                      'a', arx, ary, 0, 0, 0, -cell_width, -height/2,
+                      'z',
+                      'm', -bar_space, 0,
+                      'a', lr, lr, 0, 0, 1, 0, height];
+  var cell_path_bg = ['M', far_left, top,
+                      'a', lr, lr, 0, 0, 1, 0, height,
+                      'h', bar_space,
+                      'a', arx, ary, 0, 0, 0, cell_width, -height/2,
+                      'a', arx, ary, 0, 0, 0, -cell_width, -height/2,
+                      'h', -bar_space,
+                      'z'];
 
   this.push_el(this.canvas.path(cell_path_bg).attr(this.cell_bg_attr),
                'drag_cell');
@@ -868,11 +868,11 @@ Cell.prototype.init_mux = function(inv) {
   this.push_el(this.io.i1.el_target, 'drag_other');
   this.push_el(this.io.s.el_target, 'drag_other');
 
-  var cell_path = ["M", left, top,
-                   "v", height,
-                   "l", width, -this.be.io_spacing/2,
-                   "v", -nheight,
-                   "z"];
+  var cell_path = ['M', left, top,
+                   'v', height,
+                   'l', width, -this.be.io_spacing/2,
+                   'v', -nheight,
+                   'z'];
 
   this.push_el(this.canvas.path(cell_path).attr(this.cell_bg_attr),
                'drag_cell');
@@ -881,8 +881,8 @@ Cell.prototype.init_mux = function(inv) {
                'mark_del');
 
   var attr = {
-    "stroke-width": 0,
-    fill: "#000",
+    'stroke-width': 0,
+    fill: '#000',
     'text-anchor': 'start'
   };
   left += this.be.stroke_cell_fg;
@@ -899,17 +899,17 @@ Cell.prototype.init_input = function() {
 
   this.init_io(false, 1, 0, left, right);
 
-  var path = ["M", left, top,
-              "v", height,
-              "h", width,
-              "L", right, 0,
-              "L", width/2, top,
-              "z"];
+  var path = ['M', left, top,
+              'v', height,
+              'h', width,
+              'L', right, 0,
+              'L', width/2, top,
+              'z'];
   this.push_el(this.canvas.path(path).attr(this.cell_bg_attr), 'drag_cell');
   this.draw_stubs();
   this.push_el(this.canvas.path(path).attr(this.cell_fg_attr), 'mark_del');
 
-  this.el_text = this.canvas.text(0, 0, "");
+  this.el_text = this.canvas.text(0, 0, '');
   this.push_el(this.el_text);
 };
 
@@ -925,27 +925,27 @@ Cell.prototype.init_output = function() {
   this.qty_cx = this.io.i.x;
   this.qty_top = this.io.i.y;
 
-  var path = ["M", right, top,
-              "v", height,
-              "h", -width,
-              "L", left, 0,
-              "L", -width/2, top,
-              "z"];
+  var path = ['M', right, top,
+              'v', height,
+              'h', -width,
+              'L', left, 0,
+              'L', -width/2, top,
+              'z'];
   this.push_el(this.canvas.path(path).attr(this.cell_bg_attr), 'drag_cell');
   this.draw_stubs();
   this.push_el(this.canvas.path(path).attr(this.cell_fg_attr), 'mark_del');
 
-  this.el_text = this.canvas.text(0, 0, "");
+  this.el_text = this.canvas.text(0, 0, '');
   this.push_el(this.el_text);
 
   // Placeholder for output check result.
   var attr = {
-    "stroke-width": this.be.stroke_check,
-    "stroke-linejoin": "round",
-    "stroke-linecap": "round"
+    'stroke-width': this.be.stroke_check,
+    'stroke-linejoin': 'round',
+    'stroke-linecap': 'round'
   };
-  this.el_check = this.canvas.path("M0,0").attr(attr);
-  this.el_check.setAttr("visibility", "hidden");
+  this.el_check = this.canvas.path('M0,0').attr(attr);
+  this.el_check.setAttr('visibility', 'hidden');
   this.push_el(this.el_check);
 
   // Draw a "question mark" when the output check is pending.  If a
@@ -963,18 +963,18 @@ Cell.prototype.init_output = function() {
   var nheight = 1+cos30*2;
   var ry = uheight/nheight;
   var attr = {
-    stroke: "#888", // gray
-    "stroke-width": this.be.stroke_question,
-    "stroke-linejoin": "round",
-    "stroke-linecap": "round"
+    stroke: '#888', // gray
+    'stroke-width': this.be.stroke_question,
+    'stroke-linejoin': 'round',
+    'stroke-linecap': 'round'
   };
-  var path = ["M", cx - rx, -cheight/2+ry,
-              "a", rx, ry, 0, 1, 1, cwidth*3/4, cos30*ry,
-              "a", rx, ry, 0, 0, 0, -cwidth*1/4, cos30*ry,
-              "m", 0, gap,
-              "l", 0, 0];
+  var path = ['M', cx - rx, -cheight/2+ry,
+              'a', rx, ry, 0, 1, 1, cwidth*3/4, cos30*ry,
+              'a', rx, ry, 0, 0, 0, -cwidth*1/4, cos30*ry,
+              'm', 0, gap,
+              'l', 0, 0];
   this.el_question = this.canvas.path(path).attr(attr);
-  this.el_question.setAttr("visibility", "hidden");
+  this.el_question.setAttr('visibility', 'hidden');
   this.push_el(this.el_question);
 };
 
@@ -982,15 +982,15 @@ Cell.prototype.fit_input_text = function() {
   var name = this.name.toUpperCase();
   var value = this.be.level.value(this.name);
   if (value === undefined){
-    var text = name + "=X";
+    var text = name + '=X';
   } else {
-    var text = name + "=" + this.be.level.value(this.name);
+    var text = name + '=' + this.be.level.value(this.name);
   }
 
   if (text === this.text) return;
   this.text = text;
 
-  this.el_text.attr({text: text, x: 0, "font-size": "10"});
+  this.el_text.attr({text: text, x: 0, 'font-size': '10'});
   var bbox = this.el_text.getBBox(true);
 
   var height = 1.5 * this.be.io_spacing;
@@ -1008,7 +1008,7 @@ Cell.prototype.fit_input_text = function() {
   // right.
   var shift = -width/2 - (bbox.x * scale) + this.be.stroke_cell_fg/2;
 
-  this.el_text.attr({x: shift, "font-size": "" + 10*scale});
+  this.el_text.attr({x: shift, 'font-size': '' + 10*scale});
 };
 
 Cell.prototype.fit_output_text = function() {
@@ -1017,13 +1017,13 @@ Cell.prototype.fit_output_text = function() {
   if (value === undefined){
     var text = name;
   } else {
-    var text = name + "=" + value + "?";
+    var text = name + '=' + value + '?';
   }
 
   if (text === this.text) return;
   this.text = text;
 
-  this.el_text.attr({text: text, x: 0, "font-size": "10"});
+  this.el_text.attr({text: text, x: 0, 'font-size': '10'});
   var bbox = this.el_text.getBBox(true);
   if (text.length < 3){
     // To prevent the text from getting weirdly huge, we pretend that
@@ -1048,7 +1048,7 @@ Cell.prototype.fit_output_text = function() {
   // left.
   var shift = width/2 - ((bbox.x + bbox.width) * scale) - this.be.stroke_cell_fg/2;
 
-  this.el_text.attr({x: shift, "font-size": "" + 10*scale});
+  this.el_text.attr({x: shift, 'font-size': '' + 10*scale});
 };
 
 Cell.prototype.init_const = function() {
@@ -1090,17 +1090,17 @@ Cell.prototype.init_latch = function() {
   this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
 
   var attr = {
-    "stroke-width": 0,
-    fill: "#000",
+    'stroke-width': 0,
+    fill: '#000',
     'text-anchor': 'start'
   };
   left += this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(left, -this.be.io_spacing, "D").attr(attr));
-  this.push_el(this.canvas.text(left, 0, "E").attr(attr));
+  this.push_el(this.canvas.text(left, -this.be.io_spacing, 'D').attr(attr));
+  this.push_el(this.canvas.text(left, 0, 'E').attr(attr));
 
   attr['text-anchor'] = 'end';
   right -= this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(right, -this.be.io_spacing, "Q").attr(attr));
+  this.push_el(this.canvas.text(right, -this.be.io_spacing, 'Q').attr(attr));
 };
 
 Cell.prototype.init_condenser = function(ni) {
@@ -1113,11 +1113,11 @@ Cell.prototype.init_condenser = function(ni) {
 
   this.init_io(false, 1, ni, left, right, true, true);
 
-  var cell_path = ["M", left, top,
-                   "v", height,
-                   "L", right, this.be.io_spacing/2,
-                   "v", -this.be.io_spacing,
-                   "z"];
+  var cell_path = ['M', left, top,
+                   'v', height,
+                   'L', right, this.be.io_spacing/2,
+                   'v', -this.be.io_spacing,
+                   'z'];
 
   var trace_path = [];
   for (var i = 0; i < ni; i++) {
@@ -1139,7 +1139,7 @@ Cell.prototype.init_condenser = function(ni) {
 
   // Create drag targets to use for resizing the condenser.
   var attr = {
-    "stroke-width": 0,
+    'stroke-width': 0,
     cursor: 'row-resize'
   };
 
@@ -1149,8 +1149,8 @@ Cell.prototype.init_condenser = function(ni) {
                      'v', -this.be.io_spacing/2,
                      'z'];
   this.el_top_target = this.canvas.path(target_path).attr(attr);
-  this.el_top_target.setAttr("visibility", "hidden");
-  this.el_top_target.setAttr("pointer-events", "all");
+  this.el_top_target.setAttr('visibility', 'hidden');
+  this.el_top_target.setAttr('pointer-events', 'all');
   this.push_el(this.el_top_target, 'drag_other');
   this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
                      {start: this.harness_drag_start,
@@ -1164,8 +1164,8 @@ Cell.prototype.init_condenser = function(ni) {
                      'v', this.be.io_spacing/2,
                      'z'];
   this.el_bottom_target = this.canvas.path(target_path).attr(attr);
-  this.el_bottom_target.setAttr("visibility", "hidden");
-  this.el_bottom_target.setAttr("pointer-events", "all");
+  this.el_bottom_target.setAttr('visibility', 'hidden');
+  this.el_bottom_target.setAttr('pointer-events', 'all');
   this.push_el(this.el_bottom_target, 'drag_other');
   this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
                      {start: this.harness_drag_start,
@@ -1187,11 +1187,11 @@ Cell.prototype.init_expander = function(no) {
   this.qty_cx = this.io.i.x;
   this.qty_top = this.io.i.y;
 
-  var cell_path = ["M", right, top,
-                   "v", height,
-                   "L", left, this.be.io_spacing/2,
-                   "v", -this.be.io_spacing,
-                   "z"];
+  var cell_path = ['M', right, top,
+                   'v', height,
+                   'L', left, this.be.io_spacing/2,
+                   'v', -this.be.io_spacing,
+                   'z'];
 
   var trace_path = [];
   for (var i = 0; i < no; i++) {
@@ -1213,7 +1213,7 @@ Cell.prototype.init_expander = function(no) {
 
   // Create drag targets to use for resizing the expander.
   var attr = {
-    "stroke-width": 0,
+    'stroke-width': 0,
     cursor: 'row-resize'
   };
 
@@ -1223,8 +1223,8 @@ Cell.prototype.init_expander = function(no) {
                      'v', -this.be.io_spacing/2,
                      'z'];
   this.el_top_target = this.canvas.path(target_path).attr(attr);
-  this.el_top_target.setAttr("visibility", "hidden");
-  this.el_top_target.setAttr("pointer-events", "all");
+  this.el_top_target.setAttr('visibility', 'hidden');
+  this.el_top_target.setAttr('pointer-events', 'all');
   this.push_el(this.el_top_target, 'drag_other');
   this.be.bdrag.drag($(this.el_top_target.node), this, 'cell',
                      {start: this.harness_drag_start,
@@ -1238,8 +1238,8 @@ Cell.prototype.init_expander = function(no) {
                      'v', this.be.io_spacing/2,
                      'z'];
   this.el_bottom_target = this.canvas.path(target_path).attr(attr);
-  this.el_bottom_target.setAttr("visibility", "hidden");
-  this.el_bottom_target.setAttr("pointer-events", "all");
+  this.el_bottom_target.setAttr('visibility', 'hidden');
+  this.el_bottom_target.setAttr('pointer-events', 'all');
   this.push_el(this.el_bottom_target, 'drag_other');
   this.be.bdrag.drag($(this.el_bottom_target.node), this, 'cell',
                      {start: this.harness_drag_start,
@@ -1251,8 +1251,8 @@ Cell.prototype.init_expander = function(no) {
 Cell.prototype.init_null = function() {
   // A "null" port is used as the connection point for wires
   // currently being dragged.
-  var io_obj = new Io(this.be, this.canvas, this, "null", "null", 0, 0, 0);
-  this.io["null"] = io_obj;
+  var io_obj = new Io(this.be, this.canvas, this, 'null', 'null', 0, 0, 0);
+  this.io['null'] = io_obj;
   this.be.null_io = io_obj;
 };
 
@@ -1280,7 +1280,7 @@ Cell.prototype.push_el = function(el, type) {
                        (type == 'drag_cbox')); // ignore touch events if true
   } else if (type != 'drag_other') {
     // This el passes through mouse/touch events.
-    el.setAttr("pointer-events", "none");
+    el.setAttr('pointer-events', 'none');
   }
 };
 
@@ -1340,11 +1340,11 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
     top = -top - height;
   }
 
-  var cell_path = ["M", x_wide, top,
-                   "v", height,
-                   "l", cwidth, -(height-this.be.io_spacing)/2,
-                   "v", -this.be.io_spacing,
-                   "z"];
+  var cell_path = ['M', x_wide, top,
+                   'v', height,
+                   'l', cwidth, -(height-this.be.io_spacing)/2,
+                   'v', -this.be.io_spacing,
+                   'z'];
   this.con_bg.attr({path: cell_path});
   this.con_fill.attr({path: cell_path});
   this.con_fg.attr({path: cell_path});

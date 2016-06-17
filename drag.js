@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Drag(be) {
   this.be = be;
@@ -8,9 +8,9 @@ function Drag(be) {
 
   var tw = this.be.io_handle_size;
   var attr = {
-    "stroke-width": tw/5,
-    stroke: "#f00",
-    fill: "#fff"
+    'stroke-width': tw/5,
+    stroke: '#f00',
+    fill: '#fff'
   };
 
   this.el_handle1 = this.el_handle();
@@ -23,25 +23,25 @@ function Drag(be) {
   // we just draw it horizontally and then rotate the whole thing
   // when we position the fail symbol over an IO.
   var el_fail_circle = this.be.cdraw.circle(0, 0, tw/2, tw/2).attr(attr);
-  var el_fail_slash = this.be.cdraw.path(["M", -tw/2, 0,
-                                          "h", tw]).attr(attr);
+  var el_fail_slash = this.be.cdraw.path(['M', -tw/2, 0,
+                                          'h', tw]).attr(attr);
 
   this.el_fail = this.be.cdraw.set(el_fail_circle, el_fail_slash);
-  this.el_fail.setAttr("visibility", "hidden");
-  this.el_fail.setAttr("pointer-events", "none");
+  this.el_fail.setAttr('visibility', 'hidden');
+  this.el_fail.setAttr('pointer-events', 'none');
 }
 
 Drag.prototype.el_handle = function () {
   var attr = {
-    "stroke-width": this.be.stroke_io_handle,
-    stroke: "#f80",
-    fill: "#ff0",
-    opacity: "0.80"
+    'stroke-width': this.be.stroke_io_handle,
+    stroke: '#f80',
+    fill: '#ff0',
+    opacity: '0.80'
   };
   var tw = this.be.io_handle_size;
   var el_handle = this.be.cdraw.circle(0, 0, tw/2, tw/2).attr(attr);
-  el_handle.setAttr("visibility", "hidden");
-  el_handle.setAttr("pointer-events", "none");
+  el_handle.setAttr('visibility', 'hidden');
+  el_handle.setAttr('pointer-events', 'none');
   return el_handle;
 };
 
@@ -58,7 +58,7 @@ Drag.prototype.remove_null_wire = function() {
 };
 
 Drag.prototype.gen_old_wires = function(io) {
-  var type = (this.new_io == this.be.null_io) ? "null" : "del";
+  var type = (this.new_io == this.be.null_io) ? 'null' : 'del';
   this.old_wires = this.old_wires.concat(io.w.slice(0));
   for (var i = 0; i < this.old_wires.length; i++){
     this.old_wires[i].mark_old(type);
@@ -90,7 +90,7 @@ Drag.prototype.remove_old_wires = function() {
 };
 
 Drag.prototype.commit_new_wires = function() {
-  var attr = {stroke: "#eee"}
+  var attr = {stroke: '#eee'}
   if (this.new_wires.length) this.be.level.circuit_changed();
   for (var i = 0; i < this.new_wires.length; i++){
     this.new_wires[i].el_bg.attr(attr);
@@ -309,11 +309,11 @@ Drag.prototype.snap_end = function() {
 
 Drag.prototype.show_handle = function(el, io) {
   el.transform('t' + (io.cell.x + io.x) + ',' + (io.cell.y + io.y));
-  el.setAttr("visibility", "visible");
+  el.setAttr('visibility', 'visible');
 };
 
 Drag.prototype.hide_handle = function(el) {
-  el.setAttr("visibility", "hidden");
+  el.setAttr('visibility', 'hidden');
 };
 
 Drag.prototype.show_fail = function(io) {
@@ -322,11 +322,11 @@ Drag.prototype.show_fail = function(io) {
 
 Drag.prototype.show_fail_xy = function(x, y) {
   this.el_fail.transform('t' + x + ',' + y + 'r45');
-  this.el_fail.setAttr("visibility", "visible");
+  this.el_fail.setAttr('visibility', 'visible');
 };
 
 Drag.prototype.hide_fail = function() {
-  this.el_fail.setAttr("visibility", "hidden");
+  this.el_fail.setAttr('visibility', 'hidden');
 };
 
 Drag.prototype.connect_o_to_i = function(o, i) {
@@ -375,20 +375,20 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
   this.remove_new_wires();
   this.new_io = io;
 
-  if (io.type == "null") {
-    if (this.orig_io.type == "input") this.gen_old_wires(this.orig_io);
+  if (io.type == 'null') {
+    if (this.orig_io.type == 'input') this.gen_old_wires(this.orig_io);
     this.update_free_drag(x, y);
-  } else if ((this.orig_io.type == "output") && (io.type == "input")) {
+  } else if ((this.orig_io.type == 'output') && (io.type == 'input')) {
     this.connect_o_to_i(this.orig_io, io);
-  } else if ((this.orig_io.type == "output") && (io.type == "output")) {
+  } else if ((this.orig_io.type == 'output') && (io.type == 'output')) {
     this.gen_old_wires(this.orig_io);
     for (var i = 0; i < this.old_wires.length; i++){
       this.new_wires.push(new Wire(this.be, this.old_wires[i].i, this.new_io,
                                    true));
     }
-  } else if ((this.orig_io.type == "input") && (io.type == "output")) {
+  } else if ((this.orig_io.type == 'input') && (io.type == 'output')) {
     this.connect_o_to_i(io, this.orig_io);
-  } else if ((this.orig_io.type == "input") && (io.type == "input")) {
+  } else if ((this.orig_io.type == 'input') && (io.type == 'input')) {
     this.gen_old_wires(this.orig_io);
     if (io.w.length && (io.w[0].o == this.orig_io.w[0].o)){
       // The new wire would duplicate an existing connection at
@@ -414,7 +414,7 @@ Drag.prototype.update_free_drag = function(x, y) {
       this.null_wire.redraw();
     } else {
       // create_null_wire
-      if ((this.orig_io.type == "input") && (!this.orig_empty)){
+      if ((this.orig_io.type == 'input') && (!this.orig_empty)){
         var from_io = this.orig_io.w[0].o;
       } else {
         var from_io = this.orig_io;

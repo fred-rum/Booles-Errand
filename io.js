@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Io(be, canvas, cell, name, type, x, y, inner_x) {
   this.be = be;
@@ -19,21 +19,21 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   // The null IO has position and wire connectivity information, but
   // it doesn't have any of the other IO features, e.g. graphics and
   // event handling.
-  if (type == "null") return;
+  if (type == 'null') return;
 
-  this.min_color = Raphael.getRGB("#aaf");
-  this.max_color = Raphael.getRGB("#8d8");
+  this.min_color = Raphael.getRGB('#aaf');
+  this.max_color = Raphael.getRGB('#8d8');
 
   this.registered = false;
 
   if (inner_x == 'mux') {
     // Special case: the stub is vertical, not horizontal.
-    this.path = ["M", x, y,
-                 "H", 0,
-                 "V", 0];
+    this.path = ['M', x, y,
+                 'H', 0,
+                 'V', 0];
   } else {
-    this.path = ["M", x, y,
-                 "H", inner_x];
+    this.path = ['M', x, y,
+                 'H', inner_x];
   }
 
   // An IO for a cell in the cell box has graphics for the stub, but
@@ -46,11 +46,11 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
 
   var tw = this.be.io_handle_size; // Actually, double the IO handle size.
   var attr = {
-    "stroke-width": 0,
+    'stroke-width': 0,
   };
   this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
-  this.el_target.setAttr("visibility", "hidden");
-  this.el_target.setAttr("pointer-events", "all");
+  this.el_target.setAttr('visibility', 'hidden');
+  this.el_target.setAttr('pointer-events', 'all');
 
   this.be.drag.enable_drag(this);
   if (this.be.showing_soln) {
@@ -65,22 +65,22 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   // x center of the text.
   var text_height = 15;
   var attr = {
-    "text-anchor": "middle",
-    //"font-family": "Verdana, Helvetica, Arial, sans-serif",
-    "font-family": "Courier New, Fixed, monospace",
-    "font-size": text_height
+    'text-anchor': 'middle',
+    //'font-family': 'Verdana, Helvetica, Arial, sans-serif',
+    'font-family': 'Courier New, Fixed, monospace',
+    'font-size': text_height
   };
   this.value_y = 0;
-  this.el_value_text = this.canvas.text(this.x, this.value_y, "").attr(attr);
-  this.el_value_text.setAttr("pointer-events", "none");
+  this.el_value_text = this.canvas.text(this.x, this.value_y, '').attr(attr);
+  this.el_value_text.setAttr('pointer-events', 'none');
 
   var attr_bg = {
-    "stroke-width": 0,
-    opacity: "0"
+    'stroke-width': 0,
+    opacity: '0'
   };
   this.el_value_text_bg = this.canvas.rect(0, 0, 0, 0);
   this.el_value_text_bg.attr(attr_bg);
-  this.el_value_text_bg.setAttr("pointer-events", "none");
+  this.el_value_text_bg.setAttr('pointer-events', 'none');
 
   this.set_io = this.canvas.set(this.el_value_text_bg,
                                 this.el_value_text);
@@ -88,22 +88,22 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
 
 Io.prototype.draw_stub_fg = function() {
   var stub_fg_attr = {
-    "stroke-width": this.be.stroke_wire_fg,
+    'stroke-width': this.be.stroke_wire_fg,
     stroke: Wire.color(undefined)
   };
   var stub_end_attr = {
-    "stroke-width": this.be.stroke_stub_end_undefined,
+    'stroke-width': this.be.stroke_stub_end_undefined,
     stroke: Wire.color(undefined)
   };
-  var stub_end_path = ["M", this.x, this.y - this.be.stub_end_len/2,
-                       "v", this.be.stub_end_len];
+  var stub_end_path = ['M', this.x, this.y - this.be.stub_end_len/2,
+                       'v', this.be.stub_end_len];
   this.el_stub_end = this.canvas.path(stub_end_path).attr(stub_end_attr);
-  this.el_stub_end.setAttr("pointer-events", "none");
-  this.el_stub_end.setAttr("visibility", "hidden");
+  this.el_stub_end.setAttr('pointer-events', 'none');
+  this.el_stub_end.setAttr('visibility', 'hidden');
   this.set_io.push(this.el_stub_end);
 
   this.stub = this.canvas.path(this.path).attr(stub_fg_attr);
-  this.stub.setAttr("pointer-events", "none");
+  this.stub.setAttr('pointer-events', 'none');
   return this.stub;
 };
 
@@ -112,10 +112,10 @@ Io.prototype.connect = function(wire) {
     this.locked = true;
     this.be.drag.disable_drag(this);
   } else if (!this.w.length && this.el_stub_end){
-    this.el_stub_end.setAttr("visibility", "visible");
+    this.el_stub_end.setAttr('visibility', 'visible');
   }
 
-  if ((this.type == "output") && (this.w.length > 0)) {
+  if ((this.type == 'output') && (this.w.length > 0)) {
     // We want the new wire to be ordered together with the existing
     // wires connected to the same output.  But we also want the new
     // wire to be on top.  So we reorder all existing wires to be
@@ -132,7 +132,7 @@ Io.prototype.disconnect = function(wire) {
     if (wire == this.w[i]){
       this.w.splice(i, 1);
       if (!this.w.length && this.el_stub_end){
-        this.el_stub_end.setAttr("visibility", "hidden");
+        this.el_stub_end.setAttr('visibility', 'hidden');
       }
       return;
     }
@@ -166,7 +166,7 @@ Io.prototype.color_stub = function(value) {
   };
   if (!this.pending_del) this.stub.attr(attr);
 
-  attr["stroke-width"] =
+  attr['stroke-width'] =
     (value === undefined) ? this.be.stroke_stub_end_undefined :
     this.be.stroke_stub_end_defined;
   this.el_stub_end.attr(attr);
@@ -180,13 +180,13 @@ Io.prototype.update_value = function(value) {
   this.color_stub(value);
 
   if (value === undefined){
-    value = "";
+    value = '';
     var bg_opacity = 0;
   } else {
-    var bg_opacity = "1.0";
+    var bg_opacity = '1.0';
   }
 
-  this.el_value_text.attr({text: "" + value});
+  this.el_value_text.attr({text: '' + value});
 
   // Create a background rectangle for the text and move both of them
   // up so that the bottom of each is just above the stub.
@@ -226,7 +226,7 @@ Io.prototype.reset = function() {
   // We know that all wires (that can potentially propagate values)
   // are connected to cells on both ends, so we only need to reset
   // wires in one consistent direction from each cell.
-  if (this.type == "input"){
+  if (this.type == 'input'){
     for (var i = 0; i < this.w.length; i++) {
       this.w[i].reset(i_was_undefined);
     }

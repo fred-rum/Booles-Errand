@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Circuit() {
   ExtendRaphael();
@@ -10,21 +10,21 @@ function Circuit() {
   this.be.circuit = this;
   this.be.bdrag = new Bdrag(this.be);
 
-  this.be.cdrag = Raphael("cdrag", "100%", "100%");
-  this.be.cbox = Raphael("cbox", "100%", "100%");
-  this.be.cdraw = Raphael("cdraw", "100%", "100%");
+  this.be.cdrag = Raphael('cdrag', '100%', '100%');
+  this.be.cbox = Raphael('cbox', '100%', '100%');
+  this.be.cdraw = Raphael('cdraw', '100%', '100%');
 
   this.be.window = $(window);
-  this.be.div_truth = $("#truth");
-  this.be.div_info = $("#info");
-  this.be.div_infotxt = $("#infotxt");
-  this.be.div_info_stub = $("#info-stub");
-  this.be.div_controls = $("#sim-controls");
-  this.be.div_zoom = $("#zoom-controls");
-  this.be.div_main_stub = $("#main-stub");
-  this.be.div_cdrag = $("#cdrag");
-  this.be.div_cdraw = $("#cdraw");
-  this.be.div_cbox = $("#cbox");
+  this.be.div_truth = $('#truth');
+  this.be.div_info = $('#info');
+  this.be.div_infotxt = $('#infotxt');
+  this.be.div_info_stub = $('#info-stub');
+  this.be.div_controls = $('#sim-controls');
+  this.be.div_zoom = $('#zoom-controls');
+  this.be.div_main_stub = $('#main-stub');
+  this.be.div_cdrag = $('#cdrag');
+  this.be.div_cdraw = $('#cdraw');
+  this.be.div_cbox = $('#cbox');
 
   // We want cdrag to be wide enough to overlap the border between
   // cbox and cdraw.  jquery appears to round up for outerwidth(),
@@ -76,13 +76,13 @@ function Circuit() {
   this.be.box_spacing = this.be.io_spacing;
 
   // Create Z-level references
-  this.be.z_cell = this.be.cdraw.path("M0,0");
-  this.be.z_wire = this.be.cdraw.path("M0,0");
-  this.be.z_io = this.be.cdraw.path("M0,0");
-  this.be.z_handle = this.be.cdraw.path("M0,0");
+  this.be.z_cell = this.be.cdraw.path('M0,0');
+  this.be.z_wire = this.be.cdraw.path('M0,0');
+  this.be.z_io = this.be.cdraw.path('M0,0');
+  this.be.z_handle = this.be.cdraw.path('M0,0');
 
   // null cell
-  new Cell(this.be, "cdraw", "null", 0, 0, "null");
+  new Cell(this.be, 'cdraw', 'null', 0, 0, 'null');
 
   this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
@@ -96,12 +96,12 @@ function Circuit() {
 
   this.be.div_cdraw.mousewheel($.proxy(this.canvas_mousewheel, this));
 
-  $("#button-info-hide").click($.proxy(this.click_info_hide, this));
-  $("#button-info-unhide").click($.proxy(this.click_info_unhide, this));
+  $('#button-info-hide').click($.proxy(this.click_info_hide, this));
+  $('#button-info-unhide').click($.proxy(this.click_info_unhide, this));
 
-  $("#zoom-in").click($.proxy(this.click_zoom_in, this));
-  $("#zoom-out").click($.proxy(this.click_zoom_out, this));
-  $("#zoom-fit").click($.proxy(this.click_zoom_fit, this));
+  $('#zoom-in').click($.proxy(this.click_zoom_in, this));
+  $('#zoom-out').click($.proxy(this.click_zoom_out, this));
+  $('#zoom-fit').click($.proxy(this.click_zoom_fit, this));
 
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
@@ -171,7 +171,7 @@ Circuit.prototype.resize = function(maintain_center) {
     this.be.truth_width = this.be.div_truth.outerWidth();
   }
 
-  this.be.div_truth.outerHeight("auto");
+  this.be.div_truth.outerHeight('auto');
   var new_truth_height = this.be.div_truth.outerHeight();
 
   // Move div_info or its stub to the right of div_truth and decrease
@@ -515,9 +515,9 @@ Circuit.prototype.click_zoom_fit = function() {
 
 Circuit.prototype.click_info_hide = function() {
   this.info_hidden = true;
-  this.be.div_info.css({display: "none"});
-  this.be.div_info_stub.css({display: "block"});
-  this.be.div_main_stub.css({display: "block"});
+  this.be.div_info.css({display: 'none'});
+  this.be.div_info_stub.css({display: 'block'});
+  this.be.div_main_stub.css({display: 'block'});
   this.resize();
   this.update_view();
 }
@@ -530,9 +530,9 @@ Circuit.prototype.click_info_unhide = function() {
 
 Circuit.prototype.unhide_info = function() {
   this.info_hidden = false;
-  this.be.div_info_stub.css({display: "none"});
-  this.be.div_main_stub.css({display: "none"});
-  this.be.div_info.css({display: "block"});
+  this.be.div_info_stub.css({display: 'none'});
+  this.be.div_main_stub.css({display: 'none'});
+  this.be.div_info.css({display: 'block'});
 };
 
 Circuit.prototype.save_data = function(key, data) {

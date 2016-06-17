@@ -1,6 +1,6 @@
 // Copyright 2016 Chris Nelson - All rights reserved.
 
-"use strict";
+'use strict';
 
 function Wire(be, io1, io2, pending_new, locked) {
   this.be = be;
@@ -9,7 +9,7 @@ function Wire(be, io1, io2, pending_new, locked) {
   // direction, so we reverse the ports as appropriate.  Note that the
   // null_cell has port type "null", so we have to look at the other
   // port to tell the desired direction.
-  if ((io1.type == "output") || (io2.type == "input")){
+  if ((io1.type == 'output') || (io2.type == 'input')){
     this.o = io1;
     this.i = io2;
   } else {
@@ -20,19 +20,19 @@ function Wire(be, io1, io2, pending_new, locked) {
   this.compute();
 
   var attr = {
-    "stroke-width": this.be.stroke_wire_bg,
-    stroke: "#eee"
+    'stroke-width': this.be.stroke_wire_bg,
+    stroke: '#eee'
   };
   this.el_bg = this.be.cdraw.path(this.path).attr(attr);
 
   var attr = {
-    "stroke-width": this.be.stroke_wire_fg,
+    'stroke-width': this.be.stroke_wire_fg,
     stroke: Wire.color(undefined)
   };
   this.el_fg = this.be.cdraw.path(this.path).attr(attr);
 
-  this.el_bg.setAttr("pointer-events", "none");
-  this.el_fg.setAttr("pointer-events", "none");
+  this.el_bg.setAttr('pointer-events', 'none');
+  this.el_fg.setAttr('pointer-events', 'none');
 
   this.el_bg.insertBefore(this.be.z_wire);
   this.el_fg.insertBefore(this.be.z_wire);
@@ -44,7 +44,7 @@ function Wire(be, io1, io2, pending_new, locked) {
 
   this.pending_new = pending_new;
   if (pending_new){
-    var attr = {stroke: "#eeb"};
+    var attr = {stroke: '#eeb'};
     this.el_bg.attr(attr);
   }
 
@@ -52,7 +52,7 @@ function Wire(be, io1, io2, pending_new, locked) {
   this.newest_value = null;
   this.in_flight = [];
 
-  // this.measure_perf("not segmented");
+  // this.measure_perf('not segmented');
 }
 
 
@@ -60,7 +60,7 @@ function Wire(be, io1, io2, pending_new, locked) {
 
 Wire.color = function(value, width) {
   if (value === undefined) {
-    return "#888";
+    return '#888';
   } else {
     var max = (1 << width) - 1;
     var r = 0;
@@ -114,7 +114,7 @@ Wire.prototype.remove = function(removed_by_input_port) {
 
 Wire.prototype.mark_old = function(type) {
   this.pending_del = type;
-  if (type == "del"){
+  if (type == 'del'){
     this.remove_subpaths();
   }
   this.redraw_fg();
@@ -122,7 +122,7 @@ Wire.prototype.mark_old = function(type) {
 
 Wire.prototype.restore_old = function() {
   this.pending_del = false;
-  this.el_fg.attr({"stroke-dasharray": ""});
+  this.el_fg.attr({'stroke-dasharray': ''});
   this.redraw_fg();
 }
 
@@ -222,7 +222,7 @@ Wire.prototype.tick = function(speed) {
   }
 
   this.redraw_fg();
-  //this.measure_perf("segmented");
+  //this.measure_perf('segmented');
 
   if (this.in_flight.length && !this.in_flight[0].held){
     // There is still data in flight (that isn't being held), so
@@ -294,40 +294,40 @@ Wire.prototype.get_subpath = function(z1, z2) {
     2;
   var la, lb;
 
-  var path = ["M"].concat(this.get_point(z1));
+  var path = ['M'].concat(this.get_point(z1));
   if (seg1 == 0){
     if (seg2 == 0){
       // seg1 == 0, seg2 == 0
       la = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
-      path = path.concat("A", aw.r, aw.r, 0, la, aw.cwa,
+      path = path.concat('A', aw.r, aw.r, 0, la, aw.cwa,
                          this.get_point(z2));
     } else {
       // seg1 == 0, seg2 > 0
       la = ((len_aa-z1)/aw.r > Math.PI) ? 1 : 0;
-      path = path.concat("A", aw.r, aw.r, 0, la, aw.cwa,
+      path = path.concat('A', aw.r, aw.r, 0, la, aw.cwa,
                          aw.xa, aw.ya);
       if (seg2 == 1){
-        path = path.concat("L", this.get_point(z2));
+        path = path.concat('L', this.get_point(z2));
       } else {
         lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
-        path = path.concat("L", aw.xb, aw.yb,
-                           "A", aw.r, aw.r, 0, lb, aw.cwb,
+        path = path.concat('L', aw.xb, aw.yb,
+                           'A', aw.r, aw.r, 0, lb, aw.cwb,
                            this.get_point(z2));
       }
     }
   } else if (seg1 == 1){
     if (seg2 == 1){
-      path = path.concat("L", this.get_point(z2));
+      path = path.concat('L', this.get_point(z2));
     } else {
       lb = ((z2-len_b)/aw.r > Math.PI) ? 1 : 0;
-      path = path.concat("L", aw.xb, aw.yb,
-                         "A", aw.r, aw.r, 0, lb, aw.cwb,
+      path = path.concat('L', aw.xb, aw.yb,
+                         'A', aw.r, aw.r, 0, lb, aw.cwb,
                          this.get_point(z2));
     }
   } else {
     // seg1 == 2
     lb = ((z2-z1)/aw.r > Math.PI) ? 1 : 0;
-    path = path.concat("A", aw.r, aw.r, 0, lb, aw.cwb,
+    path = path.concat('A', aw.r, aw.r, 0, lb, aw.cwb,
                        this.get_point(z2));
   }
 
@@ -459,10 +459,10 @@ Wire.prototype.arcwire = function (x1, y1, xc, yc) {
 
   xa = x1+xd;
   ya = y1+yd;
-  this.path = ["M", x1, y1,
-               "A", r, r, 0, la, cwa, xa, ya,
-               "L", xb, yb,
-               "A", r, r, 0, lb, cwb, x2, y2];
+  this.path = ['M', x1, y1,
+               'A', r, r, 0, la, cwa, xa, ya,
+               'L', xb, yb,
+               'A', r, r, 0, lb, cwb, x2, y2];
 
   var seg_len = Math.sqrt((xb-xa)*(xb-xa)+(yb-ya)*(yb-ya))
   this.path_length = angle_a * r + seg_len + angle_b * r;
@@ -552,13 +552,13 @@ Wire.prototype.draw_spark = function(fl_obj) {
       }
 
       var attr = {
-        "stroke-width": this.be.stroke_io_handle,
-        stroke: "#f80",
-        fill: "#ff0",
-        opacity: "0.80"
+        'stroke-width': this.be.stroke_io_handle,
+        stroke: '#f80',
+        fill: '#ff0',
+        opacity: '0.80'
       };
       fl_obj.el_spark = this.be.cdraw.path(path).attr(attr);
-      fl_obj.el_spark.setAttr("pointer-events", "none");
+      fl_obj.el_spark.setAttr('pointer-events', 'none');
       fl_obj.el_spark.insertAfter(el_top);
     }
 
@@ -578,12 +578,12 @@ Wire.prototype.redraw_fg = function() {
     this.draw_spark(fl_obj);
   }
 
-  if (this.pending_del == "del"){
+  if (this.pending_del == 'del'){
     var attr = {
       path: this.path,
-      stroke: "#e88", // red
-      "stroke-dasharray": "-",
-      opacity: "1.0"
+      stroke: '#e88', // red
+      'stroke-dasharray': '-',
+      opacity: '1.0'
     };
     this.el_fg.attr(attr);
     return;
@@ -611,11 +611,11 @@ Wire.prototype.redraw_fg = function() {
       // The actual path will be inserted at the next loop
       // iteration or the end of the loop.
       var attr = {
-        "stroke-width": this.be.stroke_wire_fg
+        'stroke-width': this.be.stroke_wire_fg
       };
-      fl_obj.el_subpath = this.be.cdraw.path("M0,0").attr(attr);
+      fl_obj.el_subpath = this.be.cdraw.path('M0,0').attr(attr);
       fl_obj.el_subpath.insertAfter(older_el_subpath);
-      fl_obj.el_subpath.setAttr("pointer-events", "none");
+      fl_obj.el_subpath.setAttr('pointer-events', 'none');
     }
     older_value = fl_obj.value;
     older_el_subpath = fl_obj.el_subpath;
@@ -638,8 +638,8 @@ Wire.prototype.redraw_fg = function() {
   var attr = {
     path: path,
     stroke: Wire.color(older_value, this.o.cell.output_width),
-    "stroke-dasharray": "",
-    opacity: (this.pending_del == "null") ? "0.4" : "1.0"
+    'stroke-dasharray': '',
+    opacity: (this.pending_del == 'null') ? '0.4' : '1.0'
   };
   older_el_subpath.attr(attr);
 };
