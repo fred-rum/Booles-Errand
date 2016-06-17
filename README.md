@@ -1,6 +1,6 @@
 # Booles-Errand
-A logic circuit puzzler.
+A circuit design challenge game.
 
-Copyright 2016 Christopher P. Nelson - All rights reserved.
+Copyright 2016 Chris Nelson - All rights reserved.
 
 https://fred-rum.github.io/Booles-Errand/
