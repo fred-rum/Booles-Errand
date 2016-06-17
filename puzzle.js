@@ -1420,7 +1420,7 @@ Level.prototype.puzzle = [
   {name: 'Increment',
    section: 'Arithmetic',
    intro: '<p><b>Z = A + 1.</b></p>',
-   outro: '<p></p>',
+   outro: '<p>The repeating center section of the increment logic uses a <i>half adder</i> for each bit.  The half adder can add two single-bit values to produce a result bit and a carry bit.</p>',
    hint: ['<p>Boolean arithmetic is just like decimal arithmetic, except that instead of carrying a 1 to the next digit when the result exceeds 9, you carry a 1 to the next bit when the result exceeds 1.</p>',
           '<p>The carry chain is key to incrementing.  Once you know whether to add 1 to a particular bit of A, the actual addition is trivial.</p>'],
    soln: '1s2-0,o,3,i;600,condenser4,0+o,1,i;100,expander4,0+o0,4,i+o0,5,i1+o0,9,i1+o1,5,i0+o1,9,i0+o2,8,i0+o2,6,i0+o3,7,i0;450,inv,30+o,2,i0;450,xor,-20+o,2,i1;450,xor,-70+o,2,i2;450,xor,-120+o,2,i3;270,and,70+o,7,i1;270,and,160+o,8,i1+o,6,i1',
