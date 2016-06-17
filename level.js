@@ -453,10 +453,10 @@ Level.prototype.add_box_cell = function(type) {
   var cell = new Cell(this.be, "cbox", type, 0, 0);
   this.box_cells[type] = cell;
   var bbox = cell.bbox;
-  var cx = (this.be.em_size*4) - bbox.x - bbox.width/2; // align center
-  var cy = this.be.box_height - bbox.y; // align top edge
+  var cx = (this.be.em_size*4) - (bbox.right + bbox.left) / 2; // align center
+  var cy = this.be.box_height - bbox.top; // align top edge
   cell.move(cx, cy);
-  this.be.box_height += bbox.height + this.be.box_spacing;
+  this.be.box_height += (bbox.bottom - bbox.top) + this.be.box_spacing;
   return cell;
 };
 

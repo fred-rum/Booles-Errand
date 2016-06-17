@@ -312,3 +312,21 @@ Io.prototype.restore_old = function() {
     this.w[i].restore_old();
   }
 };
+
+Io.prototype.extend_bbox = function(bbox) {
+  var x = this.x - this.be.wire_arc_radius;
+  if (x < bbox.left) bbox.left = x;
+
+  var x = this.x + this.be.wire_arc_radius;
+  if (x > bbox.right) bbox.right = x;
+
+  // We don't include space for a wire arc above the top cell because
+  // in the rare case where it is used, there's some chance that it
+  // will still be visible (e.g. to the left or right of the sim
+  // controls), and it's pretty obvious how the wire goes even if it's
+  // not visible.
+  if (this.y < bbox.top) bbox.top = this.y;
+
+  // There is never a wire arc below the bottom cell.
+  if (this.y > bbox.bottom) bbox.bottom = this.y;
+};

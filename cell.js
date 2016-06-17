@@ -72,7 +72,16 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   if (type == "null") return; // do nothing else for the null cell
 
   if (this.canvas_type != "cdrag"){
-    this.bbox = this.el_cell.getBBox(true);
+    var bbox = this.el_cell.getBBox(true); // ignore transforms
+    this.bbox = {
+      left: bbox.x,
+      right: bbox.x + bbox.width,
+      top: bbox.y,
+      bottom: bbox.y + bbox.height
+    };
+    for (var port_name in this.io) {
+      this.io[port_name].extend_bbox(this.bbox);
+    }
   }
 
   var text_height = 11/16 * this.be.em_size;

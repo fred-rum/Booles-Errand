@@ -328,28 +328,20 @@ Circuit.prototype.fit_view = function() {
   var bbox = {};
   var all_cells = this.be.level.all_cells;
   for (var i = 0; i < all_cells.length; i++){
-    var bbox_left = all_cells[i].bbox.x + all_cells[i].x;
-    var bbox_top = all_cells[i].bbox.y + all_cells[i].y;
-    var bbox_right = bbox_left + all_cells[i].bbox.width;
-    var bbox_bottom = bbox_top + all_cells[i].bbox.height;
+    var bbox_left = all_cells[i].bbox.left + all_cells[i].x;
+    var bbox_right = all_cells[i].bbox.right + all_cells[i].x;
+    var bbox_top = all_cells[i].bbox.top + all_cells[i].y;
+    var bbox_bottom = all_cells[i].bbox.bottom + all_cells[i].y;
     if (bbox.left === undefined){
       bbox.left = bbox_left;
       bbox.top = bbox_top;
       bbox.right = bbox_right;
       bbox.bottom = bbox_bottom;
     } else {
-      if (bbox_left < bbox.left){
-        bbox.left = bbox_left;
-      }
-      if (bbox_top < bbox.top){
-        bbox.top = bbox_top;
-      }
-      if (bbox_right > bbox.right){
-        bbox.right = bbox_right;
-      }
-      if (bbox_bottom > bbox.bottom){
-        bbox.bottom = bbox_bottom;
-      }
+      if (bbox_left < bbox.left) bbox.left = bbox_left;
+      if (bbox_top < bbox.top) bbox.top = bbox_top;
+      if (bbox_right > bbox.right) bbox.right = bbox_right;
+      if (bbox_bottom > bbox.bottom) bbox.bottom = bbox_bottom;
     }
   }
 
@@ -359,10 +351,10 @@ Circuit.prototype.fit_view = function() {
     this.be.canvas_top = 0;
     this.be.scale = 1.0;
   } else {
-    var bbox_width = bbox.right - bbox.left + this.be.wire_arc_radius * 3;
-    var bbox_height = bbox.bottom - bbox.top + this.be.wire_arc_radius * 3;
-    var bbox_cx = bbox.left - this.be.wire_arc_radius * 1.5 + bbox_width / 2;
-    var bbox_cy = bbox.top - this.be.wire_arc_radius * 2 + bbox_height / 2;
+    var bbox_width = bbox.right - bbox.left + this.be.em_size;
+    var bbox_height = bbox.bottom - bbox.top + this.be.em_size;
+    var bbox_cx = (bbox.left + bbox.right) / 2;
+    var bbox_cy = (bbox.top + bbox.bottom) / 2;
 
     // The truth table cuts a corner out of the viewable screen
     // area, so we try two different aspect ratios to avoid it
