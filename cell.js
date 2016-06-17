@@ -192,7 +192,7 @@ Cell.prototype.propagate_width = function(n) {
       for (var i = 0; i < io.w.length; i++) {
         if (io.w[i].pending_del != 'del') {
           var cell = io.w[i].i.cell;
-          var failure = cell.update_prospective_width(n);
+          var failure = cell.update_prospective_width(n, io.w[i].pending_new);
           if (failure) return failure;
         }
       }
@@ -201,7 +201,7 @@ Cell.prototype.propagate_width = function(n) {
   // implicit return undefined for success
 };
 
-Cell.prototype.update_prospective_width = function(n) {
+Cell.prototype.update_prospective_width = function(n, pending_new) {
   var prospective_width = this.prospective_width;
 
   if (this.type == 'condenser') {
@@ -214,7 +214,7 @@ Cell.prototype.update_prospective_width = function(n) {
     this.prospective_width = n;
     return this.propagate_width(n);
   } else if (n != prospective_width) {
-    return "width mismatch";
+    return pending_new ? 'mismatch' : 'mismatch downstream';
   } else { // n == prospective_width
     return undefined; // No need to propagate further, and may be a loop.
   }

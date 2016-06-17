@@ -350,7 +350,9 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
              io.locked || failure){
     if (failure == 'exhausted cells') {
       $('#error').html('<p>Connecting a multi-bit wire here would replicate more gates downstream than are available.</p>');
-    } else if (failure == 'width mismatch') {
+    } else if (failure == 'mismatch') {
+      $('#error').html('<p>A new multi-bit wire here would have different input and output widths.</p>');
+    } else if (failure == 'mismatch downstream') {
       $('#error').html('<p>Connecting a multi-bit wire here would conflict with a different logic width downstream.</p>');
     } else if (io.locked) {
       $('#error').html('<p>The wire at this port is locked by the puzzle and cannot be modified.</p>');
