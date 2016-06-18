@@ -1427,7 +1427,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Add',
    intro: '<p>Now that\'ve built a one-bit full adder, you can use the full adder module to build a multi-bit adder. <b>Z = A + B.</b></p>',
-   outro: '<p>If Z were the same width as A and B, then the addition could <i>overflow</i>, producing a larger value than would fit in Z.  Software that adds with large numbers in fixed-width registers has to keep this in mind.</p>',
+   outro: '<p>If the last carry out were dropped so that Z could be the same width as A and B, then the addition could <i>overflow</i>.  The resulting "sum" would then be less then either A or B!</p>',
    hint: '<p>There is no carry in for the bottommost bit, so you\'ll need to input a 0 to the bottommost full adder module.</p>',
    soln:'1s3-0,o,3,i-1,o,4,i;100,expander4,0+o0,8,a+o1,7,a+o2,6,a+o3,10,a;100,expander4,100+o0,9,i0+o0,9,i1+o0,8,b+o1,7,b+o2,6,b+o3,10,b;600,condenser5,50+o,2,i;380,adder,10+cout,10,cin+s,5,i2;380,adder,120+cout,6,cin+s,5,i1;380,adder,230+cout,7,cin+s,5,i0;250,xor,250+o,8,cin;380,adder,-100+cout,5,i4+s,5,i3',
    truth: [{a:0, b:0,   z:0},
@@ -1461,6 +1461,50 @@ Level.prototype.puzzle = [
          x: 700,
          y: 50,
          width: 5
+         }
+   }
+  }
+,
+  {name: 'Subtract',
+   intro: '<p>Can you use what you\'ve learned to build a subtractor? <b>Z = A - B.</b></p>',
+   outro: '<p>This game doesn\'t bother with negative binary numbers, but your solution to this challenge gives you a hint as to how they\'d work.</p>',
+   hint: ['<p>If you drop the last carry out from a multi-bit adder, overflow can cause the result of the add to be less than either value being added.</p>',
+          '<p>What is the mathematical relationship of B vs. ~B (NOT B)?</p>',
+          '<p>When B is 4 bits wide, ~B = 15 - B.  (Try some example binary values to prove this for yourself.)</p>',
+          '<p>If you drop the upper bits of the result, A - B gets the same result as A + 16 - B.</p>',
+          '<p>A - B = A + (15 - B) + 1 = A + ~B + 1.</p>'],
+   soln: '1s3-0,o,5,i-1,o,3,i;95,inv,100+o,4,i;200,expander4,100+o0,10,i0+o0,10,i1+o0,6,b+o1,7,b+o2,8,b+o3,9,b;200,expander4,0+o0,6,a+o1,7,a+o2,8,a+o3,9,a;430,adder,230+cout,7,cin+s,11,i0;430,adder,120+cout,8,cin+s,11,i1;430,adder,10+cout,9,cin+s,11,i2;430,adder,-100+s,11,i3;310,xnor,250+o,6,cin;600,condenser4,50+o,2,i',
+   truth: [{a:0, b:0,   z:0},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:15, b:0,    z:15},
+           {a:15, b:15,   z:0}],
+   rnd: function(obj) {
+     obj.b = this.rnd(0, 15);
+     obj.a = this.rnd(obj.b, 15);
+     obj.z = obj.a - obj.b;
+   },
+   avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 700,
+         y: 50,
+         width: 4
          }
    }
   }
