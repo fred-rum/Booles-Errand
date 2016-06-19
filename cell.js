@@ -1004,7 +1004,7 @@ Cell.prototype.fit_input_text = function() {
   if (text === this.text) return;
   this.text = text;
 
-  this.el_text.attr({text: text, x: 0, 'font-size': '10'});
+  this.el_text.attr({text: text, x: 0, 'font-size': 10 * this.be.scale});
   var bbox = this.el_text.getBBox(true);
 
   var height = 1.5 * this.be.io_spacing;
@@ -1022,7 +1022,7 @@ Cell.prototype.fit_input_text = function() {
   // right.
   var shift = -width/2 - (bbox.x * scale) + this.be.stroke_cell_fg/2;
 
-  this.el_text.attr({x: shift, 'font-size': '' + 10*scale});
+  this.el_text.attr({x: shift, 'font-size': 10 * this.be.scale * scale});
 };
 
 Cell.prototype.fit_output_text = function() {
@@ -1037,7 +1037,7 @@ Cell.prototype.fit_output_text = function() {
   if (text === this.text) return;
   this.text = text;
 
-  this.el_text.attr({text: text, x: 0, 'font-size': '10'});
+  this.el_text.attr({text: text, x: 0, 'font-size': 10 * this.be.scale});
   var bbox = this.el_text.getBBox(true);
   if (text.length < 3) {
     // To prevent the text from getting weirdly huge, we pretend that
@@ -1062,7 +1062,7 @@ Cell.prototype.fit_output_text = function() {
   // left.
   var shift = width/2 - ((bbox.x + bbox.width) * scale) - this.be.stroke_cell_fg/2;
 
-  this.el_text.attr({x: shift, 'font-size': '' + 10*scale});
+  this.el_text.attr({x: shift, 'font-size': 10 * this.be.scale * scale});
 };
 
 Cell.prototype.init_const = function() {

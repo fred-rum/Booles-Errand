@@ -105,6 +105,11 @@ function Circuit() {
 
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
+  // The canvas is initially displayed at a 1:1 ratio.  We need to
+  // know this while initializing the cells in order to calculate font
+  // scaling..
+  this.be.scale = 1.0;
+
   this.be.level = new Level(this.be);
   this.begin_level();
 }
