@@ -35,8 +35,9 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   };
 
   this.cell_label_attr = {
-    'stroke-width': 0,
-    fill: '#000'
+    'text-anchor': 'middle', // is modified before use
+    'font-family': 'Verdana, Helvetica, Arial, sans-serif',
+    'font-size': 11/16 * this.be.em_size
   };
 
   // For the case that the foreground lines & fill are drawn separately.
@@ -84,15 +85,9 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
     }
   }
 
-  var text_height = 11/16 * this.be.em_size;
-  var attr = {
-    'text-anchor': 'middle',
-    'font-family': 'Verdana, Helvetica, Arial, sans-serif',
-    //'font-family': 'Courier New, Fixed, monospace',
-    'font-size': text_height
-  };
+  this.cell_label_attr['text-anchor'] = 'middle';
   this.qty_y = 0;
-  this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, '').attr(attr);
+  this.el_qty_text = this.canvas.text(this.qty_cx, this.qty_y, '').attr(this.cell_label_attr);
   this.el_qty_text.setAttr('visibility', 'hidden');
   this.push_el(this.el_qty_text);
 
@@ -853,6 +848,15 @@ Cell.prototype.init_xor = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
+Cell.prototype.add_label = function(label, pos, x, y, size) {
+  var attr = {
+    'text-anchor': pos,
+    'font-family': 'Verdana, Helvetica, Arial, sans-serif',
+    'font-size': (size || 11)/16 * this.be.em_size
+  };
+  this.push_el(this.canvas.text(x, y, label).attr(attr));
+};
+
 Cell.prototype.init_mux = function(inv) {
   var height = 3*this.be.io_spacing;
   var nheight = 2*this.be.io_spacing;
@@ -895,14 +899,9 @@ Cell.prototype.init_mux = function(inv) {
   this.push_el(this.canvas.path(cell_path).attr(this.cell_fg_attr),
                'mark_del');
 
-  var attr = {
-    'stroke-width': 0,
-    fill: '#000',
-    'text-anchor': 'start'
-  };
   left += this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(left, -data_height, '0').attr(attr));
-  this.push_el(this.canvas.text(left, data_height, '1').attr(attr));
+  this.add_label('0', 'start', left, -data_height);
+  this.add_label('1', 'start', left, data_height);
 };
 
 Cell.prototype.init_input = function() {
@@ -1104,18 +1103,12 @@ Cell.prototype.init_latch = function() {
   this.draw_stubs();
   this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
 
-  var attr = {
-    'stroke-width': 0,
-    fill: '#000',
-    'text-anchor': 'start'
-  };
   left += this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(left, -this.be.io_spacing, 'D').attr(attr));
-  this.push_el(this.canvas.text(left, 0, 'E').attr(attr));
+  this.add_label('D', 'start', left, -this.be.io_spacing);
+  this.add_label('E', 'start', left, 0);
 
-  attr['text-anchor'] = 'end';
   right -= this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(right, -this.be.io_spacing, 'Q').attr(attr));
+  this.add_label('Q', 'end', right, -this.be.io_spacing);
 };
 
 Cell.prototype.init_condenser = function(ni) {
@@ -1293,23 +1286,16 @@ Cell.prototype.init_adder = function() {
   this.draw_stubs();
   this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
 
-  var attr = {
-    'stroke-width': 0,
-    fill: '#000',
-    'text-anchor': 'middle'
-  };
-  this.push_el(this.canvas.text(0, 0, '+').attr(attr));
+  this.add_label('+', 'middle', 0, 0, 22);
 
-  attr['text-anchor'] = 'start'
   left += this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(left, -this.be.io_spacing, 'A').attr(attr));
-  this.push_el(this.canvas.text(left, 0, 'B').attr(attr));
-  this.push_el(this.canvas.text(left, this.be.io_spacing, 'Cin').attr(attr));
+  this.add_label('A', 'start', left, -this.be.io_spacing);
+  this.add_label('B', 'start', left, 0);
+  this.add_label('Cin', 'start', left, this.be.io_spacing);
 
-  attr['text-anchor'] = 'end';
   right -= this.be.stroke_cell_fg;
-  this.push_el(this.canvas.text(right, -this.be.io_spacing/2, 'Cout').attr(attr));
-  this.push_el(this.canvas.text(right, this.be.io_spacing/2, 'S').attr(attr));
+  this.add_label('Cout', 'end', right, -this.be.io_spacing/2);
+  this.add_label('S', 'end', right, this.be.io_spacing/2);
 };
 
 Cell.prototype.init_null = function() {
