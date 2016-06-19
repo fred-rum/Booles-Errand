@@ -1257,6 +1257,24 @@ Cell.prototype.init_expander = function(no) {
 };
 
 Cell.prototype.init_adder = function() {
+  if (this.canvas_type == 'cbox') {
+    // Draw a smaller stylized adder for the cbox.
+    var height = 3 * this.be.io_spacing;
+    var width = 2 * this.be.io_spacing;
+    var left = -width/2;
+    var right = width/2;
+    var top = -height/2;
+
+    this.init_io(false, 2, 3, left, right);
+
+    this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr), 'drag_cell');
+    this.draw_stubs();
+    this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
+
+    this.add_label('+', 'middle', 0, 0, 22);
+    return;
+  }
+
   var height = 4 * this.be.io_spacing;
   var width = 4 * this.be.io_spacing;
   var left = -width/2;
