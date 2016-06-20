@@ -1606,7 +1606,7 @@ Level.prototype.puzzle = [
   {name: 'Multiply by 0-3',
    intro: '<p><b>Z = A * N.</b></p>',
    outro: '<p>You can perform any positive integer multiplication by simply shifting and adding as needed.</p>',
-   hint: ['<p>Multiply by 0 can be done with an AND gate cluster.</p>',
+   hint: ['<p>Multiplication by 0 can be done with an AND gate cluster.</p>',
           '<p>A * 3 = (A * 2) + (A * 1).</p>'],
    soln: '1s3-0,o,5,i0-0,o,3,i0-1,o,4,i;220,and,10+o,6,i;110,expander2,100+o0,5,i1+o1,3,i1;220,and,100+o,7,i;330,expander4,10+o0,8,a+o1,10,a+o2,11,a+o3,12,a;330,expander4,100+o0,14,i0+o1,8,b+o2,10,b+o3,11,b;540,adder,60+cout,10,cin+s,14,i1;440,gnd,190+o,8,cin;540,adder,-50+cout,11,cin+s,14,i2;540,adder,-160+cout,12,cin+s,14,i3;540,adder,-270+cout,14,i5+s,14,i4;410,gnd,-250+o,12,b;770,condenser6,50+o,2,i',
    truth: [{rnd:'rnd'},

@@ -1061,7 +1061,6 @@ Cell.prototype.init_vdd = function() {
   var height = 3/4 * this.be.io_spacing; // a smallish cell size
   var width = height * 2/Math.sqrt(3); // equilateral
   var left = -width/2;
-  var right = width/2;
   var top = -2/3 * height; // geometric center is at 0,0
 
   this.io.o = new Io(this.be, this.canvas, this,
@@ -1085,7 +1084,6 @@ Cell.prototype.init_gnd = function() {
   var height = 3/4 * this.be.io_spacing; // a smallish cell size
   var width = height * 2/Math.sqrt(3); // equilateral
   var left = -width/2;
-  var right = width/2;
   var top = -1/3 * height; // geometric center is at 0,0
 
   this.io.o = new Io(this.be, this.canvas, this,
