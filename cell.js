@@ -185,7 +185,7 @@ Cell.prototype.propagate_width = function(n) {
     var io = this.io[port_name];
     if (io.type == 'output') {
       for (var i = 0; i < io.w.length; i++) {
-        if (io.w[i].pending_del != 'del') {
+        if ((io.w[i].pending_del != 'del') && (io.w[i].i.type != 'null')) {
           var cell = io.w[i].i.cell;
           var failure = cell.update_prospective_width(n, io.w[i].pending_new);
           if (failure) return failure;
