@@ -1448,7 +1448,7 @@ Level.prototype.puzzle = [
    intro: '<p>Now that\'ve built a one-bit full adder, you can use the full adder module to build a multi-bit adder. <b>Z = A + B.</b></p>',
    outro: '<p>If the last carry out were dropped so that Z could be the same width as A and B, then the addition could <i>overflow</i>.  The resulting "sum" would then be less then either A or B!</p>',
    hint: '<p>There is no carry in for the bottommost bit, so you\'ll need to input a 0 to the bottommost full adder module.</p>',
-   soln:'1s3-0,o,3,i-1,o,4,i;100,expander4,0+o0,8,a+o1,7,a+o2,6,a+o3,10,a;100,expander4,100+o0,9,i0+o0,9,i1+o0,8,b+o1,7,b+o2,6,b+o3,10,b;600,condenser5,50+o,2,i;380,adder,10+cout,10,cin+s,5,i2;380,adder,120+cout,6,cin+s,5,i1;380,adder,230+cout,7,cin+s,5,i0;250,xor,250+o,8,cin;380,adder,-100+cout,5,i4+s,5,i3',
+   soln:'1s3-0,o,3,i-1,o,4,i;100,expander4,0+o0,8,a+o1,7,a+o2,6,a+o3,10,a;100,expander4,100+o0,8,b+o1,7,b+o2,6,b+o3,10,b;600,condenser5,50+o,2,i;380,adder,10+cout,10,cin+s,5,i2;380,adder,120+cout,6,cin+s,5,i1;380,adder,230+cout,7,cin+s,5,i0;250,gnd,270+o,8,cin;380,adder,-100+cout,5,i4+s,5,i3',
    truth: [{a:0, b:0,   z:0},
            {rnd:'rnd'},
            {rnd:'rnd'},
@@ -1462,7 +1462,7 @@ Level.prototype.puzzle = [
      obj.b = this.rnd(0, 15);
      obj.z = obj.a + obj.b;
    },
-   avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   avail: ['adder', 'expander', 'condenser', 'inv', 'vdd', 'gnd'],
    cells: {
      a: {type: 'input',
          width: 4,
@@ -1486,13 +1486,13 @@ Level.prototype.puzzle = [
 ,
   {name: 'Subtract',
    intro: '<p>Can you use what you\'ve learned to build a subtractor? <b>Z = A - B.</b></p>',
-   outro: '<p>This game doesn\'t bother with negative binary numbers, but your solution to this challenge gives you a hint as to how they\'d work.</p>',
+   outro: '<p>This game doesn\'t bother with negative binary numbers, but your solution to this challenge gives you a hint as to how they\'re handled in real circuits.</p>',
    hint: ['<p>If you drop the last carry out from a multi-bit adder, overflow can cause the result of the add to be less than either value being added.</p>',
           '<p>What is the mathematical relationship of B vs. ~B (NOT B)?</p>',
           '<p>When B is 4 bits wide, ~B = 15 - B.  (Try some example binary values to prove this for yourself.)</p>',
           '<p>If you drop the upper bits of the result, A - B gets the same result as A + 16 - B.</p>',
           '<p>A - B = A + (15 - B) + 1 = A + ~B + 1.</p>'],
-   soln: '1s3-0,o,5,i-1,o,3,i;95,inv,100+o,4,i;200,expander4,100+o0,10,i0+o0,10,i1+o0,6,b+o1,7,b+o2,8,b+o3,9,b;200,expander4,0+o0,6,a+o1,7,a+o2,8,a+o3,9,a;430,adder,230+cout,7,cin+s,11,i0;430,adder,120+cout,8,cin+s,11,i1;430,adder,10+cout,9,cin+s,11,i2;430,adder,-100+s,11,i3;310,xnor,250+o,6,cin;600,condenser4,50+o,2,i',
+   soln: '1s3-0,o,5,i-1,o,3,i;95,inv,100+o,4,i;200,expander4,100+o0,6,b+o1,7,b+o2,8,b+o3,9,b;200,expander4,0+o0,6,a+o1,7,a+o2,8,a+o3,9,a;430,adder,230+cout,7,cin+s,11,i0;430,adder,120+cout,8,cin+s,11,i1;430,adder,10+cout,9,cin+s,11,i2;430,adder,-100+s,11,i3;310,vdd,230+o,6,cin;600,condenser4,50+o,2,i',
    truth: [{a:0, b:0,   z:0},
            {rnd:'rnd'},
            {rnd:'rnd'},
@@ -1506,7 +1506,7 @@ Level.prototype.puzzle = [
      obj.a = this.rnd(obj.b, 15);
      obj.z = obj.a - obj.b;
    },
-   avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   avail: ['adder', 'expander', 'condenser', 'inv', 'vdd', 'gnd'],
    cells: {
      a: {type: 'input',
          width: 4,
@@ -1533,8 +1533,8 @@ Level.prototype.puzzle = [
    outro: '<p>Multiplying by a constant power of 2 is incredibly trivial.  Are you ready for something tougher?</p>',
    hint: ['<p>Multiplying a binary value by 2 is much like multiplying a decimal value by 10; you need only shift the value to the left and stick a 0 on the end.</p>',
           '<p>You\'ll need to unbundle the multi-bit input before you can rearrange its bits.</p>',
-          '<p>You\'ll have to make your own 0.</p>'],
-   soln: '1s2-0,o,4,i;375,condenser8,0+o,1,i;250,xor,100+o,2,i0;125,expander7,0+o0,3,i0+o0,3,i1+o0,2,i1+o1,2,i2+o2,2,i3+o3,2,i4+o4,2,i5+o5,2,i6+o6,2,i7',
+          '<p>You\'ll have to make your own 0 to stick on the end.</p>'],
+   soln: '1s2-0,o,4,i;375,condenser8,0+o,1,i;145,gnd,100+o,2,i0;125,expander7,0+o0,2,i1+o1,2,i2+o2,2,i3+o3,2,i4+o4,2,i5+o5,2,i6+o6,2,i7',
    truth: [{a:0,   z:0},
            {a:1,   z:2},
            {a:2,   z:4},
@@ -1547,7 +1547,7 @@ Level.prototype.puzzle = [
      obj.a = this.rnd(3, 126);
      obj.z = obj.a * 2;
    },
-   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
    cells: {
      a: {type: 'input',
          width: 7,
