@@ -309,7 +309,11 @@ Cell.prototype.calc_mux = function() {
   }
 };
 
-Cell.prototype.calc_const = function() {
+Cell.prototype.calc_vdd = function() {
+  this.io.o.propagate_output(1);
+};
+
+Cell.prototype.calc_gnd = function() {
   this.io.o.propagate_output(0);
 };
 
@@ -723,7 +727,7 @@ Cell.prototype.draw_inv = function(inv, right, bg, y) {
 Cell.prototype.init_inv = function() { this.init_buf(true); };
 Cell.prototype.init_buf = function(inv) {
   var height = 1.5 * this.be.io_spacing;
-  var width = Math.sqrt(3)/2*height; /* equilateral */
+  var width = Math.sqrt(3)/2*height; // equilateral
   var left = -width/2;
   var right = width/2;
 
@@ -1053,18 +1057,52 @@ Cell.prototype.fit_output_text = function() {
   this.el_text.attr({'font-size': 10 * this.be.scale * scale});
 };
 
-Cell.prototype.init_const = function() {
-  var height = 1.5 * this.be.io_spacing;
-  var width = height;
+Cell.prototype.init_vdd = function() {
+  var height = 3/4 * this.be.io_spacing; // a smallish cell size
+  var width = height * 2/Math.sqrt(3); // equilateral
   var left = -width/2;
   var right = width/2;
-  var top = -height/2;
+  var top = -2/3 * height; // geometric center is at 0,0
 
-  this.init_io(false, 1, 0, left, right);
+  this.io.o = new Io(this.be, this.canvas, this,
+                     'o', 'output',
+                     this.be.stub_len, top + height*2, 'mux');
 
-  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr), 'drag_cell');
+  var cell_path = ['M', 0, top,
+                   'l', left, height,
+                   'h', width,
+                   'z'];
+  this.push_el(this.canvas.path(cell_path).attr(this.cell_bg_attr),
+               'drag_cell');
   this.draw_stubs();
-  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
+  this.push_el(this.canvas.path(cell_path).attr(this.cell_fg_attr),
+               'mark_del');
+
+  if (this.canvas_type == 'cdraw') this.calc_vdd();
+};
+
+Cell.prototype.init_gnd = function() {
+  var height = 3/4 * this.be.io_spacing; // a smallish cell size
+  var width = height * 2/Math.sqrt(3); // equilateral
+  var left = -width/2;
+  var right = width/2;
+  var top = -1/3 * height; // geometric center is at 0,0
+
+  this.io.o = new Io(this.be, this.canvas, this,
+                     'o', 'output',
+                     this.be.stub_len, top - height, 'mux');
+
+  var cell_path = ['M', left, top,
+                   'h', width,
+                   'l', left, height,
+                   'z'];
+  this.push_el(this.canvas.path(cell_path).attr(this.cell_bg_attr),
+               'drag_cell');
+  this.draw_stubs();
+  this.push_el(this.canvas.path(cell_path).attr(this.cell_fg_attr),
+               'mark_del');
+
+  if (this.canvas_type == 'cdraw') this.calc_gnd();
 };
 
 Cell.prototype.init_latch = function() {

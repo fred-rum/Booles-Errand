@@ -446,6 +446,12 @@ Level.prototype.update_pins = function() {
     cell.calc_output();
     cell.fit_output_text();
   }
+  for (var i = 0; i < this.all_cells.length; i++) {
+    var cell = this.all_cells[i];
+    if ((cell.type == 'vdd') || (cell.type == 'gnd')) {
+      cell.propagate_value();
+    }
+  }
 };
 
 Level.prototype.reset_sim = function() {

@@ -575,11 +575,11 @@ Level.prototype.puzzle = [
   {name: 'Generate constants',
    intro: '<p>0 and 1 values are easily available in traditional circuit designs, but in this challenge </b>you need to generate your own constants.</b></p>',
    outro: '<p>Did you get the optimal solution of one gate per constant?</p>',
-   truth: [{a: 0,   z: 0, y: 1},
-           {a: 1,   z: 0, y: 1}],
+   truth: [{a: 0,   z: 1, y: 0},
+           {a: 1,   z: 1, y: 0}],
    avail: ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    hint: '<p>How does each gate behave when its inputs are the same value?</p>',
-   soln: '1s3-0,o,3,i0-0,o,3,i1-0,o,4,i0-0,o,4,i1;170,xor,0+o,1,i;170,xnor,100+o,2,i',
+   soln: '1s3-0,o,3,i0-0,o,3,i1-0,o,4,i0-0,o,4,i1;170,xnor,0+o,1,i;170,xor,100+o,2,i',
    cells: {
      a: {type: 'input',
          x: 0,
@@ -593,6 +593,25 @@ Level.prototype.puzzle = [
      ,
      y: {type: 'output',
          x: 300,
+         y: 100
+        }
+   }
+  }
+,
+  {name: 'Power and ground',
+   intro: '<p><b>From now on you can use dedicated connections to constant values.</b></p>',
+   outro: '<p>Boolean circuits don\'t literally transmit binary numbers.  In actual operation, a 1 is represented by a high voltage, and a 0 is represented by a low voltage.  The constant supply symbols therefore represent a wire connection to the positive voltage supply or to the ground, respectively.</p>',
+   soln: '1s2;-120,gnd,120+o,1,i;-120,vdd,-20+o,0,i',
+   truth: [{z: 1, y: 0}],
+   avail: ['vdd', 'gnd'],
+   cells: {
+     z: {type: 'output',
+         x: 0,
+         y: 0
+        }
+     ,
+     y: {type: 'output',
+         x: 0,
          y: 100
         }
    }
