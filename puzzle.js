@@ -1604,7 +1604,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Multiply by 0-3',
-   intro: '<p><b>Z = A * N.</b></p>',
+   intro: '<p><b>Z = A * N, where N is a 2-bit number.</b></p>',
    outro: '<p>You can perform any positive integer multiplication by simply shifting and adding as needed.</p>',
    hint: ['<p>Multiplication by 0 can be done with an AND gate cluster.</p>',
           '<p>A * 3 = (A * 2) + (A * 1).</p>'],
@@ -1640,6 +1640,45 @@ Level.prototype.puzzle = [
          x: 900,
          y: 50,
          width: 6
+         }
+   }
+  }
+,
+  {name: 'Multiply by 0-7',
+   intro: '<p><b>Z = A * N, where N is a 3-bit number.</b></p>',
+   outro: '<p>A full adder can be used to turn the addition of three multi-bit numbers into the addition of just two multi-bit numbers.  When it is used this way, the full adder is called a 3:2 compressor.</p>',
+   soln: '1s3-0,o,4,i0-0,o,5,i0-0,o,6,i0-1,o,3,i;110,expander3,100+o0,4,i1+o1,5,i1+o2,6,i1;220,and,110+o,7,i;220,and,10+o,8,i;220,and,-70+o,9,i;330,expander4,110+o0,20,i0+o1,11,cin+o2,12,cin+o3,13,cin;330,expander4,10+o0,11,b+o1,12,b+o2,13,b+o3,14,b;330,expander4,-320+o0,12,a+o1,13,a+o2,14,a+o3,19,a;330,gnd,-140+o,14,cin+o,11,a;600,adder,80+cout,16,b+s,20,i1;600,adder,-30+cout,17,b+s,16,a;600,adder,-140+cout,18,b+s,17,a;600,adder,-250+cout,19,b+s,18,a;730,gnd,70+o,16,cin;830,adder,0+cout,17,cin+s,20,i2;830,adder,-110+cout,18,cin+s,20,i3;830,adder,-220+cout,19,cin+s,20,i4;830,adder,-330+cout,20,i6+s,20,i5;1090,condenser7,50+o,2,i',
+   truth: [{rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:15,n:7,   z:105}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 15);
+     obj.n = this.rnd(0, 7);
+     obj.z = obj.a * obj.n;
+   },
+   avail: ['expander', 'condenser', 'adder', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     n: {type: 'input',
+         width: 3,
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 1200,
+         y: 50,
+         width: 7
          }
    }
   }
