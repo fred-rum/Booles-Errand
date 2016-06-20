@@ -649,7 +649,6 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
                         (no > 1) ? 'o' + i : 'o', 'output',
                         right+cw, y, shallow ? right : 0);
     this.io[io_obj.name] = io_obj;
-    this.push_el(io_obj.el_target, 'drag_other');
   }
 
   if (no > 0) {
@@ -665,7 +664,6 @@ Cell.prototype.init_io = function(inv, no, ni, left, right,
                         (ni > 1) ? 'i' + i : 'i', 'input',
                         left-cw, y, shallow ? left : 0);
     this.io[io_obj.name] = io_obj;
-    this.push_el(io_obj.el_target, 'drag_other');
   }
 };
 
@@ -869,7 +867,6 @@ Cell.prototype.init_mux = function(inv) {
   this.io.o = new Io(this.be, this.canvas, this,
                      'o', 'output',
                      right+this.be.stub_len, 0, 0);
-  this.push_el(this.io.o.el_target, 'drag_other');
 
   this.qty_cx = this.io.o.x;
   this.qty_top = this.io.o.y;
@@ -883,9 +880,6 @@ Cell.prototype.init_mux = function(inv) {
   this.io.s = new Io(this.be, this.canvas, this,
                      's', 'input',
                      left, -top + this.be.stub_len, 'mux');
-  this.push_el(this.io.i0.el_target, 'drag_other');
-  this.push_el(this.io.i1.el_target, 'drag_other');
-  this.push_el(this.io.s.el_target, 'drag_other');
 
   var cell_path = ['M', left, top,
                    'v', height,
@@ -1086,9 +1080,6 @@ Cell.prototype.init_latch = function() {
                      left - this.be.stub_len, 0, left);
   this.io.q = new Io(this.be, this.canvas, this, 'q', 'output',
                      right + this.be.stub_len, -this.be.io_spacing, right);
-  this.push_el(this.io.d.el_target, 'drag_other');
-  this.push_el(this.io.e.el_target, 'drag_other');
-  this.push_el(this.io.q.el_target, 'drag_other');
 
   this.qty_cx = this.io.q.x;
   this.qty_top = this.io.q.y + this.be.io_spacing * 2;
@@ -1285,11 +1276,6 @@ Cell.prototype.init_adder = function() {
                         right + this.be.stub_len, -this.be.io_spacing/2, right);
   this.io.s = new Io(this.be, this.canvas, this, 's', 'output',
                      right + this.be.stub_len, this.be.io_spacing/2, right);
-  this.push_el(this.io.a.el_target, 'drag_other');
-  this.push_el(this.io.b.el_target, 'drag_other');
-  this.push_el(this.io.cin.el_target, 'drag_other');
-  this.push_el(this.io.cout.el_target, 'drag_other');
-  this.push_el(this.io.s.el_target, 'drag_other');
 
   this.qty_cx = this.io.s.x;
   this.qty_top = this.be.io_spacing * 1.5;

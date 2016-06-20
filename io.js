@@ -51,6 +51,7 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
   this.el_target.setAttr('visibility', 'hidden');
   this.el_target.setAttr('pointer-events', 'all');
+  cell.push_el(this.el_target, 'drag_other');
 
   this.be.drag.enable_drag(this);
   if (this.be.showing_soln) {
