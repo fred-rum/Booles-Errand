@@ -237,8 +237,8 @@ Level.prototype.init_table = function() {
       var last_line = (j == truth_seq.length - 1);
       html.push('<tr class="truthbody" id="row', num_rows, '">');
       if (truth_seq[j].rnd) {
-        var span = this.input_names.length + this.output_names.length;
-        this.table_line_rnd(html, span, last_line);
+        truth_seq[j] = {rnd: truth_seq[j].rnd};
+        this.table_line_rnd(html, last_line);
       } else {
         this.table_line(html, this.input_names, truth_seq[j], last_line);
         this.table_line(html, this.output_names, truth_seq[j], last_line);
@@ -293,6 +293,7 @@ Level.prototype.table_header = function(html, port_names) {
 };
 
 Level.prototype.table_line_rnd = function(html, span, last_line) {
+  var span = this.input_names.length + this.output_names.length;
   html.push('<td class="tdlr tdb" colspan="', span, '">random</td>');
 };
 
@@ -717,8 +718,7 @@ Level.prototype.circuit_changed = function() {
       if (truth_seq[i_line].rnd) {
         truth_seq[i_line] = {rnd: truth_seq[i_line].rnd};
         var html = [];
-        var span = this.input_names.length + this.output_names.length;
-        this.table_line_rnd(html, span, true);
+        this.table_line_rnd(html, true);
         this.table_blank_check(html, i);
         $('#row' + i).html(html.join(''));
       }
