@@ -1052,6 +1052,7 @@ Level.prototype.click_help_copy = function() {
 
   var url = window.location.href.split('#', 2)[0];
   url = encodeURI(url + '#' + this.level.name + '?' + this.encode_progress());
+  url = url.replace(/([-?].)/g, '<span>$1</span>');
   var html = '<p>Copy this URL to save or share your progress for this challenge:</p><input type="text" id="copyinput" size="' + url.length + '" value="' + url + '"/>';
   this.be.div_infotxt.html(this.text(html));
   $('#copyinput').select();
