@@ -1603,6 +1603,47 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Multiply by 0-3',
+   intro: '<p><b>Z = A * N.</b></p>',
+   outro: '<p>You can perform any positive integer multiplication by simply shifting and adding as needed.</p>',
+   hint: ['<p>Multiply by 0 can be done with an AND gate cluster.</p>',
+          '<p>A * 3 = (A * 2) + (A * 1).</p>'],
+   soln: '1s3-0,o,5,i0-0,o,3,i0-1,o,4,i;220,and,10+o,6,i;110,expander2,100+o0,5,i1+o1,3,i1;220,and,100+o,7,i;330,expander4,10+o0,8,a+o1,10,a+o2,11,a+o3,12,a;330,expander4,100+o0,14,i0+o1,8,b+o2,10,b+o3,11,b;540,adder,60+cout,10,cin+s,14,i1;440,gnd,190+o,8,cin;540,adder,-50+cout,11,cin+s,14,i2;540,adder,-160+cout,12,cin+s,14,i3;540,adder,-270+cout,14,i5+s,14,i4;410,gnd,-250+o,12,b;770,condenser6,50+o,2,i',
+   truth: [{rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:15,n:3,   z:45}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 15);
+     obj.n = this.rnd(0, 3);
+     obj.z = obj.a * obj.n;
+   },
+   avail: ['expander', 'condenser', 'adder', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     n: {type: 'input',
+         width: 2,
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 900,
+         y: 50,
+         width: 6
+         }
+   }
+  }
+,
   {name: 'The D latch',
    section: 'Introduction to latches',
    intro: '<p>A <i>D latch</i> is our first storage element. It passes its D (data) input to its Q output when its E (enable) input is 1, but it holds its Q output constant when E is 0. The latch is described as <i>transparent</i> when data is allowed to pass through it and <i>opaque</i> when its output is held constant.</p><p>In order to test a circuit with storage elements, each boxed section of the truth table contains multiple rows. Each row represents one step of a test sequence. Clicking in the truth table starts a fresh test sequence that includes the selected row.</p>',
