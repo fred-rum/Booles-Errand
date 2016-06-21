@@ -69,7 +69,6 @@ Level.prototype.begin = function(level_num) {
 
 //  if (true) { // cheat
 //    save_str = level.soln; // [level.soln.length-1]
-//    console.log(save_str);
 //  } else
   if (this.be.showing_soln) {
     save_str = level.soln[this.be.showing_soln-1];
@@ -575,6 +574,8 @@ Level.prototype.encode_progress = function() {
 };
 
 Level.prototype.restore_progress = function(save_str) {
+  this.cleaning_up = true; // ignore calls to circuit_changed();
+
   try {
     var ex_version_skip = /^1s([0-9]+)/;
     var ex_cell = /^;(-?[0-9]+),([a-z]*)([0-9]?),(-?[0-9]+)/;
@@ -598,6 +599,8 @@ Level.prototype.restore_progress = function(save_str) {
         var type = m[2];
         var width = m[3];
         var y = Number(m[4]);
+        save_str = save_str.substring(m[0].length);
+
         if (!this.update_box_quantity(type, -1)) {
           throw 'exhausted cell type: ' + type
         }
@@ -610,8 +613,6 @@ Level.prototype.restore_progress = function(save_str) {
                                x / 20 * this.be.io_spacing,
                                y / 20 * this.be.io_spacing,
                                undefined, undefined, width));
-
-        save_str = save_str.substring(m[0].length);
 
         while (save_str != '') {
           if (m = ex_plus.exec(save_str)) {
@@ -645,19 +646,11 @@ Level.prototype.restore_progress = function(save_str) {
       var io_i = i_cell.io[w.i_port];
       if (!io_o) throw 'bad o port: ' + w.o_port;
       if (!io_i) throw 'bad i port: ' + w.i_port;
-      if (io_i.w.length > 0) {
-        if (io_i.w[0].o == io_o) {
-          // If the save data duplicates a locked wire, we silently
-          // discard it without throwing an exception.
-        } else {
-          throw 'input port busy: ' + w.i_port;
-        }
-      } else {
+      if (io_i.w.length == 0) {
         var w = new Wire(this.be, io_o, io_i);
-        var failure = this.update_widths();
-        if (failure) {
+        if (this.update_widths() || this.check_critical_path()) {
           w.remove();
-          throw failure;
+          this.update_widths();
         }
       }
     }
@@ -667,6 +660,8 @@ Level.prototype.restore_progress = function(save_str) {
     //onsole.log('remaining:', save_str)
     // Exit without decoding any more.
   }
+
+  this.cleaning_up = false;
 };
 
 Level.prototype.not_done = function() {
@@ -917,6 +912,42 @@ Level.prototype.commit_widths = function() {
       cell.update_width(cell.pending_width);
     }
     cell.pending_width = undefined;
+  }
+};
+
+Level.prototype.check_widths = function() {
+  for (var i = 0; i < this.all_cells.length; i++) {
+    var cell = this.all_cells[i];
+    if (!cell.locked &&
+        (cell.type != 'condenser') && (cell.type != 'expander')) {
+      cell.update_width(cell.pending_width);
+    }
+    cell.pending_width = undefined;
+  }
+};
+
+Level.prototype.critical_path = function() {
+  var max_path = 0;
+
+  for (var i = 0; i < this.all_cells.length; i++) {
+    this.all_cells[i].max_path = undefined;
+  }
+
+  for (var i = 0; i < this.all_cells.length; i++) {
+    var path = this.all_cells[i].critical_path();
+    if (path > max_path) max_path = path;
+  }
+
+  return max_path;
+};
+
+Level.prototype.check_critical_path = function() {
+  if (!this.level.max_path) return 0;
+  var max_path = this.critical_path();
+  if (max_path > this.level.max_path) {
+    return max_path;
+  } else {
+    return 0;
   }
 };
 

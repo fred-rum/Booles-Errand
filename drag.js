@@ -134,6 +134,12 @@ Drag.prototype.drag_move = function(x, y) {
       if (failure) {
         this.update_new_io(x, y, io, failure);
         this.be.level.update_widths(true);
+      } else {
+        var max_path = this.be.level.check_critical_path();
+        if (max_path) {
+          this.update_new_io(x, y, io,
+                             (max_path == Infinity) ? 'loop' : 'too long');
+        }
       }
     } else {
       this.snap_io = undefined;
@@ -354,6 +360,10 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
       $('#error').html('<p>A new multi-bit wire here would have different input and output widths.</p>');
     } else if (failure == 'mismatch downstream') {
       $('#error').html('<p>Connecting a multi-bit wire here would conflict with a different logic width downstream.</p>');
+    } else if (failure == 'too long') {
+      $('#error').html('<p>Connecting a wire here would create a critical path longer than permitted for this challenge.</p>');
+    } else if (failure == 'loop') {
+      $('#error').html('<p>Connecting a wire here would create a loop of gates, which is not permitted for this challenge.</p>');
     } else if (io.locked) {
       $('#error').html('<p>The wire at this port is locked for this challenge and cannot be modified.</p>');
     } else if (io.type == 'output') {

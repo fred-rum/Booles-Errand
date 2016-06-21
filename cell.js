@@ -221,6 +221,35 @@ Cell.prototype.propagate_value = function() {
   this[calc_func_name]();
 };
 
+Cell.prototype.critical_path = function() {
+  if (this.max_path !== undefined) return this.max_path;
+
+  // Set the initial max_path value to Infinity.  If the search
+  // loops back to this cell, then that's the path length that gets
+  // used.  If the search does not loop back, then this initial value
+  // gets replaced with a real value.
+  this.max_path = Infinity;
+
+  var gate_cost = ((this.type == 'input') || (this.type == 'output') ||
+                   (this.type == 'condenser') || (this.type == 'expander') ||
+                   (this.type == 'vdd') || (this.type == 'gnd')) ? 0 : 1;
+  var max_path = gate_cost;
+
+  for (var port_name in this.io) {
+    var io = this.io[port_name];
+    if (io.type == 'output') {
+      for (var i = 0; i < io.w.length; i++) {
+        if (!io.w[i].pending_del) {
+          var path = gate_cost + io.w[i].i.cell.critical_path();
+          if (path > max_path) max_path = path;
+        }
+      }
+    }
+  }
+
+  return this.max_path = max_path;
+};
+
 Cell.prototype.reset = function() {
   for (var port_name in this.io) {
     this.io[port_name].reset();
