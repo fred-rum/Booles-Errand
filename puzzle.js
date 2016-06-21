@@ -1363,9 +1363,43 @@ Level.prototype.puzzle = [
    }
   }
 ,
-  {name: 'Increment',
+  {name: 'Critical path',
    section: 'Arithmetic',
-   intro: '<p><b>Z = A + 1.</b>  The critical path must be no longer than three gates.</p>',
+   intro: '<p><b>Detect whether an odd number of bits of A are 1.</b>  No path through the circuit may contain more than 3 logic gates.</p>',
+   outro: '<p>The maximum number of gates through which logic must propagate is called the <i>critical path</i> length.  This gives a rough measure of the speed of the circuit.</p>',
+   hint: '<p>A cone of logic is faster than a linear chain of logic.</p>',
+   soln: '1s2-0,o,2,i;140,expander8,0+o0,6,i1+o1,6,i0+o2,5,i1+o3,5,i0+o4,4,i1+o5,4,i0+o6,3,i1+o7,3,i0;280,xor,-60+o,7,i0;280,xor,-20+o,7,i1;280,xor,20+o,8,i0;280,xor,60+o,8,i1;420,xor,-40+o,9,i0;420,xor,40+o,9,i1;560,xor,0+o,1,i',
+   max_path: 3,
+   truth: [{a:0,   z:0},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:255,   z:0}],
+   rnd: function(obj) {
+     obj.a = this.rnd(0, 255);
+     obj.z = ((obj.a >> 7) ^ (obj.a >> 6) ^ (obj.a >> 5) ^ (obj.a >> 4) ^
+              (obj.a >> 3) ^ (obj.a >> 2) ^ (obj.a >> 1) ^ obj.a) & 1;
+   },
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 8,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         x: 700,
+         y: 0
+         }
+   }
+  }
+,
+  {name: 'Increment',
+   intro: '<p><b>Z = A + 1.</b>  No path through the circuit may contain more than 3 logic gates.</p>',
    outro: '<p>When performing arithmetic on binary values, you must pay attention to the range of potential output values.  This range determines the necessary width of the output bus.</p>',
    hint: ['<p>Boolean arithmetic is just like decimal arithmetic, except that instead of carrying a 1 to the next digit when the result exceeds 9, you carry a 1 to the next bit when the result exceeds 1.</p>',
           '<p>The carry chain is key to incrementing.  Once you know whether to add 1 to a particular bit of A, the actual addition is trivial.</p>'],

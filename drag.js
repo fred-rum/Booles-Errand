@@ -361,7 +361,7 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
     } else if (failure == 'mismatch downstream') {
       $('#error').html('<p>Connecting a multi-bit wire here would conflict with a different logic width downstream.</p>');
     } else if (failure == 'too long') {
-      $('#error').html('<p>Connecting a wire here would create a critical path longer than permitted for this challenge.</p>');
+      $('#error').html('<p>Connecting a wire here would create a path through more gates than is permitted for this challenge.</p>');
     } else if (failure == 'loop') {
       $('#error').html('<p>Connecting a wire here would create a loop of gates, which is not permitted for this challenge.</p>');
     } else if (io.locked) {
