@@ -1366,10 +1366,11 @@ Level.prototype.puzzle = [
   {name: 'Increment',
    section: 'Arithmetic',
    intro: '<p><b>Z = A + 1.</b></p>',
-   outro: '<p>The repeating center section of the increment logic uses a <i>half adder</i> for each bit.  The half adder can add two single-bit values to produce a result bit and a carry bit.</p>',
+   outro: '<p>When performing arithmetic on binary values, you must pay attention to the range of potential output values.  This range determines the necessary width of the output bus.</p>',
    hint: ['<p>Boolean arithmetic is just like decimal arithmetic, except that instead of carrying a 1 to the next digit when the result exceeds 9, you carry a 1 to the next bit when the result exceeds 1.</p>',
           '<p>The carry chain is key to incrementing.  Once you know whether to add 1 to a particular bit of A, the actual addition is trivial.</p>'],
-   soln: '1s2-0,o,3,i;600,condenser4,0+o,1,i;100,expander4,0+o0,4,i+o0,5,i1+o0,9,i1+o1,5,i0+o1,9,i0+o2,8,i0+o2,6,i0+o3,7,i0;450,inv,30+o,2,i0;450,xor,-20+o,2,i1;450,xor,-70+o,2,i2;450,xor,-120+o,2,i3;270,and,70+o,7,i1;270,and,160+o,8,i1+o,6,i1',
+   soln: '1s2-0,o,2,i;100,expander4,0+o0,6,i+o0,7,i1+o0,4,i1+o1,7,i0+o1,4,i0+o2,5,i0+o2,8,i0+o3,10,i0+o3,9,i0;600,condenser5,0+o,1,i;280,and,30+o,5,i1+o,8,i1;380,and,-30+o,10,i1+o,9,i1;380,inv,160+o,3,i0;380,xor,100+o,3,i1;450,xor,10+o,3,i2;490,xor,-80+o,3,i3;490,and,-140+o,3,i4',
+// file:///C:/Users/Chris/Documents/GitHub/Booles-Errand/circuit.html#Increment?1s2-0,o,2,i;100,expander4,0+o0,6,i+o0,7,i1+o0,4,i1+o1,7,i0+o1,4,i0+o2,5,i0+o2,8,i0+o3,10,i0+o3,9,i0;600,condenser5,0+o,1,i;276,and,28+o,5,i1+o,8,i1;377,and,-31+o,10,i1+o,9,i1;375,inv,148+o,3,i0;383,xor,93+o,3,i1;444,xor,12+o,3,i2;484,xor,-74+o,3,i3;478,and,-136+o,3,i4
    truth: [{a:0,   z:1},
            {a:1,   z:2},
            {a:2,   z:3},
@@ -1384,7 +1385,8 @@ Level.prototype.puzzle = [
            {a:11,  z:12},
            {a:12,  z:13},
            {a:13,  z:14},
-           {a:14,  z:15}],
+           {a:14,  z:15},
+           {a:15,  z:16}],
    avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
      a: {type: 'input',
@@ -1396,7 +1398,7 @@ Level.prototype.puzzle = [
      z: {type: 'output',
          x: 700,
          y: 0,
-         width: 4
+         width: 5
          }
    }
   }
