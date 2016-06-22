@@ -1756,12 +1756,13 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Multiply by 0-7',
-   intro: '<p><b>Z = A * N, where N is a 3-bit number.</b></p><p>No path through the circuit may contain more than 9 logic gates.  For simplicity, the full adder cell is counted as a single gate.</p>',
-   outro: '<p>A full adder can be used to turn the addition of three multi-bit numbers into the addition of just two multi-bit numbers.  When it is used this way, the full adder is called a 3:2 compressor.</p>',
-   hint: ['<p>When adding two multi-bit numbers, the carry chain becomes a significant component of the critical path.  Try to avoid having two such chains.</p>'],
-   soln: '1s3-0,o,4,i0-0,o,5,i0-0,o,6,i0-1,o,3,i;110,expander3,100+o0,4,i1+o1,5,i1+o2,6,i1;220,and,110+o,7,i;220,and,10+o,8,i;220,and,-70+o,9,i;330,expander4,110+o0,20,i0+o1,11,cin+o2,12,cin+o3,13,cin;330,expander4,10+o0,11,b+o1,12,b+o2,13,b+o3,14,b;330,expander4,-320+o0,12,a+o1,13,a+o2,14,a+o3,19,a;330,gnd,-140+o,14,cin+o,11,a;600,adder,80+cout,16,b+s,20,i1;600,adder,-30+cout,17,b+s,16,a;600,adder,-140+cout,18,b+s,17,a;600,adder,-250+cout,19,b+s,18,a;730,gnd,70+o,16,cin;830,adder,0+cout,17,cin+s,20,i2;830,adder,-110+cout,18,cin+s,20,i3;830,adder,-220+cout,19,cin+s,20,i4;830,adder,-330+cout,20,i6+s,20,i5;1090,condenser7,50+o,2,i',
-//file:///C:/Users/Chris/Documents/GitHub/Booles-Errand/circuit.html#Multiply%20by%200-7?1s3-0,o,5,i0-0,o,6,i0-0,o,7,i0-1,o,4,i;1061,condenser7,49+o,2,i;120,expander3,100+o0,5,i1+o1,6,i1+o2,7,i1;290,and,110+o,8,i;290,and,25+o,9,i;287,and,-73+o,10,i;411,expander4,106+o0,3,i0+o1,13,cin+o2,14,cin+o3,15,cin;410,expander4,21+o0,13,b+o1,14,b+o2,15,b+o3,16,b;405,expander4,-350+o0,14,a+o1,15,a+o2,16,a+o3,19,a;407,gnd,-145+o,16,cin+o,13,a;732,gnd,35+o,17,cin;607,adder,81+cout,17,b+s,3,i1;605,adder,-64+cout,20,b+s,17,a;606,adder,-175+cout,18,b+s,20,a;608,adder,-286+cout,19,b+s,18,a;829,adder,-35+cout,20,cin+s,3,i2;830,adder,-256+cout,19,cin+s,3,i4;833,adder,-367+cout,3,i6+s,3,i5;829,adder,-145+cout,18,cin+s,3,i3
-//file:///C:/Users/Chris/Documents/GitHub/Booles-Errand/circuit.html#Multiply%20by%200-7?1s3-0,o,5,i0-0,o,6,i0-0,o,21,i0-1,o,4,i;1061,condenser7,49+o,2,i;120,expander3,100+o0,5,i1+o1,6,i1+o2,21,i1;290,and,110+o,7,i;290,and,25+o,8,i;411,expander4,106+o0,3,i0+o1,9,b+o2,10,b+o3,12,b;410,expander4,21+o0,9,a+o1,10,a+o2,12,a+o3,15,a;607,adder,81+cout,13,cin+s,3,i1;605,adder,-30+cout,12,cin+s,13,b;506,gnd,182+o,9,cin;605,adder,-144+cout,15,cin+s,14,b;816,adder,-26+cout,14,cin+s,3,i2;815,adder,-137+cout,17,cin+s,3,i3;603,adder,-258+cout,18,b+s,17,b;481,gnd,-236+o,15,b;814,adder,-248+cout,18,cin+s,3,i4;815,adder,-359+cout,3,i6+s,3,i5;529,gnd,37+o,10,cin;610,expander4,-347+o0,13,a+o1,14,a+o2,17,a+o3,18,a;477,and,-345+o,20,i
+   intro: '<p><b>Z = A * N, where N is a 3-bit number.</b></p><p>No path through the circuit may contain more than 9 logic gates.  The paths through the 1-bit full adder are treated as 3 gates, and the paths through the 4-bit fast adder are treated as 5 gates.</p>',
+   outro: '<p>A full adder can be used to turn the addition of three multi-bit numbers into the addition of just two multi-bit numbers.  When it is used this way, the full adder can alternatively be called a <i>3:2 compressor</i>.</p>',
+   hint: ['<p>When adding multi-bit numbers, carry propagation becomes a significant component of the critical path.  Try to avoid propagating carry more than once.</p>',
+          '<p>A full adder doesn\'t treat Cin any different than A and B.  Its inputs could equally well be labeled A, B, and C.</p>',
+          '<p>A full adder adds a column of three bits to produce a 2-bit value that it calls S and Cout.  Rather than propagating Cout directly into Cin, the Cout values of all columns can be grouped together as a multi-bit value to be added separately.</p>',
+          '<p>If the outputs of multiple full adders are interpreted as a multi-bit bus of S values (S[3:0]) and a multi-bit bus of Cout values (Cout[3:0]), the final sum is S[3:0] + 2*Cout[3:0].</p>'],
+   soln: '1s3-0,o,6,i0-0,o,5,i0-0,o,4,i0-1,o,3,i;100,expander3,100+o0,6,i1+o1,5,i1+o2,4,i1;250,and,-90+o,7,i;250,and,10+o,8,i;250,and,110+o,9,i;370,expander4,-280+o0,13,a+o1,12,a+o2,11,a+o3,15,i3;370,expander4,10+o0,14,b+o1,13,b+o2,12,b+o3,11,b;370,expander4,110+o0,19,i0+o1,14,cin+o2,13,cin+o3,12,cin;370,gnd,-135+o,11,cin+o,14,a;550,adder,-250+cout,16,i3+s,15,i2;550,adder,-140+cout,16,i2+s,15,i1;550,adder,-30+cout,16,i1+s,15,i0;550,adder,80+cout,16,i0+s,19,i1;715,condenser4,-280+o,17,a;715,condenser4,40+o,17,b;850,fadder,30+s,18,i;980,expander5,30+o0,19,i2+o1,19,i3+o2,19,i4+o3,19,i5+o4,19,i6;1080,condenser7,50+o,2,i',
    max_path: 9,
    truth: [{rnd:'rnd'},
            {rnd:'rnd'},
@@ -1776,7 +1777,7 @@ Level.prototype.puzzle = [
      obj.n = this.rnd(0, 7);
      obj.z = obj.a * obj.n;
    },
-   avail: ['expander', 'condenser', 'adder', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
+   avail: ['expander', 'condenser', 'fadder', 'adder', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
    cells: {
      a: {type: 'input',
          width: 4,
