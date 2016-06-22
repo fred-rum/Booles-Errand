@@ -1077,13 +1077,13 @@ Level.prototype.click_help_copy = function() {
 
   var url = window.location.href.split('#', 2)[0];
   url = encodeURI(url + '#' + this.level.name + '?' + this.encode_progress());
-  url = url.replace(/([-?].)/g, '<span>$1</span>');
   var html = '<p>Copy this URL to save or share your progress for this challenge:</p><input type="text" id="copyinput" size="' + url.length + '" value="' + url + '"/>';
   this.be.div_infotxt.html(this.text(html));
   $('#copyinput').select();
   try {
     var success = document.execCommand('copy');
     if (success) {
+      url = url.replace(/([-?].)/g, '<span>$1</span>');
       var html = '<p>The following URL has been copied to your clipboard:</p><p><b>' + url + '</b></p><p>Use it to save or share your progress for this challenge.</p>';
       this.be.div_infotxt.html(this.text(html));
     }
