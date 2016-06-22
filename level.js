@@ -810,8 +810,9 @@ Level.prototype.first_failed_seq = function() {
 };
 
 Level.prototype.change_level = function(level_num, show_soln) {
-  this.cleaning_up = true;
+  this.clear_sel();
 
+  this.cleaning_up = true;
   for (var i = 0; i < this.all_cells.length; i++) {
     this.all_cells[i].remove();
   }
@@ -1032,6 +1033,21 @@ Level.prototype.select_help = function(label) {
   $('#help-' + this.cur_info).removeClass('help-selected');
   $('#help-' + label).addClass('help-selected');
   this.cur_info = label;
+
+  this.clear_sel();
+};
+
+Level.prototype.clear_sel = function() {
+  // Clear user's selection
+  if (window.getSelection) {
+    if (window.getSelection().empty) {  // Chrome
+      window.getSelection().empty();
+    } else if (window.getSelection().removeAllRanges) {  // Firefox
+      window.getSelection().removeAllRanges();
+    }
+  } else if (document.selection) {  // IE?
+    document.selection.empty();
+  }
 };
 
 Level.prototype.click_help_intro = function() {
