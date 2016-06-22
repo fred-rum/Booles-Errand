@@ -139,6 +139,7 @@ Drag.prototype.drag_move = function(x, y) {
         if (max_path) {
           this.update_new_io(x, y, io,
                              (max_path == Infinity) ? 'loop' : 'too long');
+          this.be.level.update_widths(true);
         }
       }
     } else {
