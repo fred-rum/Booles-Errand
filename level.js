@@ -522,12 +522,17 @@ Level.prototype.save_progress = function() {
   var save_str = this.encode_progress();
 
   var failed = this.be.circuit.save_data('boole.' + this.level.name + '.progress',
-                              save_str);
+                                         save_str);
   if (failed) {
     var hash_str = this.level.name + '?' + save_str;
     window.location.hash = encodeURI(hash_str);
   } else {
     window.location.hash = '';
+  }
+
+  if (this.cur_info == 'copy') {
+    this.clear_sel();
+    this.update_help_copy(save_str);
   }
 };
 
@@ -1090,9 +1095,12 @@ Level.prototype.click_help_outro = function() {
 Level.prototype.click_help_copy = function() {
   this.select_help('copy');
   this.close_help();
+  this.update_help_copy(this.encode_progress());
+};
 
+Level.prototype.update_help_copy = function(save_str) {
   var url = window.location.href.split('#', 2)[0];
-  url = encodeURI(url + '#' + this.level.name + '?' + this.encode_progress());
+  url = encodeURI(url + '#' + this.level.name + '?' + save_str);
   var html = '<p>Copy this URL to save or share your progress for this challenge:</p><input type="text" id="copyinput" size="' + url.length + '" value="' + url + '"/>';
   this.be.div_infotxt.html(this.text(html));
   $('#copyinput').select();
