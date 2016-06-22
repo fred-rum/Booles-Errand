@@ -877,9 +877,10 @@ Level.prototype.click_level = function(level_num, event) {
 Level.prototype.update_widths = function(pending) {
   for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
-    if (((cell.type == 'input') || (cell.type == 'condenser')) &&
-        (cell.width > 1)) {
-      var failure = cell.propagate_width(cell.width);
+    if (((cell.type == 'input') && (cell.width > 1)) ||
+        (cell.type == 'condenser') ||
+        (cell.type == 'fadder')) {
+      var failure = cell.propagate_width(cell.output_width);
       if (failure) break;
     }
   }
@@ -889,7 +890,9 @@ Level.prototype.update_widths = function(pending) {
   for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
     if (!cell.locked &&
-        (cell.type != 'condenser') && (cell.type != 'expander')) {
+        (cell.type != 'condenser') &&
+        (cell.type != 'expander') &&
+        (cell.type != 'fadder')) {
       var new_width = cell.prospective_width || 1;
       var old_width = (pending && cell.pending_width) || cell.width;
       if (this.update_box_quantity(cell.type, old_width - new_width)) {
@@ -908,18 +911,9 @@ Level.prototype.commit_widths = function() {
   for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
     if (!cell.locked &&
-        (cell.type != 'condenser') && (cell.type != 'expander')) {
-      cell.update_width(cell.pending_width);
-    }
-    cell.pending_width = undefined;
-  }
-};
-
-Level.prototype.check_widths = function() {
-  for (var i = 0; i < this.all_cells.length; i++) {
-    var cell = this.all_cells[i];
-    if (!cell.locked &&
-        (cell.type != 'condenser') && (cell.type != 'expander')) {
+        (cell.type != 'condenser') &&
+        (cell.type != 'expander') &&
+        (cell.type != 'fadder')) {
       cell.update_width(cell.pending_width);
     }
     cell.pending_width = undefined;

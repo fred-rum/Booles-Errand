@@ -1714,12 +1714,12 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Multiply by 0-3',
-   intro: '<p><b>Z = A * N, where N is a 2-bit number.</b></p><p>No path through the circuit may contain more than 5 logic gates.</p>',
+   intro: '<p>Use your new 4-bit fast adder to calculate <b>Z = A * N, where N is a 2-bit number.</b></p><p>No path through the circuit may contain more than 6 logic gates.  The paths through the 1-bit full adder are treated as 3 gates, and the paths through the 4-bit fast adder are treated as 5 gates.</p>',
    outro: '<p>You can perform any positive integer multiplication by simply shifting and adding as needed.</p>',
    hint: ['<p>Multiplication by 0 can be done with an AND gate cluster.</p>',
           '<p>A * 3 = (A * 2) + (A * 1).</p>'],
-   soln: '1s3-0,o,5,i0-0,o,3,i0-1,o,4,i;220,and,10+o,6,i;110,expander2,100+o0,5,i1+o1,3,i1;220,and,100+o,7,i;330,expander4,10+o0,8,a+o1,10,a+o2,11,a+o3,12,a;330,expander4,100+o0,14,i0+o1,8,b+o2,10,b+o3,11,b;540,adder,60+cout,10,cin+s,14,i1;440,gnd,190+o,8,cin;540,adder,-50+cout,11,cin+s,14,i2;540,adder,-160+cout,12,cin+s,14,i3;540,adder,-270+cout,14,i5+s,14,i4;410,gnd,-250+o,12,b;770,condenser6,50+o,2,i',
-   max_path: 5,
+   soln: '1s3-0,o,5,i0-0,o,4,i0-1,o,3,i;100,expander2,100+o0,5,i1+o1,4,i1;210,and,10+o,9,a;210,and,100+o,7,i;270,gnd,70+o,8,i3;330,expander4,100+o0,11,i0+o1,8,i0+o2,8,i1+o3,8,i2;430,condenser4,80+o,9,b;560,fadder,20+s,10,i;690,expander5,40+o0,11,i1+o1,11,i2+o2,11,i3+o3,11,i4+o4,11,i5;790,condenser6,50+o,2,i',
+   max_path: 6,
    truth: [{rnd:'rnd'},
            {rnd:'rnd'},
            {rnd:'rnd'},
@@ -1733,7 +1733,7 @@ Level.prototype.puzzle = [
      obj.n = this.rnd(0, 3);
      obj.z = obj.a * obj.n;
    },
-   avail: ['expander', 'condenser', 'adder', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
+   avail: ['expander', 'condenser', 'fadder', 'adder', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
    cells: {
      a: {type: 'input',
          width: 4,
@@ -1756,13 +1756,13 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Multiply by 0-7',
-   intro: '<p><b>Z = A * N, where N is a 3-bit number.</b></p><p>No path through the circuit may contain more than 6 logic gates.  For simplicity, the full adder cell is counted as a single gate.</p>',
+   intro: '<p><b>Z = A * N, where N is a 3-bit number.</b></p><p>No path through the circuit may contain more than 9 logic gates.  For simplicity, the full adder cell is counted as a single gate.</p>',
    outro: '<p>A full adder can be used to turn the addition of three multi-bit numbers into the addition of just two multi-bit numbers.  When it is used this way, the full adder is called a 3:2 compressor.</p>',
    hint: ['<p>When adding two multi-bit numbers, the carry chain becomes a significant component of the critical path.  Try to avoid having two such chains.</p>'],
    soln: '1s3-0,o,4,i0-0,o,5,i0-0,o,6,i0-1,o,3,i;110,expander3,100+o0,4,i1+o1,5,i1+o2,6,i1;220,and,110+o,7,i;220,and,10+o,8,i;220,and,-70+o,9,i;330,expander4,110+o0,20,i0+o1,11,cin+o2,12,cin+o3,13,cin;330,expander4,10+o0,11,b+o1,12,b+o2,13,b+o3,14,b;330,expander4,-320+o0,12,a+o1,13,a+o2,14,a+o3,19,a;330,gnd,-140+o,14,cin+o,11,a;600,adder,80+cout,16,b+s,20,i1;600,adder,-30+cout,17,b+s,16,a;600,adder,-140+cout,18,b+s,17,a;600,adder,-250+cout,19,b+s,18,a;730,gnd,70+o,16,cin;830,adder,0+cout,17,cin+s,20,i2;830,adder,-110+cout,18,cin+s,20,i3;830,adder,-220+cout,19,cin+s,20,i4;830,adder,-330+cout,20,i6+s,20,i5;1090,condenser7,50+o,2,i',
 //file:///C:/Users/Chris/Documents/GitHub/Booles-Errand/circuit.html#Multiply%20by%200-7?1s3-0,o,5,i0-0,o,6,i0-0,o,7,i0-1,o,4,i;1061,condenser7,49+o,2,i;120,expander3,100+o0,5,i1+o1,6,i1+o2,7,i1;290,and,110+o,8,i;290,and,25+o,9,i;287,and,-73+o,10,i;411,expander4,106+o0,3,i0+o1,13,cin+o2,14,cin+o3,15,cin;410,expander4,21+o0,13,b+o1,14,b+o2,15,b+o3,16,b;405,expander4,-350+o0,14,a+o1,15,a+o2,16,a+o3,19,a;407,gnd,-145+o,16,cin+o,13,a;732,gnd,35+o,17,cin;607,adder,81+cout,17,b+s,3,i1;605,adder,-64+cout,20,b+s,17,a;606,adder,-175+cout,18,b+s,20,a;608,adder,-286+cout,19,b+s,18,a;829,adder,-35+cout,20,cin+s,3,i2;830,adder,-256+cout,19,cin+s,3,i4;833,adder,-367+cout,3,i6+s,3,i5;829,adder,-145+cout,18,cin+s,3,i3
 //file:///C:/Users/Chris/Documents/GitHub/Booles-Errand/circuit.html#Multiply%20by%200-7?1s3-0,o,5,i0-0,o,6,i0-0,o,21,i0-1,o,4,i;1061,condenser7,49+o,2,i;120,expander3,100+o0,5,i1+o1,6,i1+o2,21,i1;290,and,110+o,7,i;290,and,25+o,8,i;411,expander4,106+o0,3,i0+o1,9,b+o2,10,b+o3,12,b;410,expander4,21+o0,9,a+o1,10,a+o2,12,a+o3,15,a;607,adder,81+cout,13,cin+s,3,i1;605,adder,-30+cout,12,cin+s,13,b;506,gnd,182+o,9,cin;605,adder,-144+cout,15,cin+s,14,b;816,adder,-26+cout,14,cin+s,3,i2;815,adder,-137+cout,17,cin+s,3,i3;603,adder,-258+cout,18,b+s,17,b;481,gnd,-236+o,15,b;814,adder,-248+cout,18,cin+s,3,i4;815,adder,-359+cout,3,i6+s,3,i5;529,gnd,37+o,10,cin;610,expander4,-347+o0,13,a+o1,14,a+o2,17,a+o3,18,a;477,and,-345+o,20,i
-   max_path: 6,
+   max_path: 9,
    truth: [{rnd:'rnd'},
            {rnd:'rnd'},
            {rnd:'rnd'},

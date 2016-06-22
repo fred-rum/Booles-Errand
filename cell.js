@@ -201,7 +201,9 @@ Cell.prototype.update_prospective_width = function(n, pending_new) {
 
   if (this.type == 'condenser') {
     prospective_width = 1;
-  } else if (this.locked || (this.type == 'expander')) {
+  } else if (this.locked ||
+             (this.type == 'expander') ||
+             (this.type == 'fadder')) {
     prospective_width = this.width;
   }
 
@@ -230,9 +232,17 @@ Cell.prototype.critical_path = function() {
   // gets replaced with a real value.
   this.max_path = Infinity;
 
-  var gate_cost = ((this.type == 'input') || (this.type == 'output') ||
-                   (this.type == 'condenser') || (this.type == 'expander') ||
-                   (this.type == 'vdd') || (this.type == 'gnd')) ? 0 : 1;
+  if ((this.type == 'input') || (this.type == 'output') ||
+      (this.type == 'condenser') || (this.type == 'expander') ||
+      (this.type == 'vdd') || (this.type == 'gnd')) {
+    var gate_cost = 0;
+  } else if (this.type == 'adder') {
+    gate_cost = 3;
+  } else if (this.type == 'fadder') {
+    gate_cost = 5;
+  } else {
+    gate_cost = 1;
+  }
   var max_path = gate_cost;
 
   for (var port_name in this.io) {
@@ -431,6 +441,16 @@ Cell.prototype.calc_adder = function() {
     var s = a ^ b ^ c;
     this.io.cout.propagate_output(cout);
     this.io.s.propagate_output(s);
+  }
+};
+
+Cell.prototype.calc_fadder = function() {
+  var a = this.io.a.value;
+  var b = this.io.b.value;
+  if ((a === undefined) || (b === undefined)) {
+    this.io.s.propagate_output(undefined);
+  } else {
+    this.io.s.propagate_output(a + b);
   }
 };
 
@@ -879,13 +899,22 @@ Cell.prototype.init_xor = function(inv) {
   this.draw_inv(inv, right, false);
 };
 
-Cell.prototype.add_label = function(label, pos, x, y, size) {
+Cell.prototype.add_label = function(label, pos, x, y, size, vpos) {
   var attr = {
     'text-anchor': pos,
     'font-family': 'Verdana, Helvetica, Arial, sans-serif',
     'font-size': (size || 11)/16 * this.be.em_size
   };
-  this.push_el(this.canvas.text(x, y, label).attr(attr));
+  var el = this.canvas.text(x, y, label).attr(attr)
+  this.push_el(el);
+
+  if (vpos == 'top') {
+    var bbox = el.getBBox(true);
+    var desiredtop = y + this.be.stroke_wire_fg * 2;
+    var actualtop = bbox.y;
+    var adj_y = desiredtop + (y - actualtop);
+    el.attr({y: adj_y});
+  }
 };
 
 Cell.prototype.init_mux = function(inv) {
@@ -1359,6 +1388,65 @@ Cell.prototype.init_adder = function() {
   right -= this.be.stroke_cell_fg;
   this.add_label('Cout', 'end', right, -this.be.io_spacing/2);
   this.add_label('S', 'end', right, this.be.io_spacing/2);
+};
+
+Cell.prototype.init_fadder = function() {
+  if (this.canvas_type == 'cbox') {
+    // Draw a smaller stylized adder for the cbox.
+    var height = 2 * this.be.io_spacing;
+    var width = 2 * this.be.io_spacing;
+    var left = -width/2;
+    var right = width/2;
+    var top = -height/2;
+
+    this.init_io(false, 2, 2, left, right);
+
+    this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr), 'drag_cell');
+    this.draw_stubs();
+    this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
+
+    this.add_label('F+', 'middle', 0, 0, 22);
+    return;
+  }
+
+  var height = 4 * this.be.io_spacing;
+  var width = 4 * this.be.io_spacing;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.io.a = new Io(this.be, this.canvas, this, 'a', 'input',
+                     left - this.be.stub_len, -this.be.io_spacing/2, left);
+  this.io.b = new Io(this.be, this.canvas, this, 'b', 'input',
+                     left - this.be.stub_len, this.be.io_spacing/2, left);
+  this.io.s = new Io(this.be, this.canvas, this, 's', 'output',
+                     right + this.be.stub_len, 0, right);
+
+  // The input and output widths are simply labeled,
+  // so el_qty_text is never used.
+  this.qty_cx = 0;
+  this.qty_top = 0;
+
+  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr), 'drag_cell');
+  this.draw_stubs();
+  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
+
+  this.add_label('F+', 'middle', 0, 0, 22);
+
+  left += this.be.stroke_cell_fg;
+  this.add_label('A', 'start', left, -this.be.io_spacing/2);
+  this.add_label('B', 'start', left, this.be.io_spacing/2);
+
+  right -= this.be.stroke_cell_fg;
+  this.add_label('S', 'end', right, 0);
+
+  this.add_label('x4', 'middle', this.io.b.x, this.be.io_spacing*1.5);
+  this.add_label('x5', 'middle', this.io.s.x, this.be.io_spacing*1.5);
+
+  this.width = 4;
+  this.input_width = 4;
+  this.output_width = 5;
+
 };
 
 Cell.prototype.init_null = function() {
