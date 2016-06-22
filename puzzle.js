@@ -1639,6 +1639,62 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Fast add',
+   intro: '<p>You previously built a 4-bit adder that used a <i>ripple</i> technique to propagate a carry bit. Now, make it faster.</p><p><b>Z = A + B. No path through the circuit may contain more than 5 logic gates.</b></p>',
+   outro: '<p>In complex circuits, there is always a tension between reducing the total number of gates vs. reducing the number of gates on the critical path.</p>',
+   hint: ['<p>The uppermost bit of Z is the slowest to calculate.  Figure out how to calculate that within 5 gates, and the rest of the bits will fall into place.</p>',
+          '<p>A carry out is 1 at a particular bit position if the A and B bits at that position <i>generate</i> a carry out or if the A or B bits at that position <i>propagate</i> the carry in to the carry out.</p>',
+          '<p>Write out the entire equation for each bit, then use the distributive laws to <i>flatten</i> the equation to a form similar to (p&q&r&&hellip;) | (s&t&u&&hellip;) | (v&w&x&&hellip;) | &hellip;</p><p>Then rebalance the equation as a cone of AND and OR gates.</p>'],
+   soln: '1s3-0,o,4,i-1,o,3,i;115,expander4,100+o0,6,i1+o0,13,i1+o1,8,i1+o1,7,i1+o2,10,i1+o2,9,i1+o3,12,i1+o3,11,i1;115,expander4,0+o0,6,i0+o0,13,i0+o1,8,i0+o1,7,i0+o2,10,i0+o2,9,i0+o3,12,i0+o3,11,i0;1035,condenser5,50+o,2,i;300,and,240+o,15,i1+o,14,i1;300,xor,180+o,15,i0+o,14,i0;300,and,120+o,16,i1+o,19,i0+o,20,i0;300,xor,50+o,17,i1+o,16,i0+o,26,i0+o,22,i0;300,and,-10+o,18,i1+o,21,i0;300,xor,-70+o,18,i0+o,17,i0+o,27,i0;300,and,-125+o,23,i0;306,xor,384+o,5,i0;473,xor,285+o,5,i1;471,and,213+o,19,i1+o,22,i1+o,20,i1;477,and,85+o,21,i1;470,and,-30+o,25,i0;470,and,-100+o,23,i1;600,or,210+o,26,i1;600,or,140+o,25,i1;600,or,70+o,24,i1;600,and,-10+o,24,i0;600,or,-145+o,28,i0;720,or,-15+o,27,i1;720,and,-95+o,28,i1;870,xor,10+o,5,i2;870,xor,-50+o,5,i3;870,or,-120+o,5,i4',
+   max_path: 5,
+   truth: [{a:0, b:0,   z:0},
+           {rnd:'rnd16'},
+           {rnd:'rnd16'},
+           {rnd:'rnd16'},
+           {rnd:'rnd15'},
+           {rnd:'rnd15'},
+           {rnd:'rnd15'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {rnd:'rnd'},
+           {a:15, b:15,   z:30}],
+   rnd16: function(obj) {
+     obj.a = this.rnd(0, 15);
+     obj.b = 16 - obj.a;
+     obj.z = 16;
+   },
+   rnd15: function(obj) {
+     obj.a = this.rnd(0, 15);
+     obj.b = 15 - obj.a;
+     obj.z = 15;
+   },
+   rnd: function(obj) {
+     obj.b = this.rnd(0, 15);
+     obj.a = this.rnd(0, 15);
+     obj.z = obj.a + obj.b;
+   },
+   avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     b: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 100
+        }
+     ,
+     z: {type: 'output',
+         x: 1150,
+         y: 50,
+         width: 5
+         }
+   }
+  }
+,
   {name: 'Multiply by 0-3',
    intro: '<p><b>Z = A * N, where N is a 2-bit number.</b></p><p>No path through the circuit may contain more than 5 logic gates.</p>',
    outro: '<p>You can perform any positive integer multiplication by simply shifting and adding as needed.</p>',
