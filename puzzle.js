@@ -1442,8 +1442,8 @@ Level.prototype.puzzle = [
    outro: '<p>Seven gates is good.  Five is excellent.</p>',
    hint: ['<p>Try starting with a circuit that works when C<sub>in</sub> is 0, then add logic to handle the cases when C<sub>in</sub> is 1.</p>',
           '<p>You may feel more comfortable with the AND and OR gates, but sometimes XOR is more appropriate.</p>'],
-   soln: ['1s5-0,o,8,i0-0,o,6,i0-0,o,7,i0-1,o,9,i0-1,o,5,i0-1,o,6,i1-2,o,9,i1-2,o,5,i1-2,o,7,i1;130,and,160+o,11,i1;170,and,10+o,10,i0;150,and,85+o,11,i0;410,xor,150+o,4,i;310,xor,160+o,8,i1;400,or,50+o,3,i;300,or,60+o,10,i1',
-          '1s5-0,o,7,i0-0,o,9,i0-1,o,5,i0-1,o,6,i0-2,o,5,i1-2,o,6,i1;140,xor,110+o,7,i1+o,9,i1;135,and,190+o,8,i1;390,xor,150+o,4,i;390,or,50+o,3,i;280,and,40+o,8,i0'],
+   soln: ['1s5-0,o,5,i0-0,o,6,i0-0,o,8,i0-1,o,7,i0-1,o,5,i1-1,o,8,i1-2,o,7,i1-2,o,6,i1-2,o,10,i1;150,and,10+o,9,i0;150,and,60+o,9,i1;150,and,110+o,11,i1;150,xor,160+o,10,i0;275,or,20+o,11,i0;275,xor,190+o,4,i;400,or,50+o,3,i',
+          '1s5-0,o,5,i0-0,o,6,i0-1,o,5,i1-1,o,6,i1-2,o,7,i1-2,o,8,i1;150,and,10+o,9,i0;150,xor,90+o,7,i0+o,8,i0;275,and,100+o,9,i1;275,xor,190+o,4,i;400,or,50+o,3,i'],
    truth: [{a:0, b:0, Cin:0,   Cout:0, s:0},
            {a:1, b:0, Cin:0,   Cout:0, s:1},
            {a:0, b:1, Cin:0,   Cout:0, s:1},
@@ -1646,6 +1646,24 @@ Level.prototype.puzzle = [
           '<p>A carry out is 1 at a particular bit position if the A and B bits at that position <i>generate</i> a carry out or if the A or B bits at that position <i>propagate</i> the carry in to the carry out.</p>',
           '<p>Write out the entire equation for each bit, then use the distributive laws to <i>flatten</i> the equation to a form similar to (p&q&r&&hellip;) | (s&t&u&&hellip;) | (v&w&x&&hellip;) | &hellip;</p><p>Then rebalance the equation as a cone of AND and OR gates.</p>'],
    soln: '1s3-0,o,4,i-1,o,3,i;115,expander4,100+o0,6,i1+o0,13,i1+o1,8,i1+o1,7,i1+o2,10,i1+o2,9,i1+o3,12,i1+o3,11,i1;115,expander4,0+o0,6,i0+o0,13,i0+o1,8,i0+o1,7,i0+o2,10,i0+o2,9,i0+o3,12,i0+o3,11,i0;1035,condenser5,50+o,2,i;300,and,240+o,15,i1+o,14,i1;300,xor,180+o,15,i0+o,14,i0;300,and,120+o,16,i1+o,19,i0+o,20,i0;300,xor,50+o,17,i1+o,16,i0+o,26,i0+o,22,i0;300,and,-10+o,18,i1+o,21,i0;300,xor,-70+o,18,i0+o,17,i0+o,27,i0;300,and,-125+o,23,i0;306,xor,384+o,5,i0;473,xor,285+o,5,i1;471,and,213+o,19,i1+o,22,i1+o,20,i1;477,and,85+o,21,i1;470,and,-30+o,25,i0;470,and,-100+o,23,i1;600,or,210+o,26,i1;600,or,140+o,25,i1;600,or,70+o,24,i1;600,and,-10+o,24,i0;600,or,-145+o,28,i0;720,or,-15+o,27,i1;720,and,-95+o,28,i1;870,xor,10+o,5,i2;870,xor,-50+o,5,i3;870,or,-120+o,5,i4',
+   // s4
+   // = a3&b3 | (a3|b3)&(a2&b2 | (a2|b2)&(a1&b1 | (a1|b1)&a0&b0))
+   // = a3&b3 |
+   //   (a3|b3)&(a2&b2) |
+   //   (a3|b3)&(a2|b2)&(a1&b1) |
+   //   (a3|b3)&(a2|b2)&(a1|b1)&(a0&b0)
+   // = ((a3&b3) | ((a3|b3)&(a2&b2))) |
+   //   (((a3|b3)&(a2|b2)) & ((a1&b1) | ((a1|b1)&(a0&b0))))
+   // critical path = 5 gates
+   // compare to ripple carry = 1+2*3 = 7 gates
+   //
+   // s3
+   // = (a3^b3) ^ ((a2&b2) | (a2|b2)&(a1&b1) | (a2|b2)&(a1|b1)&(a0&b0)
+   // = (a3^b3) ^ (((a2&b2) | ((a2|b2)&(a1&b1))) | (((a2|b2)&(a1|b1)) & (a0&b0))
+   // critical path = 5 gates
+   //
+   // s2
+   // = (a2^b2) ^ ((a1&b1) | (a1|b1)&(a0&b0))
    max_path: 5,
    truth: [{a:0, b:0,   z:0},
            {rnd:'rnd16'},
