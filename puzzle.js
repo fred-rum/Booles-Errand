@@ -1183,8 +1183,7 @@ Level.prototype.puzzle = [
    intro: '<p><b>Design a circuit to test whether A is equal to B.</b></p><p>When there are a lot of potential values to test, we\'ll speed things along by testing only a random subset of combinations.</p>',
    outro: '<p>Don\'t try to game the system.  If you change the circuit, you get to keep the random values in the current row, but all other values are re-randomized.</p>',
    hint: ['<p>You\'ll need an expander somewhere in the circuit in order to produce a one-bit output.  But you won\'t need to draw as many wires if you perform as much logic as you can prior to the expander.</p>'],
-   soln: ['1s3-0,o,9,i0-1,o,9,i1;300,and,-10+o,7,i0;300,and,30+o,7,i1;300,and,70+o,8,i0;300,and,110+o,8,i1;400,and,10+o,10,i0;400,and,90+o,10,i1;115,xnor,50+o,11,i;500,and,50+o,2,i;220,expander8,50+o0,6,i1+o1,6,i0+o2,5,i1+o3,5,i0+o4,4,i1+o5,4,i0+o6,3,i1+o7,3,i0',
-          '1s3-0,o,9,i0-1,o,9,i1;300,nor,-10+o,7,i0;300,nor,30+o,7,i1;300,nor,70+o,8,i0;300,nor,110+o,8,i1;400,nand,10+o,10,i0;400,nand,90+o,10,i1;115,xor,50+o,11,i;500,nor,50+o,2,i;220,expander8,50+o0,6,i1+o1,6,i0+o2,5,i1+o3,5,i0+o4,4,i1+o5,4,i0+o6,3,i1+o7,3,i0'],
+   soln: '1s3-0,o,3,i0-1,o,3,i1;115,xnor,50+o,4,i;220,expander6,50+o0,7,i1+o1,7,i0+o2,6,i1+o3,6,i0+o4,5,i1+o5,5,i0;300,and,10+o,8,i0;300,and,50+o,8,i1;300,and,90+o,9,i1;400,and,30+o,9,i0;500,and,50+o,2,i',
    truth: [{a:0, b:0,   z:1},
            {a:0, b:1,   z:0},
            {rnd:'rndeq'},
@@ -1193,44 +1192,44 @@ Level.prototype.puzzle = [
            {rnd:'rndne'},
            {rnd:'rnd', full:'full'},
            {rnd:'rnd', full:'full'},
-           {a:127, b:255,   z:0},
-           {a:255, b:255,   z:1}],
+           {a:31, b:63,   z:0},
+           {a:63, b:63,   z:1}],
    rndeq: function(obj) {
-     obj.a = this.rnd(0, 255);
+     obj.a = this.rnd(0, 63);
      obj.b = obj.a;
      obj.z = 1;
    },
    rndne: function(obj) {
-     obj.a = this.rnd(0, 255);
-     var bit = this.rnd(0, 7);
+     obj.a = this.rnd(0, 63);
+     var bit = this.rnd(0, 5);
      obj.b = obj.a ^ (1 << bit);
      obj.z = 0;
    },
    rnd: function(obj) {
-     obj.a = this.rnd(0, 255);
-     obj.b = this.rnd(0, 255);
+     obj.a = this.rnd(0, 63);
+     obj.b = this.rnd(0, 63);
      obj.z = (obj.a == obj.b) ? 1 : 0;
    },
    full: function(obj) {
-     var a = this.shuffle(0, 65535);
-     for (var i = 0; i <= 65535; i++) {
-       obj.a = (a[i] >> 8) & 255;
-       obj.b = a[i] & 255;
+     var a = this.shuffle(0, 4095);
+     for (var i = 0; i <= 4095; i++) {
+       obj.a = (a[i] >> 6) & 63;
+       obj.b = a[i] & 63;
        obj.z = (obj.a == obj.b) ? 1 : 0;
        if (this.fast_test()) return;
      }
-     // Return with the last set of values, which are effectively random.
+     // Return with the last random set of values.
    },
    avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
      a: {type: 'input',
-         width: 8,
+         width: 6,
          x: 0,
          y: 0
         }
      ,
      b: {type: 'input',
-         width: 8,
+         width: 6,
          x: 0,
          y: 100
         }
@@ -1707,7 +1706,7 @@ Level.prototype.puzzle = [
        obj.z = obj.a + obj.b;
        if (this.fast_test()) return;
      }
-     // Return with the last set of values, which are effectively random.
+     // Return with the last random set of values.
    },
    avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
    cells: {

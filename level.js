@@ -408,6 +408,10 @@ Level.prototype.next_line = function() {
   this.select_row(this.cur_row() + 1);
 };
 
+// Profiling suggests that 65536 calls of fast_test() take about half
+// a second for a puzzle with ~20 gates.  Keeping in mind that the
+// user may include an arbitrary number of useless gates, we should
+// probably limit ourselves to about 1/4 that number of calls.
 Level.prototype.fast_test = function() {
   this.be.sim_fast = true;
 
