@@ -256,7 +256,11 @@ Io.prototype.propagate_output = function(value) {
   if (this.be.sim_fast) {
     this.value = value;
     for (var i = 0; i < this.w.length; i++) {
-      this.w[i].i.fast_propagate_input(value);
+      if ((this.cell.output_width == 1) && (value == 1)) {
+        this.w[i].i.fast_propagate_input((1 << this.w[i].i.cell.input_width) - 1);
+      } else {
+        this.w[i].i.fast_propagate_input(value);
+      }
     }
   } else {
     this.update_value(value);
