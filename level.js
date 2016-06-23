@@ -461,6 +461,13 @@ Level.prototype.update_pins = function() {
         this.be.circuit.resize();
       }
     }
+
+    // We don't want to let the user pick random values while the
+    // circuit is reset, and then design a circuit that works only for
+    // those random values.  Therefore, if the user initializes any
+    // random rows in the truth table and then changes the circuit,
+    // reset those rows.
+    this.circuit_is_reset = false;
   }
   for (var i = 0; i < this.input_names.length; i++) {
     // We want the value to appear right away on the IO stub, so we
