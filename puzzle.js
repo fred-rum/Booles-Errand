@@ -1503,17 +1503,40 @@ Level.prototype.puzzle = [
    hint: '<p>There is no carry in for the bottommost bit, so you\'ll need to input a 0 to the bottommost full adder module.</p>',
    soln:'1s3-0,o,3,i-1,o,4,i;100,expander4,0+o0,8,a+o1,7,a+o2,6,a+o3,10,a;100,expander4,100+o0,8,b+o1,7,b+o2,6,b+o3,10,b;600,condenser5,50+o,2,i;380,adder,10+cout,10,cin+s,5,i2;380,adder,120+cout,6,cin+s,5,i1;380,adder,230+cout,7,cin+s,5,i0;250,gnd,270+o,8,cin;380,adder,-100+cout,5,i4+s,5,i3',
    truth: [{a:0, b:0,   z:0},
+           {rnd:'rnd16'},
+           {rnd:'rnd16'},
+           {rnd:'rnd16'},
+           {rnd:'rnd15'},
+           {rnd:'rnd15'},
+           {rnd:'rnd15'},
            {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
+           {rnd:'rnd', full:'full'},
+           {rnd:'rnd', full:'full'},
            {a:15, b:15,   z:30}],
+   rnd16: function(obj) {
+     obj.a = this.rnd(1, 15);
+     obj.b = 16 - obj.a;
+     obj.z = 16;
+   },
+   rnd15: function(obj) {
+     obj.a = this.rnd(0, 15);
+     obj.b = 15 - obj.a;
+     obj.z = 15;
+   },
    rnd: function(obj) {
      obj.a = this.rnd(0, 15);
      obj.b = this.rnd(0, 15);
      obj.z = obj.a + obj.b;
+   },
+   full: function(obj) {
+     var a = this.shuffle(0, 255);
+     for (var i = 0; i <= 255; i++) {
+       obj.a = (a[i] >> 4) & 15;
+       obj.b = a[i] & 15;
+       obj.z = obj.a + obj.b;
+       if (this.fast_test()) return;
+     }
+     // Return with the last random set of values.
    },
    avail: ['adder', 'expander', 'condenser', 'inv', 'vdd', 'gnd'],
    cells: {
