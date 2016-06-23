@@ -243,13 +243,25 @@ Io.prototype.propagate_input = function(value) {
   this.cell.propagate_value();
 };
 
+Io.prototype.fast_propagate_input = function(value) {
+  this.value = value;
+  this.cell.propagate_value();
+};
+
 Io.prototype.propagate_output = function(value) {
   // Don't propagate the newest value if it is the same as the most
   // recent value in flight.
   if (value === this.value) return;
 
-  this.update_value(value);
-  this.register_output();
+  if (this.be.sim_fast) {
+    this.value = value;
+    for (var i = 0; i < this.w.length; i++) {
+      this.w[i].i.fast_propagate_input(value);
+    }
+  } else {
+    this.update_value(value);
+    this.register_output();
+  }
 };
 
 // register_ouput() is separated from propagate_output() because it

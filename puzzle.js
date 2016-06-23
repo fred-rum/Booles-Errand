@@ -1673,11 +1673,11 @@ Level.prototype.puzzle = [
            {rnd:'rnd15'},
            {rnd:'rnd15'},
            {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
+           {rnd:'test'},
+           {rnd:'test'},
            {a:15, b:15,   z:30}],
    rnd16: function(obj) {
-     obj.a = this.rnd(0, 15);
+     obj.a = this.rnd(1, 15);
      obj.b = 16 - obj.a;
      obj.z = 16;
    },
@@ -1687,9 +1687,22 @@ Level.prototype.puzzle = [
      obj.z = 15;
    },
    rnd: function(obj) {
-     obj.b = this.rnd(0, 15);
      obj.a = this.rnd(0, 15);
+     obj.b = this.rnd(0, 15);
      obj.z = obj.a + obj.b;
+   },
+   test: function(obj) {
+     var init_a = this.rnd(0, 15);
+     var init_b = this.rnd(0, 15);
+     for (var a = 0; a <= 15; a++) {
+       for (var b = 0; b <= 15; b++) {
+         obj.a = (init_a + a) & 15;
+         obj.b = (init_b + b) & 15;
+         obj.z = obj.a + obj.b;
+         if (this.fast_test()) return;
+       }
+     }
+     // Return with the last set of values, which are effectively random.
    },
    avail: ['adder', 'expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
    cells: {

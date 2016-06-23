@@ -266,6 +266,12 @@ Cell.prototype.reset = function() {
   }
 };
 
+Cell.prototype.fast_reset = function() {
+  for (var port_name in this.io) {
+    this.io[port_name].value = undefined;
+  }
+};
+
 
 // Private functions & members
 
@@ -362,6 +368,8 @@ Cell.prototype.calc_input = function() {
 
 Cell.prototype.calc_output = function() {
   var value = this.value = this.io.i.value;
+  if (this.be.sim_fast) return;
+
   var exp_value = this.be.level.value(this.name);
   if ((exp_value === undefined) || (value === undefined)) {
     this.el_check.setAttr('visibility', 'hidden');
@@ -467,6 +475,17 @@ Cell.prototype.done_check = function() {
     return undefined;
   } else {
     this.el_question.setAttr('visibility', 'hidden');
+    return this.value === this.be.level.value(this.name);
+  }
+};
+
+Cell.prototype.fast_done_check = function() {
+  var exp_value = this.be.level.value(this.name);
+  if (exp_value === undefined) {
+    return true;
+  } else if (this.value === undefined) {
+    return undefined;
+  } else {
     return this.value === this.be.level.value(this.name);
   }
 };

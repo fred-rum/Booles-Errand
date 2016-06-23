@@ -408,6 +408,36 @@ Level.prototype.next_line = function() {
   this.select_row(this.cur_row() + 1);
 };
 
+Level.prototype.fast_test = function() {
+  this.be.sim_fast = true;
+
+  for (var i = 0; i < this.input_names.length; i++) {
+    var cell = this.named_cells[this.input_names[i]];
+    cell.propagate_value();
+  }
+  for (var i = 0; i < this.all_cells.length; i++) {
+    var cell = this.all_cells[i];
+    if ((cell.type == 'vdd') || (cell.type == 'gnd')) {
+      cell.propagate_value();
+    }
+  }
+
+  var result = true;
+  for (var i = 0; i < this.output_names.length; i++) {
+    var cell = this.named_cells[this.output_names[i]];
+    var cell_result = cell.done_check();
+    result = result && cell_result;
+  }
+
+  for (var i = 0; i < this.all_cells.length; i++) {
+    this.all_cells[i].fast_reset();
+  }
+
+  this.be.sim_fast = false;
+
+  return !result;
+};
+
 Level.prototype.update_pins = function() {
   var truth_obj = this.level.truth[this.cur_seq][this.cur_line];
   if (truth_obj.rnd && !truth_obj.initialized) {
@@ -741,11 +771,10 @@ Level.prototype.circuit_changed = function() {
 // done() gets called by Sim when there are no events left to process.
 Level.prototype.done = function() {
   var result = true;
-  for (var cell_name in this.named_cells) {
-    if (this.named_cells[cell_name].type == 'output') {
-      var cell_result = this.named_cells[cell_name].done_check();
-      result = result && cell_result;
-    }
+  for (var i = 0; i < this.output_names.length; i++) {
+    var cell = this.named_cells[this.output_names[i]];
+    var cell_result = cell.done_check();
+    result = result && cell_result;
   }
   this.record_result(this.cur_row(), result);
 
