@@ -1675,12 +1675,22 @@ Level.prototype.puzzle = [
            {rnd:'rnd'},
            {rnd:'rnd'},
            {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'}],
+           {rnd:'rnd', full:'full'},
+           {rnd:'rnd', full:'full'}],
    rnd: function(obj) {
      obj.a = this.rnd(0, 255);
      obj.n = this.rnd(0, 7);
      obj.z = ((obj.a << obj.n) | (obj.a >> (8 - obj.n))) & 255;
+   },
+   full: function(obj) {
+     var a = this.shuffle(0, 2047);
+     for (var i = 0; i <= 2047; i++) {
+       obj.a = a[i] & 255;
+       obj.n = (a[i] >> 8) & 7;
+       obj.z = ((obj.a << obj.n) | (obj.a >> (8 - obj.n))) & 255;
+       if (this.fast_test()) return;
+     }
+     // Return with the last random set of values.
    },
    avail: ['expander', 'condenser', 'mux', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
