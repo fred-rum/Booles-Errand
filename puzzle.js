@@ -1192,26 +1192,42 @@ Level.prototype.puzzle = [
           '1s3-0,o,9,i0-1,o,9,i1;300,nor,-10+o,7,i0;300,nor,30+o,7,i1;300,nor,70+o,8,i0;300,nor,110+o,8,i1;400,nand,10+o,10,i0;400,nand,90+o,10,i1;115,xor,50+o,11,i;500,nor,50+o,2,i;220,expander8,50+o0,6,i1+o1,6,i0+o2,5,i1+o3,5,i0+o4,4,i1+o5,4,i0+o6,3,i1+o7,3,i0'],
    truth: [{a:0, b:0,   z:1},
            {a:0, b:1,   z:0},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
+           {rnd:'rndeq'},
+           {rnd:'rndne'},
+           {rnd:'rndeq'},
+           {rnd:'rndne'},
+           {rnd:'rnd', full:'full'},
+           {rnd:'rnd', full:'full'},
            {a:127, b:255,   z:0},
            {a:255, b:255,   z:1}],
+   rndeq: function(obj) {
+     obj.a = this.rnd(0, 255);
+     obj.b = obj.a;
+     obj.z = 1;
+   },
+   rndne: function(obj) {
+     obj.a = this.rnd(0, 255);
+     var bit = this.rnd(0, 7);
+     obj.b = obj.a ^ (1 << bit);
+     obj.z = 0;
+   },
    rnd: function(obj) {
      obj.a = this.rnd(0, 255);
-     var type = this.rnd(0, 2);
-     if (type == 0) {
-       obj.b = obj.a;
-     } else if (type == 1) {
-       var bit = this.rnd(0, 7);
-       obj.b = obj.a ^ (1 << bit);
-     } else {
-       obj.b = this.rnd(0, 255);
-     }
+     obj.b = this.rnd(0, 255);
      obj.z = (obj.a == obj.b) ? 1 : 0;
+   },
+   full: function(obj) {
+     var init_a = this.rnd(0, 255);
+     var init_b = this.rnd(0, 255);
+     for (var a = 0; a <= 255; a++) {
+       for (var b = 0; b <= 255; b++) {
+         obj.a = (init_a + a) & 255;
+         obj.b = (init_b + b) & 255;
+         obj.z = (obj.a == obj.b) ? 1 : 0;
+         if (this.fast_test()) return;
+       }
+     }
+     // Return with the last set of values, which are effectively random.
    },
    avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
    cells: {
@@ -1673,8 +1689,8 @@ Level.prototype.puzzle = [
            {rnd:'rnd15'},
            {rnd:'rnd15'},
            {rnd:'rnd'},
-           {rnd:'test'},
-           {rnd:'test'},
+           {rnd:'rnd', full:'full'},
+           {rnd:'rnd', full:'full'},
            {a:15, b:15,   z:30}],
    rnd16: function(obj) {
      obj.a = this.rnd(1, 15);
@@ -1691,7 +1707,7 @@ Level.prototype.puzzle = [
      obj.b = this.rnd(0, 15);
      obj.z = obj.a + obj.b;
    },
-   test: function(obj) {
+   full: function(obj) {
      var init_a = this.rnd(0, 15);
      var init_b = this.rnd(0, 15);
      for (var a = 0; a <= 15; a++) {

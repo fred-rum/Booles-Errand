@@ -236,7 +236,7 @@ Level.prototype.init_table = function() {
       var last_line = (j == truth_seq.length - 1);
       html.push('<tr class="truthbody" id="row', num_rows, '">');
       if (truth_seq[j].rnd) {
-        truth_seq[j] = {rnd: truth_seq[j].rnd};
+        truth_seq[j] = {rnd: truth_seq[j].rnd, full: truth_seq[j].full};
         this.table_line_rnd(html, last_line);
       } else {
         this.table_line(html, this.input_names, truth_seq[j], last_line);
@@ -438,36 +438,73 @@ Level.prototype.fast_test = function() {
   return !result;
 };
 
+// Check all initialized rows of the truth table to see if their
+// values can uncover a bug in the circuit.  If so, we don't need to
+// initialize a new row using the full() function.
+Level.prototype.truth_can_find_bug = function() {
+  // This function manipulates this.cur_seq to test different rows.
+  // We save the original value so that we can restore it when we're
+  // done.  this.cur_line is guaranteed to be 0 for a random row, so
+  // it does need to be modified or restored.
+  var cur_seq = this.cur_seq;
+
+  for (var i = 0; i < this.level.truth.length; i++) {
+    // Skip unitialized random sequences (including the one that we're
+    // about to initialize.
+    var test_obj = this.level.truth[i];
+    if (!test_obj.rnd || test_obj.initialized) {
+      // Check whether this sequence is capable of detecting a bug.
+      // (We could also check the recorded result to see if it has
+      // already caught a bug, but that's an unnecessary optimization.)
+      this.cur_seq = i;
+      if (this.fast_test()) {
+        this.cur_seq = cur_seq;
+        return true;
+      }
+    }
+  }
+  this.cur_seq = cur_seq;
+  return false;
+};
+
+Level.prototype.init_random_row = function(truth_obj) {
+  if (truth_obj.full && !this.truth_can_find_bug()) {
+    this.level[truth_obj.full].call(this, truth_obj);
+  } else {
+    this.level[truth_obj.rnd].call(this, truth_obj);
+  }
+  var row = this.cur_row();
+  var html = [];
+  this.table_line(html, this.input_names, truth_obj, true);
+  this.table_line(html, this.output_names, truth_obj, true);
+  this.table_blank_check(html, row);
+  $('#row' + row).html(html.join(''));
+  truth_obj.initialized = true;
+
+  // The truth table may be wider now.  This looks a little awkward,
+  // but it's hard to do determine its maximum width in advance.  To
+  // minimize the awkwardness, don't let the table become narrower,
+  // even if some rows were reset.
+  if (this.be.truth_table_width) {
+    var new_width = this.div_truth_table.width();
+    if (new_width > this.be.truth_table_width) {
+      this.be.truth_table_width = new_width;
+      this.be.circuit.resize();
+    }
+  }
+
+  // We don't want to let the user pick random values while the
+  // circuit is reset, and then design a circuit that works only for
+  // those random values.  Therefore, if the user initializes any
+  // random rows in the truth table and then changes the circuit,
+  // reset those rows.
+  this.circuit_is_reset = false;
+};
+
 Level.prototype.update_pins = function() {
   var truth_obj = this.level.truth[this.cur_seq][this.cur_line];
   if (truth_obj.rnd && !truth_obj.initialized) {
-    this.level[truth_obj.rnd].call(this, truth_obj);
-    var row = this.cur_row();
-    var html = [];
-    this.table_line(html, this.input_names, truth_obj, true);
-    this.table_line(html, this.output_names, truth_obj, true);
-    this.table_blank_check(html, row);
-    $('#row' + row).html(html.join(''));
-    truth_obj.initialized = true;
-
-    // The truth table may be wider now.  This looks a little awkward,
-    // but it's hard to do determine its maximum width in advance.  To
-    // minimize the awkwardness, don't let the table become narrower,
-    // even if some rows were reset.
-    if (this.be.truth_table_width) {
-      var new_width = this.div_truth_table.width();
-      if (new_width > this.be.truth_table_width) {
-        this.be.truth_table_width = new_width;
-        this.be.circuit.resize();
-      }
-    }
-
-    // We don't want to let the user pick random values while the
-    // circuit is reset, and then design a circuit that works only for
-    // those random values.  Therefore, if the user initializes any
-    // random rows in the truth table and then changes the circuit,
-    // reset those rows.
-    this.circuit_is_reset = false;
+    this.init_random_row(truth_obj)
   }
   for (var i = 0; i < this.input_names.length; i++) {
     // We want the value to appear right away on the IO stub, so we
@@ -752,8 +789,9 @@ Level.prototype.circuit_changed = function() {
     if (i_seq != this.cur_seq) {
       var i_line = this.row_line[i];
       var truth_seq = this.level.truth[i_seq];
-      if (truth_seq[i_line].rnd) {
-        truth_seq[i_line] = {rnd: truth_seq[i_line].rnd};
+      var old_obj = truth_seq[i_line];
+      if (old_obj.rnd) {
+        truth_seq[i_line] = {rnd: old_obj.rnd, full: old_obj.full};
         var html = [];
         this.table_line_rnd(html, true);
         this.table_blank_check(html, i);
