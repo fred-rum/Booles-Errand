@@ -1222,3 +1222,22 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     $('#span-next-main').css({display: 'none'});
   }
 };
+
+// Return a random integer between min and max, inclusive.
+Level.prototype.rnd = function(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+// Return a shuffled array of values between min and max, inclusive.
+// This uses the "inside-out" version of the Durstenfeld shuffling
+// algorithm to initialize the array at the same time as it shuffles
+// it.
+Level.prototype.shuffle = function(min, max) {
+  var a = [];
+  for (var i = 0; i <= max-min; i++) {
+    var j = this.rnd(0, i);
+    a.push(a[j]);
+    a[j] = min+i;
+  }
+  return a;
+};

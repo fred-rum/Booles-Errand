@@ -2,11 +2,6 @@
 
 'use strict';
 
-// Return a random integer between min and max, inclusive.
-Level.prototype.rnd = function(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
 var x = undefined;
 Level.prototype.puzzle = [
   {name: 'Press play',
@@ -1217,15 +1212,12 @@ Level.prototype.puzzle = [
      obj.z = (obj.a == obj.b) ? 1 : 0;
    },
    full: function(obj) {
-     var init_a = this.rnd(0, 255);
-     var init_b = this.rnd(0, 255);
-     for (var a = 0; a <= 255; a++) {
-       for (var b = 0; b <= 255; b++) {
-         obj.a = (init_a + a) & 255;
-         obj.b = (init_b + b) & 255;
-         obj.z = (obj.a == obj.b) ? 1 : 0;
-         if (this.fast_test()) return;
-       }
+     var a = this.shuffle(0, 65535);
+     for (var i = 0; i <= 65535; i++) {
+       obj.a = (a[i] >> 8) & 255;
+       obj.b = a[i] & 255;
+       obj.z = (obj.a == obj.b) ? 1 : 0;
+       if (this.fast_test()) return;
      }
      // Return with the last set of values, which are effectively random.
    },
@@ -1708,15 +1700,12 @@ Level.prototype.puzzle = [
      obj.z = obj.a + obj.b;
    },
    full: function(obj) {
-     var init_a = this.rnd(0, 15);
-     var init_b = this.rnd(0, 15);
-     for (var a = 0; a <= 15; a++) {
-       for (var b = 0; b <= 15; b++) {
-         obj.a = (init_a + a) & 15;
-         obj.b = (init_b + b) & 15;
-         obj.z = obj.a + obj.b;
-         if (this.fast_test()) return;
-       }
+     var a = this.shuffle(0, 255);
+     for (var i = 0; i <= 255; i++) {
+       obj.a = (a[i] >> 4) & 15;
+       obj.b = a[i] & 15;
+       obj.z = obj.a + obj.b;
+       if (this.fast_test()) return;
      }
      // Return with the last set of values, which are effectively random.
    },
