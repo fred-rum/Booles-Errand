@@ -1245,3 +1245,14 @@ Level.prototype.shuffle = function(min, max) {
   }
   return a;
 };
+
+// Shuffle an array in place.  This uses the standard Durstenfeld
+// shuffling algorithm.
+Level.prototype.shuffle_array = function(a) {
+  for (var i = a.length-1; i > 0; i--) {
+    var j = this.rnd(0, i);
+    var temp = a[i];
+    a[i] = a[j];
+    a[j] = temp;
+  }
+};

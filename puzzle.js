@@ -1573,14 +1573,30 @@ Level.prototype.puzzle = [
            {rnd:'rnd'},
            {rnd:'rnd'},
            {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
+           {rnd:'rnd', full:'full'},
+           {rnd:'rnd', full:'full'},
            {a:15, b:0,    z:15},
            {a:15, b:15,   z:0}],
    rnd: function(obj) {
      obj.b = this.rnd(0, 15);
      obj.a = this.rnd(obj.b, 15);
      obj.z = obj.a - obj.b;
+   },
+   full: function(obj) {
+     var array = [];
+     for (var b = 0; b <= 15; b++) {
+       for (var a = b; a <= 15; a++) {
+         array.push([a,b]);
+       }
+     }
+     this.shuffle_array(array);
+     for (var i = 0; i < array.length; i++) {
+       obj.a = array[i][0];
+       obj.b = array[i][1];
+       obj.z = obj.a - obj.b;
+       if (this.fast_test()) return;
+     }
+     // Return with the last random set of values.
    },
    avail: ['adder', 'expander', 'condenser', 'inv', 'vdd', 'gnd'],
    cells: {
