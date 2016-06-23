@@ -72,6 +72,9 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this['init_' + type](harness_width);
   if (type == 'null') return; // do nothing else for the null cell
 
+  var calc_func_name = 'calc_' + this.type;
+  this.propagate_value = this[calc_func_name] || this.calc_null;
+
   if (this.canvas_type != 'cdrag') {
     var bbox = this.el_cell.getBBox(true); // ignore transforms
     this.bbox = {
@@ -217,12 +220,6 @@ Cell.prototype.update_prospective_width = function(n, pending_new) {
   }
 };
 
-Cell.prototype.propagate_value = function() {
-  var calc_func_name = 'calc_' + this.type;
-  if (!this[calc_func_name]) return;
-  this[calc_func_name]();
-};
-
 Cell.prototype.critical_path = function() {
   if (this.max_path !== undefined) return this.max_path;
 
@@ -360,6 +357,11 @@ Cell.prototype.calc_vdd = function() {
 
 Cell.prototype.calc_gnd = function() {
   this.io.o.propagate_output(0);
+};
+
+Cell.prototype.calc_null = function() {
+  // This function is used when a cell's 'calc' function has not yet
+  // been written.  Do nothing.
 };
 
 Cell.prototype.calc_input = function() {
