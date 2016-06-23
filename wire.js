@@ -510,7 +510,7 @@ Wire.prototype.draw_spark = function(fl_obj) {
 
   if (!fl_obj.el_spark || (fl_obj.age !== fl_obj.spark_age)) {
     // Radius range for outer points.
-    var max_r1 = this.be.io_handle_size / 2;
+    var max_r1 = this.be.io_handle_radius;
     var min_r1 = max_r1/2;
 
     // Radius range for inner points.

@@ -6,25 +6,25 @@ function Drag(be) {
   this.be = be;
   this.io_set = [];
 
-  var tw = this.be.io_handle_size;
-  var attr = {
-    'stroke-width': tw/5,
-    stroke: '#f00',
-    fill: '#fff'
-  };
-
   this.el_handle1 = this.el_handle();
   this.el_handle2 = this.el_handle();
 
   // el_fail is generated after the el_handles so that it shows up on
   // top in case of overlap.
 
+  var r = this.be.io_handle_radius;
+  var attr = {
+    'stroke-width': this.be.stroke_io_fail,
+    stroke: '#f00',
+    fill: '#fff'
+  };
+
   // Rather than doing trigonometry to draw the diagonal slash,
   // we just draw it horizontally and then rotate the whole thing
   // when we position the fail symbol over an IO.
-  var el_fail_circle = this.be.cdraw.circle(0, 0, tw/2, tw/2).attr(attr);
-  var el_fail_slash = this.be.cdraw.path(['M', -tw/2, 0,
-                                          'h', tw]).attr(attr);
+  var el_fail_circle = this.be.cdraw.circle(0, 0, r, r).attr(attr);
+  var el_fail_slash = this.be.cdraw.path(['M', -r, 0,
+                                          'h', r*2]).attr(attr);
 
   this.el_fail = this.be.cdraw.set(el_fail_circle, el_fail_slash);
   this.el_fail.setAttr('visibility', 'hidden');
@@ -38,8 +38,8 @@ Drag.prototype.el_handle = function () {
     fill: '#ff0',
     opacity: '0.80'
   };
-  var tw = this.be.io_handle_size;
-  var el_handle = this.be.cdraw.circle(0, 0, tw/2, tw/2).attr(attr);
+  var r = this.be.io_handle_radius;
+  var el_handle = this.be.cdraw.circle(0, 0, r, r).attr(attr);
   el_handle.setAttr('visibility', 'hidden');
   el_handle.setAttr('pointer-events', 'none');
   return el_handle;
@@ -232,7 +232,8 @@ Drag.prototype.closest_io = function(x, y, limit) {
   // freely.  When an event triggers the 'closest' check, then the
   // mouse may be near the edge of the limit, and we don't want to
   // confuse matters by not finding an IO to act on.
-  var limit2 = limit ? this.be.io_handle_size*this.be.io_handle_size : Infinity;
+  var radius_squared = this.be.io_target_radius * this.be.io_target_radius;
+  var limit2 = limit ? radius_squared : Infinity;
 
   var mx = this.be.circuit.cdraw_to_canvas_x(x);
   var my = this.be.circuit.cdraw_to_canvas_y(y);
@@ -411,8 +412,7 @@ Drag.prototype.update_new_io = function(x, y, io, failure) {
       this.new_wires.push(new Wire(this.be, this.orig_io.w[0].o, io, true));
     }
   } else {
-    // This should never happen.
-    this.update_new_io(x, y, this.be.null_io);
+    // This is impossible.
   }
 };
 

@@ -44,11 +44,11 @@ function Io(be, canvas, cell, name, type, x, y, inner_x) {
   }
 
 
-  var tw = this.be.io_handle_size; // Actually, double the IO handle size.
+  var r = this.be.io_target_radius;
   var attr = {
     'stroke-width': 0,
   };
-  this.el_target = this.canvas.circle(x, y, tw, tw).attr(attr);
+  this.el_target = this.canvas.circle(x, y, r, r).attr(attr);
   this.el_target.setAttr('visibility', 'hidden');
   this.el_target.setAttr('pointer-events', 'all');
   cell.push_el(this.el_target, 'drag_other');

@@ -2,10 +2,15 @@
 
 'use strict';
 
+// Circuit is the "main" object.  It creates all the other top-level
+// objects.  It handles resizing of the various panels within the
+// window.  It handles drag and zoom of the drawing canvas.
 function Circuit() {
   ExtendRaphael();
 
-  // this.be is a data structure for "global" values for the whole circuit.
+  // "be" == "Boole's Errand'.  this.be is a data structure for
+  // "global" values for the whole circuit.  Any objects that need to
+  // access "global" values keeps a pointer to this.be.
   this.be = {}
   this.be.circuit = this;
   this.be.bdrag = new Bdrag(this.be);
@@ -14,43 +19,56 @@ function Circuit() {
   this.be.cbox = Raphael('cbox', '100%', '100%');
   this.be.cdraw = Raphael('cdraw', '100%', '100%');
 
+  // We keep copies of various jQuery objects so that they don't need
+  // to be created multiple times, especially in resize(), where
+  // performance is important.
   this.be.window = $(window);
   this.be.div_truth = $('#truth');
   this.be.div_info = $('#info');
   this.be.div_infotxt = $('#infotxt');
   this.be.div_info_stub = $('#info-stub');
   this.be.div_controls = $('#sim-controls');
-  this.be.div_zoom = $('#zoom-controls');
   this.be.div_main_stub = $('#main-stub');
   this.be.div_cdrag = $('#cdrag');
   this.be.div_cdraw = $('#cdraw');
   this.be.div_cbox = $('#cbox');
 
-  // We want cdrag to be wide enough to overlap the border between
-  // cbox and cdraw.  jquery appears to round up for outerwidth(),
-  // which is what we want to avoid a sub-pixel gap.
-  this.be.cbox_width = this.be.div_cbox.outerWidth();
-  this.be.div_cdrag.width(this.be.cbox_width);
-
-  this.be.zoom_width = this.be.div_zoom.outerWidth();
-  this.be.zoom_height = this.be.div_zoom.outerHeight();
+  // For window panels that have fixed dimensions, record those
+  // dimensions.  When a cell is dragged, it is marked to be deleted
+  // if it is dragged onto one of these panels.
+  var div_zoom = $('#zoom-controls');
+  this.be.zoom_width = div_zoom.outerWidth();
+  this.be.zoom_height = div_zoom.outerHeight();
 
   this.be.main_stub_width = this.be.div_main_stub.outerWidth();
   this.be.main_stub_height = this.be.div_main_stub.outerHeight();
 
-  // Other div dimensions are resized dynamically as appropriate.
-  // The first puzzle level will reflow the text and call this.resize().
+  // Other div dimensions are resized dynamically as appropriate.  The
+  // first puzzle level will determine the desired size of certain
+  // panels, then call this.resize() to adjust all panels to match.
+
+  // We set the initial drawing canvas dimensions to 0 so that the
+  // first call to this.resize() is guaranteed to increase its size to
+  // something reasonable.
   this.cdraw_width = 0;
   this.cdraw_height = 0;
 
-  // Sizes are based on the "em" size in the document.  Thus,
-  // devices with very small pixels (like phones) will scale up as
-  // appropriate.
+  // Sizes are based on the "em" size in the document.  Thus, devices
+  // with very small pixels (like phones) will scale up as
+  // appropriate.  It happens that the em size on my development
+  // browser is 16 pixels, so many dimensions are a multiple of 1/16
+  // em.
+  //
+  // The width of div_truth is initially set to 8em purely so that I
+  // can measure it.  It'll get resized to fit the truth table later.
   var em_size = this.be.em_size = this.be.div_truth.width() / 8;
   this.be.io_spacing = em_size * 10/8;
-  this.be.io_handle_size = this.be.io_spacing * 3/4;
+  this.be.io_handle_radius = this.be.io_spacing * 3/8;
+  this.be.io_target_radius = this.be.io_handle_radius * 2;
+
   this.be.stub_len = em_size * 5/8;
-  this.be.stub_end_len = 6;
+  this.be.stub_end_len = em_size * 6/16;
+
   this.be.inv_bubble_size = em_size * 4/8;
   this.be.wire_arc_radius = em_size * 10/8;
 
@@ -69,10 +87,9 @@ function Circuit() {
   this.be.stroke_stub_end_defined   = em_size * 2/16;
 
   this.be.stroke_io_handle = em_size * 1/16;
+  this.be.stroke_io_fail = this.be.io_handle_radius * 0.4;
 
-  this.be.cell_grid_x = this.be.io_spacing * 6;
-  this.be.cell_grid_y = this.be.io_spacing * 4;
-
+  // The vertical gap between cells in cbox.
   this.be.box_spacing = this.be.io_spacing;
 
   // Create Z-level references
