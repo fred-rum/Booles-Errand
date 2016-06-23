@@ -1632,12 +1632,21 @@ Level.prototype.puzzle = [
            {a:2,   z:4},
            {rnd:'rnd'},
            {rnd:'rnd'},
-           {rnd:'rnd'},
-           {rnd:'rnd'},
+           {rnd:'rnd', full:'full'},
+           {rnd:'rnd', full:'full'},
            {a:127, z:254}],
    rnd: function(obj) {
      obj.a = this.rnd(3, 126);
      obj.z = obj.a * 2;
+   },
+   full: function(obj) {
+     var a = this.shuffle(3, 126);
+     for (var i = 0; i < a.length; i++) {
+       obj.a = a[i];
+       obj.z = obj.a * 2;
+       if (this.fast_test()) return;
+     }
+     // Return with the last random set of values.
    },
    avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor', 'vdd', 'gnd'],
    cells: {
