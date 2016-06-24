@@ -169,6 +169,12 @@ Circuit.prototype.update_window_size = function() {
   if (this.be.window_height > this.cdraw_height) {
     this.cdraw_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.cdraw_height);
+
+    // It would be nice if we could simply leave div_cdrag as 100% of the
+    // window height.  However, the window may be a non-integer height that we
+    // cannot measure accurately, which would screw up the scaling at the
+    // boundary between cdrag and cdraw.  Therefore we adjust the height of the
+    // cdrag canvas to exactly match the height of the cdraw canvas.
     this.be.div_cdrag.height(this.cdraw_height);
   }
 };
@@ -468,7 +474,7 @@ Circuit.prototype.update_view = function() {
   // canvas_cdrag_width/height indicates the size of the cdrag area in
   // canvas coordinates.
   var canvas_cdrag_width = this.be.cbox_width / this.be.scale;
-  var canvas_cdrag_height = this.be.window_height / this.be.scale;
+  var canvas_cdrag_height = this.cdraw_height / this.be.scale;
   this.be.cdrag.setViewBox(this.be.canvas_left, this.be.canvas_top,
                            canvas_cdrag_width, canvas_cdrag_height);
 };
