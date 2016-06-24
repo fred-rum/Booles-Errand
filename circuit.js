@@ -217,14 +217,17 @@ Circuit.prototype.resize = function(maintain_center) {
   } else {
     // The info panel is anchored to the top right of the screen, so
     // we just need to adjust its width to match the space remaining
-    // to the right of the trutht able.  Note that this may reflow the
+    // to the right of the truth table.  Note that this may reflow the
     // info text and thus change the height of the info panel.
     //
     // The border of the truth div may make it a non-integer width,
-    // which jQuery rounds up.  To avoid a potential gap, shoot for a
-    // 1 pixel overlap.  Since info is below truth in the z-index,
-    // this won't be visible, and the minor difference in text
-    // position won't be noticeable, either.
+    // and the window itself may be a non-integer width (e.g. if the
+    // user has zoomed in the whole browser).  jQuery rounds up both
+    // of these values to the next higher integer.  To avoid a
+    // potential gap between the truth table and the info panel, shoot
+    // for a 1 pixel overlap.  Since info is below truth in the
+    // z-index, this won't be visible, and the minor difference in
+    // text position won't be noticeable, either.
     this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
 
     // The info panel extends all the way to the right, so there's no
@@ -257,19 +260,19 @@ Circuit.prototype.resize = function(maintain_center) {
   if (this.be.hide_cbox) {
     this.be.cbox_width = 0;
   } else {
-    // Move the cbox below div_truth and adjust its height
-    // accordingly.  The border of the truth div may make it a
-    // non-integer height, which jQuery rounds up.  To avoid a
-    // potential gap, shoot for a 1 pixel overlap.  Since cbox is
-    // below truth in the z-index, this won't be visible, and the
-    // minor difference in cell (and scrollbar) position won't be
-    // noticeable either.
+    // The cbox is anchored to the bottom left of the screen, so we
+    // just need to adjust its height to match the space remaining
+    // below the truth table.
+    //
+    // The border of the truth div may make it a non-integer height,
+    // and the window itself may be a non-integer height (e.g. if the
+    // user has zoomed in the whole browser).  jQuery rounds up both
+    // of these values to the next higher integer.  To avoid a
+    // potential gap between the truth table and the cbox, shoot for a
+    // 1 pixel overlap.  Since cbox is below truth in the z-index,
+    // this won't be visible, and the minor difference in cell (and
+    // scrollbar) position won't be noticeable either.
     var cbox_height = this.be.window_height - this.be.truth_height + 1;
-    var cbox_offset = {
-      top: this.be.truth_height - 1,
-      left: 0
-    };
-    this.be.div_cbox.offset(cbox_offset);
     this.be.div_cbox.height(cbox_height);
 
     var max_width = this.be.window_width / 5;
