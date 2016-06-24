@@ -418,7 +418,10 @@ Circuit.prototype.resize = function() {
   this.be.sim.measure_slider();
 };
 
+// Adjust the position and scale of the canvas to fit all of the cells.
 Circuit.prototype.fit_view = function() {
+  this.be.view_is_fit = true;
+
   var bbox = {};
   var all_cells = this.be.level.all_cells;
   for (var i = 0; i < all_cells.length; i++) {
@@ -444,48 +447,47 @@ Circuit.prototype.fit_view = function() {
     this.be.canvas_left = 0;
     this.be.canvas_top = 0;
     this.be.scale = 1.0;
-  } else {
-    var bbox_width = bbox.right - bbox.left + this.be.em_size;
-    var bbox_height = bbox.bottom - bbox.top + this.be.em_size;
-    var bbox_cx = (bbox.left + bbox.right) / 2;
-    var bbox_cy = (bbox.top + bbox.bottom) / 2;
-
-    // The truth table cuts a corner out of the viewable screen
-    // area, so we try two different aspect ratios to avoid it
-    // and see which one is better.
-
-    // Try to the right of the truth table.
-    var cdraw_left1 = this.be.truth_width;
-    var cdraw_width1 = this.be.window_width - cdraw_left1;
-    var cdraw_top1 = this.be.info_height + this.be.div_controls.outerHeight();
-    var cdraw_height1 = this.be.window_height - this.be.zoom_height - cdraw_top1;
-    var x_scale1 = cdraw_width1 / bbox_width;
-    var y_scale1 = cdraw_height1 / bbox_height;
-    var scale1 = Math.min(x_scale1, y_scale1);
-
-    // Try below the truth table.
-    var cdraw_left2 = this.be.cbox_width;
-    var cdraw_width2 = this.be.window_width - cdraw_left2;
-    var cdraw_top2 = Math.max(cdraw_top1, this.be.truth_height);
-    var cdraw_height2 = this.be.window_height - this.be.zoom_height - cdraw_top2;
-    var x_scale2 = cdraw_width2 / bbox_width;
-    var y_scale2 = cdraw_height2 / bbox_height;
-    var scale2 = Math.min(x_scale2, y_scale2);
-
-    if (scale1 > scale2) {
-      var scale = this.be.scale = Math.min(scale1, 2.0);
-      var cdraw_cx = cdraw_left1 + cdraw_width1 / 2;
-      var cdraw_cy = cdraw_top1 + cdraw_height1 / 2;
-    } else {
-      var scale = this.be.scale = Math.min(scale2, 2.0);
-      var cdraw_cx = cdraw_left2 + cdraw_width2 / 2;
-      var cdraw_cy = cdraw_top2 + cdraw_height2 / 2;
-    }
-    this.be.canvas_left = bbox_cx - cdraw_cx / scale;
-    this.be.canvas_top = bbox_cy - cdraw_cy / scale;
+    return;
   }
 
-  this.be.view_is_fit = true;
+  var bbox_width = bbox.right - bbox.left + this.be.em_size;
+  var bbox_height = bbox.bottom - bbox.top + this.be.em_size;
+  var bbox_cx = (bbox.left + bbox.right) / 2;
+  var bbox_cy = (bbox.top + bbox.bottom) / 2;
+
+  // The truth table cuts a corner out of the viewable screen
+  // area, so we try two different aspect ratios to avoid it
+  // and see which one is better.
+
+  // Try to the right of the truth table.
+  var cdraw_left1 = this.be.truth_width;
+  var cdraw_width1 = this.be.window_width - cdraw_left1;
+  var cdraw_top1 = this.be.info_height + this.be.div_controls.outerHeight();
+  var cdraw_height1 = this.be.window_height - this.be.zoom_height - cdraw_top1;
+  var x_scale1 = cdraw_width1 / bbox_width;
+  var y_scale1 = cdraw_height1 / bbox_height;
+  var scale1 = Math.min(x_scale1, y_scale1);
+
+  // Try below the truth table.
+  var cdraw_left2 = this.be.cbox_width;
+  var cdraw_width2 = this.be.window_width - cdraw_left2;
+  var cdraw_top2 = Math.max(cdraw_top1, this.be.truth_height);
+  var cdraw_height2 = this.be.window_height - this.be.zoom_height - cdraw_top2;
+  var x_scale2 = cdraw_width2 / bbox_width;
+  var y_scale2 = cdraw_height2 / bbox_height;
+  var scale2 = Math.min(x_scale2, y_scale2);
+
+  if (scale1 > scale2) {
+    var scale = this.be.scale = Math.min(scale1, 2.0);
+    var cdraw_cx = cdraw_left1 + cdraw_width1 / 2;
+    var cdraw_cy = cdraw_top1 + cdraw_height1 / 2;
+  } else {
+    var scale = this.be.scale = Math.min(scale2, 2.0);
+    var cdraw_cx = cdraw_left2 + cdraw_width2 / 2;
+    var cdraw_cy = cdraw_top2 + cdraw_height2 / 2;
+  }
+  this.be.canvas_left = bbox_cx - cdraw_cx / scale;
+  this.be.canvas_top = bbox_cy - cdraw_cy / scale;
 };
 
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
