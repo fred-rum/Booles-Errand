@@ -54,7 +54,7 @@ function Sim(be) {
   this.set_slider(x);
 }
 
-Sim.prototype.resize_slider = function () {
+Sim.prototype.measure_slider = function () {
   var slider = $('#speed-slider');
   var slider_offset = slider.offset();
   this.slider_left = slider_offset.left;

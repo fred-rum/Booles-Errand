@@ -157,16 +157,32 @@ Circuit.prototype.begin_level = function(level_num) {
   this.update_view();
 };
 
+// Measure the window size and adjust the cdraw and cdrag div dimensions
+// accordingly.  Note that the actual canvas viewport is adjusted separately,
+// in update_view().
 Circuit.prototype.update_window_size = function() {
   // Record the window dimensions.  They get used all over.
   this.be.window_width = this.be.window.width();
   this.be.window_height = this.be.window.height();
 
-  if (this.be.window_width > this.cdraw_width) {
+  // We need cdraw to be at least as large as the window.  The window may be a
+  // non-integer size, which jQuery rounds down, so we actually need cdraw to
+  // be at least as large as the measured window size + 1.
+  //
+  // It's tempting to simply set the cdraw dimensions to a huge constant value,
+  // but who knows what size displays the future will bring, and the browser
+  // may be doing crazy scaling as well.  So we set the cdraw dimensions based
+  // on the measured window size, plus some margin so that we won't have to
+  // re-adjust every time that the window is resized.
+  //
+  // I assume that there's no advantage to reducing the size of the canvas when
+  // the window shrinks, so I don't bother to do so.
+  if (this.be.window_width >= this.cdraw_width) {
     this.cdraw_width = this.be.window_width + 1000;
     this.be.div_cdraw.width(this.cdraw_width);
   }
-  if (this.be.window_height > this.cdraw_height) {
+
+  if (this.be.window_height >= this.cdraw_height) {
     this.cdraw_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.cdraw_height);
 
@@ -318,7 +334,8 @@ Circuit.prototype.resize = function() {
     // If the info panel is hidden, then we allow the hidden truth table width
     // to be subordinate to the cbox width.  Possibly this applies to only the
     // 'Hidden truths' puzzle since it is the only one that hides the truth
-    // table, but has gates available in cbox.
+    // table while also having gates available in the cbox.  Basically, this
+    // code only exists because that one case looks super weird without it.
 
     // If the info panel is not hidden, then changing the truth width changes
     // the info width, which changes the info height, which changes the cbox
@@ -327,42 +344,64 @@ Circuit.prototype.resize = function() {
     // width when the info panel is showing.
 
     // If the info panel is hidden and the truth table is visible, then the
-    // truth table is always wider than the cbox width for the browsers I've
-    // tried.  So I don't bother with the extra code that would be needed to
-    // try to reduce its width here.
+    // truth table is always wider than the maximum cbox width for the browsers
+    // I've tried.  So I don't bother with the extra code that would be needed
+    // to try to reduce its width here.
     this.be.truth_width = this.be.cbox_width;
     this.be.div_truth.outerWidth(this.be.truth_width);
   }
+
   if (this.info_hidden) {
+    // Position the info stub just to the right of the truth table.
     var info_stub_offset = {
       top: 0,
       left: this.be.truth_width - 1
     };
     this.be.div_info_stub.offset(info_stub_offset);
+
+    // info_width is not actually the width of the info panel, but of the cdraw
+    // region excluded from view by the info panel.  It does not need to be
+    // precise, as the boundary for cell deletion looks natural.
     this.be.info_width = this.be.truth_width + this.be.div_info_stub.outerWidth();
   }
 
   // Position the sim controls.
 
   if (this.info_hidden) {
+    // The sim controls are positioned at the top of the window between the
+    // info panel stub and the main menu stub.
     var avail_width = (this.be.window_width -
                        this.be.info_width - this.be.main_stub_width);
     var cx = this.be.info_width + avail_width/2;
+
+    // The info panel has extra padding at the top that we don't need if it's
+    // placed at the top of the window, so we simply offset it to hide the
+    // padding.
     this.be.controls_top = -1;
   } else {
+    // The sim controls are positioned below the info panel.  If the truth
+    // table height was increased to match info panel height, then the sim
+    // controls are centered below both of those, and to the right of the cbox.
+    // But if the truth table height is greater than the info panel height,
+    // then the sim controls are centered to the right of the truth table.
     if (this.be.info_height == this.be.truth_height) {
       avail_width = this.be.window_width - this.be.cbox_width;
     } else {
       avail_width = this.be.window_width - this.be.truth_width;
     }
     cx = this.be.window_width - avail_width/2;
+
+    // The info panel may be a non-integer height, in which case jQuery rounds
+    // down.  To avoid a gap, we position the top of the sim controls one pixel
+    // above the measured info panel height.  The sim controls have one pixel
+    // of padding at the top which is hidden if the info panel is an exact
+    // integer height.
     this.be.controls_top = this.be.info_height - 1;
   }
 
-  // Position the sim controls at the left edge (to avoid an
-  // accidental line break at their right edge), then measure their
-  // desired width after any necessary line break to meet the
-  // avail_width constraint.
+  // Position the sim controls at the left edge (to avoid an accidental line
+  // break at their right edge), then measure their desired dimensions after
+  // any necessary line break to meet the avail_width constraint.
   this.be.div_controls.css({top: this.be.controls_top,
                             left: 0,
                             'max-width': avail_width});
@@ -370,11 +409,13 @@ Circuit.prototype.resize = function() {
   this.be.controls_height = this.be.div_controls.outerHeight();
 
   // Horizontally center the sim controls in the available space using
-  // their actual width (with the avail_width contraint).
+  // their measured width (with the avail_width contraint).
   this.be.controls_left = cx - this.be.controls_width/2;
   this.be.div_controls.css({left: this.be.controls_left});
 
-  this.be.sim.resize_slider();
+  // Sim needs to know the slider offset and width so that it can properly
+  // handle mouse drag interaction.
+  this.be.sim.measure_slider();
 };
 
 Circuit.prototype.fit_view = function() {
@@ -572,13 +613,11 @@ Circuit.prototype.click_info_hide = function() {
   this.be.div_info_stub.css({display: 'block'});
   this.be.div_main_stub.css({display: 'block'});
   this.resize();
-  this.update_view();
 };
 
 Circuit.prototype.click_info_unhide = function() {
   this.unhide_info();
   this.resize();
-  this.update_view();
 };
 
 Circuit.prototype.unhide_info = function() {
