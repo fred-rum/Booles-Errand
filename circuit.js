@@ -92,18 +92,24 @@ function Circuit() {
   // The vertical gap between cells in cbox.
   this.be.box_spacing = this.be.io_spacing;
 
-  // Create Z-level references
+  // Create Z-level references.  Raphael doesn't support the Z index,
+  // and even if it did, what we really need is a relative ordering
+  // among a constantly shifting set of elements.  The following
+  // references are named after the primary components that are
+  // ordered *before* each reference.  E.g. a cell can be moved above
+  // all other cells by ordering it just before z_cell.
   this.be.z_cell = this.be.cdraw.path('M0,0');
   this.be.z_wire = this.be.cdraw.path('M0,0');
   this.be.z_io = this.be.cdraw.path('M0,0');
-  this.be.z_handle = this.be.cdraw.path('M0,0');
 
-  // null cell
+  // The null cell provides a mobile, invisible attachment point for
+  // the end of a wire that is not connected to a real cell's IO.
   new Cell(this.be, 'cdraw', 'null', 0, 0, 'null');
 
   this.be.sim = new Sim(this.be);
   this.be.drag = new Drag(this.be);
 
+  // Set events on the background of the drawing canvas.
   this.be.bdrag.drag(this.be.div_cdraw, this, 'canvas',
                      {start: this.canvas_drag_start,
                       move: this.canvas_drag_move,
@@ -113,6 +119,9 @@ function Circuit() {
 
   this.be.div_cdraw.mousewheel($.proxy(this.canvas_mousewheel, this));
 
+  // Set events on buttons that trigger Circuit tasks.  These buttons
+  // always exist, so we only need to set the trigger once, but some
+  // buttons may be hidden at times.
   $('#button-info-hide').click($.proxy(this.click_info_hide, this));
   $('#button-info-unhide').click($.proxy(this.click_info_unhide, this));
 
@@ -120,17 +129,25 @@ function Circuit() {
   $('#zoom-out').click($.proxy(this.click_zoom_out, this));
   $('#zoom-fit').click($.proxy(this.click_zoom_fit, this));
 
+  // Set an event on window resize.  This may also be triggered by a
+  // change in device orientation.
   this.be.window.resize($.proxy(this.resize_event, this)); 
 
   // The canvas is initially displayed at a 1:1 ratio.  We need to
   // know this while initializing the cells in order to calculate font
-  // scaling..
+  // scaling.
   this.be.scale = 1.0;
 
+  // Initialize the Level object and begin the first puzzle.  A puzzle
+  // is always in progress throughout the game, although the user may
+  // not be able to interact with it when the main menu is showing.
   this.be.level = new Level(this.be);
   this.begin_level();
 }
 
+// Circuit.begin_level() calls Level.begin(), which calls
+// Sim.begin_level().  Each function initializes its own variables and
+// interface.
 Circuit.prototype.begin_level = function(level_num) {
   this.be.level.begin(level_num);
 
@@ -143,9 +160,16 @@ Circuit.prototype.begin_level = function(level_num) {
 
 Circuit.prototype.resize_event = function() {
   if (this.be.view_is_fit) {
-    this.resize(false);
+    // After the user has clicked 'fit' (or when a new puzzle is
+    // begun, which is automatically fit), resizing the window (or
+    // reorienting the screen) cause the view to be fit again.  This
+    // allows the user to get comfortable before making any manual
+    // changes, which unset view_is_fit.
+    this.resize(false); // Does not re-center the view.
     this.fit_view();
   } else {
+    // Keep the current drawing scale, but adjust its position to
+    // remain centered in view.
     this.resize(true);
   }
   this.update_view();
