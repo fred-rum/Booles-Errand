@@ -169,6 +169,7 @@ Circuit.prototype.update_window_size = function() {
   if (this.be.window_height > this.cdraw_height) {
     this.cdraw_height = this.be.window_height + 1000;
     this.be.div_cdraw.height(this.cdraw_height);
+    this.be.div_cdrag.height(this.cdraw_height);
   }
 };
 
