@@ -158,6 +158,7 @@ Circuit.prototype.begin_level = function(level_num) {
   this.update_view();
 };
 
+// Handler for the window resize event.
 Circuit.prototype.resize_event = function() {
   if (this.be.view_is_fit) {
     // After the user has clicked 'fit' (or when a new puzzle is
@@ -175,90 +176,97 @@ Circuit.prototype.resize_event = function() {
   this.update_view();
 };
 
+// Update the position and size of all window panels.  This may be in
+// reaction to a change in the window size or to a change in the
+// natural size of individual panels.
+//
+// The width of the truth table determines the width of the info
+// panel, which determines the height of the info panel, which
+// determines the minimum height of the truth table, which causes the
+// cbox to scale and so determines the width of the cbox.  But if the
+// truth table and info stub heights are fixed, then the width of the
+// cbox determines the width of the truth table.  Finally, the info
+// stub and the sim controls are placed relative to the truth table,
+// cbox, and info panel.
 Circuit.prototype.resize = function(maintain_center) {
-  // Adjust the sizes and positions of the various divs to fit the
-  // window size.
-
+  // Determine the (approximate) center of view.  We'll use these
+  // values later if maintain_center is true.
   var old_cdraw_cx = (this.be.window_width + this.be.cbox_width)/2
   var old_cdraw_cy = (this.be.window_height + this.be.info_height)/2;
 
+  // Record the window dimensions.  They get used all over.
   this.be.window_width = this.be.window.width();
   this.be.window_height = this.be.window.height();
-
-  // I might have set the div_truth dimensions in the past, so if I
-  // want to measure its natural dimensions to fit its contents, I
-  // have to set them back to auto first.
-
-  // Both Chrome and Firefox do a *terrible* job with overflow-auto.
-  // When the browser decides that a vertical scrollbar is needed, it
-  // refuses to expand the div width to accommodate it.  I've tried
-  // everything, and the only solution that looks somewhat decent is
-  // to artificially widen the div by 20 pixels over its natural width
-  // so that if a vertical scrollbar is needed, it has enough room to
-  // appear without triggering a horizontal scrollbar.  And worst that
-  // can happen if the hack is not completely successful for some
-  // browser is that both scrollbars appear.
-  //
-  // We measure and set the interior width here so that the minimum
-  // width of the truth table exactly matches the maximum width of
-  // cbox (which is also based on its interior width.)
-  this.be.div_truth.width(Math.max(this.be.truth_table_width + 20,
-                                   this.be.em_size * 8));
 
   if (this.be.hide_truth && this.be.hide_cbox) {
     // Hide the truth div altogether (but only if the cbox div will
     // also be hidden).
     this.be.truth_width = 0;
   } else {
-    // The actual div_truth may be smaller than what we just set due to
-    // the max-width property, so we measure it again to get the final
-    // width.  Here, we measure the outer width since that's what useful
-    // for positioning adjacent elements.
+    // The actual div_truth may be smaller than what we set due to its
+    // max-width property, so we measure it to get its current width.
+    // Here, we measure the outer width since that's what useful for
+    // positioning adjacent elements.
     this.be.truth_width = this.be.div_truth.outerWidth();
   }
 
-  this.be.div_truth.outerHeight('auto');
-  var new_truth_height = this.be.div_truth.outerHeight();
-
-  // Move div_info or its stub to the right of div_truth and decrease
-  // its width accordingly.  Note that this may reflow the text and
-  // thus change the height of div_info.
-  //
-  // The truth div may be a non-integer width.  To avoid a gap,
-  // shoot for a 1 pixel overlap.  Since info is below truth in the
-  // z-index, this won't be visible, and the minor difference in text
-  // position won't be noticeable, either.
-
-  // Position either the info panel or the info stub.
   if (this.info_hidden) {
-    // For now, just set the info panel stub height.  We'll set its
-    // width and position later.
+    // For now, just measure the info panel stub height.  We'll set
+    // its position and measure its width later.
     this.be.info_height = this.be.div_info_stub.outerHeight();
   } else {
+    // The info panel is anchored to the top right of the screen, so
+    // we just need to adjust its width to match the space remaining
+    // to the right of the trutht able.  Note that this may reflow the
+    // info text and thus change the height of the info panel.
+    //
+    // The border of the truth div may make it a non-integer width,
+    // which jQuery rounds up.  To avoid a potential gap, shoot for a
+    // 1 pixel overlap.  Since info is below truth in the z-index,
+    // this won't be visible, and the minor difference in text
+    // position won't be noticeable, either.
     this.be.div_info.width(this.be.window_width - this.be.truth_width + 1);
+
+    // The info panel extends all the way to the right, so there's no
+    // need to be exact about its width.
     this.be.info_width = Infinity;
+
+    // Measure the resulting height of the info panel.
     this.be.info_height = this.be.div_info.outerHeight();
   }
 
   // Make sure that div_truth is at least as tall as div_info.
-  if (new_truth_height < this.be.info_height) {
-    new_truth_height = this.be.info_height;
-    this.be.div_truth.outerHeight(new_truth_height);
+  //
+  // We can measure the height of the truth table itself, but that
+  // doesn't tell me the desired height of its container (with
+  // border).  Because of the max_height constraint, we can't just
+  // measure it once and assume that it stays that height, so we
+  // re-measure it every time we resize.  We may have set the
+  // div_truth height manually in the past, so if I want to measure
+  // its natural height to fit its contents, I have to set it back to
+  // auto first.
+  this.be.div_truth.outerHeight('auto');
+  this.be.truth_height = this.be.div_truth.outerHeight();
+  if (this.be.truth_height < this.be.info_height) {
+    this.be.div_truth.outerHeight(this.be.truth_height = this.be.info_height);
+    // The truth table max height is at least as tall as the info
+    // panel max height, so the newly set height is guaranteed to be
+    // used, and we don't need to remeasure it.
   }
-  this.be.truth_height = new_truth_height;
 
   if (this.be.hide_cbox) {
     this.be.cbox_width = 0;
   } else {
-    // Move the cbox below div_truth and decrease its height
-    // accordingly.  div_truth may not be an exact integer height, but
-    // jQuery always reports its height as an integer, and so the top of
-    // cbox is always at an integer offset (which is necessary to allow
-    // smooth dragging from cbox to cdraw, which is also at an integer
-    // offset).
-    var cbox_height = this.be.window_height - this.be.truth_height;
+    // Move the cbox below div_truth and adjust its height
+    // accordingly.  The border of the truth div may make it a
+    // non-integer height, which jQuery rounds up.  To avoid a
+    // potential gap, shoot for a 1 pixel overlap.  Since cbox is
+    // below truth in the z-index, this won't be visible, and the
+    // minor difference in cell (and scrollbar) position won't be
+    // noticeable either.
+    var cbox_height = this.be.window_height - this.be.truth_height + 1;
     var cbox_offset = {
-      top: this.be.truth_height,
+      top: this.be.truth_height - 1,
       left: 0
     };
     this.be.div_cbox.offset(cbox_offset);

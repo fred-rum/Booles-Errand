@@ -197,6 +197,26 @@ Level.prototype.level_name_to_num = function(name) {
   return undefined;
 }
 
+Level.prototype.update_truth_width = function(table_width) {
+  this.be.truth_table_width = table_width;
+
+  // Both Chrome and Firefox do a *terrible* job with overflow-auto.
+  // When the browser decides that a vertical scrollbar is needed, it
+  // refuses to expand the div width to accommodate it.  I've tried
+  // everything, and the only solution that looks somewhat decent is
+  // to artificially widen the div by 20 pixels over its natural width
+  // so that if a vertical scrollbar is needed, it has enough room to
+  // appear without triggering a horizontal scrollbar.  And worst that
+  // can happen if the hack is not completely successful for some
+  // browser is that both scrollbars appear.
+  //
+  // We measure and set the interior width here so that the minimum
+  // width of the truth table exactly matches the maximum width of
+  // cbox (which is also based on its interior width.)
+  this.be.div_truth.width(Math.max(this.be.truth_table_width + 20,
+                                   this.be.em_size * 8));
+};
+
 Level.prototype.init_table = function() {
   var level = this.level;
   this.sequenced = false;
@@ -253,11 +273,7 @@ Level.prototype.init_table = function() {
   html.push('</table>');
   $('#truth').html(html.join(''));
   this.div_truth_table = $('#truth-table');
-  if (level.hide.truth) {
-    this.be.truth_table_width = 0;
-  } else {
-    this.be.truth_table_width = this.div_truth_table.width();
-  }
+  this.update_truth_width(level.hide.truth ? 0 : this.div_truth_table.width());
 
   this.row_top = [];
   for (var i = 0; i < num_rows; i++) {
@@ -492,7 +508,7 @@ Level.prototype.init_random_row = function(truth_obj) {
   if (this.be.truth_table_width) {
     var new_width = this.div_truth_table.width();
     if (new_width > this.be.truth_table_width) {
-      this.be.truth_table_width = new_width;
+      this.update_truth_width(new_width);
       this.be.circuit.resize();
     }
   }
