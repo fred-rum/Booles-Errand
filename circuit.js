@@ -420,72 +420,148 @@ Circuit.prototype.resize = function() {
 
 // Adjust the position and scale of the canvas to fit all of the cells.
 Circuit.prototype.fit_view = function() {
+  // If the view is currently fit, resizing the window refits the view.
   this.be.view_is_fit = true;
 
-  var bbox = {};
+  // Default values in case we need to bail out.
+  this.be.canvas_left = 0;
+  this.be.canvas_top = 0;
+  this.be.scale = 1.0;
+
   var all_cells = this.be.level.all_cells;
+  if (all_cells.length == 0) return;
+
+  // Each cell's bbox includes margin for wires (assuming that if the cell is
+  // at the edge, then those wires curl towards the center).  However, here at
+  // the top level we also add 1/2 em margin so that the cells & wires aren't
+  // directly touching the edge of the viewing area.
+  var half_em = this.be.em_size/2;
+
+  // Get the bounding box of all cells on the canvas.
   for (var i = 0; i < all_cells.length; i++) {
-    var bbox_left = all_cells[i].bbox.left + all_cells[i].x;
-    var bbox_right = all_cells[i].bbox.right + all_cells[i].x;
-    var bbox_top = all_cells[i].bbox.top + all_cells[i].y;
-    var bbox_bottom = all_cells[i].bbox.bottom + all_cells[i].y;
-    if (bbox.left === undefined) {
-      bbox.left = bbox_left;
-      bbox.top = bbox_top;
-      bbox.right = bbox_right;
-      bbox.bottom = bbox_bottom;
+    var cell_left = all_cells[i].bbox.left + all_cells[i].x - half_em;
+    var cell_top = all_cells[i].bbox.top + all_cells[i].y - half_em;
+    var cell_right = all_cells[i].bbox.right + all_cells[i].x + half_em;
+    var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + half_em;
+    if (bbox_left === undefined) {
+      var bbox_left = cell_left;
+      var bbox_top = cell_top;
+      var bbox_right = cell_right;
+      var bbox_bottom = cell_bottom;
     } else {
-      if (bbox_left < bbox.left) bbox.left = bbox_left;
-      if (bbox_top < bbox.top) bbox.top = bbox_top;
-      if (bbox_right > bbox.right) bbox.right = bbox_right;
-      if (bbox_bottom > bbox.bottom) bbox.bottom = bbox_bottom;
+      if (cell_left < bbox_left) bbox_left = cell_left;
+      if (cell_top < bbox_top) bbox_top = cell_top;
+      if (cell_right > bbox_right) bbox_right = cell_right;
+      if (cell_bottom > bbox_bottom) bbox_bottom = cell_bottom;
     }
   }
 
-  if (bbox.left === undefined) {
-    // Handle the case that no cells are in cdraw.
-    this.be.canvas_left = 0;
-    this.be.canvas_top = 0;
-    this.be.scale = 1.0;
+  // These variables form the ideal bounding box in cdraw (i.e. window
+  // coordinates).  This cdraw bounding box will be reduced in size as needed
+  // to prevent cells from overlapping the incursions into this space.
+  var cdraw_left = this.be.cbox_width;
+  var cdraw_top = this.be.info_height + this.be.div_controls.outerHeight();
+  var cdraw_right = this.be.window_width;
+  var cdraw_bottom = this.be.window_height;
+
+  // Determine the ideal scale at which to fit the canvas into cdraw.
+  var scale1 = (cdraw_right - cdraw_left) / (bbox_right - bbox_left);
+  var scale2 = (cdraw_bottom - cdraw_top) / (bbox_bottom - bbox_top);
+  var scale = Math.min(scale1, scale2);
+
+  // The truth table may be an incursion into the ideal bounding box.
+  var tl_left = this.be.truth_width;
+  var tl_top = Math.max(cdraw_top, this.be.truth_height);
+
+  // The zoom controls are an incursion into the ideal bounding box.
+  var br_right = cdraw_right - this.be.zoom_width;
+  var br_bottom = cdraw_bottom - this.be.zoom_height;
+
+  // Review all cells again.  If any cell overlaps an incursion, reduce the
+  // ideal bounding box and possibly reduce the scale until the cells don't
+  // overlap the incursion.  This heuristic isn't perfect, but it works well
+  // for most cases and still works OK where it's not perfect.
+  //
+  // The heuristic doesn't account for wires that may cross the incursion.
+
+  // If the scale must be reduced multiple times to avoid an incursion, a
+  // constraint set by a previous cell may not be sufficient to avoid trouble
+  // at a smaller scale.  We awkwardly deal with that by repeating the loop
+  // until the scale stops reducing.
+  var old_scale = 0;
+  while (scale != old_scale) {
+    old_scale = scale;
+
+    for (var i = 0; i < all_cells.length; i++) {
+      var cell_left = all_cells[i].bbox.left + all_cells[i].x - half_em;
+      var cell_top = all_cells[i].bbox.top + all_cells[i].y - half_em;
+
+      var cell_cdraw_left = cdraw_left + (cell_left - bbox_left) * scale;
+      var cell_cdraw_top = cdraw_top + (cell_top - bbox_top) * scale;
+
+      if ((cell_cdraw_left < tl_left) && (cell_cdraw_top < tl_top)) {
+        var scale1 = (cdraw_right - tl_left) / (bbox_right - cell_left);
+        var scale2 = (cdraw_bottom - tl_top) / (bbox_bottom - cell_top);
+        if (scale1 < scale2) {
+          // tl_left is the tighter constraint, so avoid it by keep adjusting
+          // the vertical dimensions of the ideal cdraw bounding box.  It may
+          // be that we had some wiggle room in the vertical dimension, in
+          // which case we can keep the same scale as before.
+          if (scale2 < scale) scale = scale2;
+
+          // Now adjust the top of the cdraw bounding box so that the cell
+          // doesn't overlap the incursion.  I.e. position cell_top at tl_top
+          // at the new scale.
+          var cdraw_top = tl_top - scale * (cell_top - bbox_top);
+        } else {
+          // This is the same as above except that it positions cell_left at
+          // to_left at the new scale.
+          if (scale1 < scale) scale = scale1;
+          var cdraw_left = tl_left - scale * (cell_left - bbox_left);
+        }
+      }
+
+      // This is the same as above, but adjusting for the bottom-right
+      // incursion instead of the top-left.
+      var cell_right = all_cells[i].bbox.right + all_cells[i].x + half_em;
+      var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + half_em;
+
+      var cell_cdraw_right = cdraw_right - (bbox_right - cell_right) * scale;
+      var cell_cdraw_bottom = cdraw_bottom - (bbox_bottom - cell_bottom) * scale;
+
+      if ((cell_cdraw_right > br_right) && (cell_cdraw_bottom > br_bottom)) {
+        var scale1 = (br_right - cdraw_left) / (cell_right - bbox_left);
+        var scale2 = (br_bottom - cdraw_top) / (cell_bottom - bbox_top);
+        if (scale1 < scale2) {
+          if (scale2 < scale) scale = scale2;
+          var cdraw_bottom = br_bottom + scale * (bbox_bottom - cell_bottom);
+        } else {
+          if (scale1 < scale) scale = scale1;
+          var cdraw_right = br_right + scale * (bbox_right - cell_right);
+        }
+      }
+    }
+  }
+
+  if (scale <= 0) {
+    // The window is so small that there's no room to draw anything.
     return;
   }
 
-  var bbox_width = bbox.right - bbox.left + this.be.em_size;
-  var bbox_height = bbox.bottom - bbox.top + this.be.em_size;
-  var bbox_cx = (bbox.left + bbox.right) / 2;
-  var bbox_cy = (bbox.top + bbox.bottom) / 2;
+  // Limit the scale to keep cells from being drawn crazy enormous.  Note that
+  // we do this after fitting incursions, so the cells will perceptually be
+  // centered with the most possible margin on all sides.
+  if (scale > 2) scale = 2;
 
-  // The truth table cuts a corner out of the viewable screen
-  // area, so we try two different aspect ratios to avoid it
-  // and see which one is better.
+  // Set the canvas_top/left offset so that the cell bounding box is centered
+  // within the adjusted cdraw bounding box.
+  var bbox_cx = (bbox_left + bbox_right) / 2;
+  var bbox_cy = (bbox_top + bbox_bottom) / 2;
 
-  // Try to the right of the truth table.
-  var cdraw_left1 = this.be.truth_width;
-  var cdraw_width1 = this.be.window_width - cdraw_left1;
-  var cdraw_top1 = this.be.info_height + this.be.div_controls.outerHeight();
-  var cdraw_height1 = this.be.window_height - this.be.zoom_height - cdraw_top1;
-  var x_scale1 = cdraw_width1 / bbox_width;
-  var y_scale1 = cdraw_height1 / bbox_height;
-  var scale1 = Math.min(x_scale1, y_scale1);
+  var cdraw_cx = (cdraw_left + cdraw_right) / 2;
+  var cdraw_cy = (cdraw_top + cdraw_bottom) / 2;
 
-  // Try below the truth table.
-  var cdraw_left2 = this.be.cbox_width;
-  var cdraw_width2 = this.be.window_width - cdraw_left2;
-  var cdraw_top2 = Math.max(cdraw_top1, this.be.truth_height);
-  var cdraw_height2 = this.be.window_height - this.be.zoom_height - cdraw_top2;
-  var x_scale2 = cdraw_width2 / bbox_width;
-  var y_scale2 = cdraw_height2 / bbox_height;
-  var scale2 = Math.min(x_scale2, y_scale2);
-
-  if (scale1 > scale2) {
-    var scale = this.be.scale = Math.min(scale1, 2.0);
-    var cdraw_cx = cdraw_left1 + cdraw_width1 / 2;
-    var cdraw_cy = cdraw_top1 + cdraw_height1 / 2;
-  } else {
-    var scale = this.be.scale = Math.min(scale2, 2.0);
-    var cdraw_cx = cdraw_left2 + cdraw_width2 / 2;
-    var cdraw_cy = cdraw_top2 + cdraw_height2 / 2;
-  }
+  this.be.scale = scale;
   this.be.canvas_left = bbox_cx - cdraw_cx / scale;
   this.be.canvas_top = bbox_cy - cdraw_cy / scale;
 };
