@@ -84,7 +84,8 @@
 // specifies how many of that cell type are available.  If a cell type is not
 // followed by an integer, an infinite number of that cell type is available.
 // If avail is empty, no cells are available, and cbox is hidden.  If avail is
-// not present, a default set of cell types is made available to the user.
+// not present, a default set of cell types is made available to the user.  The
+// order of cells in the avail array determines the order of cells in the cbox.
 //
 // cells: This is an object that specifies which cells and wires are always
 // present (locked) in the drawing area for the puzzle level.  This must

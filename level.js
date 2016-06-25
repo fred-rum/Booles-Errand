@@ -2,20 +2,50 @@
 
 'use strict';
 
+// Level is a top-level object that initializes and maintains the puzzle
+// levels.  It handles setting up a level, sequencing through tests, and
+// completing the puzzle.  It also handles the help menu and the main menu.
 function Level(be) {
+  // "be" == "Boole's Errand'.  this.be is a data structure for "global" values
+  // for the whole circuit.  Any object that needs to access "global" values
+  // keeps a pointer to this.be.
   this.be = be;
 
+  // Read the completion status of all puzzles from local storage.  If local
+  // storage is not available, the user cannot save completion status from
+  // session to session, but the completion status is still kept for as long as
+  // a current game session remains running.
   for (var i = 0; i < this.puzzle.length; i++) {
     var key = 'boole.' + this.puzzle[i].name + '.completed';
     this.puzzle[i].completed = this.be.circuit.load_data(key);
   }
 
+  // Initialize the table of levels within the main menu div.  Most rows have
+  // three columns.  The first column contains a check mark if the puzzle is
+  // complete.  The second column contains a star if the puzzle contains a UI
+  // lesson.  The third column gives the name of the puzzle.
+
+  // To avoid inefficient string manipulation, the table is composed in an
+  // array, then joined together in a string at the end.
   var html = [];
+
+  // The first row presents a key to the interface lessons.
   html.push('<table class="levels"><tr><td></td><td colspan="2">&#9733; <b>= Interface lessons</b></td></tr>');
+
   for (var i = 0; i < this.puzzle.length; i++) {
+    // If the puzzles introduces a new section, the section name spans all
+    // three columns in a row prior to the regular puzzle row.
     if (this.puzzle[i].section) {
       html.push('<tr><td colspan="3"><b>', this.puzzle[i].section, '</b></td></tr>');
     }
+
+    // The regular puzzle row.  It includes an HTML ID for reference.  Note
+    // that the ID increments for each puzzle, not for each table row.
+    // I.e. non-puzzle rows don't include an ID.
+    //
+    // A blank SVG canvas is inserted in the first row to reserve the right
+    // amount of space, but we don't yet draw a check mark for completed
+    // puzzles.  We'll do that later.
     html.push('<tr class="levels" id="level', i, '">');
     html.push('<td><svg id="complete', i, '" display="block" width="1em" height="1em" viewBox="0 0 33 33"></svg></td><td>');
     if (this.puzzle[i].ui) {
@@ -26,11 +56,16 @@ function Level(be) {
   html.push('</table>');
   $('#levels').html(html.join(''));
 
+  // For each table row corresponding to a puzzle, mark whether the puzzle is
+  // complete, and also set a click handler on the table row.
   for (var i = 0; i < this.puzzle.length; i++) {
     if (this.puzzle[i].completed) this.mark_complete(i);
     $('#level' + i).click($.proxy(this.click_level, this, i));
   }
 
+  // Set events on buttons that trigger Level tasks.  These buttons always
+  // exist, so we only need to set the trigger once, but some buttons may be
+  // hidden at times.
   $('#button-help').click($.proxy(this.click_help, this));
 
   $('#button-main').click($.proxy(this.click_main, this));
@@ -40,14 +75,31 @@ function Level(be) {
   $('#next-main').click($.proxy(this.click_main, this));
 }
 
+// Mark a puzzle complete by drawing a check mark in its table row.
 Level.prototype.mark_complete = function(level_num) {
   var id = '#complete' + level_num;
   $(id).html('<path d="M7.5,16.5l6,12l12,-24" class="checkmark"/>')
 };
 
+// Circuit.begin_level() calls Level.begin(), which calls Sim.begin_level().
+// Each function initializes its own variables and interface.
 Level.prototype.begin = function(level_num) {
+  // If there is progress to be restored from any source, its string is placed
+  // in save_str.
   var save_str = undefined;
 
+  // If the level_num paramater is not specified (e.g. when the game is first
+  // loaded), we check to see if the URL specifies a level name.  If level info
+  // is encoded in the URL, it is in this form:
+  // <game location>#<level name>?<save_str>
+  //
+  // All permanent storage uses the level name, not the level number.  This way
+  // if we re-arrange the order of levels, the stored data will still make
+  // sense.  (We just have to be careful about renaming levels.)
+  //
+  // BTW, later on as the level starts, the information after the '#' is
+  // removed from the URL displayed in the address bar.  So we'll only get this
+  // information as the game starts, and it will otherwise be blank.
   if (level_num === undefined) {
     var anchor = decodeURI(window.location.hash.substring(1));
     if (anchor != '') {
@@ -57,25 +109,41 @@ Level.prototype.begin = function(level_num) {
       level_num = this.level_name_to_num(level_name);
     }
   }
+
+  // If level_num is still not specified, we check the saved information in
+  // local storage.
   if (level_num === undefined) {
     var level_name = this.be.circuit.load_data('boole.state.level');
     level_num = this.level_name_to_num(level_name);
   }
 
+  // If level is still not specified, start at level 0.
   if (!level_num) level_num = 0;
+
   this.level_num = level_num;
   var level = this.level = this.puzzle[level_num];
+
+  // Record which level the user is working on in local storage.
   this.be.circuit.save_data('boole.state.level', level.name);
 
-//  if (true) { // cheat
-//    save_str = level.soln; // [level.soln.length-1]
-//  } else
+  // If the user selects 'Show sample solution' from the help menu, it restarts
+  // the level with this.be.showing_soln = <soln #>, where <soln #> is 1-N.
+  // (It perhaps would be cleaner to pass it as a parameter, but there are a
+  // bunch of levels of function to pass that parameter through that don't care
+  // about its value.)
+  //
+  // If this.be.showing_soln has a value, we use that solution from the puzzle
+  // data.  Otherwise if the URL had a save_str field, we use that progres
+  // info.  Otherwise we get the progress info for the current level from the
+  // local storage.
   if (this.be.showing_soln) {
     save_str = level.soln[this.be.showing_soln-1];
   } else if (!save_str) {
     save_str = this.be.circuit.load_data('boole.' + level.name + '.progress');
   }
 
+  // If it isn't an object already, turn the 'hide' array in the puzzle data
+  // into an object for easy look up.
   if (level.hide === undefined) {
     level.hide = {};
   } else if (Array.isArray(level.hide)) {
@@ -86,17 +154,30 @@ Level.prototype.begin = function(level_num) {
     level.hide = hide;
   }
 
-  this.box_cells = {};
-  this.be.box_height = this.be.box_spacing;
+  // If the puzzle doesn't specify which cells are available for the user to
+  // use, here is a default list.
   if (level.avail === undefined) {
     level.avail = ['inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'];
   }
 
+  // For each type of available cell type, box_cells has a link to the Cell
+  // object in cbox.
+  this.box_cells = {};
+
+  // box_height specifies the total height of the cells and inter-cell spacing
+  // in cbox.  It is initialized with the height of the space prior to the
+  // first cell, and each new cell adds its own height plus one more inter-cell
+  // space.
+  this.be.box_height = this.be.box_spacing;
+
+  // If no cells are available to the user (only cells locked to the drawing
+  // area), the cbox is hidden.
   this.be.hide_cbox = (level.avail.length == 0);
   var display = this.be.hide_cbox ? 'none' : 'block';
   this.be.div_cbox.css({display: display});
   this.be.div_cdrag.css({display: display});
 
+  // Parse the cell types and quantities from the puzzle's avail array.
   for (var i = 0; i < level.avail.length; i++) {
     var name = level.avail[i];
     if (typeof name == 'string') {

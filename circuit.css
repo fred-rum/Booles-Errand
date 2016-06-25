@@ -315,7 +315,7 @@ th.check, td.check {
 table.levels {
     border: thin solid;
     cursor: pointer;
-    line-height: 1.15;
+    line-height: 1.15; /* a fixed line height keeps the table looking regular */
     -webkit-user-select: none;  /* Chrome all / Safari all */
     -moz-user-select: none;     /* Firefox all */
     -ms-user-select: none;      /* IE 10+ */

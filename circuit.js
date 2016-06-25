@@ -8,9 +8,9 @@
 function Circuit() {
   ExtendRaphael();
 
-  // "be" == "Boole's Errand'.  this.be is a data structure for
-  // "global" values for the whole circuit.  Any objects that need to
-  // access "global" values keeps a pointer to this.be.
+  // "be" == "Boole's Errand'.  this.be is a data structure for "global" values
+  // for the whole circuit.  Any object that needs to access "global" values
+  // keeps a pointer to this.be.
   this.be = {}
   this.be.circuit = this;
   this.be.bdrag = new Bdrag(this.be);
