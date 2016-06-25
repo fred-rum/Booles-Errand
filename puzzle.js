@@ -2,7 +2,119 @@
 
 'use strict';
 
-var x = undefined;
+// Each element of the array is one puzzle level.  The format is as follows:
+//
+// name: Name of the level as presented in the main menu.
+//
+// section: if present, is displayed above the puzzle name in the main menu.
+//
+// ui: if present and true, indicates that the puzzle teaches a UI feature.
+// This is marked with a star in the main menu.
+//
+// intro: HTML text that introduces the puzzle.  This text is displayed when
+// the puzzle is begun.
+//
+// outro: HTML text that concludes the puzzle.  This text is displayed when all
+// rows of the truth table are passed.
+//
+// hint: This can be a single HTML string or an array of HTML strings.  Each
+// string gives a hint as to how to solve the puzzle.  These hints are
+// available to the user via the help menu.
+//
+// soln: This can be a single string or an array of strings.  Each string holds
+// a solution to the puzzle in the same format used for sharing URLs (the
+// portion after the '?') or saving progress in local storage.  These solutions
+// are available via the help menu.  Note that an easy way to generate the soln
+// string is to can design your own circuit within the game, select 'Copy my
+// progress' from the help menu, then copy everything after '?' as the soln
+// string.  To make the solution as pretty as possible, you can touch up the
+// coordinates the URL and test them in the game before making the final copy.
+//
+// truth: An array of test sequences.  Each test sequence can be a single
+// object or an array of objects representing multiple steps of one sequence.
+// In each object, stimulus pin values are given as name/value pairs.  If a pin
+// is not listed or its value is undefined, the stimulus pin is left as
+// "unknown" for that step of the sequence.  Also in each object, test pin
+// values are given as name/value pairs.  If a pin is not listed or its value
+// is undefined, the test pin is left as "don't care" for that step of the
+// sequence.
+//
+//   Instead of having name/value pairs, an test sequence step object can
+//   contain a property 'rnd' whose value is the name of a function that is
+//   declared in the level object.  This function is called with the test
+//   sequence step object as a parameter, and the function fills in the object
+//   with name/value pairs for stimulus and test pins, randomly chosen to best
+//   test the circuit.
+//
+//   In addition to the 'rnd' property, the test sequence step object may also
+//   have another property 'full' that is also the name of another function
+//   that is declared in the level object.  This function is called with the
+//   test sequence step object as a parameter.  The function tries putting
+//   various stimuls and test values in the object and calls this.fast_test()
+//   on each attempt to check whether it exposes a bug in the circuit.
+//
+//   The 'full' function tries to pretend that it's just a random function that
+//   happens to get lucky and find circuit bugs with unusual frequency.  To
+//   enhance this fiction, it searches for the stimulus space in a thoroughly
+//   random order that it generates by calling this.shuffle() on an array that
+//   encodes the order of testing in whatever manner it chooses.  If the 'full'
+//   function does not find any stimulus that triggers a bug, it leaves the
+//   object with a random set of stimulus values and the corresponding test
+//   values (e.g. the last random ones that it tested).  The Level object only
+//   calls the 'full' function if it doesn't already have a test sequence in
+//   the truth table that exposes a bug.  Otherwise it calls the 'rnd' function
+//   instead.
+//
+//   To guarantee that a bug is found, at least two entries in the truth table
+//   must contain a 'full' function.  This is because when the user changes the
+//   circuit (e.g. to fix a bug and introduce a new bug), the currently
+//   selected test sequence is not re-randomized.  Changing the circuit only
+//   re-randomizes non-selected test sequences.
+//
+//   We now continue with a description of the properties of the level
+//   object...
+//
+// hide: if present, is an array of strings that name UI elements to be hidden.
+// Possible strings are 'truth', which hides the truth table, and 'speed',
+// which hides the speed slider and the pause-at controls.
+//
+// avail: if present, is an array of strings that name cell types that are
+// available in the inventory box (cbox) for the user to use in her circuit
+// design.  A named cell type can be followed in the array by an integer, which
+// specifies how many of that cell type are available.  If a cell type is not
+// followed by an integer, an infinite number of that cell type is available.
+// If avail is empty, no cells are available, and cbox is hidden.  If avail is
+// not present, a default set of cell types is made available to the user.
+//
+// cells: This is an object that specifies which cells and wires are always
+// present (locked) in the drawing area for the puzzle level.  This must
+// include all stimulus and test pins, and it may include other locked cells.
+// For each name/value pair in the object, the name is the name of the cell,
+// and the value is an object specifying various attributes of the cell
+// (described below).  For a stimulus/test pin, the name is the pin name that
+// is displayed on the pin and used in the truth table, except that if the name
+// contains no capital letters, it is first converted to all caps.
+// (E.g. 'Cout' is not changed, but 'z' becomes 'Z'.)  The value for the named
+// cell is an object with the following properties:
+//
+//   x, y: specifies the cell's coordinates on the canvas.  Primitive cells are
+//   roughtly 40x40 (not including wire stubs), so the starting cells should be
+//   spaced apart from each other accordingly.  Since the puzzle is fit to the
+//   view when the level is started, the coordinate origin doesn't matter, but
+//   small positive integers are easiest to understand and use the least script
+//   bandwidth and also mean that when the user places cells at similar nearby
+//   coordinates, her cells use the least characters in local storage or in a
+//   shared URL.
+//
+//   io: specifies an array of wire connctions to make from the cell's
+//   output(s).  Each array element is itself an array usually containing three
+//   values: the output port name, the input cell name, and the input port
+//   name.  If the array contains a fourth value that evaluates as true
+//   (e.g. 1), the wire is unlocked and may be modified by the user.
+//   Otherwise, the wire defaults to being locked, which means that the user
+//   cannot modify that wire nor add any other wires to the ports it connects
+//   to.
+
 Level.prototype.puzzle = [
   {name: 'Press play',
    section: 'Introduction',
@@ -447,8 +559,8 @@ Level.prototype.puzzle = [
    outro: '<p>This circuit simulator uses a black color to represent a value that is unknown, which includes "don\'t care" values. If a logic gate has an unknown input, a logic gate may output a known or unknown value depending on its other inputs and its logic function.</p>',
    soln: '1s3-0,o,3,i0-1,o,3,i1;150,nor,50+o,2,i',
    truth: [{a:0, b:0,   z:1},
-           {a:x, b:1,   z:0},
-           {a:1, b:x,   z:0}],
+           {     b:1,   z:0},
+           {a:1,        z:0}],
    avail: ['nor', 1],
    cells: {
      a: {type: 'input',
@@ -1938,12 +2050,12 @@ Level.prototype.puzzle = [
    intro: '<p>The logic that feeds the SR latch can be built up to implement the D latch. Because NAND gates are generally easier to implement using silicon transistors than AND and OR gates, a more common SR latch design uses a pair of NAND gates to recirculate the data. This latch design has the convenient property that the latch output is available in both regular and inverted forms.</p><p><b>Connect the latch so that it is transparent and propagates the D value only when E is 1.</b> Once the latch output is initialized, ~Q must be the inverted value of Q.</p>',
    outro: '<p>The circuit you designed is called a D latch.</p>',
    soln: '1s6-0,o,7,i0-0,o,8,i0-1,o,6,i-1,o,7,i1;152,inv,100+o,8,i1;250,nand,10+o,4,i0;250,nand,90+o,5,i1',
-   truth: [[{e:0, d:0,   q:x, '~q':x},
+   truth: [[{e:0, d:0,              },
             {e:1, d:0,   q:0, '~q':1},
             {e:1, d:1,   q:1, '~q':0},
             {e:0, d:1,   q:1, '~q':0},
             {e:0, d:0,   q:1, '~q':0}],
-           [{e:0, d:1,   q:x, '~q':x},
+           [{e:0, d:1,              },
             {e:1, d:1,   q:1, '~q':0},
             {e:1, d:0,   q:0, '~q':1},
             {e:0, d:0,   q:0, '~q':1},
@@ -2213,7 +2325,7 @@ Level.prototype.puzzle = [
          '<p>Use two latches in series with opposite polarity enables.</p>',
          '<p>Make sure that the first latch meets the hold time requirement of the second.</p>'],
    soln: '1s3-0,o,4,d-1,o,5,i-1,o,3,e;440,latch,100+q,2,i;280,latch,-80+q,3,d;140,inv,40+o,4,e',
-   truth: [[{d:0, clk:0,   q:x},
+   truth: [[{d:0, clk:0,      },
             {d:0, clk:1,   q:0},
             {d:1, clk:1,   q:0},
             {d:1, clk:0,   q:0},

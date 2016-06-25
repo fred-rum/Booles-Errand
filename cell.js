@@ -990,11 +990,11 @@ Cell.prototype.init_input = function() {
 
   this.init_io(false, 1, 0, left, right);
 
-  var path = ['M', left, top,
+  var path = ['M', right, 0,
+              'L', width/2, top,
+              'h', -width,
               'v', height,
               'h', width,
-              'L', right, 0,
-              'L', width/2, top,
               'z'];
   this.push_el(this.canvas.path(path).attr(this.cell_bg_attr), 'drag_cell');
   this.draw_stubs();
@@ -1020,11 +1020,11 @@ Cell.prototype.init_output = function() {
   this.qty_cx = this.io.i.x;
   this.qty_top = this.io.i.y;
 
-  var path = ['M', right, top,
+  var path = ['M', left, 0,
+              'L', -width/2, top,
+              'h', width,
               'v', height,
               'h', -width,
-              'L', left, 0,
-              'L', -width/2, top,
               'z'];
   this.push_el(this.canvas.path(path).attr(this.cell_bg_attr), 'drag_cell');
   this.draw_stubs();
