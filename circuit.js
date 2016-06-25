@@ -177,6 +177,9 @@ Circuit.prototype.update_window_size = function() {
   //
   // I assume that there's no advantage to reducing the size of the canvas when
   // the window shrinks, so I don't bother to do so.
+  //
+  // Because the canvas dimensions are set to '100%' of the div dimensions,
+  // updating the div size automatically updates the canvas size.
   if (this.be.window_width >= this.cdraw_width) {
     this.cdraw_width = this.be.window_width + 1000;
     this.be.div_cdraw.width(this.cdraw_width);
@@ -432,8 +435,8 @@ Circuit.prototype.fit_view = function() {
   if (all_cells.length == 0) return;
 
   // Each cell's bbox includes margin for wires (assuming that if the cell is
-  // at the edge, then those wires curl towards the center).  However, here at
-  // the top level we also add 1/2 em margin so that the cells & wires aren't
+  // at the edge, then those wires curl towards the center).  Here at the top
+  // level we add another 1/2 em margin so that the cells & wires aren't
   // directly touching the edge of the viewing area.
   var half_em = this.be.em_size/2;
 
@@ -469,7 +472,9 @@ Circuit.prototype.fit_view = function() {
   var scale2 = (cdraw_bottom - cdraw_top) / (bbox_bottom - bbox_top);
   var scale = Math.min(scale1, scale2);
 
-  // The truth table may be an incursion into the ideal bounding box.
+  // The truth table may be an incursion into the ideal bounding box if it is
+  // taller than the info panel.  If it is the same height, then the tl
+  // incursion has no effect.
   var tl_left = this.be.truth_width;
   var tl_top = Math.max(cdraw_top, this.be.truth_height);
 
@@ -483,21 +488,22 @@ Circuit.prototype.fit_view = function() {
   // for most cases and still works OK where it's not perfect.
   //
   // The heuristic doesn't account for wires that may cross the incursion.
+  // This is usually OK because there's probably no more than one wire across
+  // that corner, and it's obvious where it goes.
 
   // If the scale must be reduced multiple times to avoid an incursion, a
   // constraint set by a previous cell may not be sufficient to avoid trouble
   // at a smaller scale.  We awkwardly deal with that by repeating the loop
   // until the scale stops reducing.
-  var old_scale = 0;
-  while (scale != old_scale) {
-    old_scale = scale;
+  while (scale !== old_scale) {
+    var old_scale = scale;
 
     for (var i = 0; i < all_cells.length; i++) {
       var cell_left = all_cells[i].bbox.left + all_cells[i].x - half_em;
       var cell_top = all_cells[i].bbox.top + all_cells[i].y - half_em;
 
-      var cell_cdraw_left = cdraw_left + (cell_left - bbox_left) * scale;
-      var cell_cdraw_top = cdraw_top + (cell_top - bbox_top) * scale;
+      var cell_cdraw_left = cdraw_left + (cell_left - bbox_left)*scale;
+      var cell_cdraw_top = cdraw_top + (cell_top - bbox_top)*scale;
 
       if ((cell_cdraw_left < tl_left) && (cell_cdraw_top < tl_top)) {
         var scale1 = (cdraw_right - tl_left) / (bbox_right - cell_left);
@@ -526,8 +532,8 @@ Circuit.prototype.fit_view = function() {
       var cell_right = all_cells[i].bbox.right + all_cells[i].x + half_em;
       var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + half_em;
 
-      var cell_cdraw_right = cdraw_right - (bbox_right - cell_right) * scale;
-      var cell_cdraw_bottom = cdraw_bottom - (bbox_bottom - cell_bottom) * scale;
+      var cell_cdraw_right = cdraw_right - (bbox_right - cell_right)*scale;
+      var cell_cdraw_bottom = cdraw_bottom - (bbox_bottom - cell_bottom)*scale;
 
       if ((cell_cdraw_right > br_right) && (cell_cdraw_bottom > br_bottom)) {
         var scale1 = (br_right - cdraw_left) / (cell_right - bbox_left);
@@ -566,22 +572,24 @@ Circuit.prototype.fit_view = function() {
   this.be.canvas_top = bbox_cy - cdraw_cy / scale;
 };
 
+// Functions to convert a cdraw (window) coordinate to a canvas coordinate.
 Circuit.prototype.cdraw_to_canvas_x = function(cdraw_x) {
   return cdraw_x / this.be.scale + this.be.canvas_left;
 };
-
 Circuit.prototype.cdraw_to_canvas_y = function(cdraw_y) {
   return cdraw_y / this.be.scale + this.be.canvas_top;
 };
 
+// Functions to convert a canvas coordinate to a cdraw (window) coordinate.
 Circuit.prototype.canvas_to_cdraw_x = function(canvas_x) {
   return (canvas_x - this.be.canvas_left) * this.be.scale;
 };
-
 Circuit.prototype.canvas_to_cdraw_y = function(canvas_y) {
   return (canvas_y - this.be.canvas_top) * this.be.scale;
 };
 
+// Update the cdraw and cdrag canvas viewports according to the current canvas
+// size, offset, and scale.
 Circuit.prototype.update_view = function() {
   // canvas_cdraw_width/height indicates the size of the overall cdraw
   // (larger than viewable) area in canvas coordinates.
@@ -598,18 +606,27 @@ Circuit.prototype.update_view = function() {
                            canvas_cdrag_width, canvas_cdrag_height);
 };
 
+// Handle dragging of the canvas background (panning).
 Circuit.prototype.canvas_drag_start = function(x, y) {
+  // Record the original mouse coordinates.  Any movement of the mouse relative
+  // to this point becomes an equivalent panning of the canvas.
   this.old_drag_x = x;
   this.old_drag_y = y;
 
+  // Force the cursor *everywhere*, even its over something that would normally
+  // have its own cursor, and even if it's outside the window.
   $(document.body).addClass('cursor-force-all-scroll');
 };
 
 Circuit.prototype.canvas_drag_move = function(x, y) {
   // Since the user made a change to the canvas position, we won't
-  // automatically refit it on a window resize.
+  // automatically refit it on a window resize.  We don't do this in
+  // canvas_drag_start because the user hasn't yet actually moved the canvas,
+  // and it may have been a misclick or accidental touch that we should ignore.
   this.be.view_is_fit = false;
 
+  // Turn the change in mouse coordinates into a difference in canvas
+  // coordinates.
   var screen_dx = x - this.old_drag_x;
   var screen_dy = y - this.old_drag_y;
   var canvas_dx = screen_dx / this.be.scale;
@@ -626,8 +643,15 @@ Circuit.prototype.canvas_drag_end = function() {
   $(document.body).removeClass('cursor-force-all-scroll');
 };
 
+// Handle pinching on the canvas background (zooming).
 Circuit.prototype.canvas_pinch_start = function(x1, y1, x2, y2) {
+  // Measure the original distance between the user's fingers.
   this.pinch_orig_distance = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
+
+  // Record the original scale.  Thus, if the user pinches beyond the point the
+  // the scale is maxed out, and then returns to the original pinch distance,
+  // we'll intuitively return to the original scale rather than immediately
+  // zooming out as soon as he starts decreasing the pinch distance.
   this.pinch_orig_scale = this.be.scale;
 };
 
@@ -637,19 +661,45 @@ Circuit.prototype.canvas_pinch_move = function(x1, y1, x2, y2) {
                    (pinch_distance / this.pinch_orig_distance));
   if (new_scale > 2.0) new_scale = 2.0;
 
+  // rescale() updates the scale while keeping x1,y1 fixed in place on the
+  // canvas.  Note that x1,y1 corresponds the user's first finger, which also
+  // pans the canvas as it moves, so its intuitive to keep it pointing at that
+  // spot during the zoom as well.  In fact, if the user keeps the angle
+  // between her fingers constant, the second finger will also continue to
+  // point to a fixed spot on the canvas as the pinch/zoom happens.
   this.rescale(x1, y1, new_scale);
 };
 
+// There is no canvas_pinch_end function because none is needed.
+
+// This function is called for mousewheel up/down events (zooming).  It also
+// gets called for left/right events, but those have no effect if event.deltaY
+// is 0.
 Circuit.prototype.canvas_mousewheel = function(event) {
   // Ignore events with bucky-key modifiers.  E.g. ctrl-scroll zooms the
   // whole window, so we don't want to also zoom the draw view.
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
 
+  // Each click of the mousewheel corresponds to a factor of 0.85 or 1/0.85.  I
+  // presume that the jquery-mousewheel has resolved any oddities with
+  // specialized mice that may click differently.
   var new_scale = this.be.scale / Math.pow(0.85, event.deltaY);
+
+  // rescale() updates the scale while keeping the current mouse position fixed
+  // in place on the canvas.
   this.rescale(event.pageX, event.pageY, new_scale);
 };
 
+// Update the scale while keeping fixed in place the canvas coordinate that
+// corresponds to the parameter x,y cdraw/window coordinate.
 Circuit.prototype.rescale = function(x, y, new_scale) {
+  // Don't change view_is_fit if the scale doesn't actually change.  If the
+  // user tries to scale beyond 2.0, new_scale will be greater than 2.0, so
+  // we'll continue with the rest of the function, including setting
+  // view_is_fit to false.  This seems intuitively right because the user at
+  // least *tried* to change the view.
+  if (new_scale == this.be.scale) return;
+
   // Since the user made a change to the canvas scale, we won't
   // automatically refit it on a window resize.
   this.be.view_is_fit = false;
@@ -666,6 +716,9 @@ Circuit.prototype.rescale = function(x, y, new_scale) {
   this.update_view();
 };
 
+// Handle clicks on the zoom control buttons.  The mouse/touch is not in a
+// meaningful position for these, so we simply zoom relative to the center of
+// the viewable area.
 Circuit.prototype.click_zoom_in = function() {
   this.zoom(1/0.85);
 };
@@ -680,11 +733,13 @@ Circuit.prototype.zoom = function(ratio) {
                this.be.scale * ratio);
 };
 
+// Handle a click on the 'fit' button.
 Circuit.prototype.click_zoom_fit = function() {
   this.be.circuit.fit_view();
   this.be.circuit.update_view();
 };
 
+// Handle a click on the 'hide info panel' button.
 Circuit.prototype.click_info_hide = function() {
   this.info_hidden = true;
   this.be.div_info.css({display: 'none'});
@@ -693,11 +748,16 @@ Circuit.prototype.click_info_hide = function() {
   this.resize();
 };
 
+// Handle a click on the 'unhide info panel' button.  There are other reasons
+// for the info panel to be unhidden, so the meat of the function is performed
+// in unhide_info().
 Circuit.prototype.click_info_unhide = function() {
   this.unhide_info();
   this.resize();
 };
 
+// Unhide the info panel, e.g. because the user requested it or because there
+// is important info to display.
 Circuit.prototype.unhide_info = function() {
   this.info_hidden = false;
   this.be.div_info_stub.css({display: 'none'});
@@ -705,6 +765,7 @@ Circuit.prototype.unhide_info = function() {
   this.be.div_info.css({display: 'block'});
 };
 
+// Save data in local storage (if possible).
 Circuit.prototype.save_data = function(key, data) {
   try {
     localStorage.setItem(key, data);
@@ -715,6 +776,7 @@ Circuit.prototype.save_data = function(key, data) {
   }
 };
 
+// Get data from local storage (if possible).
 Circuit.prototype.load_data = function(key) {
   try {
     return localStorage.getItem(key);
@@ -724,7 +786,7 @@ Circuit.prototype.load_data = function(key) {
   }
 };
 
-// This is called as soon as the DOM is ready.
+// This is called as soon as the DOM is ready.  This function begins the game.
 $(function() {
   new Circuit();
 });
