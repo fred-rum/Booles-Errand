@@ -187,6 +187,10 @@ Level.prototype.begin = function(level_num) {
       cell.el_qty_text.setAttr('visibility', 'visible');
     }
   }
+
+  // Unlike cdraw and cdrag, the cbox canvas is not exactly the size of its
+  // containing div (because the div is allowed to scroll).  Therefore, we use
+  // setViewBox to directly specify the size of the canvas.
   this.be.cbox.setViewBox(0, 0, this.be.em_size*8, this.be.box_height);
 
   this.named_cells = {};

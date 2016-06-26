@@ -178,8 +178,11 @@ Circuit.prototype.update_window_size = function() {
   // I assume that there's no advantage to reducing the size of the canvas when
   // the window shrinks, so I don't bother to do so.
   //
-  // Because the canvas dimensions are set to '100%' of the div dimensions,
-  // updating the div size automatically updates the canvas size.
+  // Because Raphael requires the canvas to be the only thing in a div, we can
+  // either resize the div and have the canvas adjust to match, or vice versa.
+  // For cdraw and cdrag, we arbitrarily choose to resize the div.  Because the
+  // canvas dimensions are set to '100%' of the div dimensions, updating the
+  // div size automatically updates the canvas size.
   if (this.be.window_width >= this.cdraw_width) {
     this.cdraw_width = this.be.window_width + 1000;
     this.be.div_cdraw.width(this.cdraw_width);
