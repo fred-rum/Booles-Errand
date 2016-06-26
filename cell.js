@@ -1034,7 +1034,8 @@ Cell.prototype.init_output = function() {
     'text-anchor': 'end',
     'font-family': 'Verdana, Helvetica, Arial, sans-serif'
   };
-  this.el_text = this.canvas.text(right - this.be.stroke_cell_fg, 0, '').attr(attr);
+  this.edge = right - this.be.stroke_cell_fg;
+  this.el_text = this.canvas.text(this.edge, 0, '').attr(attr);
   this.push_el(this.el_text);
 
   // Placeholder for output check result.
@@ -1114,15 +1115,23 @@ Cell.prototype.fit_output_text = function() {
 
   if (text === this.text) return;
   this.text = text;
+  var x = this.edge;
 
-  this.el_text.attr({text: text, 'font-size': 10 * this.be.scale});
+  this.el_text.attr({text: text, x: x, 'font-size': 10 * this.be.scale});
   var bbox = this.el_text.getBBox(true);
-  if (text.length < 3) {
-    // To prevent the text from getting weirdly huge, we pretend that
-    // a short text string is wider than it really is.
-    var inc = bbox.width * (3 / text.length - 1);
-    bbox.width += inc;
-    bbox.x -= inc/2;
+
+  // If the text string is unusually short (i.e. when the expected value is
+  // "don't care"), we pretend it's at least three characters wide to prevent
+  // it from getting weirdly huge.
+  var tl = text.length;
+  if (tl < 3) {
+    // If tl == 1, subtract one character width (bbox.width).
+    // If tl == 2, subtract 1/2 character width (bbox.width/4).
+    x -= bbox.width / tl / tl;
+
+    // If tl == 1, pretend the character is 3 times as wide.
+    // if tl == 2, pretend the character is 1.5 times as wide.
+    bbox.width *= 3 / tl;
   }
 
   var height = 1.5 * this.be.io_spacing;
@@ -1133,7 +1142,7 @@ Cell.prototype.fit_output_text = function() {
   // width + half the height to fit in the total cell width.
   var scale = total_width / (bbox.width + bbox.height/2);
 
-  this.el_text.attr({'font-size': 10 * this.be.scale * scale});
+  this.el_text.attr({x: x, 'font-size': 10 * this.be.scale * scale});
 };
 
 Cell.prototype.init_vdd = function() {
