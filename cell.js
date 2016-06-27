@@ -151,6 +151,14 @@ Cell.prototype.update_qty_text = function(n, pending) {
 };
 
 Cell.prototype.update_quantity = function(n) {
+  if (n == this.quantity) return;
+
+  if (this.quantity == Infinity) { // If true, then we know that n != Infinity
+    this.el_qty_text.setAttr('visibility', 'visible');
+  }
+  // There's no need for a similar case to hide el_qty_text because the
+  // quantity never goes from a finite value to Infinity.
+
   this.update_qty_text(n);
 
   if (n && !this.quantity) {
@@ -1576,9 +1584,9 @@ Cell.prototype.harness_drag_start = function(x, y, dir) {
   // directly or indirectly to another multi-bit port with a locked
   // width.  Do this by temporarily forcing a different width and
   // seeing if it fails.
-  this.update_width(this.width + 1);
-  this.dragging_disallowed = this.be.level.update_widths();
   this.update_width(this.width - 1);
+  this.dragging_disallowed = this.be.level.update_widths();
+  this.update_width(this.width + 1);
   this.be.level.update_widths();
 
   if (this.dragging_disallowed) {

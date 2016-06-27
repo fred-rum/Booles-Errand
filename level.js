@@ -182,9 +182,9 @@ Level.prototype.begin = function(level_num) {
     var name = level.avail[i];
     if (typeof name == 'string') {
       var cell = this.add_box_cell(name);
+      cell.quantity = Infinity;
     } else {
       cell.update_quantity(name);
-      cell.el_qty_text.setAttr('visibility', 'visible');
     }
   }
 
@@ -666,10 +666,8 @@ Level.prototype.add_box_cell = function(type) {
 Level.prototype.update_box_quantity = function(type, change) {
   var cell = this.be.level.box_cells[type];
   if (cell === undefined) return false;
-  if (cell.quantity !== undefined) {
-    if (cell.quantity + change < 0) return false;
-    cell.update_quantity(cell.quantity + change);
-  }
+  if (cell.quantity + change < 0) return false;
+  cell.update_quantity(cell.quantity + change);
   return true;
 };
 
@@ -1121,19 +1119,14 @@ Level.prototype.update_widths = function(pending) {
       }
     }
     for (var type in this.box_cells) {
-      if ((this.box_cells[type].quantity !== undefined) &&
-          (this.box_cells[type].quantity +
-           this.box_cells[type].change < 0)) {
+      if (this.box_cells[type].quantity + this.box_cells[type].change < 0) {
         failure = 'exhausted cells';
       }
     }
     if (!failure) {
       for (var type in this.box_cells) {
-        if ((this.box_cells[type].quantity !== undefined) &&
-            this.box_cells[type].change) {
-          this.box_cells[type].update_quantity(this.box_cells[type].quantity +
-                                               this.box_cells[type].change);
-        }
+        this.box_cells[type].update_quantity(this.box_cells[type].quantity +
+                                             this.box_cells[type].change);
       }
     }
   }
