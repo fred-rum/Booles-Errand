@@ -63,31 +63,38 @@ function Circuit() {
   // The width of div_truth is initially set to 8em purely so that I can
   // measure it.  It'll get resized to fit the truth table later.
   var em_size = this.be.em_size = this.be.div_truth.width() / 8;
-  this.be.io_spacing = em_size * 10/8;
+
+  // Drawing in cdraw, cdrag, and cbox, in terms of pixels, but the native size
+  // of those pixels can vary from device to device.  For this reason, we
+  // adjust the viewport scaling so that each pixel defaults to 1/16 of an em.
+  // (Additional scaling may be also be applied for zooming in and out.)
+  this.px_size = this.be.em_size / 16;
+
+  this.be.io_spacing = 20;
   this.be.io_handle_radius = this.be.io_spacing * 3/8;
   this.be.io_target_radius = this.be.io_handle_radius * 2;
 
-  this.be.stub_len = em_size * 5/8;
-  this.be.stub_end_len = em_size * 6/16;
+  this.be.stub_len = 10;
+  this.be.stub_end_len = 6;
 
-  this.be.inv_bubble_size = em_size * 4/8;
-  this.be.wire_arc_radius = em_size * 10/8;
+  this.be.inv_bubble_size = 8;
+  this.be.wire_arc_radius = 20;
 
-  this.be.wire_speed = em_size*5/8;
+  this.be.wire_speed = 10;
 
-  this.be.stroke_wire_fg = em_size * 1/16;
-  this.be.stroke_wire_bg = em_size * 5/16;
+  this.be.stroke_wire_fg = 1;
+  this.be.stroke_wire_bg = 5;
 
-  this.be.stroke_cell_fg = em_size * 3/16;
-  this.be.stroke_cell_bg = em_size * 7/16;
+  this.be.stroke_cell_fg = 3;
+  this.be.stroke_cell_bg = 7;
 
-  this.be.stroke_question = em_size * 5/16;
-  this.be.stroke_check = em_size * 7/16;
+  this.be.stroke_question = 5;
+  this.be.stroke_check = 7;
 
-  this.be.stroke_stub_end_undefined = em_size * 0.5/16;
-  this.be.stroke_stub_end_defined   = em_size * 2/16;
+  this.be.stroke_stub_end_undefined = 0.5;
+  this.be.stroke_stub_end_defined   = 2;
 
-  this.be.stroke_io_handle = em_size * 1/16;
+  this.be.stroke_io_handle = 1;
   this.be.stroke_io_fail = this.be.io_handle_radius * 0.4;
 
   // The vertical gap between cells in cbox.
@@ -322,11 +329,18 @@ Circuit.prototype.resize = function() {
     var cbox_height = this.be.window_height - this.be.truth_height + 1;
     this.be.div_cbox.height(cbox_height);
 
+    // We attempt to scale the cbox contents (and the cbox width) such that the
+    // box_height exactly fits in the available space.  However, it is limited
+    // as follows:
+    // - the box width can't be greater than 20% of the window width.
+    // - the cells in the box can't be scaled greater than 100% of default.
+    // - the cells in the box can't be scaled less than 50% of default.
+
     var max_width = this.be.window_width / 5;
     var max_scale = max_width / (this.be.em_size * 8);
 
-    var cbox_scale = Math.max(0.5,
-                              Math.min(1.0,
+    var cbox_scale = Math.max(0.5 * this.px_size,
+                              Math.min(1.0 * this.px_size,
                                        max_scale,
                                        cbox_height / this.be.box_height));
     this.be.cbox.setSize(this.be.em_size * 8 * cbox_scale,
@@ -443,14 +457,14 @@ Circuit.prototype.fit_view = function() {
   // at the edge, then those wires curl towards the center).  Here at the top
   // level we add another 1/2 em margin so that the cells & wires aren't
   // directly touching the edge of the viewing area.
-  var half_em = this.be.em_size/2;
+  var margin = 8;
 
   // Get the bounding box of all cells on the canvas.
   for (var i = 0; i < all_cells.length; i++) {
-    var cell_left = all_cells[i].bbox.left + all_cells[i].x - half_em;
-    var cell_top = all_cells[i].bbox.top + all_cells[i].y - half_em;
-    var cell_right = all_cells[i].bbox.right + all_cells[i].x + half_em;
-    var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + half_em;
+    var cell_left = all_cells[i].bbox.left + all_cells[i].x - margin;
+    var cell_top = all_cells[i].bbox.top + all_cells[i].y - margin;
+    var cell_right = all_cells[i].bbox.right + all_cells[i].x + margin;
+    var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + margin;
     if (bbox_left === undefined) {
       var bbox_left = cell_left;
       var bbox_top = cell_top;
@@ -504,8 +518,8 @@ Circuit.prototype.fit_view = function() {
     var old_scale = scale;
 
     for (var i = 0; i < all_cells.length; i++) {
-      var cell_left = all_cells[i].bbox.left + all_cells[i].x - half_em;
-      var cell_top = all_cells[i].bbox.top + all_cells[i].y - half_em;
+      var cell_left = all_cells[i].bbox.left + all_cells[i].x - margin;
+      var cell_top = all_cells[i].bbox.top + all_cells[i].y - margin;
 
       var cell_cdraw_left = cdraw_left + (cell_left - bbox_left)*scale;
       var cell_cdraw_top = cdraw_top + (cell_top - bbox_top)*scale;
@@ -534,8 +548,8 @@ Circuit.prototype.fit_view = function() {
 
       // This is the same as above, but adjusting for the bottom-right
       // incursion instead of the top-left.
-      var cell_right = all_cells[i].bbox.right + all_cells[i].x + half_em;
-      var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + half_em;
+      var cell_right = all_cells[i].bbox.right + all_cells[i].x + margin;
+      var cell_bottom = all_cells[i].bbox.bottom + all_cells[i].y + margin;
 
       var cell_cdraw_right = cdraw_right - (bbox_right - cell_right)*scale;
       var cell_cdraw_bottom = cdraw_bottom - (bbox_bottom - cell_bottom)*scale;
@@ -690,12 +704,12 @@ Circuit.prototype.limit_scale = function(scale) {
   // Limit the scale to keep cells from being drawn crazy enormous.  Note that
   // we do this after fitting incursions, so the cells will perceptually be
   // centered with the most possible margin on all sides.
-  if (scale > 2) scale = 2;
+  if (scale > 2 * this.px_size) scale = 2 * this.px_size;
 
   // Limit the scale to keep cells from being drawn so small that the user
   // can't find them.  Another motivation is that if cells are drawn too small,
   // Raphael fails to position their text labels correctly.
-  if (scale < 0.10) scale = 0.10;
+  if (scale < 0.10 * this.px_size) scale = 0.10 * this.px_size;
 
   return scale;
 };

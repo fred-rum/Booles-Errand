@@ -37,7 +37,7 @@ function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this.cell_label_attr = {
     'text-anchor': 'middle', // is modified before use
     'font-family': 'Verdana, Helvetica, Arial, sans-serif',
-    'font-size': 11/16 * this.be.em_size
+    'font-size': 11
   };
 
   // For the case that the foreground lines & fill are drawn separately.
@@ -606,7 +606,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     var bound_top = -Infinity;
     var bound_right = Infinity;
     var bound_bottom = Infinity;
-    var limit = 1500 * this.be.em_size/16;
+    var limit = 1500;
     var all_cells = this.be.level.all_cells;
     for (var i = 0; i < all_cells.length; i++) {
       var c = all_cells[i];
@@ -630,7 +630,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
     $('#error').html('<p>Cells cannot be spread out that far.</p>');
     var attr = {
       stroke: '#ffb0b0',
-      'stroke-width': 10 * this.be.em_size/16,
+      'stroke-width': 10,
     };
     this.el_too_far = this.canvas.rect(bound_left, bound_top,
                                        bound_right - bound_left,
@@ -967,7 +967,7 @@ Cell.prototype.add_label = function(label, pos, x, y, size, vpos) {
   var attr = {
     'text-anchor': pos,
     'font-family': 'Verdana, Helvetica, Arial, sans-serif',
-    'font-size': (size || 11)/16 * this.be.em_size
+    'font-size': size || 11
   };
   var el = this.canvas.text(x, y, label).attr(attr)
   this.push_el(el);
@@ -1133,6 +1133,13 @@ Cell.prototype.fit_input_text = function() {
   if (text === this.text) return;
   this.text = text;
 
+  // We draw the label into a sample canvas that the user cannot see in order
+  // to measure its width and height.  This is preferable to drawing it onto
+  // the regular canvas because the viewport scaling applied to cdraw causes
+  // the browser to scale the font differently, which leads to an inconsistent
+  // spatial or temporal appearance among labels.  At tiny scales, the measured
+  // bbox can also lose precision, which can lead to grossly incorrect label
+  // sizing.
   this.be.jq_sampletext.html(text);
   var bbox = this.be.jq_sampletext[0].getBBox();
 
@@ -1142,9 +1149,13 @@ Cell.prototype.fit_input_text = function() {
 
   // Since the text width is fitting into the angled point, we want the
   // width + half the height to fit in the total cell width.
-  var scale = total_width / (bbox.width + bbox.height/2);
+  //
+  // The sampled font-size is 24, which gives us sufficient precision without
+  // potentially running into performance issues with huge font sizes.  We
+  // therefore scale the final label relative to font-size 24.
+  var font_size = 24 * total_width / (bbox.width + bbox.height/2);
 
-  this.el_text.attr({text: text, 'font-size': this.be.em_size * scale});
+  this.el_text.attr({text: text, 'font-size': font_size});
 };
 
 Cell.prototype.fit_output_text = function() {
@@ -1183,9 +1194,9 @@ Cell.prototype.fit_output_text = function() {
 
   // Since the text width is fitting into the angled point, we want the
   // width + half the height to fit in the total cell width.
-  var scale = total_width / (bbox.width + bbox.height/2);
+  var font_size = 24 * total_width / (bbox.width + bbox.height/2);
 
-  this.el_text.attr({text: text, x: x, 'font-size': this.be.em_size * scale});
+  this.el_text.attr({text: text, x: x, 'font-size': font_size});
 };
 
 Cell.prototype.init_vdd = function() {

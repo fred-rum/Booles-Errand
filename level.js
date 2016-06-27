@@ -226,8 +226,8 @@ Level.prototype.begin = function(level_num) {
     var cell_obj = level.cells[cell_name];
     var cell = new Cell(this.be, 'cdraw',
                         cell_obj.type,
-                        cell_obj.x / 16 * this.be.em_size,
-                        cell_obj.y / 16 * this.be.em_size,
+                        cell_obj.x,
+                        cell_obj.y,
                         cell_name,
                         true);
     this.named_cells[cell_name] = cell;
@@ -656,7 +656,7 @@ Level.prototype.add_box_cell = function(type) {
   var cell = new Cell(this.be, 'cbox', type, 0, 0);
   this.box_cells[type] = cell;
   var bbox = cell.bbox;
-  var cx = (this.be.em_size*4) - (bbox.right + bbox.left) / 2; // align center
+  var cx = 64 - (bbox.right + bbox.left) / 2; // align center
   var cy = this.be.box_height - bbox.top; // align top edge
   cell.move(cx, cy);
   this.be.box_height += (bbox.bottom - bbox.top) + this.be.box_spacing;
@@ -739,9 +739,9 @@ Level.prototype.encode_progress = function() {
     if (!cell.locked) {
       var type = cell.type;
       if ((type == 'condenser') || (type == 'expander')) type += cell.width;
-      save.push(';', Math.round(cell.x / this.be.em_size * 16),
+      save.push(';', Math.round(cell.x),
                 ',', type,
-                ',', Math.round(cell.y / this.be.em_size * 16));
+                ',', Math.round(cell.y));
       emitted_cell = true;
     }
     for (var port_name in cell.io) {
@@ -783,7 +783,7 @@ Level.prototype.restore_progress = function(save_str) {
     var bound_top = -Infinity;
     var bound_right = Infinity;
     var bound_bottom = Infinity;
-    var limit = 1500 * this.be.em_size/16;
+    var limit = 1500;
 
     for (var i = 0; i < this.all_cells.length; i++) {
       var c = this.all_cells[i];
@@ -828,8 +828,8 @@ Level.prototype.restore_progress = function(save_str) {
           width = undefined;
         }
         this.add_cell(new Cell(this.be, 'cdraw', type,
-                               x / 16 * this.be.em_size,
-                               y / 16 * this.be.em_size,
+                               x,
+                               y,
                                undefined, undefined, width));
 
         while (save_str != '') {
