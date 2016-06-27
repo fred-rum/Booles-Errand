@@ -226,8 +226,8 @@ Level.prototype.begin = function(level_num) {
     var cell_obj = level.cells[cell_name];
     var cell = new Cell(this.be, 'cdraw',
                         cell_obj.type,
-                        cell_obj.x / 20 * this.be.io_spacing,
-                        cell_obj.y / 20 * this.be.io_spacing,
+                        cell_obj.x / 16 * this.be.em_size,
+                        cell_obj.y / 16 * this.be.em_size,
                         cell_name,
                         true);
     this.named_cells[cell_name] = cell;
@@ -739,9 +739,9 @@ Level.prototype.encode_progress = function() {
     if (!cell.locked) {
       var type = cell.type;
       if ((type == 'condenser') || (type == 'expander')) type += cell.width;
-      save.push(';', Math.round(cell.x / this.be.io_spacing * 20),
+      save.push(';', Math.round(cell.x / this.be.em_size * 16),
                 ',', type,
-                ',', Math.round(cell.y / this.be.io_spacing * 20));
+                ',', Math.round(cell.y / this.be.em_size * 16));
       emitted_cell = true;
     }
     for (var port_name in cell.io) {
@@ -779,6 +779,20 @@ Level.prototype.restore_progress = function(save_str) {
     var m;
     var wires = [];
 
+    var bound_left = -Infinity;
+    var bound_top = -Infinity;
+    var bound_right = Infinity;
+    var bound_bottom = Infinity;
+    var limit = 1500 * this.be.em_size/16;
+
+    for (var i = 0; i < this.all_cells.length; i++) {
+      var c = this.all_cells[i];
+      if (bound_left < c.x - limit) bound_left = c.x - limit;
+      if (bound_right > c.x + limit) bound_right = c.x + limit;
+      if (bound_top < c.y - limit) bound_top = c.y - limit;
+      if (bound_bottom > c.y + limit) bound_bottom = c.y + limit;
+    }
+
     if (m = ex_version_skip.exec(save_str)) {
       var skip = Number(m[1]);
       if (skip != this.all_cells.length) throw 'wrong skip';
@@ -795,6 +809,16 @@ Level.prototype.restore_progress = function(save_str) {
         var y = Number(m[4]);
         save_str = save_str.substring(m[0].length);
 
+        if ((x < bound_left) ||
+            (x > bound_right) ||
+            (y < bound_top) ||
+            (y > bound_bottom)) throw 'too spread out';
+
+        if (bound_left < x - limit) bound_left = x - limit;
+        if (bound_right > x + limit) bound_right = x + limit;
+        if (bound_top < y - limit) bound_top = y - limit;
+        if (bound_bottom > y + limit) bound_bottom = y + limit;
+
         if (!this.update_box_quantity(type, -1)) {
           throw 'exhausted cell type: ' + type
         }
@@ -804,8 +828,8 @@ Level.prototype.restore_progress = function(save_str) {
           width = undefined;
         }
         this.add_cell(new Cell(this.be, 'cdraw', type,
-                               x / 20 * this.be.io_spacing,
-                               y / 20 * this.be.io_spacing,
+                               x / 16 * this.be.em_size,
+                               y / 16 * this.be.em_size,
                                undefined, undefined, width));
 
         while (save_str != '') {
