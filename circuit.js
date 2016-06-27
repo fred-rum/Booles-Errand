@@ -554,15 +554,15 @@ Circuit.prototype.fit_view = function() {
     }
   }
 
-  if (scale <= 0) {
-    // The window is so small that there's no room to draw anything.
-    return;
-  }
-
   // Limit the scale to keep cells from being drawn crazy enormous.  Note that
   // we do this after fitting incursions, so the cells will perceptually be
   // centered with the most possible margin on all sides.
   if (scale > 2) scale = 2;
+
+  // Limit the scale to keep cells from being drawn so small that the user
+  // can't find them.  Another motivation is that if cells are drawn too small,
+  // Raphael fails to position their text labels correctly.
+  if (scale < 0.10) scale = 0.10;
 
   // Set the canvas_top/left offset so that the cell bounding box is centered
   // within the adjusted cdraw bounding box.
@@ -664,7 +664,6 @@ Circuit.prototype.canvas_pinch_move = function(x1, y1, x2, y2) {
   var pinch_distance = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
   var new_scale = (this.pinch_orig_scale *
                    (pinch_distance / this.pinch_orig_distance));
-  if (new_scale > 2.0) new_scale = 2.0;
 
   // rescale() updates the scale while keeping x1,y1 fixed in place on the
   // canvas.  Note that x1,y1 corresponds the user's first finger, which also
@@ -709,7 +708,10 @@ Circuit.prototype.rescale = function(x, y, new_scale) {
   // automatically refit it on a window resize.
   this.be.view_is_fit = false;
 
+  // See fit_view() for the reasoning behind these scale limits.
   if (new_scale > 2.0) new_scale = 2.0;
+  if (new_scale < 0.10) new_scale = 0.10;
+
   var old_canvas_mx = x / this.be.scale;
   var old_canvas_my = y / this.be.scale;
   var new_canvas_mx = x / new_scale;
