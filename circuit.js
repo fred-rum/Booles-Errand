@@ -554,15 +554,7 @@ Circuit.prototype.fit_view = function() {
     }
   }
 
-  // Limit the scale to keep cells from being drawn crazy enormous.  Note that
-  // we do this after fitting incursions, so the cells will perceptually be
-  // centered with the most possible margin on all sides.
-  if (scale > 2) scale = 2;
-
-  // Limit the scale to keep cells from being drawn so small that the user
-  // can't find them.  Another motivation is that if cells are drawn too small,
-  // Raphael fails to position their text labels correctly.
-  if (scale < 0.10) scale = 0.10;
+  scale = this.limit_scale(scale);
 
   // Set the canvas_top/left offset so that the cell bounding box is centered
   // within the adjusted cdraw bounding box.
@@ -694,6 +686,20 @@ Circuit.prototype.canvas_mousewheel = function(event) {
   this.rescale(event.pageX, event.pageY, new_scale);
 };
 
+Circuit.prototype.limit_scale = function(scale) {
+  // Limit the scale to keep cells from being drawn crazy enormous.  Note that
+  // we do this after fitting incursions, so the cells will perceptually be
+  // centered with the most possible margin on all sides.
+  if (scale > 2) scale = 2;
+
+  // Limit the scale to keep cells from being drawn so small that the user
+  // can't find them.  Another motivation is that if cells are drawn too small,
+  // Raphael fails to position their text labels correctly.
+  if (scale < 0.10) scale = 0.10;
+
+  return scale;
+};
+
 // Update the scale while keeping fixed in place the canvas coordinate that
 // corresponds to the parameter x,y cdraw/window coordinate.
 Circuit.prototype.rescale = function(x, y, new_scale) {
@@ -708,9 +714,7 @@ Circuit.prototype.rescale = function(x, y, new_scale) {
   // automatically refit it on a window resize.
   this.be.view_is_fit = false;
 
-  // See fit_view() for the reasoning behind these scale limits.
-  if (new_scale > 2.0) new_scale = 2.0;
-  if (new_scale < 0.10) new_scale = 0.10;
+  new_scale = this.limit_scale(new_scale);
 
   var old_canvas_mx = x / this.be.scale;
   var old_canvas_my = y / this.be.scale;
