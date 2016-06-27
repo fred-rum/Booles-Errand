@@ -579,6 +579,7 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
   // We check for deletion based on the position of the mouse pointer,
   // not the center (0,0) coordinate of the cell.
   var del;
+  var too_far = false;
   if (is_new &&
       (x >= 0) &&
       (x < this.be.cbox_width) &&
@@ -601,8 +602,46 @@ Cell.prototype.check_for_del = function(x, y, is_new) {
               (y >= this.be.window_height - this.be.zoom_height))) {
     del = 'del';
   } else {
-    del = false;
+    var bound_left = -Infinity;
+    var bound_top = -Infinity;
+    var bound_right = Infinity;
+    var bound_bottom = Infinity;
+    var limit = 1500 * this.be.em_size/16;
+    var all_cells = this.be.level.all_cells;
+    for (var i = 0; i < all_cells.length; i++) {
+      var c = all_cells[i];
+      if (c == this) continue;
+      if (bound_left < c.x - limit) bound_left = c.x - limit;
+      if (bound_right > c.x + limit) bound_right = c.x + limit;
+      if (bound_top < c.y - limit) bound_top = c.y - limit;
+      if (bound_bottom > c.y + limit) bound_bottom = c.y + limit;
+    }
+    if ((this.x < bound_left) ||
+        (this.x > bound_right) ||
+        (this.y < bound_top) ||
+        (this.y > bound_bottom)) {
+      del = 'del';
+      too_far = true;
+    } else {
+      del = false;
+    }
   }
+  if (too_far && !this.el_too_far) {
+    $('#error').html('<p>Cells cannot be spread out that far.</p>');
+    var attr = {
+      stroke: '#ffb0b0',
+      'stroke-width': 10 * this.be.em_size/16,
+    };
+    this.el_too_far = this.canvas.rect(bound_left, bound_top,
+                                       bound_right - bound_left,
+                                       bound_bottom - bound_top).attr(attr);
+  } else if (!too_far && this.el_too_far) {
+    $('#error').html('');
+    this.el_too_far.remove();
+    this.el_too_far = undefined;
+  }
+  this.too_far = too_far;
+
   if (del && (del != this.pending_del)) {
     var attr;
     if (del == 'new') {
@@ -688,6 +727,10 @@ Cell.prototype.cell_drag_end = function() {
   this.be.cdrag_cell = undefined;
 
   if (this.cdraw_cell.pending_del) {
+    if (this.cdraw_cell.el_too_far) {
+      $('#error').html('');
+      this.cdraw_cell.el_too_far.remove();
+    }
     this.cdraw_cell.remove();
   }
   this.be.level.commit_widths();
