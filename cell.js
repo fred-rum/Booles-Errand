@@ -1704,6 +1704,7 @@ Cell.prototype.harness_drag_end = function(dir) {
     new_cell.io[new_port_name].update_value(this.io[old_port_name].value);
   }
 
+  this.be.level.update_widths();
   new_cell.propagate_value();
 
   // Delete the old cell now that it has been replaced.
