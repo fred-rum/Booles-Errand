@@ -1104,6 +1104,40 @@ Level.prototype.update_widths = function(pending) {
     }
   }
 
+  if (!failure) {
+    // Check whether there are enough cells available in cbox.
+    for (var type in this.box_cells) {
+      this.box_cells[type].change = 0;
+    }
+    for (var i = 0; i < this.all_cells.length; i++) {
+      var cell = this.all_cells[i];
+      if (!cell.locked &&
+          (cell.type != 'condenser') &&
+          (cell.type != 'expander') &&
+          (cell.type != 'fadder')) {
+        var new_width = cell.prospective_width || 1;
+        var old_width = cell.pending_width || cell.width;
+        this.box_cells[cell.type].change += old_width - new_width;
+      }
+    }
+    for (var type in this.box_cells) {
+      if ((this.box_cells[type].quantity !== undefined) &&
+          (this.box_cells[type].quantity +
+           this.box_cells[type].change < 0)) {
+        failure = 'exhausted cells';
+      }
+    }
+    if (!failure) {
+      for (var type in this.box_cells) {
+        if ((this.box_cells[type].quantity !== undefined) &&
+            this.box_cells[type].change) {
+          this.box_cells[type].update_quantity(this.box_cells[type].quantity +
+                                               this.box_cells[type].change);
+        }
+      }
+    }
+  }
+
   // Even if there's a failure, we still perform this step in order to
   // clear the prospective_width values.
   for (var i = 0; i < this.all_cells.length; i++) {
@@ -1112,12 +1146,9 @@ Level.prototype.update_widths = function(pending) {
         (cell.type != 'condenser') &&
         (cell.type != 'expander') &&
         (cell.type != 'fadder')) {
-      var new_width = cell.prospective_width || 1;
-      var old_width = (pending && cell.pending_width) || cell.width;
-      if (this.update_box_quantity(cell.type, old_width - new_width)) {
+      if (!failure) {
+        var new_width = cell.prospective_width || 1;
         cell.update_width(new_width, pending);
-      } else {
-        if (!failure) failure = 'exhausted cells';
       }
       cell.prospective_width = undefined;
     }

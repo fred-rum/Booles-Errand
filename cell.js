@@ -167,6 +167,8 @@ Cell.prototype.update_quantity = function(n) {
 Cell.prototype.update_width = function(n, pending) {
   var name = pending ? 'pending_width' : 'width';
 
+  if (!pending) this.pending_width = undefined;
+
   if (n == this[name]) return;
 
   if ((n == 1) && (!pending || (this.width == 1))) {
