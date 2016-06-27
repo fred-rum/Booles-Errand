@@ -193,10 +193,22 @@ Level.prototype.begin = function(level_num) {
   // setViewBox to directly specify the size of the canvas.
   this.be.cbox.setViewBox(0, 0, this.be.em_size*8, this.be.box_height);
 
+  // This puzzle level may have been completed in the past, but it is not
+  // "currently completed" until the current circuit is tested.
+  this.mark_currently_completed(false);
+
+  // Initialize the help menu.
+  this.init_help();
+  this.display_intro();
+
+  // Named cells maps cell names to Cell objects in cdraw.  A cell is named if
+  // and only if it is created and locked by the puzzle.
   this.named_cells = {};
+
+  // All cells is an array containing all Cell objects in cdraw
   this.all_cells = [];
 
-  // Get a list of the input and output pins.
+  // Get the names of all input and output pins.
   this.input_names = [];
   this.output_names = [];
   for (var cell_name in level.cells) {
@@ -205,16 +217,11 @@ Level.prototype.begin = function(level_num) {
     if (cell_obj.type == 'output') this.output_names.push(cell_name);
   }
 
-  this.mark_currently_completed(false);
-
   // Initialize the truth table with columns for the input and output pins.
   this.init_table();
 
-  // Initialize the help menu.
-  this.init_help();
-  this.display_intro();
-
-  // Initialize the cells required by the level while ignoring IO connections.
+  // Initialize the cdraw cells required by the level while ignoring their IO
+  // connections for the moment.
   for (var cell_name in level.cells) {
     var cell_obj = level.cells[cell_name];
     var cell = new Cell(this.be, 'cdraw',
@@ -241,9 +248,8 @@ Level.prototype.begin = function(level_num) {
         var io_name2 = conn_list[i][2];
         var unlocked = conn_list[i][3];
         if (!save_str || !unlocked) {
-          // If there's a save_str, don't draw unlocked wires.
-          // Instead, allow the save_str to determine those wires are
-          // drawn or not.
+          // If there's a save_str, don't draw unlocked wires.  Instead, allow
+          // the save_str to determine whether those wires are drawn or not.
           new Wire(this.be,
                    this.named_cells[cell_name].io[io_name],
                    this.named_cells[cell_name2].io[io_name2],
@@ -259,6 +265,9 @@ Level.prototype.begin = function(level_num) {
     this.restore_progress(save_str);
   }
   this.update_widths();
+
+  // In case progress was restored from the URL, then we want to save it to
+  // local storage.
   this.save_progress();
 
   // Initialize the level to the first row of the table, and
@@ -270,6 +279,7 @@ Level.prototype.begin = function(level_num) {
 
   this.be.sim.begin_level(level.hide.speed, this.sequenced);
 
+  // *** Should this be in select_seq or select_row?
   this.circuit_is_reset = true;
 };
 
@@ -1304,8 +1314,6 @@ Level.prototype.click_next = function() {
 
 Level.prototype.mark_currently_completed = function(currently_completed) {
   if (currently_completed) {
-    //$('#truth').css({'background-color': '#d0ffd0'});
-    //$('.check').css({'background-color': '#d0ffd0'});
     $('#info').css({'background-color': '#d0ffd0'});
     $('#info-stub').css({'background-color': '#d0ffd0'});
     $('.help-drop').addClass('complete');
@@ -1317,8 +1325,6 @@ Level.prototype.mark_currently_completed = function(currently_completed) {
     }
     this.be.controls_height = this.be.div_controls.outerHeight();
   } else {
-    //$('#truth').css({'background-color': ''});
-    //$('.check').css({'background-color': ''});
     $('#info').css({'background-color': ''});
     $('#info-stub').css({'background-color': ''});
     $('.help-drop').removeClass('complete');

@@ -107,6 +107,9 @@
 //   coordinates, her cells use the least characters in local storage or in a
 //   shared URL.
 //
+//   width: if present, specifies the width of the cell cluster.  If not
+//   present, defaults to 1.
+//
 //   io: specifies an array of wire connctions to make from the cell's
 //   output(s).  Each array element is itself an array usually containing three
 //   values: the output port name, the input cell name, and the input port
