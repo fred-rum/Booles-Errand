@@ -1090,8 +1090,8 @@ Cell.prototype.fit_input_text = function() {
   if (text === this.text) return;
   this.text = text;
 
-  this.el_text.attr({text: text, 'font-size': 10 * this.be.scale});
-  var bbox = this.el_text.getBBox(true);
+  this.be.jq_sampletext.html(text);
+  var bbox = this.be.jq_sampletext[0].getBBox();
 
   var height = 1.5 * this.be.io_spacing;
   var width = height;
@@ -1101,7 +1101,7 @@ Cell.prototype.fit_input_text = function() {
   // width + half the height to fit in the total cell width.
   var scale = total_width / (bbox.width + bbox.height/2);
 
-  this.el_text.attr({'font-size': 10 * this.be.scale * scale});
+  this.el_text.attr({text: text, 'font-size': this.be.em_size * scale});
 };
 
 Cell.prototype.fit_output_text = function() {
@@ -1117,8 +1117,8 @@ Cell.prototype.fit_output_text = function() {
   this.text = text;
   var x = this.edge;
 
-  this.el_text.attr({text: text, x: x, 'font-size': 10 * this.be.scale});
-  var bbox = this.el_text.getBBox(true);
+  this.be.jq_sampletext.html(text);
+  var bbox = this.be.jq_sampletext[0].getBBox();
 
   // If the text string is unusually short (i.e. when the expected value is
   // "don't care"), we pretend it's at least three characters wide to prevent
@@ -1142,7 +1142,7 @@ Cell.prototype.fit_output_text = function() {
   // width + half the height to fit in the total cell width.
   var scale = total_width / (bbox.width + bbox.height/2);
 
-  this.el_text.attr({x: x, 'font-size': 10 * this.be.scale * scale});
+  this.el_text.attr({text: text, x: x, 'font-size': this.be.em_size * scale});
 };
 
 Cell.prototype.init_vdd = function() {

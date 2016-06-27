@@ -33,6 +33,8 @@ function Circuit() {
   this.be.div_cdraw = $('#cdraw');
   this.be.div_cbox = $('#cbox');
 
+  this.be.jq_sampletext = $('#sampletext');
+
   // For window panels that have fixed dimensions, record those dimensions.
   // When a cell is dragged, it is marked to be deleted if it is dragged onto
   // one of these panels.
