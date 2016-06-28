@@ -812,6 +812,7 @@ Circuit.prototype.load_data = function(key) {
 };
 
 // This is called as soon as the DOM is ready.  This function begins the game.
-$(function() {
+$(window).on('load', function() {
+//$(function() {
   new Circuit();
 });
