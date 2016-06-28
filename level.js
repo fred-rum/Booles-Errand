@@ -470,6 +470,7 @@ Level.prototype.update_hover = function() {
 };
 
 Level.prototype.row_click = function(row, event) {
+  $('#info').html('');
   var e = event.originalEvent || event;
   this.be.sim.click_pause();
   var old_row = this.cur_row();
@@ -482,6 +483,7 @@ Level.prototype.row_click = function(row, event) {
     } else if ((this.row_click_time !== undefined) &&
                (e.timeStamp !== undefined)) {
       var delay = e.timeStamp - this.row_click_time;
+      $('#info').append('<p>' + delay + '</p>');
       if ((delay > 0) && (delay < 500)) {
         // The user is re-selecting the current line of a sequence after
         // previously selecting it less than 500 milliseconds ago (as measured
@@ -497,6 +499,7 @@ Level.prototype.row_click = function(row, event) {
     this.row_allows_simple_click = row;
   }
   this.row_click_time = e.timeStamp;
+  $('#info').append('<p>' + e.timeStamp + '</p>');
 };
 
 Level.prototype.cur_row = function() {
