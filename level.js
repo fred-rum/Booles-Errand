@@ -377,8 +377,9 @@ Level.prototype.init_table = function() {
               $.proxy(this.row_leave, this, i));
     row.click($.proxy(this.row_click, this, i));
     row.dblclick($.proxy(this.row_dblclick, this, i));
-//    this.be.bdrag.drag(row, this, 'truth',
-//                       {dblclick: this.row_dblclick});
+    this.be.bdrag.drag(row, this, 'truth',
+                       {click: this.row_click,
+                        dblclick: this.row_dblclick});
 
     this.row_top.push(row.offset().top);
   }
@@ -494,6 +495,7 @@ Level.prototype.row_click = function(row, event) {
 
 Level.prototype.row_dblclick = function(row, event) {
   this.be.sim.click_play();
+  return false;
 };
 
 Level.prototype.cur_row = function() {
