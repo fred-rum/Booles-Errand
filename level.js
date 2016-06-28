@@ -376,10 +376,6 @@ Level.prototype.init_table = function() {
     row.hover($.proxy(this.row_enter, this, i),
               $.proxy(this.row_leave, this, i));
     row.click($.proxy(this.row_click, this, i));
-    row.dblclick($.proxy(this.row_dblclick, this, i));
-    this.be.bdrag.drag(row, this, 'truth',
-                       {click: this.row_click,
-                        dblclick: this.row_dblclick});
 
     this.row_top.push(row.offset().top);
   }
@@ -474,6 +470,7 @@ Level.prototype.update_hover = function() {
 };
 
 Level.prototype.row_click = function(row, event) {
+  var e = event.originalEvent || event;
   this.be.sim.click_pause();
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click) {
@@ -482,20 +479,24 @@ Level.prototype.row_click = function(row, event) {
       // current line is complete and passed.  Go ahead and advance to
       // the next line, rather than starting the sequence over.
       this.next_line();
-    } else {
-      // The user is re-selecting the current line of a sequence after
-      // previously selecting it.  This is probably a double click, so
-      // this click is ignored.
+    } else if ((this.row_click_time !== undefined) &&
+               (e.timeStamp !== undefined)) {
+      var delay = e.timeStamp - this.row_click_time;
+      if ((delay > 0) && (delay < 500)) {
+        // The user is re-selecting the current line of a sequence after
+        // previously selecting it less than 500 milliseconds ago (as measured
+        // between mouseup/touchend events).  Interpret this as a double click.
+        this.be.sim.click_play();
+      }
+      // If the click occurred with greater delay, ignore it.  (But do record
+      // the new click timestamp, below.)
     }
   } else {
     this.reset_sim();
     this.select_seq(this.row_seq[row]);
+    this.row_allows_simple_click = row;
   }
-};
-
-Level.prototype.row_dblclick = function(row, event) {
-  this.be.sim.click_play();
-  return false;
+  this.row_click_time = e.timeStamp;
 };
 
 Level.prototype.cur_row = function() {
