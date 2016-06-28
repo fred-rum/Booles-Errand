@@ -1604,6 +1604,10 @@ Cell.prototype.harness_drag_start = function(x, y, dir) {
   this.canvas_drag_offset_y = this.be.circuit.cdraw_to_canvas_y(y);
   this.pending_width = this.width;
 
+  if (this.type == 'condenser') {
+    this.be.level.update_widths(true);
+  }
+
   // Pop cell to top for more natural resizing.
   this.bring_to_top();
 
@@ -1620,6 +1624,28 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
   var change = Math.round(canvas_dy / this.be.io_spacing);
   var width = this.width + change * bigdir;
   width = Math.min(8, Math.max(2, width));
+
+  if (this.type == 'condenser') {
+    if (this.max_width) {
+        if (width > this.max_width) {
+          return;
+        } else {
+          $('#error').html('');
+          this.max_width = undefined;
+        }
+    }
+
+    for (this.pending_output_width = width;
+         this.be.level.update_widths(true);
+         this.pending_output_width--);
+
+    if (this.pending_output_width != width) {
+      this.max_width = width = this.pending_output_width;
+      $('#error').html('<p>Expanding this condenser further would replicate more gates downstream than are available.</p>');
+    }
+
+    this.pending_output_width = undefined;
+  }
 
   if (width == this.pending_width) return;
 
@@ -1714,7 +1740,14 @@ Cell.prototype.harness_drag_end = function(dir) {
     new_cell.io[new_port_name].update_value(this.io[old_port_name].value);
   }
 
-  this.be.level.update_widths();
+  if (this.type == 'condenser') {
+    if (this.max_width) {
+      $('#error').html('');
+      this.max_width = undefined;
+    }
+    this.be.level.commit_widths();
+  }
+
   new_cell.propagate_value();
 
   // Delete the old cell now that it has been replaced.

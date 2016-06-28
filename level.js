@@ -1097,7 +1097,8 @@ Level.prototype.update_widths = function(pending) {
     if (((cell.type == 'input') && (cell.width > 1)) ||
         (cell.type == 'condenser') ||
         (cell.type == 'fadder')) {
-      var failure = cell.propagate_width(cell.output_width);
+      var failure = cell.propagate_width(cell.pending_output_width ||
+                                         cell.output_width);
       if (failure) break;
     }
   }
