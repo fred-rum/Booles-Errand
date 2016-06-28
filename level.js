@@ -482,7 +482,7 @@ Level.prototype.row_click = function(row, event) {
       this.next_line();
     } else if (this.row_click_time !== undefined) {
       var delay = time - this.row_click_time;
-      $('#info').append('<p>' + delay + '</p>');
+      $('#info').append('<p>delay = ' + delay + '</p>');
       if ((delay > 0) && (delay < 500)) {
         // The user is re-selecting the current line of a sequence after
         // previously selecting it less than 500 milliseconds ago (as measured
@@ -498,7 +498,7 @@ Level.prototype.row_click = function(row, event) {
     this.row_allows_simple_click = row;
   }
   this.row_click_time = time;
-  $('#info').append('<p>' + time + '</p>');
+  $('#info').append('<p>time = ' + time + '</p>');
 };
 
 Level.prototype.cur_row = function() {
