@@ -1685,6 +1685,9 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
   this.el_harness_stub_bg.transform(xform);
   this.el_harness_stub_fg.transform(xform);
   this.el_qty_text.transform(xform);
+
+  bus_port.y = top + height/2;
+  bus_port.redraw();
 };
 
 Cell.prototype.harness_drag_end = function(dir) {
@@ -1723,7 +1726,7 @@ Cell.prototype.harness_drag_end = function(dir) {
                           undefined, undefined, width);
   this.be.level.add_cell(new_cell);
 
-  // Move old IO info to new IOs.
+  // Move wires from the old IOs to the new IOs.
   var bus_port_name = (this.type == 'condenser') ? 'o' : 'i';
   var w = new_cell.io[bus_port_name].w = this.io[bus_port_name].w;
   for (var i = 0; i < w.length; i++) {
