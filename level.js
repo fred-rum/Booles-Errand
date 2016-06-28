@@ -1094,9 +1094,7 @@ Level.prototype.click_level = function(level_num, event) {
 Level.prototype.update_widths = function(pending) {
   for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
-    if (((cell.type == 'input') && (cell.width > 1)) ||
-        (cell.type == 'condenser') ||
-        (cell.type == 'fadder')) {
+    if (cell.locked_width && (cell.output_width > 1)) {
       var failure = cell.propagate_width(cell.pending_output_width ||
                                          cell.output_width);
       if (failure) break;
@@ -1110,10 +1108,7 @@ Level.prototype.update_widths = function(pending) {
     }
     for (var i = 0; i < this.all_cells.length; i++) {
       var cell = this.all_cells[i];
-      if (!cell.locked &&
-          (cell.type != 'condenser') &&
-          (cell.type != 'expander') &&
-          (cell.type != 'fadder')) {
+      if (!cell.locked_width) {
         var new_width = cell.prospective_width || 1;
         var old_width = cell.pending_width || cell.width;
         this.box_cells[cell.type].change += old_width - new_width;
@@ -1136,10 +1131,7 @@ Level.prototype.update_widths = function(pending) {
   // clear the prospective_width values.
   for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
-    if (!cell.locked &&
-        (cell.type != 'condenser') &&
-        (cell.type != 'expander') &&
-        (cell.type != 'fadder')) {
+    if (!cell.locked_width) {
       if (!failure) {
         var new_width = cell.prospective_width || 1;
         cell.update_width(new_width, pending);
@@ -1154,10 +1146,7 @@ Level.prototype.update_widths = function(pending) {
 Level.prototype.commit_widths = function() {
   for (var i = 0; i < this.all_cells.length; i++) {
     var cell = this.all_cells[i];
-    if (!cell.locked &&
-        (cell.type != 'condenser') &&
-        (cell.type != 'expander') &&
-        (cell.type != 'fadder')) {
+    if (!cell.locked_width) {
       cell.update_width(cell.pending_width);
     }
     cell.pending_width = undefined;

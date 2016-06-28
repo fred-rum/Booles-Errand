@@ -5,13 +5,13 @@
 function Cell(be, canvas_type, type, x, y, name, locked, harness_width) {
   this.be = be;
   this.name = name;
-  this.locked = locked;
   this.canvas_type = canvas_type;
   this.canvas = (canvas_type == 'cdraw') ? this.be.cdraw :
                 (canvas_type == 'cbox')  ? this.be.cbox :
                                            this.be.cdrag;
 
   this.type = type;
+  this.locked_width = this.locked = locked;
   this.width = 1;
   this.input_width = 1;
   this.output_width = 1;
@@ -212,12 +212,8 @@ Cell.prototype.propagate_width = function(n) {
 Cell.prototype.update_prospective_width = function(n, pending_new) {
   var prospective_width = this.prospective_width;
 
-  if (this.type == 'condenser') {
-    prospective_width = 1;
-  } else if (this.locked ||
-             (this.type == 'expander') ||
-             (this.type == 'fadder')) {
-    prospective_width = this.width;
+  if (this.locked_width) {
+    prospective_width = this.input_width;
   }
 
   if (prospective_width === undefined) {
@@ -1035,6 +1031,8 @@ Cell.prototype.init_mux = function(inv) {
 };
 
 Cell.prototype.init_input = function() {
+  this.locked_width = true;
+
   var height = 1.5 * this.be.io_spacing;
   var width = height;
   var left = -width/2;
@@ -1062,6 +1060,8 @@ Cell.prototype.init_input = function() {
 };
 
 Cell.prototype.init_output = function() {
+  this.locked_width = true;
+
   var height = 1.5 * this.be.io_spacing;
   var width = height;
   var left = -width/2 - height/2;
@@ -1285,6 +1285,8 @@ Cell.prototype.init_latch = function() {
 };
 
 Cell.prototype.init_condenser = function(ni) {
+  this.locked_width = true;
+
   ni = ni || 2;
   var height = ni*this.be.io_spacing;
   var width = this.be.io_spacing * 2;
@@ -1356,6 +1358,8 @@ Cell.prototype.init_condenser = function(ni) {
 };
 
 Cell.prototype.init_expander = function(no) {
+  this.locked_width = true;
+
   no = no || 2;
   var height = no*this.be.io_spacing;
   var width = this.be.io_spacing * 2;
@@ -1502,6 +1506,8 @@ Cell.prototype.init_fadder = function() {
     this.add_label('F+', 'middle', 0, 0, 22);
     return;
   }
+
+  this.locked_width = true;
 
   var height = 4 * this.be.io_spacing;
   var width = 4 * this.be.io_spacing;
