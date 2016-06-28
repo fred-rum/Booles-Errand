@@ -471,7 +471,7 @@ Level.prototype.update_hover = function() {
 
 Level.prototype.row_click = function(row, event) {
   $('#info').html('');
-  var e = event.originalEvent || event;
+  var time = Date.now ? Date.now() : (new Date().getTime());
   this.be.sim.click_pause();
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click) {
@@ -480,9 +480,8 @@ Level.prototype.row_click = function(row, event) {
       // current line is complete and passed.  Go ahead and advance to
       // the next line, rather than starting the sequence over.
       this.next_line();
-    } else if ((this.row_click_time !== undefined) &&
-               (e.timeStamp !== undefined)) {
-      var delay = e.timeStamp - this.row_click_time;
+    } else if (this.row_click_time !== undefined) {
+      var delay = time - this.row_click_time;
       $('#info').append('<p>' + delay + '</p>');
       if ((delay > 0) && (delay < 500)) {
         // The user is re-selecting the current line of a sequence after
@@ -498,8 +497,8 @@ Level.prototype.row_click = function(row, event) {
     this.select_seq(this.row_seq[row]);
     this.row_allows_simple_click = row;
   }
-  this.row_click_time = e.timeStamp;
-  $('#info').append('<p>' + e.timeStamp + '</p>');
+  this.row_click_time = time;
+  $('#info').append('<p>' + time + '</p>');
 };
 
 Level.prototype.cur_row = function() {
