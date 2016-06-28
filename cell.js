@@ -1625,6 +1625,7 @@ Cell.prototype.harness_drag_move = function(x, y, dir) {
   var width = this.width + change * bigdir;
   width = Math.min(8, Math.max(2, width));
 
+  // Resizing the condenser causes downstream gate widths to resize.
   if (this.type == 'condenser') {
     if (this.max_width) {
         if (width > this.max_width) {
@@ -1699,6 +1700,15 @@ Cell.prototype.harness_drag_end = function(dir) {
   this.be.drag.enable_hover();
 
   var width = this.pending_width;
+
+  if (this.type == 'condenser') {
+    if (this.max_width) {
+      $('#error').html('');
+      this.max_width = undefined;
+    }
+    this.be.level.commit_widths();
+  }
+
   this.pending_width = undefined;
   var change = width - this.width;
   if (!change) return;
@@ -1739,14 +1749,6 @@ Cell.prototype.harness_drag_end = function(dir) {
     }
     this.io[old_port_name].w = [];
     new_cell.io[new_port_name].update_value(this.io[old_port_name].value);
-  }
-
-  if (this.type == 'condenser') {
-    if (this.max_width) {
-      $('#error').html('');
-      this.max_width = undefined;
-    }
-    this.be.level.commit_widths();
   }
 
   new_cell.propagate_value();
