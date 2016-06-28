@@ -1702,6 +1702,7 @@ Cell.prototype.harness_drag_end = function(dir) {
   this.pending_width = undefined;
   var change = width - this.width;
   if (!change) return;
+  this.be.level.circuit_changed();
 
   var bigdir = (dir == 'top') ? -1 : 1;
   var dy = bigdir * change * this.be.io_spacing/2;
