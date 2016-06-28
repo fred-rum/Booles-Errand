@@ -62,7 +62,7 @@ function Circuit() {
   //
   // The width of div_truth is initially set to 8em purely so that I can
   // measure it.  It'll get resized to fit the truth table later.
-  var em_size = this.be.em_size = this.be.div_truth.width() / 8;
+  this.be.em_size = this.be.div_truth.width() / 8;
 
   // Drawing in cdraw, cdrag, and cbox, in terms of pixels, but the native size
   // of those pixels can vary from device to device.  For this reason, we
