@@ -377,8 +377,8 @@ Level.prototype.init_table = function() {
               $.proxy(this.row_leave, this, i));
     row.click($.proxy(this.row_click, this, i));
     row.dblclick($.proxy(this.row_dblclick, this, i));
-    this.be.bdrag.drag(row, this, 'truth',
-                       {dblclick: this.row_dblclick});
+//    this.be.bdrag.drag(row, this, 'truth',
+//                       {dblclick: this.row_dblclick});
 
     this.row_top.push(row.offset().top);
   }
