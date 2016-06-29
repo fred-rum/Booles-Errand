@@ -133,6 +133,13 @@ Drag.prototype.drag_start = function(x, y) {
   this.null_wire = null;
   this.disable_hover();
 
+  // If the drag started on an empty port or an output port, update_free_drag
+  // draws a tiny line which is mostly hidden by the handle, although some of
+  // it may stick out.  However, the more relevant case is when the drag
+  // started on a busy input port, in which case the entire wire being moved is
+  // highlighted.
+  this.update_free_drag(x, y);
+
   // No widths are actually updated here, but this step initializes
   // the pending_width values so that a later commit_widths() won't
   // fail.
