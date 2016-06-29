@@ -470,8 +470,6 @@ Level.prototype.update_hover = function() {
 };
 
 Level.prototype.row_click = function(row, event) {
-  $('#info').html('');
-  var time = Date.now ? Date.now() : (new Date().getTime());
   this.be.sim.click_pause();
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click) {
@@ -480,25 +478,26 @@ Level.prototype.row_click = function(row, event) {
       // current line is complete and passed.  Go ahead and advance to
       // the next line, rather than starting the sequence over.
       this.next_line();
-    } else if (this.row_click_time !== undefined) {
-      var delay = time - this.row_click_time;
-      $('#info').append('<p>delay = ' + delay + '</p>');
-      if ((delay > 0) && (delay < 500)) {
-        // The user is re-selecting the current line of a sequence after
-        // previously selecting it less than 500 milliseconds ago (as measured
-        // between mouseup/touchend events).  Interpret this as a double click.
-        this.be.sim.click_play();
-      }
-      // If the click occurred with greater delay, ignore it.  (But do record
-      // the new click timestamp, below.)
     }
+    // The other possibility is that row == old_row.  I.e. the user is
+    // re-selecting the current line of a sequence after previously selecting
+    // it.  This may be a double click, so this click is ignored here.
   } else {
     this.reset_sim();
     this.select_seq(this.row_seq[row]);
-    this.row_allows_simple_click = row;
+  }
+
+  var time = Date.now ? Date.now() : (new Date().getTime());
+  if (this.row_click_time !== undefined) {
+    var delay = time - this.row_click_time;
+    if ((delay > 0) && (delay < 500)) {
+      // The user is re-selecting the current line of a sequence after
+      // previously selecting it less than 500 milliseconds ago (as measured
+      // between mouseup/touchend events).  Interpret this as a double click.
+      this.be.sim.click_play();
+    }
   }
   this.row_click_time = time;
-  $('#info').append('<p>time = ' + time + '</p>');
 };
 
 Level.prototype.cur_row = function() {
