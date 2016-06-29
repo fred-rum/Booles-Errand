@@ -811,6 +811,14 @@ Circuit.prototype.load_data = function(key) {
   }
 };
 
+// The event.timeStamp property is unreliable in an undocumented way.  For
+// example, the click event on iOS always reports timeStamp = 0.  So instead of
+// trying to figure that out, we just get our own time stamp, which is also
+// measured in milliseconds.
+Circuit.prototype.now = function() {
+  return Date.now ? Date.now() : new Date().getTime();
+}
+
 // This is called as soon as the DOM is ready.  This function begins the game.
 $(window).on('load', function() {
 //$(function() {

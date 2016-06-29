@@ -487,7 +487,7 @@ Level.prototype.row_click = function(row, event) {
     this.select_seq(this.row_seq[row]);
   }
 
-  var time = Date.now ? Date.now() : (new Date().getTime());
+  var time = this.be.circuit.now();
   if (this.row_click_time !== undefined) {
     var delay = time - this.row_click_time;
     if ((delay > 0) && (delay < 500)) {

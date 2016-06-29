@@ -79,11 +79,12 @@ Bdrag.prototype.touchstart = function (data, event) {
   }
   if (this.dragging == 'mouse') return;
 
-  if (data.callbacks.dblclick && (e.timeStamp !== undefined)) {
+  var time = this.be.circuit.now();
+  if (data.callbacks.dblclick) {
     var tapdata = this.tapdata[data.type];
     if ((tapdata !== undefined) && (tapdata.jel == data.jel)) {
-      var delay = e.timeStamp - tapdata.timeStamp;
-      if ((delay < 500) && (delay > 0)) {
+      var delay = time - tapdata.timeStamp;
+      if ((delay > 0) && (delay < 500)) {
         data.callbacks.dblclick.call(data.context,
                                      e.changedTouches[0].pageX,
                                      e.changedTouches[0].pageY,
@@ -95,7 +96,7 @@ Bdrag.prototype.touchstart = function (data, event) {
     }
     this.tapdata[data.type] = {
       jel: data.jel,
-      timeStamp: e.timeStamp
+      timeStamp: time
     };
   }
 
