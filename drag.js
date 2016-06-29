@@ -105,6 +105,23 @@ Drag.prototype.commit_new_wires = function() {
 
 Drag.prototype.drag_start = function(x, y) {
   var io = this.closest_io(x, y);
+
+  // Check for a double click on the same IO.
+  var time = this.be.circuit.now();
+  if ((io == this.last_io) && (this.last_time !== undefined) && io.w.length) {
+    var delay = time - this.last_time;
+    if ((delay > 0) && (delay < 500)) {
+      // Double click detected.  Delete all wires connected to this IO.
+      while (io.w.length) {
+        io.w[0].remove();
+        this.be.level.save_progress();
+      }
+      this.be.level.update_widths();
+    }
+  }
+  this.last_io = io;
+  this.last_time = time;
+
   this.show_handle(this.el_handle1, io);
   $(document.body).addClass('cursor-force-default');
   this.snap_io = io;
@@ -124,6 +141,10 @@ Drag.prototype.drag_start = function(x, y) {
 
 Drag.prototype.drag_move = function(x, y) {
   var io = this.closest_io(x, y, true);
+
+  // Prevent a double click if the user drags off of the IO, even if she
+  // returns to it before the second click.
+  if (io != this.last_io) this.last_io = undefined;
 
   if (io != this.snap_io) {
     if (this.snap_io) this.snap_end(x, y, this.snap_io);
@@ -172,20 +193,6 @@ Drag.prototype.drag_end = function() {
 
   $(document.body).removeClass('cursor-force-default');
   this.enable_hover();
-};
-
-Drag.prototype.mouse_double_click = function(event) {
-  this.dblclick(event.pageX, event.pageY);
-};
-
-Drag.prototype.dblclick = function(x, y) {
-  var io = this.closest_io(x, y);
-  while (io.w.length > 0) {
-    io.w[0].remove();
-    this.be.level.save_progress();
-  }
-
-  this.be.level.update_widths();
 };
 
 Drag.prototype.hover_start = function(event) {
@@ -253,12 +260,10 @@ Drag.prototype.closest_io = function(x, y, limit) {
 };
 
 Drag.prototype.enable_drag = function(io) {
-  io.el_target.dblclick($.proxy(this.mouse_double_click, this));
   this.be.bdrag.drag($(io.el_target.node), this, 'cell',
                      {start: this.drag_start,
                       move: this.drag_move,
-                      end: this.drag_end,
-                      dblclick: this.dblclick});
+                      end: this.drag_end});
   io.el_target.hover($.proxy(this.hover_start, this),
                      $.proxy(this.hover_end, this));
   this.io_set.push(io);
@@ -268,7 +273,6 @@ Drag.prototype.disable_drag = function(io) {
   var el = $(io.el_target.node)
 
   this.be.bdrag.undrag(el);
-  io.el_target.undblclick();
   io.el_target.unhover();
 
   io.el_target.attr({cursor: 'not-allowed'});
@@ -280,7 +284,6 @@ Drag.prototype.disable_drag = function(io) {
 
 Drag.prototype.remove_io = function(io) {
   this.be.bdrag.undrag($(io.el_target.node));
-  io.el_target.undblclick();
   io.el_target.unhover();
 
   for (var i = 0; i < this.io_set.length; i++) {

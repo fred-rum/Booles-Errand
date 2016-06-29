@@ -72,33 +72,10 @@ Bdrag.prototype.mouseup = function (event) {
 Bdrag.prototype.touchstart = function (data, event) {
   var e = event.originalEvent || event;
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
-    if (data.type != 'cbox') {
-      event.preventDefault();
-    }
+    event.preventDefault();
     event.stopPropagation();
   }
   if (this.dragging == 'mouse') return;
-
-  var time = this.be.circuit.now();
-  if (data.callbacks.dblclick) {
-    var tapdata = this.tapdata[data.type];
-    if ((tapdata !== undefined) && (tapdata.jel == data.jel)) {
-      var delay = time - tapdata.timeStamp;
-      if ((delay > 0) && (delay < 500)) {
-        data.callbacks.dblclick.call(data.context,
-                                     e.changedTouches[0].pageX,
-                                     e.changedTouches[0].pageY,
-                                     data.extra);
-        // We allow processing to continue for the touch in case the
-        // user wants to drag out a new wire immediately from the
-        // double tap.
-      }
-    }
-    this.tapdata[data.type] = {
-      jel: data.jel,
-      timeStamp: time
-    };
-  }
 
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
     // It is possible for touchstart to be called with multiple touches
