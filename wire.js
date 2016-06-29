@@ -51,8 +51,6 @@ function Wire(be, io1, io2, pending_new, locked) {
   this.pending_del = false;
   this.newest_value = null;
   this.in_flight = [];
-
-  // this.measure_perf('not segmented');
 }
 
 
@@ -72,19 +70,6 @@ Wire.color = function(value, width) {
 
 
 // Public members
-
-Wire.prototype.measure_perf = function(name) {
-  if (!this.measured) this.measured = {};
-  if (this.measured[name]) return;
-  this.measured[name] = true;
-
-  var n0 = performance.now();
-  for (var i = 0; i < 1000; i++) {
-    this.redraw_fg();
-  }
-  var n1 = performance.now();
-  return n1-n0;
-};
 
 Wire.prototype.remove = function(removed_by_input_port) {
   this.o.disconnect(this);
@@ -222,7 +207,6 @@ Wire.prototype.tick = function(speed) {
   }
 
   this.redraw_fg();
-  //this.measure_perf('segmented');
 
   if (this.in_flight.length && !this.in_flight[0].held) {
     // There is still data in flight (that isn't being held), so
