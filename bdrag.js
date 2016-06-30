@@ -80,9 +80,9 @@ Bdrag.prototype.touchstart = function (data, event) {
 
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
     $('#info').html('');
-    $('#info').append('0 start target');
+    $('#info').append('x start target');
     this.touch_append(e.targetTouches);
-    $('#info').append('0 start changed');
+    $('#info').append('x start changed');
     this.touch_append(e.changedTouches);
 
     // It is possible for touchstart to be called with multiple touches
