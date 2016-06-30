@@ -29,7 +29,7 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
-  $('#info').append('mousedown<br>');
+  $('#info').append('mousedown' + event.which + '<br>');
   this.mousedown = true;
 
   // Accept only button 1 (if a button is specified).
@@ -61,6 +61,9 @@ Bdrag.prototype.mousemove = function (event) {
 
 Bdrag.prototype.mouseup = function (event) {
   this.dragging = false;
+
+  $('#info').append('mouseup<br>');
+  this.mousedown = false;
 
   var doc = $(document);
   doc.off('mousemove.booledrag');
