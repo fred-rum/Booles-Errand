@@ -1488,7 +1488,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Critical path',
    section: 'Arithmetic',
-   intro: '<p><b>Detect whether an odd number of bits of A are 1.</b></p><p>No path through the circuit may contain more than 3 logic gates.</p>',
+   intro: '<p><b>Detect whether an odd number of bits of A are 1.</b></p><p>No path through the circuit may contain more than 3 logic gates.</p><p>Tip: the condenser and expander are just bundles of wires, so they don\'t contribute toward the critical path.</p>',
    outro: '<p>The maximum number of gates through which logic must propagate is called the <i>critical path</i> length. This gives a rough measure of the speed of the circuit.</p>',
    hint: '<p>A cone of logic is faster than a linear chain of logic.</p>',
    soln: '1s2-0,o,2,i;140,expander8,0+o0,6,i1+o1,6,i0+o2,5,i1+o3,5,i0+o4,4,i1+o5,4,i0+o6,3,i1+o7,3,i0;280,xor,-60+o,7,i0;280,xor,-20+o,7,i1;280,xor,20+o,8,i0;280,xor,60+o,8,i1;420,xor,-40+o,9,i0;420,xor,40+o,9,i1;560,xor,0+o,1,i',
@@ -1532,7 +1532,7 @@ Level.prototype.puzzle = [
   }
 ,
   {name: 'Increment',
-   intro: '<p><b>Z = A + 1.</b></p><p>No path through the circuit may contain more than 5 logic gates. For simplicity, the full adder cell is counted as a single gate.</p>',
+   intro: '<p><b>Z = A + 1.</b></p><p>No path through the circuit may contain more than 3 logic gates.</p>',
    outro: '<p>When performing arithmetic on binary values, you must pay attention to the range of potential output values. This range determines the necessary width of the output bus.</p>',
    hint: ['<p>Boolean arithmetic is just like decimal arithmetic, except that instead of carrying a 1 to the next digit when the result exceeds 9, you carry a 1 to the next bit when the result exceeds 1.</p>',
           '<p>The carry chain is key to incrementing. Once you know whether to add 1 to a particular bit of A, the actual addition is trivial.</p>'],
