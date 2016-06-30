@@ -182,7 +182,7 @@ body {
     background-clip: padding-box;
     border-right-style: dotted;
     border-width: thin;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     z-index: 2;
     -webkit-user-select: none;  /* Chrome all / Safari all */
