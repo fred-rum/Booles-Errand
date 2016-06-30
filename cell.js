@@ -1569,8 +1569,9 @@ Cell.prototype.push_el = function(el, type) {
     this.el_s.push(el);
   }
 
-  if ((type == 'drag_cell') ||
-      ((type == 'drag_cbox') && (this.canvas_type == 'cbox'))) {
+  if ((this.canvas_type != 'cdrag') &&
+      ((type == 'drag_cell') ||
+       ((type == 'drag_cbox') && (this.canvas_type == 'cbox')))) {
     // This el captures cell drag events.
     this.el_cell_drag.push(el);
     this.be.bdrag.drag($(el.node), this, 'cell',
@@ -1579,7 +1580,7 @@ Cell.prototype.push_el = function(el, type) {
                         end: this.cell_drag_end},
                        undefined,
                        (type == 'drag_cbox')); // ignore touch events if true
-  } else if (type != 'drag_other') {
+  } else if ((this.canvas_type == 'cdrag') || (type != 'drag_other')) {
     // This el passes through mouse/touch events.
     el.setAttr('pointer-events', 'none');
   }
