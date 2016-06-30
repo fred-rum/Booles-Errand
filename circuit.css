@@ -171,6 +171,10 @@ body {
     height: 100%;
     width: 8em; /* resized in Javascript to match cbox + border */
     z-index: -1;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+    user-select: none;          /* Likely future */      
 }
 #cbox {
     position: fixed;
