@@ -29,7 +29,7 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
-  $('#info').append('mousedown<br>');
+  $('#info').append('mousedown');
   this.mousedown = true;
 
   // Accept only button 1 (if a button is specified).
@@ -79,20 +79,15 @@ Bdrag.prototype.touchstart = function (data, event) {
     event.stopPropagation();
     event.stopImmediatePropagation();
   }
-
-  if (this.dragging == 'mouse'){
-    if (this.mousedown)$('#info').append('killed by mousedown<br>');
-    this.mousedown = false;
-    return;
-  }
+  if (this.dragging == 'mouse') return;
 
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
     $('#info').html('');
-    if (this.mousedown)$('#info').append('was mousedown<br>');
+    if (this.mousedown)$('#info').append('was mousedown');
     this.mousedown = false;
-    $('#info').append('2 start target');
+    $('#info').append('1 start target');
     this.touch_append(e.targetTouches);
-    $('#info').append('2 start changed');
+    $('#info').append('1 start changed');
     this.touch_append(e.changedTouches);
 
     // It is possible for touchstart to be called with multiple touches
