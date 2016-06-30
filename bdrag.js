@@ -74,6 +74,7 @@ Bdrag.prototype.touchstart = function (data, event) {
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
   }
   if (this.dragging == 'mouse') return;
 
