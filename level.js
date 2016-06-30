@@ -471,6 +471,7 @@ Level.prototype.update_hover = function() {
 
 Level.prototype.row_click = function(row, event) {
   this.be.sim.click_pause();
+  var seq = this.row_seq[row];
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click) {
     if (row == old_row + 1) {
@@ -484,20 +485,22 @@ Level.prototype.row_click = function(row, event) {
     // it.  This may be a double click, so this click is ignored here.
   } else {
     this.reset_sim();
-    this.select_seq(this.row_seq[row]);
+    this.select_seq(seq);
   }
 
   var time = this.be.circuit.now();
-  if (this.row_click_time !== undefined) {
-    var delay = time - this.row_click_time;
-    if ((delay > 0) && (delay < 500)) {
-      // The user is re-selecting the current step of a sequence after
-      // previously selecting it less than 500 milliseconds ago (as measured
-      // between mouseup/touchend events).  Interpret this as a double click.
-      this.be.sim.click_play();
-    }
+  var delay = time - this.row_click_time;
+  if ((seq === this.row_click_seq) && (this.row_click_time !== undefined) &&
+      (delay > 0) && (delay < 500)) {
+    // The user is re-selecting the current step of a sequence after
+    // previously selecting it less than 500 milliseconds ago (as measured
+    // between mouseup/touchend events).  Interpret this as a double click.
+    this.be.sim.click_play();
+    this.row_click_time = undefined;
+  } else {
+    this.row_click_time = time;
+    this.row_click_seq = seq;
   }
-  this.row_click_time = time;
 };
 
 Level.prototype.cur_row = function() {
