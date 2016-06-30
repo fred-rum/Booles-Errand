@@ -29,9 +29,6 @@ Bdrag.prototype.undrag = function (jel) {
 };
 
 Bdrag.prototype.mousedown = function (data, event) {
-  $('#info').append('mousedown');
-  this.mousedown = true;
-
   // Accept only button 1 (if a button is specified).
   if ((event.which !== undefined) && (event.which != 1)) return;
 
@@ -83,11 +80,9 @@ Bdrag.prototype.touchstart = function (data, event) {
 
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
     $('#info').html('');
-    if (this.mousedown)$('#info').append('was mousedown');
-    this.mousedown = false;
-    $('#info').append('1 start target');
+    $('#info').append('0 start target');
     this.touch_append(e.targetTouches);
-    $('#info').append('1 start changed');
+    $('#info').append('0 start changed');
     this.touch_append(e.changedTouches);
 
     // It is possible for touchstart to be called with multiple touches
