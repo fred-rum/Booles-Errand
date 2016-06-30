@@ -90,9 +90,9 @@ Bdrag.prototype.touchstart = function (data, event) {
     $('#info').html('');
     if (this.mousedown)$('#info').append('was mousedown<br>');
     this.mousedown = false;
-    $('#info').append('4 start target');
+    $('#info').append('3 start target');
     this.touch_append(e.targetTouches);
-    $('#info').append('start changed');
+    $('#info').append('3 start changed');
     this.touch_append(e.changedTouches);
 
     // It is possible for touchstart to be called with multiple touches
@@ -171,10 +171,6 @@ Bdrag.prototype.touch_append = function (touches) {
 // necessary since the iPad doesn't send proper changedTouches when
 // two touches end at once.)
 Bdrag.prototype.touchmoveetc = function (event) {
-  event.preventDefault();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-
   var e = event.originalEvent || event;
   // The touch types are processed in a certain order so that changes
   // to the canvas are made before cell dragging is updated.
