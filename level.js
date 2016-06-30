@@ -274,7 +274,7 @@ Level.prototype.begin = function(level_num) {
   // correspondingly set up the initial input values and output
   // (expected) values.
   this.cur_seq = 0;
-  this.cur_line = 0;
+  this.cur_step = 0;
   this.select_seq(0);
 
   this.be.sim.begin_level(level.hide.speed, this.sequenced);
@@ -336,7 +336,7 @@ Level.prototype.init_table = function() {
   html.push('<th class="check"></th></tr>');
   var num_rows = 0;
   this.row_seq = [];
-  this.row_line = [];
+  this.row_step = [];
   for (var i = 0; i < level.truth.length; i++) {
     if (Array.isArray(level.truth[i])) {
       if (level.truth[i].length > 1) this.sequenced = true;
@@ -348,20 +348,20 @@ Level.prototype.init_table = function() {
     var truth_seq = level.truth[i];
     truth_seq.first_row = num_rows;
     for (var j = 0; j < truth_seq.length; j++) {
-      var last_line = (j == truth_seq.length - 1);
+      var last_step = (j == truth_seq.length - 1);
       html.push('<tr class="truthbody" id="row', num_rows, '">');
       if (truth_seq[j].rnd) {
         truth_seq[j] = {rnd: truth_seq[j].rnd, full: truth_seq[j].full};
-        this.table_line_rnd(html, last_line);
+        this.table_line_rnd(html, last_step);
       } else {
-        this.table_line(html, this.input_names, truth_seq[j], last_line);
-        this.table_line(html, this.output_names, truth_seq[j], last_line);
+        this.table_line(html, this.input_names, truth_seq[j], last_step);
+        this.table_line(html, this.output_names, truth_seq[j], last_step);
       }
       this.table_blank_check(html, num_rows);
       html.push('</tr>');
       this.row_result.push(undefined);
       this.row_seq.push(i);
-      this.row_line.push(j);
+      this.row_step.push(j);
       num_rows++;
     }
   }
@@ -399,25 +399,25 @@ Level.prototype.table_header = function(html, port_names) {
   }
 };
 
-Level.prototype.table_line_rnd = function(html, span, last_line) {
+Level.prototype.table_line_rnd = function(html, span, last_step) {
   var span = this.input_names.length + this.output_names.length;
   html.push('<td class="tdlr tdb" colspan="', span, '">random</td>');
 };
 
-Level.prototype.table_line = function(html, port_names, truth_line, last_line) {
+Level.prototype.table_line = function(html, port_names, truth_step, last_step) {
   for (var i = 0; i < port_names.length; i++) {
     html.push('<td');
-    this.push_padding(html, i, port_names.length, last_line);
+    this.push_padding(html, i, port_names.length, last_step);
     html.push('>');
-    if (truth_line[port_names[i]] !== undefined) {
-      html.push(truth_line[port_names[i]]);
+    if (truth_step[port_names[i]] !== undefined) {
+      html.push(truth_step[port_names[i]]);
     }
     html.push('</td>');
   }
 };
 
-Level.prototype.push_padding = function(html, i, num, last_line) {
-  var tdb = last_line ? ' tdb' : '';
+Level.prototype.push_padding = function(html, i, num, last_step) {
+  var tdb = last_step ? ' tdb' : '';
   if (i == 0) {
     if (i < num-1) {
       html.push(' class="tdl', tdb, '"');
@@ -426,7 +426,7 @@ Level.prototype.push_padding = function(html, i, num, last_line) {
     }
   } else if (i == num-1) {
     html.push(' class="tdr', tdb, '"');
-  } else if (last_line) {
+  } else if (last_step) {
     html.push(' class="tdb"');
   }
 };
@@ -474,13 +474,13 @@ Level.prototype.row_click = function(row, event) {
   var old_row = this.cur_row();
   if (row === this.row_allows_simple_click) {
     if (row == old_row + 1) {
-      // The user is selecting the next line of a sequence, and the
-      // current line is complete and passed.  Go ahead and advance to
-      // the next line, rather than starting the sequence over.
-      this.next_line();
+      // The user is selecting the next step of a sequence, and the
+      // current step is complete and passed.  Go ahead and advance to
+      // the next step, rather than starting the sequence over.
+      this.next_step();
     }
     // The other possibility is that row == old_row.  I.e. the user is
-    // re-selecting the current line of a sequence after previously selecting
+    // re-selecting the current step of a sequence after previously selecting
     // it.  This may be a double click, so this click is ignored here.
   } else {
     this.reset_sim();
@@ -491,7 +491,7 @@ Level.prototype.row_click = function(row, event) {
   if (this.row_click_time !== undefined) {
     var delay = time - this.row_click_time;
     if ((delay > 0) && (delay < 500)) {
-      // The user is re-selecting the current line of a sequence after
+      // The user is re-selecting the current step of a sequence after
       // previously selecting it less than 500 milliseconds ago (as measured
       // between mouseup/touchend events).  Interpret this as a double click.
       this.be.sim.click_play();
@@ -501,14 +501,14 @@ Level.prototype.row_click = function(row, event) {
 };
 
 Level.prototype.cur_row = function() {
-  return this.level.truth[this.cur_seq].first_row + this.cur_line;
+  return this.level.truth[this.cur_seq].first_row + this.cur_step;
 }
 
 Level.prototype.select_row = function(row) {
   $('#row' + this.cur_row()).css({'background-color': ''});
   $('#row' + row).css({'background-color': '#ff8'});
   this.cur_seq = this.row_seq[row];
-  this.cur_line = this.row_line[row];
+  this.cur_step = this.row_step[row];
   this.update_hover();
   this.update_pins();
 };
@@ -518,7 +518,7 @@ Level.prototype.select_seq = function(seq) {
   this.select_row(this.level.truth[seq].first_row);
 };
 
-Level.prototype.next_line = function() {
+Level.prototype.next_step = function() {
   this.not_done();
   this.select_row(this.cur_row() + 1);
 };
@@ -563,7 +563,7 @@ Level.prototype.fast_test = function() {
 Level.prototype.truth_can_find_bug = function() {
   // This function manipulates this.cur_seq to test different rows.
   // We save the original value so that we can restore it when we're
-  // done.  this.cur_line is guaranteed to be 0 for a random row, so
+  // done.  this.cur_step is guaranteed to be 0 for a random row, so
   // it does need to be modified or restored.
   var cur_seq = this.cur_seq;
 
@@ -621,7 +621,7 @@ Level.prototype.init_random_row = function(truth_obj) {
 };
 
 Level.prototype.update_pins = function() {
-  var truth_obj = this.level.truth[this.cur_seq][this.cur_line];
+  var truth_obj = this.level.truth[this.cur_seq][this.cur_step];
   if (truth_obj.rnd && !truth_obj.initialized) {
     this.init_random_row(truth_obj)
   }
@@ -676,7 +676,7 @@ Level.prototype.update_box_quantity = function(type, change) {
 };
 
 Level.prototype.value = function(name) {
-  return this.level.truth[this.cur_seq][this.cur_line][name];
+  return this.level.truth[this.cur_seq][this.cur_step][name];
 };
 
 Level.prototype.add_cell = function(cell) {
@@ -928,11 +928,11 @@ Level.prototype.circuit_changed = function() {
     this.record_result(i, undefined);
     var i_seq = this.row_seq[i];
     if (i_seq != this.cur_seq) {
-      var i_line = this.row_line[i];
+      var i_step = this.row_step[i];
       var truth_seq = this.level.truth[i_seq];
-      var old_obj = truth_seq[i_line];
+      var old_obj = truth_seq[i_step];
       if (old_obj.rnd) {
-        truth_seq[i_line] = {rnd: old_obj.rnd, full: old_obj.full};
+        truth_seq[i_step] = {rnd: old_obj.rnd, full: old_obj.full};
         var html = [];
         this.table_line_rnd(html, true);
         this.table_blank_check(html, i);
@@ -966,10 +966,10 @@ Level.prototype.done = function() {
 
   if (!result) return 'fail';
 
-  if (this.cur_line < this.level.truth[this.cur_seq].length - 1) {
+  if (this.cur_step < this.level.truth[this.cur_seq].length - 1) {
     this.row_allows_simple_click = this.cur_row() + 1;
     this.update_hover();
-    return 'line';
+    return 'step';
   }
 
   if (this.first_failed_seq() !== null) return 'seq';
@@ -992,8 +992,8 @@ Level.prototype.done = function() {
 };
 
 Level.prototype.advance_truth = function(type) {
-  if (type == 'line') {
-    this.next_line();
+  if (type == 'step') {
+    this.next_step();
   } else {
     // There is guaranteed to be a failed sequence somewhere, or we
     // wouldn't be here.

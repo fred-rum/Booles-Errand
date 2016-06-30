@@ -17,7 +17,7 @@ function Sim(be) {
 
   this.pause_at = 'done';
   $('#pause-at-gate').click($.proxy(this.click_pause_at, this, 'gate'));
-  $('#pause-at-line').click($.proxy(this.click_pause_at, this, 'line'));
+  $('#pause-at-step').click($.proxy(this.click_pause_at, this, 'step'));
   $('#pause-at-seq').click($.proxy(this.click_pause_at, this, 'seq'));
   $('#pause-at-done').click($.proxy(this.click_pause_at, this, 'done'));
 
@@ -182,12 +182,12 @@ Sim.prototype.done = function(fresh_play) {
     this.be.level.advance_truth(pass_status);
   } else if ((this.pause_at == 'done') ||
              ((this.pause_at == 'seq') && (pass_status != 'seq'))) {
-    // Delay briefly, then continue to the next line or seq.
+    // Delay briefly, then continue to the next step or seq.
     this.delay_timer = setTimeout($.proxy(this.be.level.advance_truth,
                                           this.be.level, pass_status),
                                   Math.min(2000, 1000/this.speed));
   } else {
-    // Pause-at-line or pause-at-seq.
+    // Pause-at-step or pause-at-seq.
     this.click_pause();
   }
 };
