@@ -79,6 +79,12 @@ Bdrag.prototype.touchstart = function (data, event) {
   if (this.dragging == 'mouse') return;
 
   if (data.callbacks.start || data.callbacks.move || data.callbacks.end) {
+    $('#info').html('');
+    $('#info').append('start target');
+    this.touch_append(e.targetTouches);
+    $('#info').append('start changed');
+    this.touch_append(e.changedTouches);
+
     // It is possible for touchstart to be called with multiple touches
     // at once, as long as they are all on the same object.  Normally,
     // we accept only the first, but we accept up to two for a pinch.
@@ -106,8 +112,8 @@ Bdrag.prototype.touchstart = function (data, event) {
       if (!this.dragging) {
         var doc = $(document);
         doc.on('touchmove.booledrag', $.proxy(this.touchmove, this));
-        doc.on('touchend.booledrag', $.proxy(this.touchmove, this));
-        doc.on('touchcancel.booledrag', $.proxy(this.touchmove, this));
+        doc.on('touchend.booledrag', $.proxy(this.touchend, this));
+        doc.on('touchcancel.booledrag', $.proxy(this.touchcancel, this));
       }
       this.dragging = 'touch';
 
@@ -122,11 +128,39 @@ Bdrag.prototype.touchstart = function (data, event) {
   }
 };
 
+Bdrag.prototype.touchmove = function (event) {
+  var e = event.originalEvent || event;
+  $('#info').append('move');
+  this.touch_append(e.touches);
+  this.touchmoveetc(event);
+};
+
+Bdrag.prototype.touchend = function (event) {
+  var e = event.originalEvent || event;
+  $('#info').append('end');
+  this.touch_append(e.touches);
+  this.touchmoveetc(event);
+};
+
+Bdrag.prototype.touchcancel = function (event) {
+  var e = event.originalEvent || event;
+  $('#info').append('cancel');
+  this.touch_append(e.touches);
+  this.touchmoveetc(event);
+};
+
+Bdrag.prototype.touch_append = function (touches) {
+  for (var j = 0; j < touches.length; j++) {
+    $('#info').append(' ' + touches[j].identifier);
+  }
+  $('#info').append('<br>');
+};
+
 // touchmove also handles touchend and touchcancel by looking for
 // touches that are no longer present.  (Some form of this is
 // necessary since the iPad doesn't send proper changedTouches when
 // two touches end at once.)
-Bdrag.prototype.touchmove = function (event) {
+Bdrag.prototype.touchmoveetc = function (event) {
   var e = event.originalEvent || event;
   // The touch types are processed in a certain order so that changes
   // to the canvas are made before cell dragging is updated.
