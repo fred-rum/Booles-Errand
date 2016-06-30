@@ -81,7 +81,7 @@ Bdrag.prototype.touchstart = function (data, event) {
   }
 
   if (this.dragging == 'mouse'){
-    if (this.mousedown)$('#info').append('killed by mousedown<br>');
+    if (this.mousedown) $('#info').append('killed by mousedown<br>');
     this.mousedown = false;
     return;
   }
@@ -90,9 +90,9 @@ Bdrag.prototype.touchstart = function (data, event) {
     $('#info').html('');
     if (this.mousedown)$('#info').append('was mousedown<br>');
     this.mousedown = false;
-    $('#info').append('2 start target');
+    $('#info').append('3 start target');
     this.touch_append(e.targetTouches);
-    $('#info').append('2 start changed');
+    $('#info').append('3 start changed');
     this.touch_append(e.changedTouches);
 
     // It is possible for touchstart to be called with multiple touches
