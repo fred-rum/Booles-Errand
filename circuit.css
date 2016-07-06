@@ -105,6 +105,9 @@ body {
     max-height: 30vh;
     z-index: 101;
 }
+sup {
+    line-height: 0; /* Prevent extra space above a line with a superscript */
+}
 #info-stub {
     position: fixed;
     display: none;

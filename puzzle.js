@@ -1570,6 +1570,78 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Gray encoding',
+   intro: '<p>There are circuit scenarios where it is beneficial to change only one bit at a time of a multi-bit value. In this case, a <i>Gray code</i> is often used. In a sequence of values in the Gray code, the next number flips the smallest bit (nearest 2<sup>0</sup>) which would not repeat a previous value.</p><p><b>Convert the input binary values into Gray codes.</b></p>',
+   outro: '<p>If you were toggling values into the front panel, which sequence would you rather use?</p>',
+   soln: '1s2-0,o,2,i;100,expander4,0+o0,6,i1+o1,5,i1+o1,6,i0+o2,4,i1+o2,5,i0+o3,3,i3+o3,4,i0;900,condenser4,0+o,1,i;500,xor,10+o,3,i2;500,xor,60+o,3,i1;500,xor,110+o,3,i0',
+   truth: [{a:0,   z:0},
+           {a:1,   z:1},
+           {a:2,   z:3},
+           {a:3,   z:2},
+           {a:4,   z:6},
+           {a:5,   z:7},
+           {a:6,   z:5},
+           {a:7,   z:4},
+           {a:8,   z:12},
+           {a:9,   z:13},
+           {a:10,   z:15},
+           {a:11,   z:14},
+           {a:12,   z:10},
+           {a:13,   z:11},
+           {a:14,   z:9},
+           {a:15,   z:8}],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         width: 4,
+         x: 1000,
+         y: 0
+         }
+   }
+  }
+,
+  {name: 'Gray decoding',
+   intro: '<p><b>Convert the input Gray codes back into regular binary values.</b></p>',
+   outro: '<p>What is encoded must eventually be decoded.</p>',
+   soln: '1s2-0,o,3,i;900,condenser4,0+o,1,i;100,expander4,0+o0,6,i1+o1,5,i1+o2,4,i1+o3,2,i3+o3,4,i0;400,xor,10+o,2,i2+o,5,i0;550,xor,60+o,2,i1+o,6,i0;700,xor,110+o,2,i0',
+   truth: [{a:0,   z:0},
+           {a:1,   z:1},
+           {a:2,   z:3},
+           {a:3,   z:2},
+           {a:4,   z:7},
+           {a:5,   z:6},
+           {a:6,   z:4},
+           {a:7,   z:5},
+           {a:8,   z:15},
+           {a:9,   z:14},
+           {a:10,   z:12},
+           {a:11,   z:13},
+           {a:12,   z:8},
+           {a:13,   z:9},
+           {a:14,   z:11},
+           {a:15,   z:10}],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         width: 4,
+         x: 1000,
+         y: 0
+         }
+   }
+  }
+,
   {name: 'Full adder',
    intro: '<p>When performing a bit-by-bit addition of A+B, most bits require also adding the carry from the previous bit. This can be made easier by creating a <i>full adder</i> module to <b>add a single bit of A+B+C<sub>in</sub> to get a single-bit sum (S) and a carry out (C<sub>out</sub>).</b></p>',
    outro: '<p>Seven gates is good. Five is excellent.</p>',
