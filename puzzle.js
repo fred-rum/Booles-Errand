@@ -1642,6 +1642,44 @@ Level.prototype.puzzle = [
    }
   }
 ,
+  {name: 'Gray increment',
+   intro: '<p><b>Increment a Gray-code value to the next Gray-code value.</b></p><p>No path through the circuit may contain more than 4 logic gates.</p>',
+   outro: '<p>Excellent!</p>',
+   hint: ['<p>The logic must decide for each bit whether to flip that bit\'s value.</p>',
+          '<p>Whether to flip a bit\'s value depends greatly on how many bits are 1.<p>'],
+   soln: '1s2-0,o,2,i;100,expander4,0+o0,9,i+o0,4,i1+o0,10,i+o0,13,i0+o1,11,i0+o1,4,i0+o1,14,i0+o1,12,i0+o2,5,i1+o2,6,i1+o2,7,i+o3,8,i+o3,5,i0+o3,15,i1;900,condenser4,0+o,1,i;350,nor,-170+o,6,i0;350,xnor,210+o,14,i1+o,13,i1;480,and,-160+o,15,i0;460,inv,-70+o,16,i0;460,inv,-25+o,17,i0;460,inv,50+o,11,i1;460,inv,120+o,12,i1;570,and,20+o,17,i1+o,16,i1;570,and,110+o,18,i0;570,and,200+o,18,i1;570,xor,270+o,3,i0;640,or,-150+o,3,i3;680,nor,-75+o,19,i0;700,and,0+o,19,i1;680,or,120+o,3,i1;800,or,-10+o,3,i2',
+   max_path: 4,
+   truth: [{a:0,   z:1},
+           {a:1,   z:3},
+           {a:3,   z:2},
+           {a:2,   z:6},
+           {a:6,   z:7},
+           {a:7,   z:5},
+           {a:5,   z:4},
+           {a:4,   z:12},
+           {a:12,  z:13},
+           {a:13,  z:15},
+           {a:15,  z:14},
+           {a:14,  z:10},
+           {a:10,  z:11},
+           {a:11,  z:9},
+           {a:9,   z:8}],
+   avail: ['expander', 'condenser', 'inv', 'and', 'nand', 'or', 'nor', 'xor', 'xnor'],
+   cells: {
+     a: {type: 'input',
+         width: 4,
+         x: 0,
+         y: 0
+        }
+     ,
+     z: {type: 'output',
+         width: 4,
+         x: 1000,
+         y: 0
+         }
+   }
+  }
+,
   {name: 'Full adder',
    intro: '<p>When performing a bit-by-bit addition of A+B, most bits require also adding the carry from the previous bit. This can be made easier by creating a <i>full adder</i> module to <b>add a single bit of A+B+C<sub>in</sub> to get a single-bit sum (S) and a carry out (C<sub>out</sub>).</b></p>',
    outro: '<p>Seven gates is good. Five is excellent.</p>',
