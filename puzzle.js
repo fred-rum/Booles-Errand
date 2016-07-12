@@ -2094,6 +2094,7 @@ Level.prototype.puzzle = [
             {e:1, d:0,   q:0},
             {e:0, d:0,   q:0},
             {e:0, d:1,   q:0}]],
+   avail: [],
    cells: {
      e: {type: 'input',
          x: 0,
@@ -2434,7 +2435,7 @@ Level.prototype.puzzle = [
 ,
   {name: 'Build a D flip-flop',
    intro: '<p>Sequential circuits are typically built around an oscillating clock signal. The clock cannot simply be used as the enable to a D latch because doing so would allow values to propagate all the way through the circuit while the clock is high.</p><p><b>Design a circuit that transmits the D input to the Q output only as the CLK signal transitions from 0 to 1.</b></p>',
-   outro: '<p>This circuit is called a D flip-flop. If you used a chained pair of latches, it is a master-slave D flip-flop.</p>',
+   outro: '<p>This circuit is called a D flip-flop. The name refers to the two-step process of data transfer through the latches. If you used a chained pair of latches, it is a master-slave D flip-flop.</p>',
    hint: ['<p>If you use a D latch as the final storage element, you still need to prevent the output from changing value while the latch is transparent. That means that the latch\'s D input needs to be held constant while E is 1 to prevent the output from changing value.</p>',
          '<p>Use two latches in series with opposite polarity enables.</p>',
          '<p>Make sure that the first latch meets the hold time requirement of the second.</p>'],
@@ -2527,6 +2528,31 @@ Level.prototype.puzzle = [
        x: 600,
        y: 100
      }
+   }
+  }
+,
+  {name: 'The D flip-flop',
+   section: 'Introduction to flops',
+   intro: '<p>A <i>D flip-flop</i> (often called simply a <i>flop</i>) is the easiest storage element to design with. It passes its D (data) input to its Q output only at the moment when its clock input changes from 0 to 1.</p><p>For this series of challenges, we\'ll use an implicit clock so that you don\'t have to worry about set-up and hold constraints. The implicit clock changes from 0 to 1 and then back to 0 once for each sequence step in the truth table.</p>',
+   outro: '<p>Without extra logic, the D flip-flop holds its value for only one clock cycle, then gets a new value in the next clock cycle.  However, as with a D latch, logic can be put around the flop to recirculate a data value for as long as you need it.</p>',
+   truth: [[{d:0,      },
+            {d:1,   q:0},
+            {d:0,   q:1},
+            {d:0,   q:0},
+            {d:1,   q:0},
+            {d:1,   q:1},
+            {       q:1}]],
+   avail: ['flop'],
+   cells: {
+     d: {type: 'input',
+         x: 0,
+         y: 0
+        }
+     ,
+     q: {type: 'output',
+         x: 300,
+         y: 0
+        }
    }
   }
 ];

@@ -524,6 +524,13 @@ Level.prototype.select_seq = function(seq) {
 Level.prototype.next_step = function() {
   this.not_done();
   this.select_row(this.cur_row() + 1);
+
+  for (var i = 0; i < this.all_cells.length; i++) {
+    var cell = this.all_cells[i];
+    if (cell.type == 'flop') {
+      cell.advance_flop();
+    }
+  }
 };
 
 // Profiling suggests that 65536 calls of fast_test() take about half

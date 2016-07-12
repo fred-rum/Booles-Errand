@@ -409,15 +409,22 @@ Cell.prototype.calc_latch = function() {
   var d = this.io.d.value;
   var e = this.io.e.value;
   if (e === 1) {
-    if (d === undefined) {
-      this.io.q.propagate_output(undefined);
-    } else {
-      this.io.q.propagate_output(d);
-    }
+    this.io.q.propagate_output(d);
+  } else if ((e === undefined) && (d !== this.io.q.value)) {
+    this.io.q.propagate_output(undefined);
   } else {
     // Don't propagate a value (leave the output unchanged)
     // if E is 0 or undefined.
   }
+};
+
+Cell.prototype.calc_flop = function() {
+  // Nothing happens when the input value changes.
+  // advance_flop() is called when the implicit clock advances.
+};
+
+Cell.prototype.advance_flop = function() {
+  this.io.q.propagate_output(this.io.d.value);
 };
 
 Cell.prototype.calc_condenser = function() {
@@ -1279,6 +1286,37 @@ Cell.prototype.init_latch = function() {
   left += this.be.stroke_cell_fg;
   this.add_label('D', 'start', left, -this.be.io_spacing);
   this.add_label('E', 'start', left, 0);
+
+  right -= this.be.stroke_cell_fg;
+  this.add_label('Q', 'end', right, -this.be.io_spacing);
+};
+
+Cell.prototype.init_flop = function() {
+  var height = 3*this.be.io_spacing;
+  var width = 2*this.be.io_spacing;
+  var left = -width/2;
+  var right = width/2;
+  var top = -height/2;
+
+  this.io.d = new Io(this.be, this.canvas, this, 'd', 'input',
+                     left - this.be.stub_len, -this.be.io_spacing, left);
+  this.io.q = new Io(this.be, this.canvas, this, 'q', 'output',
+                     right + this.be.stub_len, -this.be.io_spacing, right);
+
+  this.qty_cx = this.io.q.x;
+  this.qty_top = this.io.q.y + this.be.io_spacing * 2;
+
+  var cell_path = ['M', left, this.be.io_spacing * 2/3,
+                   'l', this.be.io_spacing * 1/3, this.be.io_spacing * 1/3,
+                   'l', -this.be.io_spacing * 1/3, this.be.io_spacing * 1/3,
+                  ];
+  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_bg_attr), 'drag_cell');
+  this.draw_stubs();
+  this.push_el(this.canvas.rect(left, top, width, height).attr(this.cell_fg_attr), 'mark_del');
+  this.push_el(this.canvas.path(cell_path).attr(this.cell_fg_line_attr), 'mark_del');
+
+  left += this.be.stroke_cell_fg;
+  this.add_label('D', 'start', left, -this.be.io_spacing);
 
   right -= this.be.stroke_cell_fg;
   this.add_label('Q', 'end', right, -this.be.io_spacing);
